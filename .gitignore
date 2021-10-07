@@ -1,0 +1,12 @@
+.DS_Store
+venv
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+credentials.json
+.idea
+.vscode/
+env/
+.envrc
+*.iml
