@@ -7,11 +7,11 @@
 
 ## Run the sample
 
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2FGPS-Demos%2FRADLab&cloudshell_git_branch=main)
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/rad-lab&cloudshell_git_branch=main)
 
 ## Steps to Install RAD Lab Pre-requisites
 
-1. [Download](https://github.com/GPS-Demos/radlab/archive/refs/heads/main.zip) the Complete directory structure & its files on your **Cloud Shell** or Localhost.
+1. [Download](https://github.com/GoogleCloudPlatform/rad-lab/archive/refs/heads/main.zip) the Complete directory structure & its files on your **Cloud Shell** or Localhost.
 
 NOTE: Alternatively if you want to deploy using the above **Open in Cloud Shell** button you will need to set up GitHup Personal Access Token following [these steps](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) and skip 1. Enter you GitHib credentials. (Enter your Personal Access Token for the password)
 
