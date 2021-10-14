@@ -1,0 +1,34 @@
+# Code owners file.
+# This file controls who is tagged for review for any given pull request.
+
+# The gps-demos team is the default owner for anything not
+# explicitly taken by someone else.
+
+*       @GoogleCloudPlatform/gps-demos
+
+# Below are the owners if specific folders and its files 
+# directory in the root of your repository and any of its
+# subdirectories.
+/docs/                          @agussman @BrianReevz @debakkerb @guptamukul-google
+
+/modules/                       @debakkerb @guptamukul-google @debakkerb
+
+/scripts/                       @guptamukul-google
+
+/scripts/gcp-ai-notebook-tools/ @hradhakrishnan
+
+/scripts/notebooks-playground/  @hradhakrishnan
+
+/tools/                         @guptamukul-google
+
+# Below are the owners of individual file types
+
+*.tf    @debakkerb @guptamukul-google
+
+*.py    @guptamukul-google
+
+*.txt   @guptamukul-google
+
+*.sh    @debakkerb @guptamukul-google @hradhakrishnan
+
+*.md    @agussman @BrianReevz @debakkerb @guptamukul-google @hradhakrishnan
