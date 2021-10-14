@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 
-/**
-* Declaring Variables
-*/
+variable "billing_account_id" {
+  description = "Billing Account associated to the GCP Resources"
+  type        = string
+}
 
-variable "random_id" {
-  description = "Adds a suffix of 4 random characters to the `project_id`"
+variable "boot_disk_size_gb" {
+  description = "The size of the boot disk in GB attached to this instance"
+  type        = number
+  default     = 100
+}
+
+variable "boot_disk_type" {
+  description = "Disk types for notebook instances"
+  type        = string
+  default     = "PD_SSD"
+}
+
+variable "domain" {
+  description = "Display Name of Organization where GCP Resources need to get spin up"
   type        = string
   default     = ""
 }
@@ -30,46 +43,10 @@ variable "file_path" {
   default     = ""
 }
 
-variable "organization_id" {
-  description = "Organization ID where GCP Resources need to get spin up"
-  type        = string
-  default     = ""
-}
-
-variable "domain" {
-  description = "Display Name of Organization where GCP Resources need to get spin up"
-  type        = string
-  default     = ""
-}
-
 variable "folder_id" {
   description = "Folder ID in which GCP Resources need to get spin up"
   type        = string
   default     = ""
-}
-
-variable "billing_account_id" {
-  description = "Billing Account associated to the GCP Resources"
-  type        = string
-  default     = ""
-}
-
-variable "zone" {
-  description = "Cloud Zone associated to the AI Notebooks"
-  type        = string
-  default     = "us-east4-c"
-}
-
-variable "trusted_users" {
-  description = "The list of trusted users."
-  type        = set(string)
-  default     = []
-}
-
-variable "notebook_count" {
-  description = "Number of AI Notebooks requested"
-  type        = string
-  default     = "1"
 }
 
 variable "ip_cidr_range" {
@@ -84,16 +61,21 @@ variable "machine_type" {
   default     = "n1-standard-1"
 }
 
-variable "boot_disk_type" {
-  description = "Disk types for notebook instances"
+variable "notebook_count" {
+  description = "Number of AI Notebooks requested"
   type        = string
-  default     = "PD_SSD"
+  default     = "1"
 }
 
-variable "boot_disk_size_gb" {
-  description = "The size of the boot disk in GB attached to this instance"
-  type        = number
-  default     = 100
+variable "organization_id" {
+  description = "Organization ID where GCP Resources need to get spin up"
+  type        = string
+}
+
+variable "random_id" {
+  description = "Adds a suffix of 4 random characters to the `project_id`"
+  type        = string
+  default     = ""
 }
 
 variable "set_external_ip_policy" {
@@ -112,6 +94,19 @@ variable "set_trustedimage_project_policy" {
   description = "Apply org policy to set the trusted image projects."
   type        = bool
   default     = true
+}
+
+variable "trusted_users" {
+  description = "The list of trusted users."
+  type        = set(string)
+  default     = []
+}
+
+
+variable "zone" {
+  description = "Cloud Zone associated to the AI Notebooks"
+  type        = string
+  default     = "us-east4-c"
 }
 
 locals {
