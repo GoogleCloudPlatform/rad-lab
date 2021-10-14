@@ -52,47 +52,24 @@ def main():
         print("Login with Cloud Admin account...")
         os.system("gcloud auth application-default login")
 
-    model = input("\nList of available RADLab modules:\n[1] Data Science\n[2] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
+    model = input("\nList of available RADLab modules:\n[1] Data Science\n[2] (APP MOD) Elastic Search\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
     
-    if(model.strip() == "1" or model.upper().strip() == "DATA SCIENCE"):
+    if(model.strip() == "1"):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
-        state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ')
-        state = state.strip()
+        
+        # Select Action to perform
+        state = select_state()
 
         # Get Terraform Bucket Details
         tfbucket = getbucket(state.strip())
         print("\nGCS bucket to save Terrafrom config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
         # Setting Org ID, Billing Account, Folder ID, Domain
-        if(state == "1"):
-            
-            print("\nEnter following info to start the setup and use the user which have Project Owner & Billing Account User roles:-")
+        if(state == "1"):  
 
-            # Selecting Org ID
-            orgid = getorgid()
-            print("\nOrg ID (Selected) : " + Fore.GREEN + Style.BRIGHT + orgid + Style.RESET_ALL )
-
-            # Org ID Validation
-            if (orgid.strip().isdecimal() == False) :
-                sys.exit(Fore.RED + "\nError Occured - INVALID ORG ID\n")
-            
-            # Selecting Billing Account
-            billing_acc = getbillingacc()
-            print("\nBilling Account (Selected) : " + Fore.GREEN + Style.BRIGHT + billing_acc + Style.RESET_ALL )  
-            
-            # Selecting Folder ID
-            folderid = input(Fore.YELLOW + Style.BRIGHT + "\nFolder ID [Optional]"+ Style.RESET_ALL + ': ')
-
-            # Folder ID Validation
-            if (folderid.strip() and folderid.strip().isdecimal() == False):
-                sys.exit(Fore.RED + "\nError Occured - INVALID FOLDER ID ACCOUNT\n")
-
-            # Fetching Domain name 
-            domain = getdomain(orgid)
-            
-            # Create Random Deployment ID
-            randomid = get_random_alphanumeric_string(4)
+            # Getting Base Inputs
+            orgid, billing_acc, folderid, domain, randomid = basic_input()
 
             # Set environment path as deployment directory
             prefix = 'data_science_'+randomid
@@ -101,24 +78,14 @@ def main():
             # Checking if 'deployment' folder exist in local. If YES, delete the same.
             delifexist(env_path)
 
-            # Copy datascience directory
+            # Copy module directory
             shutil.copytree(os.path.dirname(os.getcwd()) + '/modules/data_science', env_path)
             
             # Set Terraform states remote backend as GCS
             settfstategcs(env_path,prefix,tfbucket)
 
             # Create file with billing/org/folder details
-            my_path  = env_path + '/env.json'
-            envjson = [
-                {
-                    "orgid"         : orgid,
-                    "billing_acc"   : billing_acc,
-                    "folderid"      : folderid
-                }
-            ]
-            with open(my_path , 'w') as file:
-                json.dump(envjson, file, indent=4)
-
+            create_env(env_path, orgid, billing_acc, folderid)
 
         elif(state == "2" or state == "3"):
             
@@ -133,42 +100,14 @@ def main():
                 prefix = 'data_science_'+randomid
                 env_path = setup_path+'/deployments/'+prefix
                 
-                if(blob_exists(tfbucket, prefix)):
-
-                    # Checking if 'deployment' folder exist in local. If YES, delete the same.
-                    delifexist(env_path)
-
-                    # Creating Local directory
-                    os.mkdir(env_path)
-
-                    # Copy Terraform deployment configs from GCS to Local
-                    if(os.system('gsutil -q -m cp -r gs://'+ tfbucket +'/radlab/'+ prefix +'/deployments/* ' + env_path) == 0):
-                        print("Terraform state downloaded to local...")
-                    else:
-                        print(Fore.RED + "\nError Occured whiled downloading Deployment Configs from GCS. Checking if the deployment exist locally...\n")
-
-                elif(os.path.isdir(env_path)):
-                    print("Terraform state exist locally...")
-                
-                else:
-                    sys.exit(Fore.RED + "\nThe deployment with the entered ID do not exist !\n")
+                # Setting Local Deployment
+                setlocaldeployment(tfbucket,prefix,env_path)
 
             else:
                 sys.exit(Fore.RED + "\nInvalid deployment ID!\n")
 
-            # Read orgid / billing acc / folder id from env.json
-            my_path  = env_path + '/env.json'
-            # Opening JSON file
-            f = open(my_path,)
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            orgid       = data[0]['orgid']
-            billing_acc = data[0]['billing_acc']
-            folderid    = data[0]['folderid']
-
-            # Closing file
-            f.close()
+            # Get env values
+            orgid, billing_acc, folderid = get_env(env_path)
 
             # Fetching Domain name 
             domain = getdomain(orgid)
@@ -181,6 +120,10 @@ def main():
         
         else:
             sys.exit(Fore.RED + "\nInvalid RADLab Module State selected")
+
+        ###########################
+        # Module Specific Options #
+        ###########################
 
         # No. of AI Notebooks and assigning trusted users
         if(state == "1" or state == "2"):
@@ -207,6 +150,82 @@ def main():
                         new_name = new_name.split("@")[0]
                     trusted_users.append("user:" + new_name + "@" + domain)
             # print(trusted_users)
+
+    elif(model.strip() == "2"):
+
+        print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elastic Search"+ Style.RESET_ALL)
+
+        # Select Action to perform
+        state = select_state()
+
+        # Get Terraform Bucket Details
+        tfbucket = getbucket(state.strip())
+        print("\nGCS bucket to save Terrafrom config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
+
+        # Setting Org ID, Billing Account, Folder ID, Domain
+        if(state == "1"):
+            
+            # Getting Base Inputs
+            orgid, billing_acc, folderid, domain, randomid = basic_input()
+
+            # Set environment path as deployment directory
+            prefix = 'app_mod_elastic_'+randomid
+            env_path = setup_path+'/deployments/'+prefix
+
+            # Checking if 'deployment' folder exist in local. If YES, delete the same.
+            delifexist(env_path)
+
+            # Copy module directory
+            shutil.copytree(os.path.dirname(os.getcwd()) + '/modules/app_mod_elastic', env_path)
+            
+            # Set Terraform states remote backend as GCS
+            settfstategcs(env_path,prefix,tfbucket)
+
+            # Create file with billing/org/folder details
+            create_env(env_path, orgid, billing_acc, folderid)
+
+        elif(state == "2" or state == "3"):
+            
+            # Get Deployment ID
+            randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RADLab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
+            randomid = randomid.strip()
+
+            # Validating Deployment ID
+            if(len(randomid) == 4 and randomid.isalnum()):
+                
+                # Set environment path as deployment directory
+                prefix = 'app_mod_elastic_'+randomid
+                env_path = setup_path+'/deployments/'+prefix
+                
+                # Setting Local Deployment
+                setlocaldeployment(tfbucket,prefix,env_path)
+
+            else:
+                sys.exit(Fore.RED + "\nInvalid deployment ID!\n")
+
+            # Get env values
+            orgid, billing_acc, folderid = get_env(env_path)
+
+            # Fetching Domain name 
+            domain = getdomain(orgid)
+            
+            # Set Terraform states remote backend as GCS
+            settfstategcs(env_path,prefix,tfbucket)
+
+            if(state == "3"):
+                print("DELETING DEPLOYMENT...")
+        
+        else:
+            sys.exit(Fore.RED + "\nInvalid RADLab Module State selected")
+
+
+        ###########################
+        # Module Specific Options #
+        ###########################
+        
+    elif(model.strip() == "3"):
+        sys.exit(Fore.GREEN + "\nExiting Installer")
+
     else:
         sys.exit(Fore.RED + "\nInvalid Model")
 
@@ -240,6 +259,95 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
 
     # Deleting Local deployment config
     shutil.rmtree(env_path)
+
+def select_state():
+    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ')
+    state = state.strip()
+    return state
+
+def basic_input():
+
+    print("\nEnter following info to start the setup and use the user which have Project Owner & Billing Account User roles:-")
+
+    # Selecting Org ID
+    orgid = getorgid()
+    print("\nOrg ID (Selected) : " + Fore.GREEN + Style.BRIGHT + orgid + Style.RESET_ALL )
+
+    # Org ID Validation
+    if (orgid.strip().isdecimal() == False) :
+        sys.exit(Fore.RED + "\nError Occured - INVALID ORG ID\n")
+    
+    # Selecting Billing Account
+    billing_acc = getbillingacc()
+    print("\nBilling Account (Selected) : " + Fore.GREEN + Style.BRIGHT + billing_acc + Style.RESET_ALL )  
+    
+    # Selecting Folder ID
+    folderid = input(Fore.YELLOW + Style.BRIGHT + "\nFolder ID [Optional]"+ Style.RESET_ALL + ': ')
+
+    # Folder ID Validation
+    if (folderid.strip() and folderid.strip().isdecimal() == False):
+        sys.exit(Fore.RED + "\nError Occured - INVALID FOLDER ID ACCOUNT\n")
+
+    # Fetching Domain name 
+    domain = getdomain(orgid)
+    
+    # Create Random Deployment ID
+    randomid = get_random_alphanumeric_string(4)
+
+    return orgid, billing_acc, folderid, domain, randomid
+
+def create_env(env_path, orgid, billing_acc, folderid):
+
+    my_path  = env_path + '/env.json'
+    envjson = [
+        {
+            "orgid"         : orgid,
+            "billing_acc"   : billing_acc,
+            "folderid"      : folderid
+        }
+    ]
+    with open(my_path , 'w') as file:
+        json.dump(envjson, file, indent=4)
+
+def get_env(env_path):
+
+    # Read orgid / billing acc / folder id from env.json
+    my_path  = env_path + '/env.json'
+    # Opening JSON file
+    f = open(my_path,)
+    # returns JSON object as a dictionary
+    data = json.load(f)
+    
+    orgid       = data[0]['orgid']
+    billing_acc = data[0]['billing_acc']
+    folderid    = data[0]['folderid']
+
+    # Closing file
+    f.close()
+
+    return orgid, billing_acc, folderid
+
+def setlocaldeployment(tfbucket,prefix, env_path):
+
+    if(blob_exists(tfbucket, prefix)):
+
+        # Checking if 'deployment' folder exist in local. If YES, delete the same.
+        delifexist(env_path)
+
+        # Creating Local directory
+        os.mkdir(env_path)
+
+        # Copy Terraform deployment configs from GCS to Local
+        if(os.system('gsutil -q -m cp -r gs://'+ tfbucket +'/radlab/'+ prefix +'/deployments/* ' + env_path) == 0):
+            print("Terraform state downloaded to local...")
+        else:
+            print(Fore.RED + "\nError Occured whiled downloading Deployment Configs from GCS. Checking if the deployment exist locally...\n")
+
+    elif(os.path.isdir(env_path)):
+        print("Terraform state exist locally...")
+    
+    else:
+        sys.exit(Fore.RED + "\nThe deployment with the entered ID do not exist !\n")
 
 def get_random_alphanumeric_string(length):
 	letters_and_digits = string.ascii_lowercase + string.digits
