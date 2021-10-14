@@ -108,8 +108,3 @@ variable "zone" {
   type        = string
   default     = "us-east4-c"
 }
-
-locals {
-  # "Region associated to the GCP Resources"
-  region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
-}
