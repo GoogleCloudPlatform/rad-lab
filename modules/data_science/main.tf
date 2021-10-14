@@ -15,6 +15,9 @@
  */
 
 locals {
+  
+  region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
+
   notebook_sa_project_roles = [
     "roles/compute.instanceAdmin",
     "roles/notebooks.admin",

@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-/**
-* Defining Terraform Outputs 
-*/
-
 output "deployment_id" {
   description = "RADLab Module Deployment ID"
   value       = var.random_id
