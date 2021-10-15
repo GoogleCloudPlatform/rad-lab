@@ -37,4 +37,10 @@ Below Architechture Diagram is the base representation of what will be created a
 
 ## Outputs
 
+| name | description | sensitive |
+|---|---|:---:|
+| deployment_id | RADLab Module Deployment ID |  |
+| notebooks-instance-names | Notebook Instance Names |  |
+| project-radlab-ds-analytics-id | Analytics Project ID |  |
+| user-scripts-bucket-uri | User Script Bucket URI |  |
 <!-- END TFDOC -->
