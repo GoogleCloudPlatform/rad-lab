@@ -33,8 +33,14 @@ Below Architechture Diagram is the base representation of what will be created a
 | *set_shielded_vm_policy* | Apply org policy to disable shielded VMs. | <code title="">bool</code> |  | <code title="">true</code> |
 | *set_trustedimage_project_policy* | Apply org policy to set the trusted image projects. | <code title="">bool</code> |  | <code title="">true</code> |
 | *trusted_users* | The list of trusted users. | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
-| *zone* | Cloud Zone associated to the AI Notebooks | <code title="">string</code> |  | <code title="us-east4-c&#10;&#125;&#10;locals &#123;&#10;region &#61; join&#40;&#34;-&#34;, &#91;split&#40;&#34;-&#34;, var.zone&#41;&#91;0&#93;, split&#40;&#34;-&#34;, var.zone&#41;&#91;1&#93;&#93;&#41;">...</code> |
+| *zone* | Cloud Zone associated to the AI Notebooks | <code title="">string</code> |  | <code title="">us-east4-c</code> |
 
 ## Outputs
 
+| name | description | sensitive |
+|---|---|:---:|
+| deployment_id | RADLab Module Deployment ID |  |
+| notebooks-instance-names | Notebook Instance Names |  |
+| project-radlab-ds-analytics-id | Analytics Project ID |  |
+| user-scripts-bucket-uri | User Script Bucket URI |  |
 <!-- END TFDOC -->
