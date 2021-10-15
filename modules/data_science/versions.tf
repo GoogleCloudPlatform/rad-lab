@@ -16,6 +16,6 @@
 
 terraform {
   required_version = "~> 1.0"
-  google           = "~> 3.0"
-  google-beta      = "~> 3.0"
+  google           = "~> 3.88"
+  google-beta      = "~> 3.88"
 }
