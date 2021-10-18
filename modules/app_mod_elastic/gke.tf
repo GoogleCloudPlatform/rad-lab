@@ -17,6 +17,10 @@
 data "google_compute_zones" "zones" {
   project = module.elastic_search_project.project_id
   region  = var.region
+
+  depends_on = [
+    module.elastic_search_project
+  ]
 }
 
 module "gke_cluster" {
@@ -25,19 +29,19 @@ module "gke_cluster" {
   project_id                 = module.elastic_search_project.project_id
   name                       = var.gke_cluster_name
   region                     = var.region
-  network                    = module.elastic_search_network.network_self_link
-  subnetwork                 = module.elastic_search_network.subnets_self_links.0
+  network                    = module.elastic_search_network.network_name
+  subnetwork                 = module.elastic_search_network.subnets_names.0
   remove_default_node_pool   = true
   initial_node_count         = 1
-  ip_range_pods              = var.pod_cidr_block
-  ip_range_services          = var.service_cidr_block
+  ip_range_pods              = local.pod_range_name
+  ip_range_services          = local.service_range_name
   regional                   = true
-  release_channel            = "RAPID"
+  release_channel            = var.release_channel
   issue_client_certificate   = false
-  identity_namespace         = "${module.elastic_search_project.project_id}.svc.google.com"
+  identity_namespace         = "${module.elastic_search_project.project_id}.svc.id.goog"
   create_service_account     = true
   enable_private_nodes       = true
-  enable_private_endpoint    = true
+  enable_private_endpoint    = false
   master_ipv4_cidr_block     = var.master_ipv4_cidr_block
   horizontal_pod_autoscaling = true
 
@@ -49,12 +53,16 @@ module "gke_cluster" {
       min_count      = 1
       max_count      = 10
       image_type     = "COS"
-      preemptible    = false
+      preemptible    = var.preemptible_nodes
     }
   ]
 
   node_pools_oauth_scopes = {
     all = ["https://www.googleapis.com/auth/cloud-platform"]
   }
+
+  depends_on = [
+    module.elastic_search_project
+  ]
 
 }

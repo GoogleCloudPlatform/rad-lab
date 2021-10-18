@@ -72,6 +72,12 @@ variable "pod_cidr_block" {
   default     = "10.100.0.0/16"
 }
 
+variable "preemptible_nodes" {
+  description = "Use preemptible VMs for the node pools"
+  type        = bool
+  default     = true
+}
+
 variable "project_name" {
   description = "Name that will be assigned to the project.  To ensure uniqueness, a random_id will be added to the name."
   type        = string
@@ -79,7 +85,7 @@ variable "project_name" {
 }
 
 variable "random_id" {
-  description = "Random ID that will be used to suffix all resources.  Leave blank if you want to module to use a generated one."
+  description = "Random ID that will be used to suffix all resources.  Leave blank if you want the module to use a generated one."
   type        = string
   default     = null
 }
@@ -88,6 +94,12 @@ variable "region" {
   description = "Region where the resources should be created."
   type        = string
   default     = "us-west1"
+}
+
+variable "release_channel" {
+  description = "Enroll the GKE cluster in this release channel."
+  type        = string
+  default     = "REGULAR"
 }
 
 variable "service_cidr_block" {

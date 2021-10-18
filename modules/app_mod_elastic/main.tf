@@ -15,8 +15,10 @@
  */
 
 locals {
-  random_id    = var.random_id != null ? var.random_id : random_id.random_id.hex
-  project_name = format("%s-%s", var.project_name, local.random_id)
+  random_id          = var.random_id != null ? var.random_id : random_id.random_id.hex
+  project_name       = format("%s-%s", var.project_name, local.random_id)
+  pod_range_name     = "pod-ip-range"
+  service_range_name = "service-ip-range"
 }
 
 resource "random_id" "random_id" {
@@ -28,7 +30,7 @@ module "elastic_search_project" {
   version = "~> 11.0"
 
   name              = local.project_name
-  random_project_id = true
+  random_project_id = false
   org_id            = var.organization_id
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
@@ -61,10 +63,10 @@ module "elastic_search_network" {
 
   secondary_ranges = {
     "${var.subnet_name}" = [{ # Do not remove quotes, Terraform doesn't like variable references as map-keys without them
-      range_name    = "pod-ip-range"
+      range_name    = local.pod_range_name
       ip_cidr_range = var.pod_cidr_block
       }, {
-      range_name    = "service-ip-range"
+      range_name    = local.service_range_name
       ip_cidr_range = var.service_cidr_block
     }]
   }
