@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
+output "cluster_credentials_cmd" {
+  value = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.region} --project ${module.elastic_search_project.project_id}"
+}
+
+output "network_selflink" {
+  value = module.elastic_search_network.network_self_link
+}
+
 output "project_id" {
   value = module.elastic_search_project.project_id
 }
 
-output "cluster_credentials_cmd" {
-  value = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.region} --project ${module.elastic_search_project.project_id}"
+output "subnet_selflink" {
+  value = module.elastic_search_network.subnets_self_links.0
 }

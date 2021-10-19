@@ -37,6 +37,7 @@ module "gke_cluster" {
   ip_range_services          = local.service_range_name
   regional                   = true
   release_channel            = var.release_channel
+  kubernetes_version         = var.gke_version
   issue_client_certificate   = false
   identity_namespace         = "${module.elastic_search_project.project_id}.svc.id.goog"
   create_service_account     = true
@@ -50,8 +51,8 @@ module "gke_cluster" {
       name           = var.node_pool_name
       machine_type   = var.node_pool_machine_type
       node_locations = join(",", data.google_compute_zones.zones.names)
-      min_count      = 1
-      max_count      = 10
+      min_count      = var.node_pool_min_count
+      max_count      = var.node_pool_max_count
       image_type     = "COS"
       preemptible    = var.preemptible_nodes
     }

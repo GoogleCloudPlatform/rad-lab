@@ -61,6 +61,18 @@ variable "node_pool_machine_type" {
   default     = "e2-medium"
 }
 
+variable "node_pool_max_count" {
+  description = "Maximum instance count for the custom node pool."
+  type        = number
+  default     = 10
+}
+
+variable "node_pool_min_count" {
+  description = "Minimum instance count for the custom nodepool."
+  type        = number
+  default     = 1
+}
+
 variable "node_pool_name" {
   description = "Name of the nodepool."
   type        = string
