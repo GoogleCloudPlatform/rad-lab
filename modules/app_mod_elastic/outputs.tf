@@ -13,3 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+output "project_id" {
+  value = module.elastic_search_project.project_id
+}
+
+output "cluster_credentials_cmd" {
+  value = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.region} --project ${module.elastic_search_project.project_id}"
+}

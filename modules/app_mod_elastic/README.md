@@ -9,6 +9,11 @@
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../scripts/radlab.py).
 
+## Get credentials
+```shell
+$(terraform show -json | jq -r .values.outputs.cluster_credentials_cmd.value)
+```
+
 <!-- BEGIN TFDOC -->
 ## Variables
 

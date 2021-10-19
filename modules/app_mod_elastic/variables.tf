@@ -31,6 +31,12 @@ variable "gke_cluster_name" {
   default     = "elastic-search-cluster"
 }
 
+variable "gke_version" {
+  description = "Version to be used for the GKE cluster.  Ensure that the release channel is properly set when updating this variable."
+  type        = string
+  default     = "1.20.10-gke.1600"
+}
+
 variable "master_ipv4_cidr_block" {
   description = "IPv4 CIDR block to assign to the Master cluster."
   type        = string
