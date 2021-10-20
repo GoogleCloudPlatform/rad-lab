@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Make a request for new functionality
-title: "[FR]"
+title: ''
 labels: enhancement
 assignees: ''
 
