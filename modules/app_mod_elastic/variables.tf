@@ -33,16 +33,28 @@ variable "disk_type_nodes" {
   default     = "pd-standard"
 }
 
-variable "folder_id" {
-  description = "Folder ID where the project should be created.  Leave blank if the project should be created directly underneath the Organization node."
+variable "elastic_search_count" {
+  description = "Number of instances of the Elastic Search pod."
   type        = string
-  default     = ""
+  default     = "1"
+}
+
+variable "elk_version" {
+  description = "Version for Elastic Search and Kibana."
+  type        = string
+  default     = "7.15.1"
 }
 
 variable "enable_internet_egress_traffic" {
   description = "Enable egress traffic to the internet.  Necessary to download the Elastic Search pods."
   type        = bool
   default     = true
+}
+
+variable "folder_id" {
+  description = "Folder ID where the project should be created.  Leave blank if the project should be created directly underneath the Organization node."
+  type        = string
+  default     = ""
 }
 
 variable "gke_cluster_name" {
@@ -56,6 +68,13 @@ variable "gke_version" {
   type        = string
   default     = "1.20.10-gke.1600"
 }
+
+variable "kibana_instance_count" {
+  description = "Number of Kibana instances deployed in the cluster."
+  type        = string
+  default     = "1"
+}
+
 
 variable "master_ipv4_cidr_block" {
   description = "IPv4 CIDR block to assign to the Master cluster."

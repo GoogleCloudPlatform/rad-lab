@@ -104,15 +104,15 @@ resource "kubernetes_manifest" "elastic_search" {
     "kind"       = "Elasticsearch"
 
     metadata = {
-      name      = "es-quickstart"
+      name      = "elastic-search"
       namespace = local.elastic_namespace_name
     }
 
     spec = {
-      version = "7.15.1"
+      version = var.elk_version
       nodeSets = [{
         name  = "default"
-        count = "1"
+        count = var.elastic_search_count
         config = {
           "node.store.allow_mmap" = "false"
         }
@@ -133,13 +133,13 @@ resource "kubernetes_manifest" "kibana" {
     "kind" : "Kibana"
 
     metadata = {
-      name      = "es-quickstart"
+      name      = "kibana"
       namespace = local.elastic_namespace_name
     }
 
     spec = {
-      version = "7.15.1"
-      count   = "1"
+      version = var.elk_version
+      count   = var.kibana_instance_count
       elasticsearchRef = {
         "name" = "es-quickstart"
       }
