@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-// CRD: https://download.elastic.co/downloads/eck/1.8.0/crds.yaml
-// Operator: https://download.elastic.co/downloads/eck/1.8.0/operator.yaml
-
 locals {
   k8s_credentials_cmd    = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.region} --project ${module.elastic_search_project.project_id}"
   elastic_namespace_name = "elastic-search"
@@ -141,7 +138,7 @@ resource "kubernetes_manifest" "kibana" {
       version = var.elk_version
       count   = var.kibana_instance_count
       elasticsearchRef = {
-        "name" = "es-quickstart"
+        "name" = "elastic-search"
       }
     }
   }
