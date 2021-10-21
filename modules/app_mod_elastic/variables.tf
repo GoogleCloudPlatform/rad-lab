@@ -14,15 +14,35 @@
  * limitations under the License.
  */
 
+
+
 variable "billing_account_id" {
   description = "Billing account ID that will be linked to the project."
   type        = string
+}
+
+variable "disk_size_gb_nodes" {
+  description = "Size of the disks attached to the nodes."
+  type        = number
+  default     = 256
+}
+
+variable "disk_type_nodes" {
+  description = "Type of disks to attach to the nodes."
+  type        = string
+  default     = "pd-standard"
 }
 
 variable "folder_id" {
   description = "Folder ID where the project should be created.  Leave blank if the project should be created directly underneath the Organization node."
   type        = string
   default     = ""
+}
+
+variable "enable_internet_egress_traffic" {
+  description = "Enable egress traffic to the internet.  Necessary to download the Elastic Search pods."
+  type        = bool
+  default     = true
 }
 
 variable "gke_cluster_name" {

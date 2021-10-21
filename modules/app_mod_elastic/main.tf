@@ -37,37 +37,8 @@ module "elastic_search_project" {
 
   activate_apis = [
     "compute.googleapis.com",
-    "container.googleapis.com"
+    "container.googleapis.com",
+    "monitoring.googleapis.com",
+    "logging.googleapis.com"
   ]
-}
-
-module "elastic_search_network" {
-  source  = "terraform-google-modules/network/google"
-  version = "~> 3.0"
-
-  project_id   = module.elastic_search_project.project_id
-  network_name = var.network_name
-  routing_mode = "GLOBAL"
-  description  = "VPC Network created via Terraform"
-
-  subnets = [
-    {
-      subnet_name           = var.subnet_name
-      subnet_ip             = var.network_cidr_block
-      subnet_region         = var.region
-      description           = "Subnetwork inside ${var.network_name} VPC network, created via Terraform"
-      subnet_private_access = true
-
-    }
-  ]
-
-  secondary_ranges = {
-    "${var.subnet_name}" = [{ # Do not remove quotes, Terraform doesn't like variable references as map-keys without them
-      range_name    = local.pod_range_name
-      ip_cidr_range = var.pod_cidr_block
-      }, {
-      range_name    = local.service_range_name
-      ip_cidr_range = var.service_cidr_block
-    }]
-  }
 }

@@ -55,6 +55,8 @@ module "gke_cluster" {
       max_count      = var.node_pool_max_count
       image_type     = "COS"
       preemptible    = var.preemptible_nodes
+      disk_size_gb   = var.disk_size_gb_nodes
+      disk_type      = var.disk_type_nodes
     }
   ]
 
@@ -66,4 +68,14 @@ module "gke_cluster" {
     module.elastic_search_project
   ]
 
+}
+
+module "gke_authentication" {
+  source  = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  version = "~> 17.0"
+
+  project_id           = module.elastic_search_project.project_id
+  cluster_name         = module.gke_cluster.name
+  location             = var.region
+  use_private_endpoint = false
 }

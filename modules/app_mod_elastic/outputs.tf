@@ -15,7 +15,7 @@
  */
 
 output "cluster_credentials_cmd" {
-  value = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.region} --project ${module.elastic_search_project.project_id}"
+  value = local.k8s_credentials_cmd
 }
 
 output "network_selflink" {
