@@ -1,5 +1,7 @@
 # RAD Lab Application Mordernization Module (w/ Elastic Search) 
 
+This module allows the user to create an Elastic Search cluster, deployed on a GKE cluster in Google Cloud Platform.  It follows the [Quickstart-tutorial](https://www.elastic.co/guide/en/cloud-on-k8s/1.8/k8s-quickstart.html) available on https://elastic.co.   
+
 ## GCP Products/Services 
 
 * Google Kubernetes Engine
@@ -9,9 +11,25 @@
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../scripts/radlab.py).
 
-## Get credentials
+## Commands
+Retrieve the cluster credentials 
 ```shell
-$(terraform show -json | jq -r .values.outputs.cluster_credentials_cmd.value)
+$(terraform show -json | jq -r .values.outputs.cluster_credentials_cmd.value)`
+```
+
+ElasticSearch status:
+```shell
+kubectl get elasticsearch -n elastic-search
+```
+
+Kibana status:
+```shell
+kubectl get kibana -n elastic-search
+```
+
+Retrieve Elastic password
+```shell
+kubectl get secret es-quickstart-es-elastic-user -o=jsonpath='{.data.elastic}' -n elastic-search | base64 --decode; echo
 ```
 
 <!-- BEGIN TFDOC -->
