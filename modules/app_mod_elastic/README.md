@@ -35,9 +35,17 @@ Kibana status:
 kubectl get kibana -n elastic-search
 ```
 
-Retrieve Elastic password
+Access Elastic Search:
 ```shell
-kubectl get secret es-quickstart-es-elastic-user -o=jsonpath='{.data.elastic}' -n elastic-search | base64 --decode; echo
+
+# Retrieve password
+kubectl get secret elastic-search-es-elastic-user -n elastic-search -o go-template='{{.data.elastic | base64decode}}'
+
+# Start port-forwarding tunnel
+kubectl port-forward -n elastic-search service/kibana-kb-http 5601
+
+# Open a browser window and point it to https://localhost:5601
+
 ```
 
 <!-- BEGIN TFDOC -->
