@@ -23,7 +23,7 @@ output "network_selflink" {
 }
 
 output "project_id" {
-  value = module.elastic_search_project.project_id
+  value = local.project_id
 }
 
 output "subnet_selflink" {

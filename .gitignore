@@ -12,3 +12,4 @@ env/
 *.iml
 terraform.tfvars
 *.lock.hcl
+elk/

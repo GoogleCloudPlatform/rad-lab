@@ -15,7 +15,7 @@
  */
 
 data "google_compute_zones" "zones" {
-  project = module.elastic_search_project.project_id
+  project = local.project_id
   region  = var.region
 
   depends_on = [
@@ -26,20 +26,20 @@ data "google_compute_zones" "zones" {
 module "gke_cluster" {
   source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
   version                    = "~> 17.0"
-  project_id                 = module.elastic_search_project.project_id
+  project_id                 = local.project_id
   name                       = var.gke_cluster_name
   region                     = var.region
   network                    = module.elastic_search_network.network_name
   subnetwork                 = module.elastic_search_network.subnets_names.0
   remove_default_node_pool   = true
   initial_node_count         = 1
-  ip_range_pods              = local.pod_range_name
-  ip_range_services          = local.service_range_name
+  ip_range_pods              = var.pod_ip_range_name
+  ip_range_services          = var.service_ip_range_name
   regional                   = true
   release_channel            = var.release_channel
   kubernetes_version         = var.gke_version
   issue_client_certificate   = false
-  identity_namespace         = "${module.elastic_search_project.project_id}.svc.id.goog"
+  identity_namespace         = "${local.project_id}.svc.id.goog"
   create_service_account     = true
   enable_private_nodes       = true
   enable_private_endpoint    = false
@@ -57,11 +57,28 @@ module "gke_cluster" {
       preemptible    = var.preemptible_nodes
       disk_size_gb   = var.disk_size_gb_nodes
       disk_type      = var.disk_type_nodes
+
     }
   ]
 
+  node_pools_metadata = {
+    all = {}
+
+    "${var.node_pool_name}" = {
+      workload-metadata = "GKE_METADATA"
+    }
+  }
+
   node_pools_oauth_scopes = {
-    all = ["https://www.googleapis.com/auth/cloud-platform"]
+    all = []
+
+    "${var.node_pool_name}" = [
+      "https://www.googleapis.com/auth/cloud-platform",
+    ]
+
+    default-node-pool = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
   }
 
   depends_on = [
@@ -74,7 +91,7 @@ module "gke_authentication" {
   source  = "terraform-google-modules/kubernetes-engine/google//modules/auth"
   version = "~> 17.0"
 
-  project_id           = module.elastic_search_project.project_id
+  project_id           = local.project_id
   cluster_name         = module.gke_cluster.name
   location             = var.region
   use_private_endpoint = false

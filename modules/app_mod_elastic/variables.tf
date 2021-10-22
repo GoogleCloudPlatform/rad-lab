@@ -21,6 +21,12 @@ variable "billing_account_id" {
   type        = string
 }
 
+variable "create_project" {
+  description = "Create a new project or use an existing project.  When set to true, variable project_name has to match the exact project ID of the existing project."
+  type        = bool
+  default     = true
+}
+
 variable "disk_size_gb_nodes" {
   description = "Size of the disks attached to the nodes."
   type        = number
@@ -33,7 +39,7 @@ variable "disk_type_nodes" {
   default     = "pd-standard"
 }
 
-variable "elastic_search_count" {
+variable "elastic_search_instance_count" {
   description = "Number of instances of the Elastic Search pod."
   type        = string
   default     = "1"
@@ -129,6 +135,12 @@ variable "pod_cidr_block" {
   default     = "10.100.0.0/16"
 }
 
+variable "pod_ip_range_name" {
+  description = "Range name for the pod IP addresses."
+  type        = string
+  default     = "pod-ip-range"
+}
+
 variable "preemptible_nodes" {
   description = "Use preemptible VMs for the node pools"
   type        = bool
@@ -163,6 +175,12 @@ variable "service_cidr_block" {
   description = "CIDR block to be assigned to services running in the GKE cluster."
   type        = string
   default     = "10.150.0.0/16"
+}
+
+variable "service_ip_range_name" {
+  description = "Name for the IP range for services."
+  type        = string
+  default     = "service-ip-range"
 }
 
 variable "subnet_name" {

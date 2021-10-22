@@ -15,10 +15,10 @@
  */
 
 locals {
+  # Allow users to either create their own random_id or use a generated one
   random_id          = var.random_id != null ? var.random_id : random_id.random_id.hex
-  project_name       = format("%s-%s", var.project_name, local.random_id)
-  pod_range_name     = "pod-ip-range"
-  service_range_name = "service-ip-range"
+  # If a project has to be created, concat the random id and the project name.  If the project already exists, use the value of the variable project_name.
+  project_id         = var.create_project ? format("%s-%s", var.project_name, local.random_id) : var.project_name
 }
 
 resource "random_id" "random_id" {
@@ -26,14 +26,16 @@ resource "random_id" "random_id" {
 }
 
 module "elastic_search_project" {
+  count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 11.0"
 
-  name              = local.project_name
+  name              = local.project_id
   random_project_id = false
   org_id            = var.organization_id
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
+  create_project_sa = false
 
   activate_apis = [
     "compute.googleapis.com",
@@ -41,4 +43,21 @@ module "elastic_search_project" {
     "monitoring.googleapis.com",
     "logging.googleapis.com"
   ]
+}
+
+resource "google_service_account" "elastic_search_gcp_identity" {
+  project      = local.project_id
+  account_id   = "elastic-search-id"
+  description  = "Elastic Search pod identity."
+  display_name = "Elastic Search Identity"
+
+  depends_on = [
+    module.elastic_search_project
+  ]
+}
+
+resource "google_service_account_iam_member" "elastic_search_k8s_identity" {
+  member             = "serviceAccount:${local.project_id}.svc.id.goog[${local.elastic_namespace_name}/${local.elastic_search_identity_name}]"
+  role               = "roles/iam.workloadIdentityUser"
+  service_account_id = google_service_account.elastic_search_gcp_identity.id
 }

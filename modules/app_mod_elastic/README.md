@@ -1,11 +1,19 @@
 # RAD Lab Application Mordernization Module (w/ Elastic Search) 
 
-This module allows the user to create an Elastic Search cluster, deployed on a GKE cluster in Google Cloud Platform.  It follows the [Quickstart-tutorial](https://www.elastic.co/guide/en/cloud-on-k8s/1.8/k8s-quickstart.html) available on https://elastic.co.   
+This module allows the user to create an Elastic Search cluster, deployed on a GKE cluster in Google Cloud Platform.  It follows the [Quickstart-tutorial](https://www.elastic.co/guide/en/cloud-on-k8s/1.8/index.html) available on https://elastic.co.   
 
 ## GCP Products/Services 
 
 * Google Kubernetes Engine
 * Virtual Private Cloud (VPC)
+
+## Prerequisites
+
+Ensure that the identity executing this module has the following IAM permissions:
+- `roles/resourcemanager.projectCreator`
+- `roles/compute.admin`
+
+The project creator permissions are only necessary when `create_project` is set to true.  Otherwise, these permissions are not needed.
 
 ## Reference Architechture Diagram
 
@@ -14,7 +22,7 @@ Below Architechture Diagram is the base representation of what will be created a
 ## Commands
 Retrieve the cluster credentials 
 ```shell
-$(terraform show -json | jq -r .values.outputs.cluster_credentials_cmd.value)`
+$(terraform show -json | jq -r .values.outputs.cluster_credentials_cmd.value)
 ```
 
 ElasticSearch status:

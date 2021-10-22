@@ -18,7 +18,7 @@ module "elastic_search_network" {
   source  = "terraform-google-modules/network/google"
   version = "~> 3.0"
 
-  project_id   = module.elastic_search_project.project_id
+  project_id   = local.project_id
   network_name = var.network_name
   routing_mode = "GLOBAL"
   description  = "VPC Network created via Terraform"
@@ -36,20 +36,24 @@ module "elastic_search_network" {
 
   secondary_ranges = {
     "${var.subnet_name}" = [{ # Do not remove quotes, Terraform doesn't like variable references as map-keys without them
-      range_name    = local.pod_range_name
+      range_name    = var.pod_ip_range_name
       ip_cidr_range = var.pod_cidr_block
       }, {
-      range_name    = local.service_range_name
+      range_name    = var.service_ip_range_name
       ip_cidr_range = var.service_cidr_block
     }]
   }
+
+  depends_on = [
+    module.elastic_search_project
+  ]
 }
 
 // External access
 resource "google_compute_router" "router" {
   count = var.enable_internet_egress_traffic ? 1 : 0
 
-  project = module.elastic_search_project.project_id
+  project = local.project_id
   name    = "es-access-router"
   network = module.elastic_search_network.network_self_link
   region  = var.region
@@ -57,11 +61,15 @@ resource "google_compute_router" "router" {
   bgp {
     asn = 64514
   }
+
+  depends_on = [
+    module.elastic_search_project
+  ]
 }
 
 resource "google_compute_router_nat" "nat" {
   count                              = var.enable_internet_egress_traffic ? 1 : 0
-  project                            = module.elastic_search_project.project_id
+  project                            = local.project_id
   name                               = "es-proxy-ext-access-nat"
   router                             = google_compute_router.router[0].name
   region                             = var.region
@@ -72,14 +80,22 @@ resource "google_compute_router_nat" "nat" {
     enable = true
     filter = "ERRORS_ONLY"
   }
+
+  depends_on = [
+    module.elastic_search_project
+  ]
 }
 
 resource "google_compute_route" "external_access" {
   count            = var.enable_internet_egress_traffic ? 1 : 0
-  project          = module.elastic_search_project.project_id
+  project          = local.project_id
   dest_range       = "0.0.0.0/0"
   name             = "proxy-external-access"
   network          = module.elastic_search_network.network_name
   next_hop_gateway = "default-internet-gateway"
+
+  depends_on = [
+    module.elastic_search_project
+  ]
 }
 
