@@ -19,24 +19,17 @@ The project creator permissions are only necessary when `create_project` is set 
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../scripts/radlab.py).
 
-## Commands
-Retrieve the cluster credentials 
+## Access Elastic Search 
+
 ```shell
+# Retrieve credentials to query the Kubernetes API server
 $(terraform show -json | jq -r .values.outputs.cluster_credentials_cmd.value)
-```
 
-ElasticSearch status:
-```shell
+# Check status Elastic Search.  
 kubectl get elasticsearch -n elastic-search
-```
 
-Kibana status:
-```shell
+# Check status Kibana.
 kubectl get kibana -n elastic-search
-```
-
-Access Elastic Search:
-```shell
 
 # Retrieve password
 kubectl get secret elastic-search-es-elastic-user -n elastic-search -o go-template='{{.data.elastic | base64decode}}'
@@ -45,7 +38,6 @@ kubectl get secret elastic-search-es-elastic-user -n elastic-search -o go-templa
 kubectl port-forward -n elastic-search service/kibana-kb-http 5601
 
 # Open a browser window and point it to https://localhost:5601
-
 ```
 
 <!-- BEGIN TFDOC -->
