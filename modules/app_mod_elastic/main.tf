@@ -16,14 +16,20 @@
 
 locals {
   # Allow users to either create their own random_id or use a generated one
-  random_id          = var.random_id != null ? var.random_id : random_id.random_id.hex
+  random_id = var.random_id != null ? var.random_id : random_id.random_id.hex
   # If a project has to be created, concat the random id and the project name.  If the project already exists, use the value of the variable project_name.
-  project_id         = var.create_project ? format("%s-%s", var.project_name, local.random_id) : var.project_name
+  project_id = var.create_project ? format("%s-%s", var.project_name, local.random_id) : var.project_name
 }
 
 resource "random_id" "random_id" {
   byte_length = 2
 }
+
+data "google_project" "existing_project" {
+  count      = var.create_project ? 0 : 1
+  project_id = local.project_id
+}
+
 
 module "elastic_search_project" {
   count   = var.create_project ? 1 : 0
