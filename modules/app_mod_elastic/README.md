@@ -9,11 +9,20 @@ This module allows the user to create an Elastic Search cluster, deployed on a G
 
 ## Prerequisites
 
-Ensure that the identity executing this module has the following IAM permissions:
+Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
 - `roles/resourcemanager.projectCreator`
 - `roles/compute.admin`
 
-The project creator permissions are only necessary when `create_project` is set to true.  Otherwise, these permissions are not needed.
+When deploying in an existing project, ensure the identity has the following permissions on the project:
+- `roles/compute.admin`
+- `roles/container.admin`
+- `roles/logging.admin`
+- `roles/monitoring.admin`
+- `roles/iam.serviceAccountAdmin`
+- `roles/iam.serviceAccountUser`
+- `roles/resourcemanager.projectIamAdmin`
+
+Also ensure that the identity creating the resources has access to a billing account, via `roles/billing.user`.
 
 ## Reference Architechture Diagram
 
