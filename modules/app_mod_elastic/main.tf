@@ -19,6 +19,12 @@ locals {
   random_id = var.random_id != null ? var.random_id : random_id.random_id.hex
   # If a project has to be created, concat the random id and the project name.  If the project already exists, use the value of the variable project_name.
   project_id = var.create_project ? format("%s-%s", var.project_name, local.random_id) : var.project_name
+  project_services = [
+    "compute.googleapis.com",
+    "container.googleapis.com",
+    "monitoring.googleapis.com",
+    "logging.googleapis.com"
+  ]
 }
 
 resource "random_id" "random_id" {
@@ -29,7 +35,6 @@ data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
   project_id = local.project_id
 }
-
 
 module "elastic_search_project" {
   count   = var.create_project ? 1 : 0
@@ -43,11 +48,18 @@ module "elastic_search_project" {
   billing_account   = var.billing_account_id
   create_project_sa = false
 
-  activate_apis = [
-    "compute.googleapis.com",
-    "container.googleapis.com",
-    "monitoring.googleapis.com",
-    "logging.googleapis.com"
+  activate_apis = []
+}
+
+resource "google_project_service" "enabled_services" {
+  for_each                   = toset(local.project_services)
+  project                    = local.project_id
+  service                    = each.value
+  disable_dependent_services = true
+  disable_on_destroy         = true
+
+  depends_on = [
+    module.elastic_search_project
   ]
 }
 

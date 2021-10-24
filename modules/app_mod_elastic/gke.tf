@@ -19,7 +19,7 @@ data "google_compute_zones" "zones" {
   region  = var.region
 
   depends_on = [
-    module.elastic_search_project
+    google_project_service.enabled_services
   ]
 }
 
@@ -82,7 +82,7 @@ module "gke_cluster" {
   }
 
   depends_on = [
-    module.elastic_search_project
+    module.elastic_search_network
   ]
 
 }

@@ -45,7 +45,8 @@ module "elastic_search_network" {
   }
 
   depends_on = [
-    module.elastic_search_project
+    module.elastic_search_project,
+    google_project_service.enabled_services
   ]
 }
 
@@ -61,10 +62,6 @@ resource "google_compute_router" "router" {
   bgp {
     asn = 64514
   }
-
-  depends_on = [
-    module.elastic_search_project
-  ]
 }
 
 resource "google_compute_router_nat" "nat" {
@@ -82,7 +79,7 @@ resource "google_compute_router_nat" "nat" {
   }
 
   depends_on = [
-    module.elastic_search_project
+    google_project_service.enabled_services
   ]
 }
 
@@ -93,9 +90,5 @@ resource "google_compute_route" "external_access" {
   name             = "proxy-external-access"
   network          = module.elastic_search_network.network_name
   next_hop_gateway = "default-internet-gateway"
-
-  depends_on = [
-    module.elastic_search_project
-  ]
 }
 
