@@ -82,7 +82,9 @@ module "gke_cluster" {
   }
 
   depends_on = [
-    module.elastic_search_network
+    module.elastic_search_network,
+    module.elastic_search_project,
+    google_project_service.enabled_services
   ]
 
 }
