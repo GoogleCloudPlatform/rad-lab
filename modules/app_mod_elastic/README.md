@@ -21,6 +21,7 @@ When deploying in an existing project, ensure the identity has the following per
 - `roles/iam.serviceAccountAdmin`
 - `roles/iam.serviceAccountUser`
 - `roles/resourcemanager.projectIamAdmin`
+- `roles/serviceusage.serviceUsageAdmin`
 
 Also ensure that the identity creating the resources has access to a billing account, via `roles/billing.user`.
 
