@@ -215,6 +215,9 @@ def main():
             if(state == "3"):
                 print("DELETING DEPLOYMENT...")
         
+        elif(state == "4"):
+            print("LISTING EXISTING MODULE - WORK IN PROGRESS")
+
         else:
             sys.exit(Fore.RED + "\nInvalid RADLab Module State selected")
 
@@ -261,7 +264,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     shutil.rmtree(env_path)
 
 def select_state():
-    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ')
+    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ')
     state = state.strip()
     return state
 
