@@ -25,7 +25,7 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
 
 NOTE: If you are using Cloud Shell then CURL & BASH comes pre-installed with it, thus you can skip this step.
 
-4. Navigate to the RADLab `scripts` folder : `cd ./radlab/scripts`
+4. Navigate to the RADLab `scripts` folder : `cd ./rad-lab-main/scripts`
 
 4. Install all the pre-requisites by running : `python3 installer_prereq.py`. _NOTE:_ Currently the deployment is supported for `Python 3.7.3` and above. List of Pre-requisites we are installing in this step:
 
@@ -88,7 +88,7 @@ NOTE: If the default project id is not set then in the guided setup you will nee
 
 Currently RAD Lab is only comprised of single module i.e. **Data Science** Module and new modules will be coming out soon.
 
-1. Navigate to the RAD Lab `scripts` folder : `cd ./RADLab/scripts` on your Cloud Shell.
+1. Navigate to the RAD Lab `scripts` folder : `cd ./rad-lab-main/scripts` on your Cloud Shell.
 
 2. Start the Guided setup by running : `python3 radlab.py`
 
