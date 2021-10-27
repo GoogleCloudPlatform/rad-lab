@@ -253,6 +253,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     else:
         if(state == '1' or state == '2'):
             os.system('gsutil -q -m cp -r ' + env_path + '/*.tf gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments')
+            os.system('gsutil -q -m cp -r ' + env_path + '/templates/* gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments')
             os.system('gsutil -q -m cp -r ' + env_path + '/*.json gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments')
 
         elif(state == '3'):
