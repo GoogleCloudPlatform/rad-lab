@@ -62,6 +62,8 @@ module "deploy_eck_operator" {
 }
 
 resource "kubernetes_namespace" "elastic_search_namespace" {
+  count = var.deploy_elastic_search ? 1 : 0
+
   metadata {
     annotations = {
       name = local.elastic_namespace_name
@@ -82,6 +84,8 @@ resource "kubernetes_namespace" "elastic_search_namespace" {
 }
 
 resource "kubernetes_service_account" "elastic_search_identity" {
+  count = var.deploy_elastic_search ? 1 : 0
+
   metadata {
     name      = local.elastic_search_identity_name
     namespace = local.elastic_namespace_name
@@ -98,6 +102,7 @@ resource "kubernetes_service_account" "elastic_search_identity" {
 }
 
 data "template_file" "elastic_search_yaml" {
+  count    = var.deploy_elastic_search ? 1 : 0
   template = file("${path.module}/templates/elastic_search_deployment.yaml.tpl")
   vars = {
     NAMESPACE            = local.elastic_namespace_name
@@ -108,6 +113,7 @@ data "template_file" "elastic_search_yaml" {
 }
 
 data "template_file" "kibana_yaml" {
+  count    = var.deploy_elastic_search ? 1 : 0
   template = file("${path.module}/templates/kibana_deployment.yaml.tpl")
   vars = {
     NAMESPACE            = local.elastic_namespace_name
@@ -118,16 +124,19 @@ data "template_file" "kibana_yaml" {
 }
 
 resource "local_file" "elastic_search_yaml_output" {
+  count    = var.deploy_elastic_search ? 1 : 0
   filename = "${path.module}/elk/elastic_search_deployment.yaml"
   content  = data.template_file.elastic_search_yaml.rendered
 }
 
 resource "local_file" "kibana_yaml_output" {
+  count    = var.deploy_elastic_search ? 1 : 0
   filename = "${path.module}/elk/kibana_deployment.yaml"
   content  = data.template_file.kibana_yaml.rendered
 }
 
 module "deploy_elastic_search" {
+  count   = var.deploy_elastic_search ? 1 : 0
   source  = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
   version = "~> 3.0"
 

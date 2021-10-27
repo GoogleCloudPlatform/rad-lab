@@ -21,8 +21,15 @@ variable "billing_account_id" {
   type        = string
 }
 
+
 variable "create_project" {
   description = "Create a new project or use an existing project.  When set to true, variable project_name has to match the exact project ID of the existing project."
+  type        = bool
+  default     = true
+}
+
+variable "deploy_elastic_search" {
+  description = "Deploy Elastic Search and Kibana."
   type        = bool
   default     = true
 }
