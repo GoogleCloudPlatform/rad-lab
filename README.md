@@ -19,13 +19,13 @@ NOTE: RAD Lab deployment is supported only via GCP Cloud Shell, MAC OS, Linux & 
 
 NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and Run as Adminstrator`. 
 
-2. Decompress the download: `unzip radlab-main.zip`
+2. Decompress the download: `unzip rad-lab-main.zip`
 
 3. Make sure [CURL](https://curl.se/) & [BASH](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) is installed on the operating system from where you are running the deployment. 
 
 NOTE: If you are using Cloud Shell then CURL & BASH comes pre-installed with it, thus you can skip this step.
 
-4. Navigate to the RADLab `scripts` folder : `cd ./radlab/scripts`
+4. Navigate to the RADLab `scripts` folder : `cd ./rad-lab-main/scripts`
 
 4. Install all the pre-requisites by running : `python3 installer_prereq.py`. _NOTE:_ Currently the deployment is supported for `Python 3.7.3` and above. List of Pre-requisites we are installing in this step:
 
@@ -51,7 +51,7 @@ NOTE: If you are using Cloud Shell then CURL & BASH comes pre-installed with it,
         * [OPTIONAL] GCS Bucket with read/write access where the Terraform states will be saved.
         
         NOTE: If you don’t have the GCS bucket already, you will also get the option to create the same as part of the guided setup.
-    * Depending on how your Google Organization is configured and how your Project and Service quotas are set, you can run into errors during deployment. Please see the [Troubleshooting Common Problems](https://github.com/GPS-Demos/radlab/blob/1ebf347ef5821b9eb59feee3be7b8eef12ebf5c0/docs/TROUBLESHOOTING.md) section for a list of common problems and fixes. 
+    * Depending on how your Google Organization is configured and how your Project and Service quotas are set, you can run into errors during deployment. Please see the [Troubleshooting Common Problems](./docs/TROUBLESHOOTING.md) section for a list of common problems and fixes. 
 7.  _Cloud Admin_ will also need to set the mandotory variables in `variables.tf` file to set up the infrastructure. Please see the details of each variable below:
 
     * `zone`
@@ -88,7 +88,7 @@ NOTE: If the default project id is not set then in the guided setup you will nee
 
 Currently RAD Lab is only comprised of single module i.e. **Data Science** Module and new modules will be coming out soon.
 
-1. Navigate to the RAD Lab `scripts` folder : `cd ./RADLab/scripts` on your Cloud Shell.
+1. Navigate to the RAD Lab `scripts` folder : `cd ./rad-lab-main/scripts` on your Cloud Shell.
 
 2. Start the Guided setup by running : `python3 radlab.py`
 
@@ -190,11 +190,11 @@ GCS Bucket storing Terrafrom Configs: my-sample-bucket
 TERRAFORM DEPLOYMENT COMPLETED!!!
 ```
 
-NOTE: If you see any errors on your deployment run please follow the [Troubleshooting doc](https://github.com/GPS-Demos/radlab/blob/opensource-cleanup/docs/TROUBLESHOOTING.md#rad-lab-troubleshooting) to lookup for errors and corresponding solutions.
+NOTE: If you see any errors on your deployment run please follow the [Troubleshooting doc](./docs/TROUBLESHOOTING.md#rad-lab-troubleshooting) to lookup for errors and corresponding solutions.
 
 ## Access RAD Lab Modules
 
-Follow the instructions under [gcp-ai-nootbook-tools Readme](https://github.com/GPS-Demos/radlab/blob/312e841c4062c91b9450ad534623531f4f5d6f9f/gcp-ai-notebook-tools/README.md).
+Follow the instructions under [gcp-ai-nootbook-tools Readme](./scripts/gcp-ai-notebook-tools/README.md).
 
 ## Troubleshooting Common Problems
 
