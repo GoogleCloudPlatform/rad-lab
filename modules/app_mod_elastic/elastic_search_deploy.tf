@@ -152,9 +152,9 @@ module "deploy_elastic_search" {
     module.gke_cluster.endpoint,
     module.deploy_eck_crds.wait,
     module.deploy_eck_operator.wait,
-    local_file.elastic_search_yaml_output.filename,
-    local_file.kibana_yaml_output.filename,
-    kubernetes_namespace.elastic_search_namespace.id,
-    kubernetes_service_account.elastic_search_identity.id
+    local_file.elastic_search_yaml_output.0.filename,
+    local_file.kibana_yaml_output.0.filename,
+    kubernetes_namespace.elastic_search_namespace.0.id,
+    kubernetes_service_account.elastic_search_identity.0.id
   ]
 }
