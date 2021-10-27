@@ -126,13 +126,13 @@ data "template_file" "kibana_yaml" {
 resource "local_file" "elastic_search_yaml_output" {
   count    = var.deploy_elastic_search ? 1 : 0
   filename = "${path.module}/elk/elastic_search_deployment.yaml"
-  content  = data.template_file.elastic_search_yaml.rendered
+  content  = data.template_file.elastic_search_yaml.0.rendered
 }
 
 resource "local_file" "kibana_yaml_output" {
   count    = var.deploy_elastic_search ? 1 : 0
   filename = "${path.module}/elk/kibana_deployment.yaml"
-  content  = data.template_file.kibana_yaml.rendered
+  content  = data.template_file.kibana_yaml.0.rendered
 }
 
 module "deploy_elastic_search" {
