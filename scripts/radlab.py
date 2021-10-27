@@ -63,7 +63,7 @@ def main():
 
         # Get Terraform Bucket Details
         tfbucket = getbucket(state.strip())
-        print("\nGCS bucket to save Terrafrom config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
+        print("\nGCS bucket to save Terraform config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
         # Setting Org ID, Billing Account, Folder ID, Domain
         if(state == "1"):  
