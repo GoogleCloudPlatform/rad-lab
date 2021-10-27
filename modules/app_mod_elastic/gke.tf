@@ -97,4 +97,8 @@ module "gke_authentication" {
   cluster_name         = module.gke_cluster.name
   location             = var.region
   use_private_endpoint = false
+
+  depends_on = [
+    module.elastic_search_project
+  ]
 }

@@ -31,7 +31,8 @@ output "subnet_selflink" {
 }
 
 output "gke_cluster_endpoint" {
-  value = module.gke_cluster.endpoint
+  sensitive = true
+  value     = module.gke_cluster.endpoint
 }
 
 output "random_id" {
