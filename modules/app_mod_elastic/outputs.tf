@@ -30,11 +30,6 @@ output "subnet_selflink" {
   value = module.elastic_search_network.subnets_self_links.0
 }
 
-output "gke_cluster_endpoint" {
-  sensitive = true
-  value     = module.gke_cluster.endpoint
-}
-
 output "random_id" {
   value = local.random_id
 }
