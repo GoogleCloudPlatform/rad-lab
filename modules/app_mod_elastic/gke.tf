@@ -89,16 +89,16 @@ module "gke_cluster" {
 
 }
 
-module "gke_authentication" {
-  source  = "terraform-google-modules/kubernetes-engine/google//modules/auth"
-  version = "~> 17.0"
-
-  project_id           = local.project_id
-  cluster_name         = module.gke_cluster.name
-  location             = var.region
-  use_private_endpoint = false
-
-  depends_on = [
-    module.elastic_search_project
-  ]
-}
+//module "gke_authentication" {
+//  source  = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+//  version = "~> 17.0"
+//
+//  project_id           = local.project_id
+//  cluster_name         = module.gke_cluster.name
+//  location             = var.region
+//  use_private_endpoint = false
+//
+//  depends_on = [
+//    module.elastic_search_project
+//  ]
+//}

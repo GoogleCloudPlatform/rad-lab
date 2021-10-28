@@ -20,10 +20,12 @@ locals {
   elastic_search_identity_name = "es-identity"
 }
 
+data "google_client_config" "provider" {}
+
 provider "kubernetes" {
-  cluster_ca_certificate = module.gke_authentication.cluster_ca_certificate
+  cluster_ca_certificate = base64decode(module.gke_cluster.ca_certificate)
   host                   = "https://${module.gke_cluster.endpoint}"
-  token                  = module.gke_authentication.token
+  token                  = data.google_client_config.provider.access_token
 }
 
 module "deploy_eck_crds" {
