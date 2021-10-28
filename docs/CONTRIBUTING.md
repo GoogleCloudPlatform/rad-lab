@@ -15,6 +15,26 @@ You generally only need to submit a CLA once, so if you've already submitted one
 (even if it was for a different project), you probably don't need to do it
 again.
 
+## Repository Structure
+
+The project has the following file structure:
+- [/docs](../docs): Documentation about the repository.
+- [/modules](../modules): Customisable modules to create Google Cloud Platform infrastructure.
+- [/scripts](../scripts): Installer and additional scripts to support the modules.
+
+Every individual module is contained in it subdirectory and should follow these Terraform guidelines:
+
+- Create at least a `versions.tf`, `main.tf`, `variables.tf` and `outputs.tf`.  It's ok to create additional files, to split resources between files and give them more meaningful names. 
+- A README.md containing more information about the modules, required IAM permissions and any specific instructions to create the infrastructure.
+
+For every module, a base configuration is determined, which can be installed via the [radlab.py](../scripts/INSTALLER.md) installer.  The base configuration are the default values for each variable in the module itself.
+
+## Installer
+It should be possible for people with less experience in Infrastructure As Code to use every module.  The repository contains an installer for that purpose, which can be found in the [/scripts](../scripts) directory ([radlab.py](../scripts/radlab.py)).  The installer should be updated whenever new modules are introduced to the repository.
+
+## Cloud Foundation Toolkit
+Where possible, use the open source [Cloud Foundation Toolkit](https://cloud.google.com/foundation-toolkit) modules to create Google Cloud infrastructure.
+
 ## Code Reviews
 
 All submissions, including submissions by project members, require review. We

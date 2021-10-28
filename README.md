@@ -4,7 +4,7 @@ The RAD Lab repository contains a set of modules which allows users to create th
 
 These modules are bundled together with an installer, written in Python, to create a base configuration for every module.  The purpose of the installer is to allow people without Terraform or scripting knowledge to create the infrastructure in a sandbox environment, to explore the advantages of Google Cloud Platform.  Each module comes with a sample configuration that can be created via the installer.
 
-Teams with experience in Terraform can use the Terraform modules in the /modules-directory directly, to integrate the codebase with their existing infrastructure and CI/CD pipelines and should be able to support more advanced scenarios for the same module.
+Teams with experience in Terraform can use the Terraform modules in the [/modules-directory](./modules) directly, to integrate the codebase with their existing infrastructure and CI/CD pipelines and should be able to support more advanced scenarios for the same module.
 
 For any issues, please create an issue in the Issue tracker of the repository, following the provided templates.
 
@@ -47,4 +47,8 @@ The repository has the following structure:
 * [/modules](./modules): Customisable, reusable Terraform modules to create GCP infrastructure.
 * [/scripts](./scripts): Installer and additional scripts to support the modules.
 * [/tools](./tools): Automation tools to generate the necessary documentation and license checks.
+
+## Contributing
+
+We welcome all contributions.  Please read [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for more information on how to publish your contributions. 
  
