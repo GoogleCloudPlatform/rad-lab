@@ -56,6 +56,7 @@ Currently RAD Lab is only comprised of single module i.e. **Data Science** Modul
 
 2. Start the Guided setup by running : `python3 radlab.py` and follow the instructions.
 
+NOTE: Save the **deployment_id** from the output of the above script execution for future reference, for making any updates or delete the RADLab Module created.
 
 ## Example Run of RAD-Lab Installer 
 
@@ -155,7 +156,7 @@ GCS Bucket storing Terrafrom Configs: my-sample-bucket
 TERRAFORM DEPLOYMENT COMPLETED!!!
 ```
 
-NOTE: Save the **deployment_id** for future reference for making any updates or delete the RADLab Module created.
+NOTE: Save the **deployment_id** for future reference, for making any updates or delete the RADLab Module created.
 
 NOTE: If you see any errors on your deployment run please follow the [Troubleshooting doc](../../docs/TROUBLESHOOTING.md#rad-lab-troubleshooting) to lookup for errors and corresponding solutions.
 
