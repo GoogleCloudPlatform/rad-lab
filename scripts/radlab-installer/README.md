@@ -6,6 +6,8 @@ The RAD Lab installer provides an automated way to create the modules inside you
 
 1. [Download](https://github.com/GoogleCloudPlatform/rad-lab/archive/refs/heads/main.zip) the Complete directory structure & its files on your **Cloud Shell** or Localhost.
 
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/rad-lab&cloudshell_git_branch=main)
+
 NOTE: Alternatively if you want to deploy using the above **Open in Cloud Shell** button you will need to set up GitHup Personal Access Token following [these steps](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) and skip 1. Enter you GitHib credentials. (Enter your Personal Access Token for the password)
 
 NOTE: RAD Lab deployment is supported only via GCP Cloud Shell, MAC OS, Linux & Windows Operating system.
