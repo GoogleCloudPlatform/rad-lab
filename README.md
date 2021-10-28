@@ -23,12 +23,12 @@ To create a module in your GCP environment, please click on the “Open In Cloud
 ### Prerequisites
 * [gcloud](https://cloud.google.com/sdk/docs/install) SDK version 360.0.0 or higher.
 * [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/gcp-get-started) version 1.0 or higher.
-* [python](https://www.python.org/downloads/) version 3.73.0 or higher.
+* [python](https://www.python.org/downloads/) version 3.7.3 or higher.
 
-Users can run `installer_prereq.py` included in the [scripts directory](./scripts) to validate these prerequisites and install any missing dependencies. 
+Users can run `installer_prereq.py` included in the [radlab-installer scripts directory](./scripts/radlab-installer) to validate these prerequisites and install any missing dependencies. 
 
 ### Installer
-In order to enable all types of users to run these modules, an installer has been created to install each individual module.  The installer walks the end user through a wizard to create the necessary infrastructure for each module.  More instructions on the installer can be found [here](./scripts).
+In order to enable all types of users to run these modules, an installer has been created to install each individual module.  The installer walks the end user through a wizard to create the necessary infrastructure for each module.  More instructions on the installer can be found [here](./scripts/radlab-installer).
 
 ### Modules
 
@@ -45,7 +45,7 @@ As a minimum, users should have access to a billing account when creating projec
 The repository has the following structure:
 * [/docs](./docs): General documentation about the repository and how to use it.
 * [/modules](./modules): Customisable, reusable Terraform modules to create GCP infrastructure.
-* [/scripts](./scripts): Installer and additional scripts to support the modules.
+* [/scripts](./scripts): RAD-Lab Installer and additional scripts to support the modules.
 * [/tools](./tools): Automation tools to generate the necessary documentation and license checks.
 
 ## Contributing
