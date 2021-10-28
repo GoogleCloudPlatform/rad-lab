@@ -21,9 +21,9 @@ This is not an officially supported Google product
 To create a module in your GCP environment, please click on the “Open In Cloud Shell” button at the top of this README.md file.  This will clone the entire repository to Cloud Shell and automatically select the `main`-branch.
     
 ### Prerequisites
-* [gcloud](https://cloud.google.com/sdk/docs/install) SDK version 360.0.0 or higher.
 * [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/gcp-get-started) version 1.0 or higher.
-* [python](https://www.python.org/downloads/) version 3.7.3 or higher.
+* [gcloud](https://cloud.google.com/sdk/docs/install) SDK version 360.0.0 or higher. (ONLY for [Installer](./scripts/radlab-installer))
+* [python](https://www.python.org/downloads/) version 3.7.3 or higher. (ONLY for [Installer](./scripts/radlab-installer))
 
 Users can run `installer_prereq.py` included in the [radlab-installer scripts directory](./scripts/radlab-installer) to validate these prerequisites and install any missing dependencies. 
 
