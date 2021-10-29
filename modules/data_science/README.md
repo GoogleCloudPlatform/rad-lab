@@ -13,6 +13,15 @@ Below Architechture Diagram is the base representation of what will be created a
 
 ![](../../docs/images/V1_DataScience.png)
 
+## IAM permissions to run the Terraform deployment
+
+The lab need to be deployed by a _Cloud Admin_ persona with the following GCP roles:
+* `Billing Account User`
+* `Organization Viewer`
+* `Project Creator`
+* `Storage Object Viewer`
+* [OPTIONAL] `Organization Policy Administrator`
+
 <!-- BEGIN TFDOC -->
 ## Variables
 
@@ -44,3 +53,9 @@ Below Architechture Diagram is the base representation of what will be created a
 | project-radlab-ds-analytics-id | Analytics Project ID |  |
 | user-scripts-bucket-uri | User Script Bucket URI |  |
 <!-- END TFDOC -->
+
+NOTE: `variables.tf` would list some defaults. If you would like to override or hardcode any variables, please create the `terraform.tfvars` file and set the variables there under each RAD-Lab module's folder.
+
+## Access RAD Lab Data Science Notebooks
+
+Follow the instructions under [gcp-ai-nootbook-tools Readme](./scripts/gcp-ai-notebook-tools/README.md).
