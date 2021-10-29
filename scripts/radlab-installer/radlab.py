@@ -102,7 +102,7 @@ def main():
             delifexist(env_path)
 
             # Copy datascience directory
-            shutil.copytree(os.path.dirname(os.getcwd()) + '/modules/data_science', env_path)
+            shutil.copytree(os.path.dirname(os.path.dirname(os.getcwd())) + '/modules/data_science', env_path)
             
             # Set Terraform states remote backend as GCS
             settfstategcs(env_path,prefix,tfbucket)
@@ -222,7 +222,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     if(state == "1" or state == "2"):
         return_code, stdout, stderr = tr.apply_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'domain':domain, 'file_path':env_path, 'notebook_count':notebook_count, 'trusted_users': trusted_users, 'random_id':randomid})
     elif(state == "3"):
-        return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'file_path':env_path,'random_id':randomid})
+        return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'file_path':env_path,'random_id':randomid})
 
     # return_code - 0 Success & 1 Error
     if(return_code == 1):
