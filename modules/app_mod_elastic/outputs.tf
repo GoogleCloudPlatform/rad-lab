@@ -23,7 +23,7 @@ output "network_selflink" {
 }
 
 output "project_id" {
-  value = local.project_id
+  value = local.project.project_id
 }
 
 output "subnet_selflink" {

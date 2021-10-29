@@ -15,7 +15,7 @@
  */
 
 data "google_compute_zones" "zones" {
-  project = local.project_id
+  project = local.project.project_id
   region  = var.region
 
   depends_on = [
@@ -26,7 +26,7 @@ data "google_compute_zones" "zones" {
 module "gke_cluster" {
   source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
   version                    = "~> 17.0"
-  project_id                 = local.project_id
+  project_id                 = local.project.project_id
   name                       = var.gke_cluster_name
   region                     = var.region
   network                    = module.elastic_search_network.network_name
@@ -39,7 +39,7 @@ module "gke_cluster" {
   release_channel            = var.release_channel
   kubernetes_version         = var.gke_version
   issue_client_certificate   = false
-  identity_namespace         = "${local.project_id}.svc.id.goog"
+  identity_namespace         = "${local.project.project_id}.svc.id.goog"
   create_service_account     = true
   enable_private_nodes       = true
   enable_private_endpoint    = false

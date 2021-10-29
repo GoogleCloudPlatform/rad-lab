@@ -35,10 +35,10 @@ Below Architechture Diagram is the base representation of what will be created a
 # Retrieve credentials to query the Kubernetes API server
 $(terraform show -json | jq -r .values.outputs.cluster_credentials_cmd.value)
 
-# Check status Elastic Search.  
+# Check status Elastic Search. The health column should show status green. 
 kubectl get elasticsearch -n elastic-search
 
-# Check status Kibana.
+# Check status Kibana.  The health column should show status green.
 kubectl get kibana -n elastic-search
 
 # Retrieve password

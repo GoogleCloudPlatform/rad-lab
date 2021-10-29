@@ -18,7 +18,7 @@ module "elastic_search_network" {
   source  = "terraform-google-modules/network/google"
   version = "~> 3.0"
 
-  project_id   = local.project_id
+  project_id   = local.project.project_id
   network_name = var.network_name
   routing_mode = "GLOBAL"
   description  = "VPC Network created via Terraform"
@@ -54,7 +54,7 @@ module "elastic_search_network" {
 resource "google_compute_router" "router" {
   count = var.enable_internet_egress_traffic ? 1 : 0
 
-  project = local.project_id
+  project = local.project.project_id
   name    = "es-access-router"
   network = module.elastic_search_network.network_self_link
   region  = var.region
@@ -66,7 +66,7 @@ resource "google_compute_router" "router" {
 
 resource "google_compute_router_nat" "nat" {
   count                              = var.enable_internet_egress_traffic ? 1 : 0
-  project                            = local.project_id
+  project                            = local.project.project_id
   name                               = "es-proxy-ext-access-nat"
   router                             = google_compute_router.router[0].name
   region                             = var.region
@@ -85,7 +85,7 @@ resource "google_compute_router_nat" "nat" {
 
 resource "google_compute_route" "external_access" {
   count            = var.enable_internet_egress_traffic ? 1 : 0
-  project          = local.project_id
+  project          = local.project.project_id
   dest_range       = "0.0.0.0/0"
   name             = "proxy-external-access"
   network          = module.elastic_search_network.network_name

@@ -15,7 +15,7 @@
  */
 
 locals {
-  k8s_credentials_cmd          = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.region} --project ${local.project_id}"
+  k8s_credentials_cmd          = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.region} --project ${local.project.project_id}"
   elastic_namespace_name       = "elastic-search"
   elastic_search_identity_name = "es-identity"
 }
@@ -32,7 +32,7 @@ module "deploy_eck_crds" {
   source  = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
   version = "~> 3.0.0"
 
-  project_id              = local.project_id
+  project_id              = local.project.project_id
   cluster_name            = module.gke_cluster.name
   cluster_location        = var.region
   kubectl_create_command  = "kubectl create -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
@@ -49,7 +49,7 @@ module "deploy_eck_operator" {
   source  = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
   version = "~> 3.0"
 
-  project_id              = local.project_id
+  project_id              = local.project.project_id
   cluster_name            = module.gke_cluster.name
   cluster_location        = var.region
   kubectl_create_command  = "kubectl apply -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
@@ -92,12 +92,11 @@ resource "kubernetes_service_account" "elastic_search_identity" {
     name      = local.elastic_search_identity_name
     namespace = local.elastic_namespace_name
     annotations = {
-      "iam.gke.io/gcp-service-account" = "${google_service_account.elastic_search_gcp_identity.name}@${local.project_id}.iam.gserviceaccount.com"
+      "iam.gke.io/gcp-service-account" = "${google_service_account.elastic_search_gcp_identity.name}@${local.project.project_id}.iam.gserviceaccount.com"
     }
   }
 
   depends_on = [
-    module.elastic_search_project,
     module.gke_cluster.node_pools_names,
     kubernetes_namespace.elastic_search_namespace
   ]
@@ -142,7 +141,7 @@ module "deploy_elastic_search" {
   source  = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
   version = "~> 3.0"
 
-  project_id              = local.project_id
+  project_id              = local.project.project_id
   cluster_name            = module.gke_cluster.name
   cluster_location        = var.region
   kubectl_create_command  = "kubectl apply -f ${path.module}/elk"
