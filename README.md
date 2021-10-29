@@ -12,7 +12,7 @@ This is not an officially supported Google product
 
 ## Quick Start
 
-To create a module in an existing GCP environment, please click on the “Open In Cloud Shell” button at the top of this README.md file.  This will clone the entire repository to Cloud Shell and automatically select the `main`-branch.
+To create a module in an existing GCP environment, please click on the “Open In Cloud Shell” button.  This will clone the entire repository to Cloud Shell and automatically select the `main`-branch.
 
 [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/rad-lab&cloudshell_git_branch=main)
 
