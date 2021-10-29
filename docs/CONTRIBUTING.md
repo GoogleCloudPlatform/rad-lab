@@ -37,7 +37,7 @@ NOTE: Add below 2 tags in the RAD-Lab module specific README.md for populating s
 <!-- END TFDOC -->
 ```
 
-For every module, a base configuration is determined, which can be installed via the [radlab.py](../scripts/radlab-installer/README.md) installer.  The base configuration are the default values for each variable in the module itself.
+For every module, a base configuration is determined, which can be installed via the [radlab.py](../scripts/radlab-installer/README.md) installer.  The base configuration is reflected in the default values for all the variables, except for `organization_id`, `billing_account_id` and (optional) `folder_id`. 
 
 ## Installer
 It should be possible for people with less experience in Infrastructure As Code to use every module.  The repository contains an installer for that purpose, which can be found in the [/scripts](../scripts) directory ([radlab.py](../scripts/radlab-installer/radlab.py)).  The installer needs to be updated whenever new modules are introduced to the repository.
