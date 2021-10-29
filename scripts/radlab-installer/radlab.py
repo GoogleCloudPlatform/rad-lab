@@ -39,7 +39,7 @@ def main():
     folderid       = ""
     billing_acc    = ""
     domain         = ""
-    model          = ""
+    module          = ""
     state          = ""
     notebook_count = ""
     trusted_users  = []
@@ -52,9 +52,9 @@ def main():
         print("Login with Cloud Admin account...")
         os.system("gcloud auth application-default login")
 
-    model = input("\nList of available RADLab modules:\n[1] Data Science\n[2] (APP MOD) Elastic Search\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
+    module = input("\nList of available RADLab modules:\n[1] Data Science\n[2] (APP MOD) Elastic Search\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
     
-    if(model.strip() == "1"):
+    if(module.strip() == "1"):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
         
@@ -151,7 +151,7 @@ def main():
                     trusted_users.append("user:" + new_name + "@" + domain)
             # print(trusted_users)
 
-    elif(model.strip() == "2"):
+    elif(module.strip() == "2"):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elastic Search"+ Style.RESET_ALL)
 
@@ -226,11 +226,11 @@ def main():
         # Module Specific Options #
         ###########################
         
-    elif(model.strip() == "3"):
+    elif(module.strip() == "3"):
         sys.exit(Fore.GREEN + "\nExiting Installer")
 
     else:
-        sys.exit(Fore.RED + "\nInvalid Model")
+        sys.exit(Fore.RED + "\nInvalid module")
 
     env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket)
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
@@ -244,7 +244,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     if(state == "1" or state == "2"):
         return_code, stdout, stderr = tr.apply_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'domain':domain, 'file_path':env_path, 'notebook_count':notebook_count, 'trusted_users': trusted_users, 'random_id':randomid})
     elif(state == "3"):
-        return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'file_path':env_path,'random_id':randomid})
+        return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'file_path':env_path,'random_id':randomid})
 
     # return_code - 0 Success & 1 Error
     if(return_code == 1):
