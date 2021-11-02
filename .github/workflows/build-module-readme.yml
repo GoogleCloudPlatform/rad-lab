@@ -1,0 +1,78 @@
+# .github/workflows/build-module-readme.yml
+
+name: 'BUILD - Module README.md'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'modules/**/variables.tf'
+      - 'modules/**/outputs.tf'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 'Module README Variables/Outputs'
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TF_IN_AUTOMATION: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.WORKFLOW_PAT }}
+
+      - id: files
+        uses: jitterbit/get-changed-files@v1
+        with:
+          format: 'json'
+        continue-on-error: true
+
+      - name: Get added and modified files
+        run: |
+          readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
+          for added_modified_file in "${added_modified_files[@]}"; do
+            echo "File Added/Modified : ${added_modified_file}" 
+          done
+          DIR="$(dirname ${added_modified_files[0]})"
+          echo "ENV_DIR=${DIR}" >> $GITHUB_ENV
+        continue-on-error: true
+
+      - name: Get removed files
+        run: |
+          readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
+          for removed_file in ${removed_files[@]}; do
+            echo "File Removed : ${removed_file}" 
+          done
+          DIR="$(dirname ${removed_files[0]})"
+          echo "ENV_DIR=${DIR}" >> $GITHUB_ENV
+        continue-on-error: true
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8 #install the python needed
+
+      - name: install python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: tools
+
+      - name: execute py script # run the tfdoc.py
+        run: |
+          python tfdoc.py ${GITHUB_WORKSPACE}/${{ env.ENV_DIR }}
+        working-directory: tools
+
+      - name: commit files
+        run: |
+          git config --local user.email ${{ secrets.WORKFLOW_EMAIL }}
+          git config --local user.name ${{ secrets.WORKFLOW_USERNAME }}
+          git add -A
+          git commit -m "[WORKFLOW] Auto updating RAD-Lab Module README.md" -a
+
+      - name: push changes
+        run: |
+          git push -u origin main

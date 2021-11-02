@@ -39,7 +39,7 @@ def main():
     folderid       = ""
     billing_acc    = ""
     domain         = ""
-    model          = ""
+    module          = ""
     state          = ""
     notebook_count = ""
     trusted_users  = []
@@ -52,9 +52,9 @@ def main():
         print("Login with Cloud Admin account...")
         os.system("gcloud auth application-default login")
 
-    model = input("\nList of available RADLab modules:\n[1] Data Science\n[2] (APP MOD) Elastic Search\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
+    module = input("\nList of available RADLab modules:\n[1] Data Science\n[2] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
     
-    if(model.strip() == "1"):
+    if(module.strip() == "1"):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
         
@@ -79,7 +79,7 @@ def main():
             delifexist(env_path)
 
             # Copy module directory
-            shutil.copytree(os.path.dirname(os.getcwd()) + '/modules/data_science', env_path)
+            shutil.copytree(os.path.dirname(os.path.dirname(os.getcwd())) + '/modules/data_science', env_path)
             
             # Set Terraform states remote backend as GCS
             settfstategcs(env_path,prefix,tfbucket)
@@ -150,87 +150,12 @@ def main():
                         new_name = new_name.split("@")[0]
                     trusted_users.append("user:" + new_name + "@" + domain)
             # print(trusted_users)
-
-    elif(model.strip() == "2"):
-
-        print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elastic Search"+ Style.RESET_ALL)
-
-        # Select Action to perform
-        state = select_state()
-
-        # Get Terraform Bucket Details
-        tfbucket = getbucket(state.strip())
-        print("\nGCS bucket to save Terrafrom config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
-
-        # Setting Org ID, Billing Account, Folder ID, Domain
-        if(state == "1"):
-            
-            # Getting Base Inputs
-            orgid, billing_acc, folderid, domain, randomid = basic_input()
-
-            # Set environment path as deployment directory
-            prefix = 'app_mod_elastic_'+randomid
-            env_path = setup_path+'/deployments/'+prefix
-
-            # Checking if 'deployment' folder exist in local. If YES, delete the same.
-            delifexist(env_path)
-
-            # Copy module directory
-            shutil.copytree(os.path.dirname(os.getcwd()) + '/modules/app_mod_elastic', env_path)
-            
-            # Set Terraform states remote backend as GCS
-            settfstategcs(env_path,prefix,tfbucket)
-
-            # Create file with billing/org/folder details
-            create_env(env_path, orgid, billing_acc, folderid)
-
-        elif(state == "2" or state == "3"):
-            
-            # Get Deployment ID
-            randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RADLab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
-            randomid = randomid.strip()
-
-            # Validating Deployment ID
-            if(len(randomid) == 4 and randomid.isalnum()):
-                
-                # Set environment path as deployment directory
-                prefix = 'app_mod_elastic_'+randomid
-                env_path = setup_path+'/deployments/'+prefix
-                
-                # Setting Local Deployment
-                setlocaldeployment(tfbucket,prefix,env_path)
-
-            else:
-                sys.exit(Fore.RED + "\nInvalid deployment ID!\n")
-
-            # Get env values
-            orgid, billing_acc, folderid = get_env(env_path)
-
-            # Fetching Domain name 
-            domain = getdomain(orgid)
-            
-            # Set Terraform states remote backend as GCS
-            settfstategcs(env_path,prefix,tfbucket)
-
-            if(state == "3"):
-                print("DELETING DEPLOYMENT...")
-        
-        elif(state == "4"):
-            print("LISTING EXISTING MODULE - WORK IN PROGRESS")
-
-        else:
-            sys.exit(Fore.RED + "\nInvalid RADLab Module State selected")
-
-
-        ###########################
-        # Module Specific Options #
-        ###########################
-        
-    elif(model.strip() == "3"):
+  
+    elif(module.strip() == "2"):
         sys.exit(Fore.GREEN + "\nExiting Installer")
 
     else:
-        sys.exit(Fore.RED + "\nInvalid Model")
+        sys.exit(Fore.RED + "\nInvalid module")
 
     env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket)
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
@@ -244,7 +169,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     if(state == "1" or state == "2"):
         return_code, stdout, stderr = tr.apply_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'domain':domain, 'file_path':env_path, 'notebook_count':notebook_count, 'trusted_users': trusted_users, 'random_id':randomid})
     elif(state == "3"):
-        return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'file_path':env_path,'random_id':randomid})
+        return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'file_path':env_path,'random_id':randomid})
 
     # return_code - 0 Success & 1 Error
     if(return_code == 1):
@@ -253,8 +178,6 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     else:
         if(state == '1' or state == '2'):
             os.system('gsutil -q -m cp -r ' + env_path + '/*.tf gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments')
-            os.system('gsutil -q -m cp -r ' + env_path + '/templates gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments/templates')
-            os.system('gsutil -q -m cp -r ' + env_path + '/elk gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments/elk')
             os.system('gsutil -q -m cp -r ' + env_path + '/*.json gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments')
 
         elif(state == '3'):
@@ -266,7 +189,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     shutil.rmtree(env_path)
 
 def select_state():
-    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ')
+    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ')
     state = state.strip()
     return state
 

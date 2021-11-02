@@ -9,6 +9,9 @@
 # Below are the owners if specific folders and its files 
 # directory in the root of your repository and any of its
 # subdirectories.
+
+/.github/                       @guptamukul-google
+
 /docs/                          @agussman @BrianReevz @debakkerb @guptamukul-google
 
 /modules/                       @debakkerb @guptamukul-google @debakkerb
@@ -23,12 +26,16 @@
 
 # Below are the owners of individual file types
 
-*.tf    @debakkerb @guptamukul-google
+*.json   @guptamukul-google 
+
+*.md    @agussman @BrianReevz @debakkerb @guptamukul-google @hradhakrishnan
 
 *.py    @guptamukul-google
 
-*.txt   @guptamukul-google
-
 *.sh    @debakkerb @guptamukul-google @hradhakrishnan
 
-*.md    @agussman @BrianReevz @debakkerb @guptamukul-google @hradhakrishnan
+*.tf    @debakkerb @guptamukul-google
+
+*.txt   @guptamukul-google
+
+*.yml   @guptamukul-google 

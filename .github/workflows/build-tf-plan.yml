@@ -33,22 +33,22 @@ jobs:
 
       - name: Get added and modified files
         run: |
-          mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
+          readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
           for added_modified_file in "${added_modified_files[@]}"; do
             echo "File Added/Modified : ${added_modified_file}" 
           done
           DIR="$(dirname ${added_modified_files[0]})"
-          echo "ENV_DIR=${DIR:2}" >> $GITHUB_ENV
+          echo "ENV_DIR=${DIR}" >> $GITHUB_ENV
         continue-on-error: true
 
       - name: Get removed files
         run: |
           readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
           for removed_file in ${removed_files[@]}; do
-            echo "File Added/Modified : ${removed_file}" 
+            echo "File Removed : ${removed_file}" 
           done
           DIR="$(dirname ${removed_files[0]})"
-          echo "ENV_DIR=${DIR:2}" >> $GITHUB_ENV
+          echo "ENV_DIR=${DIR}" >> $GITHUB_ENV
         continue-on-error: true
 
       - name: Setup Terraform
