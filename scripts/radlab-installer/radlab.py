@@ -58,12 +58,14 @@ def main():
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
         
+        module_name = 'data_science'
+
         # Select Action to perform
         state = select_state()
 
         # Get Terraform Bucket Details
         tfbucket = getbucket(state.strip())
-        print("\nGCS bucket to save Terraform config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
+        print("\nGCS bucket for Terraform config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
         # Setting Org ID, Billing Account, Folder ID, Domain
         if(state == "1"):  
@@ -72,7 +74,7 @@ def main():
             orgid, billing_acc, folderid, domain, randomid = basic_input()
 
             # Set environment path as deployment directory
-            prefix = 'data_science_'+randomid
+            prefix = module_name+'_'+randomid
             env_path = setup_path+'/deployments/'+prefix
 
             # Checking if 'deployment' folder exist in local. If YES, delete the same.
@@ -97,7 +99,7 @@ def main():
             if(len(randomid) == 4 and randomid.isalnum()):
                 
                 # Set environment path as deployment directory
-                prefix = 'data_science_'+randomid
+                prefix = module_name+'_'+randomid
                 env_path = setup_path+'/deployments/'+prefix
                 
                 # Setting Local Deployment
@@ -118,6 +120,10 @@ def main():
             if(state == "3"):
                 print("DELETING DEPLOYMENT...")
         
+        elif(state == "4"):
+            list_radlab_deployments(tfbucket, module_name)
+            sys.exit()
+
         else:
             sys.exit(Fore.RED + "\nInvalid RADLab Module State selected")
 
@@ -155,12 +161,14 @@ def main():
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elastic Search"+ Style.RESET_ALL)
 
+        module_name = 'app_mod_elastic'
+
         # Select Action to perform
         state = select_state()
 
         # Get Terraform Bucket Details
         tfbucket = getbucket(state.strip())
-        print("\nGCS bucket to save Terrafrom config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
+        print("\nGCS bucket for Terrafrom config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
         # Setting Org ID, Billing Account, Folder ID, Domain
         if(state == "1"):
@@ -169,7 +177,7 @@ def main():
             orgid, billing_acc, folderid, domain, randomid = basic_input()
 
             # Set environment path as deployment directory
-            prefix = 'app_mod_elastic_'+randomid
+            prefix = module_name+'_'+randomid
             env_path = setup_path+'/deployments/'+prefix
 
             # Checking if 'deployment' folder exist in local. If YES, delete the same.
@@ -194,7 +202,7 @@ def main():
             if(len(randomid) == 4 and randomid.isalnum()):
                 
                 # Set environment path as deployment directory
-                prefix = 'app_mod_elastic_'+randomid
+                prefix = module_name+'_'+randomid
                 env_path = setup_path+'/deployments/'+prefix
                 
                 # Setting Local Deployment
@@ -214,6 +222,10 @@ def main():
 
             if(state == "3"):
                 print("DELETING DEPLOYMENT...")
+
+        elif(state == "4"):
+            list_radlab_deployments(tfbucket, module_name)
+            sys.exit()
 
         else:
             sys.exit(Fore.RED + "\nInvalid RADLab Module State selected")
@@ -263,7 +275,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     shutil.rmtree(env_path)
 
 def select_state():
-    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ')
+    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ')
     state = state.strip()
     return state
 
@@ -432,13 +444,13 @@ def getbucket(state):
     if(state == '1'):
         bucketoption = input("\nWant to use existing GCS Bucket for Terraform configs or Create Bucket ?:\n[1] Use Existing Bucket\n[2] Create New Bucket\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ')
     
-    if(bucketoption == '1' or state == '2' or state == '3'):
+    if(bucketoption == '1' or state == '2' or state == '3' or state == '4'):
         try:
             buckets = storage_client.list_buckets()
 
             barray = []    
             x = 0
-            print("\nSelect a bucket to save Terraform Configs & States... \n")
+            print("\nSelect a bucket for Terraform Configs & States... \n")
             # Print out Buckets in the default project
             for bucket in buckets:
                 print("[" + str(x+1) + "] " + bucket.name)
@@ -509,6 +521,19 @@ def blob_exists(tfbucket, prefix):
     blob = bucket.blob('radlab/'+ prefix+'/deployments/main.tf')
     # print(blob.exists())
     return blob.exists()
+
+def list_radlab_deployments(tfbucket, module_name):
+    """Lists all the blobs in the bucket that begin with the prefix."""
+
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(tfbucket)
+    iterator = bucket.list_blobs(prefix='radlab/',delimiter='/')
+    response = iterator._get_next_page_response()
+    print("\nPlease find the list of "+ module_name + " module below:\n")
+
+    for prefix in response['prefixes']:
+        if module_name in prefix:
+            print(Fore.GREEN + Style.BRIGHT + prefix.split('/')[1] + Style.RESET_ALL)
 
 if __name__ == "__main__":
     main()
