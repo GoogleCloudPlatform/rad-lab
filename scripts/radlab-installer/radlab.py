@@ -241,7 +241,7 @@ def main():
     else:
         sys.exit(Fore.RED + "\nInvalid module")
 
-    # env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket)
+    env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket)
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
 	
