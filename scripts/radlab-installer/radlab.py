@@ -156,11 +156,6 @@ def main():
                         new_name = new_name.split("@")[0]
                     trusted_users.append("user:" + new_name + "@" + domain)
             # print(trusted_users)
-<<<<<<< HEAD
-  
-    elif(module.strip() == "2"):
-=======
-
     elif(module.strip() == "2"):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elastic Search"+ Style.RESET_ALL)
