@@ -52,12 +52,8 @@ def main():
         print("Login with Cloud Admin account...")
         os.system("gcloud auth application-default login")
 
-<<<<<<< HEAD
-    module = input("\nList of available RADLab modules:\n[1] Data Science\n[2] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
-=======
     module = input("\nList of available RADLab modules:\n[1] Data Science\n[2] (APP MOD) Elastic Search\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
->>>>>>> b94c85b7e1a10ad561b78010d0acdabf93c89523
-    
+
     if(module.strip() == "1"):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
