@@ -1,0 +1,155 @@
+# .github/workflows/notifications.yml
+
+name: BUILD - RAD Lab Notifications
+on:
+  issues:
+    types: [opened, reopened]
+  pull_request:
+    branches:
+      - main
+    types: [opened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Git Issue Details
+      if: github.event_name == 'issues'
+      run: |
+          echo "Issue creator: ${{ github.event.issue.user.login }}"
+          echo "Issue title: ${{ github.event.issue.title }}"
+          echo "Issue number: ${{ github.event.issue.number }}"
+          echo "Issue url: ${{ github.event.issue.html_url }}"
+          echo "Issue body: ${{ github.event.issue.body }}"
+          echo "Assigned labels: " ${{ join(github.event.issue.labels.*.name) }}
+          echo "Assignees: " ${{ join(github.event.issue.assignees.*.login) }}
+    - name: Google Chat Notification - Issue
+      if: github.event_name == 'issues'
+      run: |
+          curl --location --request POST '${{ secrets.WEBHOOK }}' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+              "cards": [
+                  {
+                      "header": {
+                          "title": "Issue Tracker",
+                          "subtitle": "Issue No: #${{ github.event.issue.number }}"
+                      },
+                      "sections": [
+                          {
+                              "widgets": [
+                                  {
+                                     "keyValue": {
+                                          "topLabel": "Creator",
+                                          "content": "${{ github.event.issue.user.login }}"
+                                      },
+                                   },
+                                   {
+                                     "keyValue": {
+                                          "topLabel": "Title",
+                                          "content": "${{ github.event.issue.title }}"
+                                      }
+                                   },
+                                   {
+                                     "keyValue": {
+                                          "topLabel": "Assigned Lables",
+                                          "content": "- ${{ join(github.event.issue.labels.*.name) }}"
+                                      }
+                                   },
+                                   {
+                                     "keyValue": {
+                                          "topLabel": "Assignees",
+                                          "content": "- ${{ join(github.event.issue.assignees.*.login) }}"
+                                      }
+                                   },
+                                   {
+                                      "buttons": [
+                                          {
+                                              "textButton": {
+                                                  "text": "OPEN ISSUE",
+                                                  "onClick": {
+                                                      "openLink": {
+                                                          "url": "${{ github.event.issue.html_url }}"
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                      ]
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+              ]
+          }'
+
+    - name: Git Pull Request Details
+      if: github.event_name == 'pull_request'
+      run: |
+          echo "PR creator: ${{ github.event.pull_request.user.login }}"
+          echo "PR title: ${{ github.event.pull_request.title }}"
+          echo "PR number: ${{ github.event.pull_request.number }}"
+          echo "PR url: ${{ github.event.pull_request.html_url }}"
+          echo "PR body: ${{ github.event.pull_request.body }}"
+          echo "Assigned labels: " ${{ join(github.event.pull_request.labels.*.name) }}
+          echo "Assignees: " ${{ join(github.event.pull_request.assignees.*.login) }}
+    - name: Google Chat Notification - Pull Request
+      if: github.event_name == 'pull_request'
+      run: |
+          curl --location --request POST '${{ secrets.WEBHOOK }}' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+              "cards": [
+                  {
+                      "header": {
+                          "title": "Pull Request Tracker",
+                          "subtitle": "Pull Request No: #${{ github.event.pull_request.number }}"
+                      },
+                      "sections": [
+                          {
+                              "widgets": [
+                                  {
+                                     "keyValue": {
+                                          "topLabel": "Creator",
+                                          "content": "${{ github.event.pull_request.user.login }}"
+                                      },
+                                   },
+                                   {
+                                     "keyValue": {
+                                          "topLabel": "Title",
+                                          "content": "${{ github.event.pull_request.title }}"
+                                      }
+                                   },
+                                   {
+                                     "keyValue": {
+                                          "topLabel": "Assigned Lables",
+                                          "content": "- ${{ join(github.event.pull_request.labels.*.name) }}"
+                                      }
+                                   },
+                                   {
+                                     "keyValue": {
+                                          "topLabel": "Assignees",
+                                          "content": "- ${{ join(github.event.pull_request.assignees.*.login) }}"
+                                      }
+                                   },
+                                   {
+                                      "buttons": [
+                                          {
+                                              "textButton": {
+                                                  "text": "OPEN PR",
+                                                  "onClick": {
+                                                      "openLink": {
+                                                          "url": "${{ github.event.pull_request.html_url }}"
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                      ]
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+              ]
+          }'
