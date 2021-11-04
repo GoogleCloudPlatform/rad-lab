@@ -235,7 +235,6 @@ def main():
         ###########################
         
     elif(module.strip() == "3"):
->>>>>>> b94c85b7e1a10ad561b78010d0acdabf93c89523
         sys.exit(Fore.GREEN + "\nExiting Installer")
 
     else:
