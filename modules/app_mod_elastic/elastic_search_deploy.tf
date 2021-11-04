@@ -51,7 +51,7 @@ module "deploy_eck_operator" {
   cluster_name            = module.gke_cluster.name
   cluster_location        = var.region
   kubectl_create_command  = "kubectl apply -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
-  kubectl_destroy_command = "${path.module}/scripts/remove_eck_operator.sh && kubectl delete -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
+  kubectl_destroy_command = "${path.module}/scripts/remove_eck_operator.sh"
   skip_download           = true
   upgrade                 = false
 
