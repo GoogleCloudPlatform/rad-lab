@@ -15,7 +15,11 @@
  */
 
 locals {
-  
+  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  project = (var.create_project
+    ? try(module.project_radlab_ds_analytics.0, null)
+    : try(data.google_project.existing_project.0, null)
+  )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   notebook_sa_project_roles = [
@@ -25,30 +29,50 @@ locals {
     "roles/storage.objectViewer"
   ]
 
-  radlab_ds_analytics_project_id = "radlab-ds-analytics-${var.random_id}"
+  project_services = [
+    "compute.googleapis.com",
+    "bigquery.googleapis.com",
+    "notebooks.googleapis.com",
+    "bigquerystorage.googleapis.com"
+  ]
+}
 
-  radlab_ds_data_project_id = "radlab-ds-data-${var.random_id}"
+resource "random_id" "default" {
+  byte_length = 2
 }
 
 #####################
 # ANALYTICS PROJECT #
 #####################
 
+data "google_project" "existing_project" {
+  count      = var.create_project ? 0 : 1
+  project_id = var.project_name
+}
+
 module "project_radlab_ds_analytics" {
+  count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 11.0"
 
-  name              = local.radlab_ds_analytics_project_id
+  name              = format("%s-%s", var.project_name, local.random_id)
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
   org_id            = var.organization_id
 
-  activate_apis = [
-    "compute.googleapis.com",
-    "bigquery.googleapis.com",
-    "notebooks.googleapis.com",
-    "bigquerystorage.googleapis.com",
+  activate_apis = []
+}
+
+resource "google_project_service" "enabled_services" {
+  for_each                   = toset(local.project_services)
+  project                    = local.project.project_id
+  service                    = each.value
+  disable_dependent_services = true
+  disable_on_destroy         = true
+
+  depends_on = [
+    module.project_radlab_ds_analytics
   ]
 }
 
@@ -56,7 +80,7 @@ module "vpc_ai_notebook" {
   source  = "terraform-google-modules/network/google"
   version = "~> 3.0"
 
-  project_id   = module.project_radlab_ds_analytics.project_id
+  project_id   = local.project.project_id
   network_name = "ai-notebook"
   routing_mode = "GLOBAL"
   description  = "VPC Network created via Terraform"
@@ -88,12 +112,16 @@ module "vpc_ai_notebook" {
       }]
     }
   ]
+
+  depends_on = [
+    google_project_service.enabled_services
+  ]
 }
 
 resource "google_project_organization_policy" "external_ip_policy" {
   count      = var.set_external_ip_policy ? 1 : 0
   constraint = "compute.vmExternalIpAccess"
-  project    = module.project_radlab_ds_analytics.project_id
+  project    = local.project.project_id
 
   list_policy {
     allow {
@@ -106,7 +134,7 @@ resource "google_project_organization_policy" "external_ip_policy" {
 resource "google_project_organization_policy" "shielded_vm_policy" {
   count      = var.set_shielded_vm_policy ? 1 : 0
   constraint = "compute.requireShieldedVm"
-  project    = module.project_radlab_ds_analytics.project_id
+  project    = local.project.project_id
 
   boolean_policy {
     enforced = false
@@ -118,7 +146,8 @@ resource "google_project_organization_policy" "shielded_vm_policy" {
 resource "google_project_organization_policy" "trustedimage_project_policy" {
   count      = var.set_trustedimage_project_policy ? 1 : 0
   constraint = "compute.trustedImageProjects"
-  project    = module.project_radlab_ds_analytics.project_id
+  project    = local.project.project_id
+
   list_policy {
     allow {
       values = [
@@ -129,14 +158,14 @@ resource "google_project_organization_policy" "trustedimage_project_policy" {
 }
 
 resource "google_service_account" "sa_p_notebook" {
-  project      = module.project_radlab_ds_analytics.project_id
-  account_id   = format("sa-p-notebook-%s", var.random_id)
+  project      = local.project.project_id
+  account_id   = format("sa-p-notebook-%s", local.random_id)
   display_name = "Notebooks in trusted environment"
 }
 
 resource "google_project_iam_member" "sa_p_notebook_permissions" {
   for_each = toset(local.notebook_sa_project_roles)
-  project  = module.project_radlab_ds_analytics.project_id
+  project  = local.project.project_id
   member   = "serviceAccount:${google_service_account.sa_p_notebook.email}"
   role     = each.value
 }
@@ -149,27 +178,27 @@ resource "google_service_account_iam_member" "sa_ai_notebook_user_iam" {
 }
 
 resource "google_project_iam_binding" "ai_notebook_user_role1" {
-  project = module.project_radlab_ds_analytics.project_id
+  project = local.project.project_id
   members = var.trusted_users
   role    = "roles/notebooks.admin"
 }
 
 resource "google_project_iam_binding" "ai_notebook_user_role2" {
-  project = module.project_radlab_ds_analytics.project_id
+  project = local.project.project_id
   members = var.trusted_users
   role    = "roles/viewer"
 }
 
 resource "google_notebooks_instance" "ai_notebook" {
   count        = var.notebook_count
-  project      = module.project_radlab_ds_analytics.project_id
+  project      = local.project.project_id
   name         = "notebooks-instance-${count.index}"
   location     = var.zone
   machine_type = var.machine_type
 
   vm_image {
-    project      = "deeplearning-platform-release"
-    image_family = "tf-latest-cpu"
+    project      = var.image_project
+    image_family = var.image_family
   }
 
   service_account = google_service_account.sa_p_notebook.email
@@ -184,7 +213,7 @@ resource "google_notebooks_instance" "ai_notebook" {
   network = module.vpc_ai_notebook.network_self_link
   subnet  = module.vpc_ai_notebook.subnets_self_links.0
 
-  post_startup_script = "gs://radlab-solution-bucket/Data_Science_Model/samplenotebook.sh"
+  post_startup_script = var.startup_script
 
   labels = {
     module = "data-science"
@@ -202,8 +231,8 @@ resource "google_notebooks_instance" "ai_notebook" {
 }
 
 resource "google_storage_bucket" "user_scripts_bucket" {
-  project                     = module.project_radlab_ds_analytics.project_id
-  name                        = join("", ["user-scripts-notebooks-instance-", var.random_id])
+  project                     = local.project.project_id
+  name                        = join("", ["user-scripts-notebooks-instance-", local.random_id])
   location                    = "US"
   force_destroy               = true
   uniform_bucket_level_access = true
@@ -217,7 +246,7 @@ resource "google_storage_bucket" "user_scripts_bucket" {
 }
 
 resource "google_storage_bucket_iam_binding" "binding" {
-  bucket = google_storage_bucket.user_scripts_bucket.name
-  role = "roles/storage.admin"
+  bucket  = google_storage_bucket.user_scripts_bucket.name
+  role    = "roles/storage.admin"
   members = var.trusted_users
 }
