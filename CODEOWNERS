@@ -24,6 +24,8 @@
 
 /tools/                         @guptamukul-google
 
+/.github/                       @guptamukul-google
+
 # Below are the owners of individual file types
 
 *.json   @guptamukul-google 
@@ -32,6 +34,13 @@
 
 *.py    @guptamukul-google
 
+<<<<<<< HEAD
+=======
+*.txt   @guptamukul-google
+
+*.yml   @guptamukul-google 
+
+>>>>>>> b94c85b7e1a10ad561b78010d0acdabf93c89523
 *.sh    @debakkerb @guptamukul-google @hradhakrishnan
 
 *.tf    @debakkerb @guptamukul-google

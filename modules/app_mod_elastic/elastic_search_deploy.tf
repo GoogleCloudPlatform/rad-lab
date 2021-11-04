@@ -30,7 +30,6 @@ provider "kubernetes" {
 
 module "deploy_eck_crds" {
   source  = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
-  version = "~> 3.0.0"
 
   project_id              = local.project.project_id
   cluster_name            = module.gke_cluster.name
@@ -47,13 +46,12 @@ module "deploy_eck_crds" {
 
 module "deploy_eck_operator" {
   source  = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
-  version = "~> 3.0"
 
   project_id              = local.project.project_id
   cluster_name            = module.gke_cluster.name
   cluster_location        = var.region
   kubectl_create_command  = "kubectl apply -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
-  kubectl_destroy_command = "kubectl get namespaces --no-headers -o custom-columns=:metadata.name | xargs -n1 kubectl delete elastic --all -n && kubectl delete -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
+  kubectl_destroy_command = "${path.module}/scripts/remove_eck_operator.sh && kubectl delete -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
   skip_download           = true
   upgrade                 = false
 
@@ -139,7 +137,6 @@ resource "local_file" "kibana_yaml_output" {
 module "deploy_elastic_search" {
   count   = var.deploy_elastic_search ? 1 : 0
   source  = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
-  version = "~> 3.0"
 
   project_id              = local.project.project_id
   cluster_name            = module.gke_cluster.name

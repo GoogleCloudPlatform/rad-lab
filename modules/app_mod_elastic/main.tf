@@ -45,7 +45,7 @@ module "elastic_search_project" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 11.0"
 
-  name              = format("%s-%s", var.project_name, random_id.random_id.hex)
+  name              = format("%s-%s", var.project_name, local.random_id)
   random_project_id = false
   org_id            = var.organization_id
   folder_id         = var.folder_id
