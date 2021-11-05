@@ -193,7 +193,7 @@ def main():
 
             # Copy module directory
             shutil.copytree(os.path.dirname(os.path.dirname(os.getcwd())) + '/modules/app_mod_elastic', env_path)
-            
+
             # Set Terraform states remote backend as GCS
             settfstategcs(env_path,prefix,tfbucket)
 
@@ -272,6 +272,11 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
         if(state == '1' or state == '2'):
             os.system('gsutil -q -m cp -r ' + env_path + '/*.tf gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments')
             os.system('gsutil -q -m cp -r ' + env_path + '/*.json gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments')
+
+            if(state == '2'):
+                os.system('gsutil -q -m cp -r ' + env_path + '/eck gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments/')
+                os.system('gsutil -q -m cp -r ' + env_path + '/scripts gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments/')
+                os.system('gsutil -q -m cp -r ' + env_path + '/templates gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments/')
 
         elif(state == '3'):
             # print(env_path)
