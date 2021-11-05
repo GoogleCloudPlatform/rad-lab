@@ -249,12 +249,12 @@ def main():
     else:
         sys.exit(Fore.RED + "\nInvalid module")
 
-    env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket)
+    env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket, model)
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
 	
 
-def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket):
+def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket, model):
     tr = Terraform(working_dir=env_path)
     return_code, stdout, stderr = tr.init_cmd(capture_output=False)
     
@@ -272,9 +272,11 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
         if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
             os.system('gsutil -q -m cp -r ' + env_path + '/*.tf ' + target_path)
             os.system('gsutil -q -m cp -r ' + env_path + '/*.json ' + target_path)
-            os.system('gsutil -q -m cp -r ' + env_path + '/eck ' + target_path)
-            os.system('gsutil -q -m cp -r ' + env_path + '/scripts ' + target_path)
-            os.system('gsutil -q -m cp -r ' + env_path + '/templates ' + target_path)
+
+            if(model == OPTION_MODULE_APP_MOD_ELASTIC_SEARCH): # Module specific folders
+                os.system('gsutil -q -m cp -r ' + env_path + '/eck ' + target_path)
+                os.system('gsutil -q -m cp -r ' + env_path + '/scripts ' + target_path)
+                os.system('gsutil -q -m cp -r ' + env_path + '/templates ' + target_path)
 
         elif(state == STATE_DELETE_DEPLOYMENT):
             deltfgcs(tfbucket, 'radlab/'+ env_path.split('/')[len(env_path.split('/'))-1])
