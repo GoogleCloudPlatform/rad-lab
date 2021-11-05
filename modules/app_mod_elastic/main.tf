@@ -79,7 +79,7 @@ resource "google_service_account" "elastic_search_gcp_identity" {
 }
 
 resource "google_service_account_iam_member" "elastic_search_k8s_identity" {
-  member             = "serviceAccount:${local.project.project_id}.svc.id.goog[${local.elastic_namespace_name}/${local.elastic_search_identity_name}]"
+  member             = "serviceAccount:${local.project.project_id}.svc.id.goog[${local.k8s_namespace}/${local.elastic_search_identity_name}]"
   role               = "roles/iam.workloadIdentityUser"
   service_account_id = google_service_account.elastic_search_gcp_identity.id
 

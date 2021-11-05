@@ -12,6 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${NAMESPACE}
+  annotations:
+    name: ${NAMESPACE}
+  labels:
+    workload: ${NAMESPACE}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${IDENTITY_NAME}
+  namespace: ${NAMESPACE}
+  annotations:
+    iam.gke.io/gcp-service-account: ${GCP_SERVICE_ACCOUNT}
+---
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
@@ -19,9 +36,21 @@ metadata:
   namespace: ${NAMESPACE}
 spec:
   version: ${VERSION}
-  serviceAccountName: ${SERVICE_ACCOUNT_NAME}
+  serviceAccountName: ${IDENTITY_NAME}
   nodeSets:
   - name: default
     count: ${COUNT}
     config:
       node.store.allow_mmap: false
+---
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: kibana
+  namespace: ${NAMESPACE}
+spec:
+  version: ${VERSION}
+  count: ${COUNT}
+  serviceAccountName: ${IDENTITY_NAME}
+  elasticsearchRef:
+    name: elastic-search

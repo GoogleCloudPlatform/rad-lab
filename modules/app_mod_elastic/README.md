@@ -35,17 +35,17 @@ Below Architechture Diagram is the base representation of what will be created a
 # Retrieve credentials to query the Kubernetes API server
 $(terraform show -json | jq -r .values.outputs.cluster_credentials_cmd.value)
 
-# Check status Elastic Search. The health column should show status green. 
-kubectl get elasticsearch -n elastic-search
+# Check status Elastic Search. The health column should show status green.  Takes around 5 minutes to complete 
+kubectl get elasticsearch -n elastic-search-demo
 
 # Check status Kibana.  The health column should show status green.
-kubectl get kibana -n elastic-search
+kubectl get kibana -n elastic-search-demo
 
 # Retrieve password
-kubectl get secret elastic-search-es-elastic-user -n elastic-search -o go-template='{{.data.elastic | base64decode}}'
+kubectl get secret elastic-search-es-elastic-user -n elastic-search-demo -o go-template='{{.data.elastic | base64decode}}'
 
 # Start port-forwarding tunnel
-kubectl port-forward -n elastic-search service/kibana-kb-http 5601
+kubectl port-forward -n elastic-search-demo service/kibana-kb-http 5601
 
 # Open a browser window and point it to https://localhost:5601
 ```
