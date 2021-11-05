@@ -38,6 +38,10 @@ STATE_UPDATE_DEPLOYMENT = "2"
 STATE_DELETE_DEPLOYMENT = "3"
 STATE_LIST_DEPLOYMENT = "4"
 
+OPTION_MODULE_DATA_SCIENCE = "1"
+OPTION_MODULE_APP_MOD_ELASTIC_SEARCH = "2"
+OPTION_QUIT = "3"
+
 def main():
     
     orgid          = ""
@@ -59,7 +63,7 @@ def main():
 
     module = input("\nList of available RADLab modules:\n[1] Data Science\n[2] (APP MOD) Elastic Search\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
 
-    if(module.strip() == "1"):
+    if(module.strip() == OPTION_MODULE_DATA_SCIENCE):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
         
@@ -73,7 +77,7 @@ def main():
         print("\nGCS bucket for Terraform config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
         # Setting Org ID, Billing Account, Folder ID, Domain
-        if(state == STATE_CREATE_DEPLOYMENT:
+        if(state == STATE_CREATE_DEPLOYMENT):
 
             # Getting Base Inputs
             orgid, billing_acc, folderid, domain, randomid = basic_input()
@@ -161,7 +165,7 @@ def main():
                         new_name = new_name.split("@")[0]
                     trusted_users.append("user:" + new_name + "@" + domain)
             # print(trusted_users)
-    elif(module.strip() == STATE_UPDATE_DEPLOYMENT):
+    elif(module.strip() ==  OPTION_MODULE_APP_MOD_ELASTIC_SEARCH):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elastic Search"+ Style.RESET_ALL)
 
@@ -239,7 +243,7 @@ def main():
         # Module Specific Options #
         ###########################
         
-    elif(module.strip() == "3"):
+    elif(module.strip() == OPTION_QUIT):
         sys.exit(Fore.GREEN + "\nExiting Installer")
 
     else:
@@ -268,11 +272,9 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
         if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
             os.system('gsutil -q -m cp -r ' + env_path + '/*.tf ' + target_path)
             os.system('gsutil -q -m cp -r ' + env_path + '/*.json ' + target_path)
-
-            if(state == STATE_UPDATE_DEPLOYMENT):
-                os.system('gsutil -q -m cp -r ' + env_path + '/eck ' + target_path)
-                os.system('gsutil -q -m cp -r ' + env_path + '/scripts ' + target_path)
-                os.system('gsutil -q -m cp -r ' + env_path + '/templates ' + target_path)
+            os.system('gsutil -q -m cp -r ' + env_path + '/eck ' + target_path)
+            os.system('gsutil -q -m cp -r ' + env_path + '/scripts ' + target_path)
+            os.system('gsutil -q -m cp -r ' + env_path + '/templates ' + target_path)
 
         elif(state == STATE_DELETE_DEPLOYMENT):
             deltfgcs(tfbucket, 'radlab/'+ env_path.split('/')[len(env_path.split('/'))-1])
