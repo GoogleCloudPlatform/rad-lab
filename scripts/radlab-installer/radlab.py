@@ -61,9 +61,9 @@ def main():
         print("Login with Cloud Admin account...")
         os.system("gcloud auth application-default login")
 
-    module = input("\nList of available RADLab modules:\n[1] Data Science\n[2] (APP MOD) Elastic Search\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ')
+    selected_module = input("\nList of available RADLab modules:\n[1] Data Science\n[2] (APP MOD) Elastic Search\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ').strip()
 
-    if(module.strip() == OPTION_MODULE_DATA_SCIENCE):
+    if(selected_module == OPTION_MODULE_DATA_SCIENCE):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
         
@@ -165,7 +165,7 @@ def main():
                         new_name = new_name.split("@")[0]
                     trusted_users.append("user:" + new_name + "@" + domain)
             # print(trusted_users)
-    elif(module.strip() ==  OPTION_MODULE_APP_MOD_ELASTIC_SEARCH):
+    elif(selected_module ==  OPTION_MODULE_APP_MOD_ELASTIC_SEARCH):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elastic Search"+ Style.RESET_ALL)
 
@@ -243,18 +243,18 @@ def main():
         # Module Specific Options #
         ###########################
         
-    elif(module.strip() == OPTION_QUIT):
+    elif(selected_module == OPTION_QUIT):
         sys.exit(Fore.GREEN + "\nExiting Installer")
 
     else:
         sys.exit(Fore.RED + "\nInvalid module")
 
-    env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket, model)
+    env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket, selected_module)
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
 	
 
-def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket, model):
+def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, trusted_users, randomid, tfbucket, selected_module):
     tr = Terraform(working_dir=env_path)
     return_code, stdout, stderr = tr.init_cmd(capture_output=False)
     
@@ -273,7 +273,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
             os.system('gsutil -q -m cp -r ' + env_path + '/*.tf ' + target_path)
             os.system('gsutil -q -m cp -r ' + env_path + '/*.json ' + target_path)
 
-            if(model == OPTION_MODULE_APP_MOD_ELASTIC_SEARCH): # Module specific folders
+            if(selected_module == OPTION_MODULE_APP_MOD_ELASTIC_SEARCH): # Module specific folders
                 os.system('gsutil -q -m cp -r ' + env_path + '/eck ' + target_path)
                 os.system('gsutil -q -m cp -r ' + env_path + '/scripts ' + target_path)
                 os.system('gsutil -q -m cp -r ' + env_path + '/templates ' + target_path)
