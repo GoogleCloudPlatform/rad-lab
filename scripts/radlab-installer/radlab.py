@@ -275,7 +275,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
 
             if(selected_module == OPTION_MODULE_APP_MOD_ELASTIC_SEARCH): # Module specific folders
                 os.system('gsutil -q -m cp -r ' + env_path + '/elk ' + target_path)
-                os.system('gsutil -q -m cp -r ' + env_path + '/scripts ' + target_path)
+                os.system('gsutil -q -m cp -r -P' + env_path + '/scripts ' + target_path)
                 os.system('gsutil -q -m cp -r ' + env_path + '/templates ' + target_path)
 
         elif(state == STATE_DELETE_DEPLOYMENT):
