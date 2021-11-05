@@ -19,14 +19,16 @@ again.
 
 The project has the following file structure:
 - [/docs](../docs): Documentation about the repository.
-- [/modules](../modules): Customisable modules to create Google Cloud Platform infrastructure.
-- [/scripts](../scripts): RAD-Lab Installer and additional scripts to support the modules.
+- [/modules](../modules): Customisable modules to create Google Cloud Platform infrastructure & supporting scripts.
+- [/radlab-installer](../radlab-installer): RAD-Lab Installer and associated scripts to support the modules.
 
 Every individual module is contained in it subdirectory and should follow these Terraform guidelines:
 
 - Create at least a `versions.tf`, `main.tf`, `variables.tf` and `outputs.tf`.  It's ok to create additional files, to split resources between files and give them more meaningful names. 
 
 NOTE: Make sure all the variables are in alphabetical order in `variables.tf`
+
+- If any additional scripts (apart from **terraform** configs) are required to support the module either to *build* or *use* the module, move them to individual module's subdirectory, example: `/modules/MODULE-NAME/scripts/build` & `/modules/MODULE-NAME/scripts/usage` respectively. 
 
 - A README.md containing more information about the modules, required IAM permissions and any specific instructions to create the infrastructure.
 
@@ -37,10 +39,10 @@ NOTE: Add below 2 tags in the RAD-Lab module specific README.md for populating s
 <!-- END TFDOC -->
 ```
 
-For every module, a base configuration is determined, which can be installed via the [radlab.py](../scripts/radlab-installer/README.md) installer.  The base configuration is reflected in the default values for all the variables, except for `organization_id`, `billing_account_id` and (optional) `folder_id`. 
+For every module, a base configuration is determined, which can be installed via the [radlab.py](../radlab-installer/README.md) installer.  The base configuration is reflected in the default values for all the variables, except for `organization_id`, `billing_account_id` and (optional) `folder_id`. 
 
 ## Installer
-It should be possible for people with less experience in Infrastructure As Code to use every module.  The repository contains an installer for that purpose, which can be found in the [/scripts](../scripts) directory ([radlab.py](../scripts/radlab-installer/radlab.py)).  The installer needs to be updated whenever new modules are introduced to the repository.
+It should be possible for people with less experience in Infrastructure As Code to use every module.  The repository contains an installer for that purpose, which can be found in the [/radlab-installer](../radlab-installer) directory ([radlab.py](../radlab-installer/radlab.py)).  The installer needs to be updated whenever new modules are introduced to the repository.
 
 ## Cloud Foundation Toolkit
 Where possible, use the open source [Cloud Foundation Toolkit](https://cloud.google.com/foundation-toolkit) modules to create Google Cloud infrastructure.

@@ -19,13 +19,13 @@ To create a module in an existing GCP environment, please click on the “Open I
     
 ### Prerequisites
 * [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/gcp-get-started) version 1.0 or higher.
-* [gcloud](https://cloud.google.com/sdk/docs/install) SDK version 360.0.0 or higher. (ONLY for [Installer](./scripts/radlab-installer))
-* [python](https://www.python.org/downloads/) version 3.7.3 or higher. (ONLY for [Installer](./scripts/radlab-installer))
+* [gcloud](https://cloud.google.com/sdk/docs/install) SDK version 360.0.0 or higher. (ONLY for [Installer](./radlab-installer))
+* [python](https://www.python.org/downloads/) version 3.7.3 or higher. (ONLY for [Installer](./radlab-installer))
 
-Users can run `installer_prereq.py` included in the [radlab-installer scripts directory](./scripts/radlab-installer) to validate these prerequisites and install any missing dependencies. If running via Cloud Shell, the above prerequisites will all be pre-installed.
+Users can run `installer_prereq.py` included in the [radlab-installer scripts directory](./radlab-installer) to validate these prerequisites and install any missing dependencies. If running via Cloud Shell, the above prerequisites will all be pre-installed.
 
 ### Installer
-An installation script is included to enable users without prior cloud or Terraform experience to explore the advantages of GCP.  The installation wizard will create the necessary infrastructure for each module.  More instructions on the installer can be found [here](./scripts/radlab-installer).
+An installation script is included to enable users without prior cloud or Terraform experience to explore the advantages of GCP.  The installation wizard will create the necessary infrastructure for each module.  More instructions on the installer can be found [here](./radlab-installer).
 
 ### Modules
 
@@ -41,8 +41,8 @@ Additional permissions are required when creating a new Project as part of the d
 
 The repository has the following structure:
 * [/docs](./docs): General documentation about the repository and how to use it.
-* [/modules](./modules): Customisable, reusable Terraform modules to create GCP infrastructure.
-* [/scripts](./scripts): RAD Lab Installer and additional scripts to support the modules.
+* [/modules](./modules): Customisable, reusable Terraform modules to create GCP infrastructure & supporting scripts.
+* [/radlab-installer](./installer): RAD Lab Installer and associated scripts to support the modules.
 * [/tools](./tools): Automation tools to generate the necessary documentation and license checks.
 
 ## Contributing

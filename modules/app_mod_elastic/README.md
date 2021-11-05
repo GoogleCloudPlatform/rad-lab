@@ -27,7 +27,7 @@ Also ensure that the identity creating the resources has access to a billing acc
 
 ## Reference Architechture Diagram
 
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../scripts/radlab.py).
+Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../radlab-installer/radlab.py).
 
 ### Deploy Elastic Search
 The module deploys both the ECK CRDs and Operators.  As this module can be used to demo Elastic Search, it also deploys an ES and Kibana pod in the cluster.  This behaviour can be switched off by setting `deploy_elastic_search` to false.  This will only deploy the CRDs and Operators.

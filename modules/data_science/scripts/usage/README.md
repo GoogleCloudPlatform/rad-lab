@@ -10,11 +10,11 @@
 
 ## Access RAD Lab Modules
 
-1. Data Science RAD Lab Users will be provided a [Bash script](https://github.com/GPS-Demos/radlab/blob/312e841c4062c91b9450ad534623531f4f5d6f9f/gcp-ai-notebook-tools/ai-notebook-desktop-script.sh) - `ai-notebook-desktop-script.sh` which they can run on their cloudshell or localhost  terminals to fetch the Proxy URIs of the Notebooks Instance.
+1. Data Science RAD Lab Users will be provided a [Bash script](./ai-notebook-desktop-script.sh) - `ai-notebook-desktop-script.sh` which they can run on their cloudshell or localhost  terminals to fetch the Proxy URIs of the Notebooks Instance.
 
 2. Navigate to the directory where the bash script is downloaded.
 
-3. Update line 25 - 27 of `ai-notebook-desktop-script.sh` script based on the information provided by the _Cloud Admin_ in step 12 under [RADLab Readme](https://github.com/GPS-Demos/radlab/blob/bd749828f7fb105ed5d76f4f813c35a2bdce2d3a/README.md).
+3. Update line 25 - 27 of `ai-notebook-desktop-script.sh` script based on the deployment output information provided by the _Cloud Admin_ as per [RADLab Readme](../../../../radlab-installer/README.md##steps-to-install-rad-lab-modules).
 ```
 export INSTANCE_NAME="AI_NOTEBOOK_INSTANCE_NAME"
 export PROJECT="PROJECT_ID"

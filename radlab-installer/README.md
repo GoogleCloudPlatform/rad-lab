@@ -160,10 +160,10 @@ TERRAFORM DEPLOYMENT COMPLETED!!!
 
 NOTE: Save the **deployment_id** for future reference, for making any updates or delete the RADLab Module created.
 
-NOTE: If you see any errors on your deployment run please follow the [Troubleshooting doc](../../docs/TROUBLESHOOTING.md#rad-lab-troubleshooting) to lookup for errors and corresponding solutions.
+NOTE: If you see any errors on your deployment run please follow the [Troubleshooting doc](../docs/TROUBLESHOOTING.md#rad-lab-troubleshooting) to lookup for errors and corresponding solutions.
 
 ## Troubleshooting Common Problems
 
-1. [Project quota exceeded](../../docs/TROUBLESHOOTING.md#project-quota-exceeded)
-2. [Unable to modify Organization Policy Constraints](../../docs/TROUBLESHOOTING.md#google-organization-policies---unable-to-modify-constraints)
-3. [Local Terraform Deployment ID Directory Already Exists](../../docs/TROUBLESHOOTING.md#local-terraform-deployment-id-directory-already-exists)
+1. [Project quota exceeded](../docs/TROUBLESHOOTING.md#project-quota-exceeded)
+2. [Unable to modify Organization Policy Constraints](../docs/TROUBLESHOOTING.md#google-organization-policies---unable-to-modify-constraints)
+3. [Local Terraform Deployment ID Directory Already Exists](../docs/TROUBLESHOOTING.md#local-terraform-deployment-id-directory-already-exists)

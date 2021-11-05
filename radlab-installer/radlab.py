@@ -44,14 +44,14 @@ OPTION_QUIT = "3"
 
 def main():
     
-    orgid          = ""
-    folderid       = ""
-    billing_acc    = ""
-    domain         = ""
-    module          = ""
-    state          = ""
-    notebook_count = ""
-    trusted_users  = []
+    orgid           = ""
+    folderid        = ""
+    billing_acc     = ""
+    domain          = ""
+    selected_module = ""
+    state           = ""
+    notebook_count  = ""
+    trusted_users   = []
 
     setup_path = os.getcwd()
 
@@ -90,7 +90,7 @@ def main():
             delifexist(env_path)
 
             # Copy module directory
-            shutil.copytree(os.path.dirname(os.path.dirname(os.getcwd())) + '/modules/data_science', env_path)
+            shutil.copytree(os.path.dirname(os.getcwd()) + '/modules/data_science', env_path)
             
             # Set Terraform states remote backend as GCS
             settfstategcs(env_path,prefix,tfbucket)
@@ -192,7 +192,7 @@ def main():
             delifexist(env_path)
 
             # Copy module directory
-            shutil.copytree(os.path.dirname(os.path.dirname(os.getcwd())) + '/modules/app_mod_elastic', env_path)
+            shutil.copytree(os.path.dirname(os.getcwd()) + '/modules/app_mod_elastic', env_path)
 
             # Set Terraform states remote backend as GCS
             settfstategcs(env_path,prefix,tfbucket)

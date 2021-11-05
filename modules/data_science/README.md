@@ -9,7 +9,7 @@
 
 ## Reference Architechture Diagram
 
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../scripts/radlab.py).
+Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../radlab-installer/radlab.py).
 
 ![](../../docs/images/V1_DataScience.png)
 
@@ -58,4 +58,4 @@ NOTE: `variables.tf` would list some defaults. If you would like to override or 
 
 ## Access RAD Lab Data Science Notebooks
 
-Follow the instructions under [gcp-ai-nootbook-tools Readme](./scripts/gcp-ai-notebook-tools/README.md).
+Follow the instructions under [gcp-ai-nootbook-tools Readme](./scripts/usage/README.md).
