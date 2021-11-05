@@ -362,7 +362,7 @@ def setlocaldeployment(tfbucket,prefix, env_path):
         os.mkdir(env_path)
 
         # Copy Terraform deployment configs from GCS to Local
-        if(os.system('gsutil -q -m cp -r gs://'+ tfbucket +'/radlab/'+ prefix +'/deployments/* ' + env_path) == 0):
+        if(os.system('gsutil -q -m cp -r -P gs://'+ tfbucket +'/radlab/'+ prefix +'/deployments/* ' + env_path) == 0):
             print("Terraform state downloaded to local...")
         else:
             print(Fore.RED + "\nError Occured whiled downloading Deployment Configs from GCS. Checking if the deployment exist locally...\n")
