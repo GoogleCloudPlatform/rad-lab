@@ -33,6 +33,11 @@ from colorama import Fore, Back, Style
 from python_terraform import Terraform
 from oauth2client.client import GoogleCredentials
 
+STATE_CREATE_DEPLOYMENT = "1"
+STATE_UPDATE_DEPLOYMENT = "2"
+STATE_DELETE_DEPLOYMENT = "3"
+STATE_LIST_DEPLOYMENT = "4"
+
 def main():
     
     orgid          = ""
@@ -68,7 +73,7 @@ def main():
         print("\nGCS bucket for Terraform config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
         # Setting Org ID, Billing Account, Folder ID, Domain
-        if(state == "1"):  
+        if(state == STATE_CREATE_DEPLOYMENT:
 
             # Getting Base Inputs
             orgid, billing_acc, folderid, domain, randomid = basic_input()
@@ -89,7 +94,7 @@ def main():
             # Create file with billing/org/folder details
             create_env(env_path, orgid, billing_acc, folderid)
 
-        elif(state == "2" or state == "3"):
+        elif(state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT):
             
             # Get Deployment ID
             randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RADLab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
@@ -117,10 +122,10 @@ def main():
             # Set Terraform states remote backend as GCS
             settfstategcs(env_path,prefix,tfbucket)
 
-            if(state == "3"):
+            if(state == STATE_DELETE_DEPLOYMENT):
                 print("DELETING DEPLOYMENT...")
         
-        elif(state == "4"):
+        elif(state == STATE_LIST_DEPLOYMENT):
             list_radlab_deployments(tfbucket, module_name)
             sys.exit()
 
@@ -132,7 +137,7 @@ def main():
         ###########################
 
         # No. of AI Notebooks and assigning trusted users
-        if(state == "1" or state == "2"):
+        if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
             # Requesting Number of AI Notebooks
             notebook_count = input(Fore.YELLOW + Style.BRIGHT + "\nNumber of AI Notebooks required [Default is 1 & Maximum is 10]"+ Style.RESET_ALL + ': ')
             if(len(notebook_count.strip()) == 0):
@@ -156,7 +161,7 @@ def main():
                         new_name = new_name.split("@")[0]
                     trusted_users.append("user:" + new_name + "@" + domain)
             # print(trusted_users)
-    elif(module.strip() == "2"):
+    elif(module.strip() == STATE_UPDATE_DEPLOYMENT):
 
         print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elastic Search"+ Style.RESET_ALL)
 
@@ -170,7 +175,7 @@ def main():
         print("\nGCS bucket for Terrafrom config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
         # Setting Org ID, Billing Account, Folder ID, Domain
-        if(state == "1"):
+        if(state == STATE_CREATE_DEPLOYMENT):
             
             # Getting Base Inputs
             orgid, billing_acc, folderid, domain, randomid = basic_input()
@@ -191,7 +196,7 @@ def main():
             # Create file with billing/org/folder details
             create_env(env_path, orgid, billing_acc, folderid)
 
-        elif(state == "2" or state == "3"):
+        elif(state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT):
             
             # Get Deployment ID
             randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RADLab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
@@ -219,10 +224,10 @@ def main():
             # Set Terraform states remote backend as GCS
             settfstategcs(env_path,prefix,tfbucket)
 
-            if(state == "3"):
+            if(state == STATE_DELETE_DEPLOYMENT):
                 print("DELETING DEPLOYMENT...")
 
-        elif(state == "4"):
+        elif(state == STATE_LIST_DEPLOYMENT):
             list_radlab_deployments(tfbucket, module_name)
             sys.exit()
 
@@ -249,9 +254,9 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     tr = Terraform(working_dir=env_path)
     return_code, stdout, stderr = tr.init_cmd(capture_output=False)
     
-    if(state == "1" or state == "2"):
+    if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
         return_code, stdout, stderr = tr.apply_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'domain':domain, 'file_path':env_path, 'notebook_count':notebook_count, 'trusted_users': trusted_users, 'random_id':randomid})
-    elif(state == "3"):
+    elif(state == STATE_DELETE_DEPLOYMENT):
         return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'file_path':env_path,'random_id':randomid})
 
     # return_code - 0 Success & 1 Error
@@ -259,18 +264,17 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
         print(stderr)
         sys.exit(Fore.RED + Style.BRIGHT + "\nError Occured - Deployment failed for ID: "+ randomid+"\n"+ "Retry using above Deployment ID" +Style.RESET_ALL )
     else:
-        if(state == '1' or state == '2'):
-            os.system('gsutil -q -m cp -r ' + env_path + '/*.tf gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments')
-            os.system('gsutil -q -m cp -r ' + env_path + '/*.json gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments')
+        target_path = 'gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments'
+        if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
+            os.system('gsutil -q -m cp -r ' + env_path + '/*.tf ' + target_path)
+            os.system('gsutil -q -m cp -r ' + env_path + '/*.json ' + target_path)
 
-            if(state == '2'):
-                os.system('gsutil -q -m cp -r ' + env_path + '/eck gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments/')
-                os.system('gsutil -q -m cp -r ' + env_path + '/scripts gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments/')
-                os.system('gsutil -q -m cp -r ' + env_path + '/templates gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments/')
+            if(state == STATE_UPDATE_DEPLOYMENT):
+                os.system('gsutil -q -m cp -r ' + env_path + '/eck ' + target_path)
+                os.system('gsutil -q -m cp -r ' + env_path + '/scripts ' + target_path)
+                os.system('gsutil -q -m cp -r ' + env_path + '/templates ' + target_path)
 
-        elif(state == '3'):
-            # print(env_path)
-            # print(env_path.split('/')[len(env_path.split('/'))-1])
+        elif(state == STATE_DELETE_DEPLOYMENT):
             deltfgcs(tfbucket, 'radlab/'+ env_path.split('/')[len(env_path.split('/'))-1])
 
     # Deleting Local deployment config
