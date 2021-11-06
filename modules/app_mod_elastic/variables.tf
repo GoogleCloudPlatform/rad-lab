@@ -107,8 +107,8 @@ variable "network_name" {
   default     = "elastic-search-nw"
 }
 
-variable "network_selflink" {
-  description = "Deploy the GKE cluster in an existing network."
+variable "network_project_id" {
+  description = "Project ID where the network is created."
   type        = string
   default     = null
 }
@@ -202,8 +202,8 @@ variable "subnet_name" {
   default     = "elastic-search-snw"
 }
 
-variable "subnet_selflink" {
-  description = "Selflink of the subnet where the cluster should be created."
-  type        = string
-  default     = null
+variable "use_existing_network" {
+  description = "Indicate if the deployment has to use a network that already exists."
+  type        = bool
+  default     = false
 }

@@ -14,7 +14,35 @@
  * limitations under the License.
  */
 
+locals {
+  network = (
+    var.use_existing_network
+    ? try(data.google_compute_network.0, null)
+    : try(module.elastic_search_network.0, null)
+  )
+
+  subnet = (
+    var.use_existing_network
+    ? try(data.google_compute_subnetwork.existing_subnet.0, null)
+    : try(module.elastic_search_network.subnets[""].0, null)
+  )
+}
+
+data "google_compute_network" "existing_network" {
+  count   = var.use_existing_network ? 1 : 0
+  project = local.project.project_id
+  name    = var.network_name
+}
+
+data "google_compute_subnetwork" "existing_subnet" {
+  count   = var.use_existing_network ? 1 : 0
+  project = local.project.project_id
+  name    = var.subnet_name
+  region  = var.region
+}
+
 module "elastic_search_network" {
+  count   = var.use_existing_network ? 0 : 1
   source  = "terraform-google-modules/network/google"
   version = "~> 3.0"
 
@@ -56,7 +84,7 @@ resource "google_compute_router" "router" {
 
   project = local.project.project_id
   name    = "es-access-router"
-  network = module.elastic_search_network.network_self_link
+  network = local.network.self_link
   region  = var.region
 
   bgp {

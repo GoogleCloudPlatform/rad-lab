@@ -71,6 +71,7 @@ module "elastic_search_simple" {
 ```
 
 #### Use existing project
+Replace `pref-project-id` with an existing project ID.
 ```hcl
 module "elastic_search_project" {
   source = "../modules/app_mod_elastic"
@@ -80,6 +81,24 @@ module "elastic_search_project" {
   folder_id          = "1234567890"
   create_project     = false
   project_name       = "pref-project-id"
+}
+```
+
+#### Use existing network
+Both the project and the network has to exist already.
+```hcl
+module "elastic_search_project" {
+  source = "../modules/app_mod_elastic"
+
+  billing_account_id = "123456-123456-123456"
+  organization_id    = "12345678901"
+  folder_id          = "1234567890"
+  create_project     = false
+  project_name       = "pref-project-id"
+
+  use_existing_network = true
+  network_selflink     = "NETWORK_SELFLINK"
+  subnet_selflink      = "SUBNET_SELFLINK"
 }
 ```
 
