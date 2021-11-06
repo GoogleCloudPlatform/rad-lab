@@ -33,3 +33,7 @@ output "subnet_selflink" {
 output "random_id" {
   value = local.random_id
 }
+
+output "gke_endpoin" {
+  value = module.gke_cluster.endpoint
+}

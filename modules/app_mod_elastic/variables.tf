@@ -107,6 +107,12 @@ variable "network_name" {
   default     = "elastic-search-nw"
 }
 
+variable "network_selflink" {
+  description = "Deploy the GKE cluster in an existing network."
+  type        = string
+  default     = null
+}
+
 variable "node_pool_machine_type" {
   description = "Machine type for the node pool."
   type        = string
@@ -194,4 +200,10 @@ variable "subnet_name" {
   description = "Name to be assigned to the subnet hosting the GKE cluster."
   type        = string
   default     = "elastic-search-snw"
+}
+
+variable "subnet_selflink" {
+  description = "Selflink of the subnet where the cluster should be created."
+  type        = string
+  default     = null
 }

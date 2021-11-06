@@ -55,6 +55,34 @@ kubectl port-forward -n elastic-search-demo service/kibana-kb-http 5601
 # Open a browser window and point it to https://localhost:5601. Login with username elastic and the password copied from the command above.
 ```
 
+### Using Terraform module
+Here are a couple of examples to directly use the Terraform module, as opposed to using the RAD Lab installer.
+
+#### Simple
+
+```hcl
+module "elastic_search_simple" {
+  source = "./app_mod_elastic"
+
+  billing_account_id = "123456-123456-123456"
+  organization_id    = "12345678901"
+  folder_id          = "1234567890"
+}
+```
+
+#### Use existing project
+```hcl
+module "elastic_search_project" {
+  source = "../modules/app_mod_elastic"
+
+  billing_account_id = "123456-123456-123456"
+  organization_id    = "12345678901"
+  folder_id          = "1234567890"
+  create_project     = false
+  project_name       = "pref-project-id"
+}
+```
+
 <!-- BEGIN TFDOC -->
 ## Variables
 
