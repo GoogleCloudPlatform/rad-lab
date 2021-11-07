@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-locals {
-  network = (
-    var.use_existing_network
-    ? try(data.google_compute_network.0, null)
-    : try(module.elastic_search_network.0, null)
-  )
-
-  subnet = (
-    var.use_existing_network
-    ? try(data.google_compute_subnetwork.existing_subnet.0, null)
-    : try(module.elastic_search_network.subnets[""].0, null)
-  )
-}
-
 data "google_compute_network" "existing_network" {
   count   = var.use_existing_network ? 1 : 0
   project = local.project.project_id
@@ -84,7 +70,7 @@ resource "google_compute_router" "router" {
 
   project = local.project.project_id
   name    = "es-access-router"
-  network = local.network.self_link
+  network = var.network_name
   region  = var.region
 
   bgp {
@@ -116,7 +102,7 @@ resource "google_compute_route" "external_access" {
   project          = local.project.project_id
   dest_range       = "0.0.0.0/0"
   name             = "proxy-external-access"
-  network          = module.elastic_search_network.network_name
+  network          = var.network_name
   next_hop_gateway = "default-internet-gateway"
 }
 

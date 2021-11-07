@@ -18,22 +18,11 @@ output "cluster_credentials_cmd" {
   value = local.k8s_credentials_cmd
 }
 
-output "network_selflink" {
-  value = module.elastic_search_network.network_self_link
-}
-
 output "project_id" {
   value = local.project.project_id
-}
-
-output "subnet_selflink" {
-  value = module.elastic_search_network.subnets_self_links.0
 }
 
 output "random_id" {
   value = local.random_id
 }
 
-output "gke_endpoin" {
-  value = module.gke_cluster.endpoint
-}

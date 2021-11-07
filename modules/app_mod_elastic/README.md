@@ -10,8 +10,8 @@ This module allows the user to create an Elastic Search cluster, deployed on a G
 ## Prerequisites
 
 Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
-- `roles/resourcemanager.projectCreator`
-- `roles/compute.admin`
+- Parent: `roles/resourcemanager.projectCreator`
+- Project: `roles/compute.admin`
 
 When deploying in an existing project, ensure the identity has the following permissions on the project:
 - `roles/compute.admin`
@@ -74,7 +74,7 @@ module "elastic_search_simple" {
 Replace `pref-project-id` with an existing project ID.
 ```hcl
 module "elastic_search_project" {
-  source = "../modules/app_mod_elastic"
+  source = "./app_mod_elastic"
 
   billing_account_id = "123456-123456-123456"
   organization_id    = "12345678901"
@@ -85,20 +85,19 @@ module "elastic_search_project" {
 ```
 
 #### Use existing network
-Both the project and the network has to exist already.
+Both the project and the network has to exist already for this to work.  Additionally, if all the resources for egress traffic have already been created, set `enable_internet_egress_traffic` to **false**.  
 ```hcl
 module "elastic_search_project" {
-  source = "../modules/app_mod_elastic"
+  source = "./app_mod_elastic"
 
   billing_account_id = "123456-123456-123456"
   organization_id    = "12345678901"
   folder_id          = "1234567890"
   create_project     = false
   project_name       = "pref-project-id"
-
-  use_existing_network = true
-  network_selflink     = "NETWORK_SELFLINK"
-  subnet_selflink      = "SUBNET_SELFLINK"
+  create_network     = false
+  network_name       = "network-name"
+  subnet_name        = "subnet-name"
 }
 ```
 

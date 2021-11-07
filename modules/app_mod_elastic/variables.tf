@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-
-
 variable "billing_account_id" {
   description = "Billing account ID that will be linked to the project."
   type        = string
 }
 
+variable "create_network" {
+  description = "Indicate if the deployment has to use a network that already exists."
+  type        = bool
+  default     = false
+}
 
 variable "create_project" {
   description = "Create a new project or use an existing project.  When set to true, variable project_name has to match the exact project ID of the existing project."
@@ -105,12 +108,6 @@ variable "network_name" {
   description = "Name to be assigned to the network hosting the GKE cluster."
   type        = string
   default     = "elastic-search-nw"
-}
-
-variable "network_project_id" {
-  description = "Project ID where the network is created."
-  type        = string
-  default     = null
 }
 
 variable "node_pool_machine_type" {
@@ -200,10 +197,4 @@ variable "subnet_name" {
   description = "Name to be assigned to the subnet hosting the GKE cluster."
   type        = string
   default     = "elastic-search-snw"
-}
-
-variable "use_existing_network" {
-  description = "Indicate if the deployment has to use a network that already exists."
-  type        = bool
-  default     = false
 }
