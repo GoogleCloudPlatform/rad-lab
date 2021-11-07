@@ -22,7 +22,7 @@ variable "billing_account_id" {
 variable "create_network" {
   description = "Indicate if the deployment has to use a network that already exists."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "create_project" {

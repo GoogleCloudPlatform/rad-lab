@@ -14,21 +14,35 @@
  * limitations under the License.
  */
 
+locals {
+  network = (
+    var.create_network
+    ? try(module.elastic_search_network.0.network.network, null)
+    : try(data.google_compute_network.existing_network.0, null)
+  )
+
+  subnet = (
+    var.create_network
+    ? try(module.elastic_search_network.0.subnets["${var.region}/${var.subnet_name}"], null)
+    : try(data.google_compute_subnetwork.existing_subnet.0, null)
+  )
+}
+
 data "google_compute_network" "existing_network" {
-  count   = var.use_existing_network ? 1 : 0
+  count   = var.create_network ? 0 : 1
   project = local.project.project_id
   name    = var.network_name
 }
 
 data "google_compute_subnetwork" "existing_subnet" {
-  count   = var.use_existing_network ? 1 : 0
+  count   = var.create_network ? 0 : 1
   project = local.project.project_id
   name    = var.subnet_name
   region  = var.region
 }
 
 module "elastic_search_network" {
-  count   = var.use_existing_network ? 0 : 1
+  count   = var.create_network ? 1 : 0
   source  = "terraform-google-modules/network/google"
   version = "~> 3.0"
 
@@ -70,7 +84,7 @@ resource "google_compute_router" "router" {
 
   project = local.project.project_id
   name    = "es-access-router"
-  network = var.network_name
+  network = local.network.name
   region  = var.region
 
   bgp {
@@ -102,7 +116,7 @@ resource "google_compute_route" "external_access" {
   project          = local.project.project_id
   dest_range       = "0.0.0.0/0"
   name             = "proxy-external-access"
-  network          = var.network_name
+  network          = local.network.name
   next_hop_gateway = "default-internet-gateway"
 }
 
