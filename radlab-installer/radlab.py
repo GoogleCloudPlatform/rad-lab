@@ -285,9 +285,11 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     shutil.rmtree(env_path)
 
 def select_state():
-    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ')
-    state = state.strip()
-    return state
+    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ').strip()
+    if(state == '1' or state == '2' or state == '3' or state == '4'):
+        return state
+    else: 
+        sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
 
 def basic_input():
 
@@ -305,6 +307,10 @@ def basic_input():
     billing_acc = getbillingacc()
     print("\nBilling Account (Selected) : " + Fore.GREEN + Style.BRIGHT + billing_acc + Style.RESET_ALL )  
     
+    # Billing Account Validation
+    if (billing_acc.count('-') != 3) :
+        sys.exit(Fore.RED + "\nError Occured - INVALID Billing Account\n")
+
     # Selecting Folder ID
     folderid = input(Fore.YELLOW + Style.BRIGHT + "\nFolder ID [Optional]"+ Style.RESET_ALL + ': ')
 
@@ -391,54 +397,74 @@ def getdomain(orgid):
     return response['displayName']
 
 def getbillingacc():
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('cloudbilling', 'v1', credentials=credentials)
-  
-    request = service.billingAccounts().list()
-    response = request.execute()
 
-    print("\nList of Billing account you have access to: \n")
-    billing_accounts = []    
-    # Print out Billing accounts
-    for x in range(len(response['billingAccounts'])):
-        print("[" + str(x+1) + "] " + response['billingAccounts'][x]['name'] + "    " + response['billingAccounts'][x]['displayName'])
-        billing_accounts.append(response['billingAccounts'][x]['name'])
+    x = input("\nHow would you like to fetch the Billing Account ?\n[1] Enter Manually\n[2] Select from the List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
 
-    # Take user input and get the corresponding item from the list
-    inp = int(input(Fore.YELLOW + Style.BRIGHT + "Choose a number for Billing Account" + Style.RESET_ALL + ': '))
-    if inp in range(1, len(billing_accounts)+1):
-        inp = billing_accounts[inp-1]
+    if(x == '1'):
+        billing_acc = input(Fore.YELLOW + Style.BRIGHT + "Enter the Billing Account ( Example format - ABCD-EFGH-IJKL-LMNO )" + Style.RESET_ALL + ': ').strip()
+        return billing_acc
+    
+    elif(x == '2'):
+        credentials = GoogleCredentials.get_application_default()
+        service = discovery.build('cloudbilling', 'v1', credentials=credentials)
+    
+        request = service.billingAccounts().list()
+        response = request.execute()
 
-        billing_acc = inp.split('/')        
-        # print(billing_acc[1])
-        return billing_acc[1]
+        print("\nList of Billing account you have access to: \n")
+        billing_accounts = []    
+        # Print out Billing accounts
+        for x in range(len(response['billingAccounts'])):
+            print("[" + str(x+1) + "] " + response['billingAccounts'][x]['name'] + "    " + response['billingAccounts'][x]['displayName'])
+            billing_accounts.append(response['billingAccounts'][x]['name'])
+
+        # Take user input and get the corresponding item from the list
+        inp = int(input(Fore.YELLOW + Style.BRIGHT + "Choose a number for Billing Account" + Style.RESET_ALL + ': '))
+        if inp in range(1, len(billing_accounts)+1):
+            inp = billing_accounts[inp-1]
+
+            billing_acc = inp.split('/')        
+            # print(billing_acc[1])
+            return billing_acc[1]
+        else:
+            sys.exit(Fore.RED + "\nError Occured - INVALID BILLING ACCOUNT\n")
     else:
-        sys.exit(Fore.RED + "\nError Occured - INVALID BILLING ACCOUNT\n")
+        sys.exit(Fore.RED + "\nError Occured - INVALID CHOICE\n"+ Style.RESET_ALL)
 
 def getorgid():
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('cloudresourcemanager', 'v1beta1', credentials=credentials)
 
-    request = service.organizations().list()
-    response = request.execute()
-
-    # pprint(response)
-
-    print("\nList of Org ID you have access to: \n")
-    org_ids = []    
-    # Print out Org IDs accounts
-    for x in range(len(response['organizations'])):
-        print("[" + str(x+1) + "] " + response['organizations'][x]['organizationId'] + "    " + response['organizations'][x]['displayName']+ "    " + response['organizations'][x]['lifecycleState'])
-        org_ids.append(response['organizations'][x]['organizationId'])
-
-    # Take user input and get the corresponding item from the list
-    inp = int(input(Fore.YELLOW + Style.BRIGHT + "Choose a number for Organization ID" + Style.RESET_ALL + ': '))
-    if inp in range(1, len(org_ids)+1):
-        orgid = org_ids[inp-1]   
-        # print(orgid)
+    x = input("\nHow would you like to fetch the Org ID ?\n[1] Enter Manually\n[2] Select from the List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
+    
+    if(x == '1'):
+        orgid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Org ID ( Example format - 1234567890 )" + Style.RESET_ALL + ': ').strip()
         return orgid
+
+    elif(x == '2'):
+        credentials = GoogleCredentials.get_application_default()
+        service = discovery.build('cloudresourcemanager', 'v1beta1', credentials=credentials)
+
+        request = service.organizations().list()
+        response = request.execute()
+
+        # pprint(response)
+
+        print("\nList of Org ID you have access to: \n")
+        org_ids = []    
+        # Print out Org IDs accounts
+        for x in range(len(response['organizations'])):
+            print("[" + str(x+1) + "] " + response['organizations'][x]['organizationId'] + "    " + response['organizations'][x]['displayName']+ "    " + response['organizations'][x]['lifecycleState'])
+            org_ids.append(response['organizations'][x]['organizationId'])
+
+        # Take user input and get the corresponding item from the list
+        inp = int(input(Fore.YELLOW + Style.BRIGHT + "Choose a number for Organization ID" + Style.RESET_ALL + ': '))
+        if inp in range(1, len(org_ids)+1):
+            orgid = org_ids[inp-1]   
+            # print(orgid)
+            return orgid
+        else:
+            sys.exit(Fore.RED + "\nError Occured - INVALID ORG ID SELECTED\n"+ Style.RESET_ALL)
     else:
-        sys.exit(Fore.RED + "\nError Occured - INVALID ORG ID SELECTED\n"+ Style.RESET_ALL)
+        sys.exit(Fore.RED + "\nError Occured - INVALID CHOICE\n"+ Style.RESET_ALL)
 
 def delifexist(env_path):
     # print(os.path.isdir(env_path))
