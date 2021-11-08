@@ -308,7 +308,7 @@ def basic_input():
     print("\nBilling Account (Selected) : " + Fore.GREEN + Style.BRIGHT + billing_acc + Style.RESET_ALL )  
     
     # Billing Account Validation
-    if (billing_acc.count('-') != 3) :
+    if (billing_acc.count('-') != 2) :
         sys.exit(Fore.RED + "\nError Occured - INVALID Billing Account\n")
 
     # Selecting Folder ID
@@ -401,7 +401,7 @@ def getbillingacc():
     x = input("\nHow would you like to fetch the Billing Account ?\n[1] Enter Manually\n[2] Select from the List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
 
     if(x == '1'):
-        billing_acc = input(Fore.YELLOW + Style.BRIGHT + "Enter the Billing Account ( Example format - ABCD-EFGH-IJKL-LMNO )" + Style.RESET_ALL + ': ').strip()
+        billing_acc = input(Fore.YELLOW + Style.BRIGHT + "Enter the Billing Account ( Example format - ABCDEF-GHIJKL-MNOPQR )" + Style.RESET_ALL + ': ').strip()
         return billing_acc
     
     elif(x == '2'):
