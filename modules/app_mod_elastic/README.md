@@ -1,6 +1,6 @@
-# RAD Lab Application Mordernization Module (w/ Elastic Search) 
+# RAD Lab Application Mordernization Module (w/ Elasticsearch) 
 
-This module allows the user to create an Elastic Search cluster, deployed on a GKE cluster in Google Cloud Platform.  It follows the [Quickstart-tutorial](https://www.elastic.co/guide/en/cloud-on-k8s/1.8/index.html) available on https://elastic.co.   
+This module allows the user to create an Elasticsearch cluster, deployed on a GKE cluster in Google Cloud Platform.  It follows the [Quickstart-tutorial](https://www.elastic.co/guide/en/cloud-on-k8s/1.8/index.html) available on https://elastic.co.   
 
 ## GCP Products/Services 
 
@@ -29,10 +29,10 @@ Also ensure that the identity creating the resources has access to a billing acc
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../radlab-installer/radlab.py).
 
-### Deploy Elastic Search
-The module deploys both the ECK CRDs and Operators.  As this module can be used to demo Elastic Search, it also deploys an ES and Kibana pod in the cluster.  This behaviour can be switched off by setting `deploy_elastic_search` to false.  This will only deploy the CRDs and Operators.
+### Deploy Elasticsearch
+The module deploys both the ECK CRDs and Operators.  As this module can be used to demo Elasticsearch, it also deploys an ES and Kibana pod in the cluster.  This behaviour can be switched off by setting `deploy_elastic_search` to false.  This will only deploy the CRDs and Operators.
 
-## Access Elastic Search 
+## Access Elasticsearch 
 
 It's currently not possible to run `kubectl port-forward` and access it via the web preview **in Cloud Shell**.  The commands below have to be run from a local terminal instead.  If you use the RAD Lab installer from Cloud Shell, you will have to execute the following commands in a terminal on your local machine.  Make sure that you are logged in with the same user locally, as the one you used to run the installer.  You can do this by running `gcloud auth login`.
 
@@ -40,7 +40,7 @@ It's currently not possible to run `kubectl port-forward` and access it via the 
 # Retrieve credentials to query the Kubernetes API server.  Replace REGION and PROJECTID with the actual values.  You can copy/paste this command from the Terraform output.
 gcloud container clusters get-credentials elastic-search-cluster --region REGION --project PROJECTID
 
-# Check status Elastic Search. The health column should show status green.  Takes around 5 minutes to complete 
+# Check status Elasticsearch. The health column should show status green.  Takes around 5 minutes to complete 
 kubectl get elasticsearch -n elastic-search-demo
 
 # Check status Kibana.  The health column should show status green.  It can take a while for the pod to become available.
