@@ -193,6 +193,18 @@ variable "service_ip_range_name" {
   default     = "service-ip-range"
 }
 
+variable "set_shielded_vm_policy" {
+  description = "Apply org policy to disable shielded VMs."
+  type        = bool
+  default     = true
+}
+
+variable "set_vpc_peering_policy" {
+  description = "Enable org policy to VPC Peering"
+  type        = bool
+  default     = true
+}
+
 variable "subnet_name" {
   description = "Name to be assigned to the subnet hosting the GKE cluster."
   type        = string

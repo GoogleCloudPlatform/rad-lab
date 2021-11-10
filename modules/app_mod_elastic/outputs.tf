@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+output "deployment_id" {
+  description = "RADLab Module Deployment ID"
+  value       = var.random_id
+}
+
 output "cluster_credentials_cmd" {
   value = local.k8s_credentials_cmd
 }
@@ -22,7 +27,4 @@ output "project_id" {
   value = local.project.project_id
 }
 
-output "random_id" {
-  value = local.random_id
-}
 
