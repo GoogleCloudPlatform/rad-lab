@@ -53,9 +53,9 @@ def main(dir):
     print('The following files cannot be accessed:')
     print('\n'.join(' - {}'.format(s) for s in warnings))
   if errors:
-    print('The following files are missing the license boilerplate:')
-    print('\n'.join(' - {}'.format(s) for s in errors))
-    sys.exit(1)
+    # print('The following files are missing the license boilerplate:')
+    # print('\n'.join(' - {}'.format(s) for s in errors))
+    return errors
 
 
 if __name__ == '__main__':
