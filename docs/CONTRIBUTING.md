@@ -20,7 +20,7 @@ again.
 The project has the following file structure:
 - [/docs](../docs): Documentation about the repository.
 - [/modules](../modules): Customisable modules to create Google Cloud Platform infrastructure & supporting scripts.
-- [/radlab-installer](../radlab-installer): RAD-Lab Installer and associated scripts to support the modules.
+- [/radlab-launcher](../radlab-launcher): RAD-Lab Launcher and associated scripts to support the modules.
 
 Every individual module is contained in it subdirectory and should follow these Terraform guidelines:
 
@@ -39,10 +39,10 @@ NOTE: Add below 2 tags in the RAD-Lab module specific README.md for populating s
 <!-- END TFDOC -->
 ```
 
-For every module, a base configuration is determined, which can be installed via the [radlab.py](../radlab-installer/README.md) installer.  The base configuration is reflected in the default values for all the variables, except for `organization_id`, `billing_account_id` and (optional) `folder_id`. 
+For every module, a base configuration is determined, which can be deployed via the [radlab.py](../radlab-launcher/README.md) launcher.  The base configuration is reflected in the default values for all the variables, except for `organization_id`, `billing_account_id` and (optional) `folder_id`. 
 
-## Installer
-It should be possible for people with less experience in Infrastructure As Code to use every module.  The repository contains an installer for that purpose, which can be found in the [/radlab-installer](../radlab-installer) directory ([radlab.py](../radlab-installer/radlab.py)).  The installer needs to be updated whenever new modules are introduced to the repository.
+## RAD Lab Launcher
+It should be possible for people with less experience in Infrastructure As Code to use every module.  The repository contains a launcher for that purpose, which can be found in the [/radlab-launcher](../radlab-launcher) directory ([radlab.py](../radlab-launcher/radlab.py)).  The launcher needs to be updated whenever new modules are introduced to the repository.
 
 ## Cloud Foundation Toolkit
 Where possible, use the open source [Cloud Foundation Toolkit](https://cloud.google.com/foundation-toolkit) modules to create Google Cloud infrastructure.

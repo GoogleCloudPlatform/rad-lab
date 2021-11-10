@@ -27,14 +27,14 @@ Also ensure that the identity creating the resources has access to a billing acc
 
 ## Reference Architechture Diagram
 
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../radlab-installer/radlab.py).
+Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
 ### Deploy Elasticsearch
 The module deploys both the ECK CRDs and Operators.  As this module can be used to demo Elasticsearch, it also deploys an ES and Kibana pod in the cluster.  This behaviour can be switched off by setting `deploy_elastic_search` to false.  This will only deploy the CRDs and Operators.
 
 ## Access Elasticsearch 
 
-It's currently not possible to run `kubectl port-forward` and access it via the web preview **in Cloud Shell**.  The commands below have to be run from a local terminal instead.  If you use the RAD Lab installer from Cloud Shell, you will have to execute the following commands in a terminal on your local machine.  Make sure that you are logged in with the same user locally, as the one you used to run the installer.  You can do this by running `gcloud auth login`.
+It's currently not possible to run `kubectl port-forward` and access it via the web preview **in Cloud Shell**.  The commands below have to be run from a local terminal instead.  If you use the RAD Lab launcher from Cloud Shell, you will have to execute the following commands in a terminal on your local machine.  Make sure that you are logged in with the same user locally, as the one you used to run the launcher.  You can do this by running `gcloud auth login`.
 
 ```shell
 # Retrieve credentials to query the Kubernetes API server.  Replace REGION and PROJECTID with the actual values.  You can copy/paste this command from the Terraform output.
@@ -56,7 +56,7 @@ kubectl port-forward -n elastic-search-demo service/kibana-kb-http 5601
 ```
 
 ### Using Terraform module
-Here are a couple of examples to directly use the Terraform module, as opposed to using the RAD Lab installer.
+Here are a couple of examples to directly use the Terraform module, as opposed to using the RAD Lab Launcher.
 
 #### Simple
 

@@ -1,6 +1,6 @@
-# RAD Lab Installer
+# RAD Lab Launcher
 
-The RAD Lab installer provides an automated way to create the modules inside your Google Cloud environment.  
+The RAD Lab Launcher provides an automated way to create the modules inside your Google Cloud environment.  
 
 ## Steps to Install RAD Lab Pre-requisites
 
@@ -20,7 +20,7 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
 
 NOTE: If you are using Cloud Shell then CURL & BASH comes pre-installed with it, thus you can skip this step.
 
-4. Navigate to the RADLab `radlab-installer` folder : `cd ./rad-lab-main/scripts/radlab-installer`
+4. Navigate to the RADLab `radlab-launcher` folder : `cd ./rad-lab-main/radlab-launcher`
 
 5. Install all the pre-requisites by running : `python3 installer_prereq.py`. _NOTE:_ Currently the deployment is supported for `Python 3.7.3` and above. List of Pre-requisites we are installing in this step:
 
@@ -50,17 +50,17 @@ gcloud config set project <myProject>
 
 NOTE: If the default project id is not set then in the guided setup you will need to manually enter the GCS bucket name (you would like to create) where you would like to store Terraform configs/state for RAD Lab configs and also the project ID where the GCS bucket will be created.
 
-## Steps to Install RAD Lab Modules
+## Steps to Deploy RAD Lab Modules
 
 Currently RAD Lab is only comprised of single module i.e. **Data Science** Module and new modules will be coming out soon.
 
-1. Navigate to the RAD Lab `radlab-installer` folder : `cd ./rad-lab-main/scripts/radlab-installer`.
+1. Navigate to the RAD Lab `radlab-launcher` folder : `cd ./rad-lab-main/radlab-launcher`.
 
 2. Start the Guided setup by running : `python3 radlab.py` and follow the instructions.
 
 NOTE: Save the **deployment_id** from the output of the above script execution for future reference, for making any updates or delete the RADLab Module created.
 
-## Example Run of RAD-Lab Installer 
+## Example Run of RAD-Lab Launcher 
 
 1. Select the RAD Lab modules you would like to deploy
 

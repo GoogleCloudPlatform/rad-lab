@@ -20,7 +20,7 @@ Error Occurred - Deployment failed for ID: <deployment_id>
 
 ```
 
-**Solution**: If you see below error in your initial deployment run, rerun the deployment via ``` python3 radlab.py``` using the <deployment_id> and select `Update` (in [Steps to Install RAD Lab Modules](../radlab-installer/README.md#steps-to-install-rad-lab-modules). This may have been caused as the Org Policy ```constraints/compute.vmExternalIpAccess``` is not completely rolled out.
+**Solution**: If you see below error in your initial deployment run, rerun the deployment via ``` python3 radlab.py``` using the <deployment_id> and select `Update` (in [Steps to Install RAD Lab Modules](../radlab-launcher/README.md#steps-to-install-rad-lab-modules). This may have been caused as the Org Policy ```constraints/compute.vmExternalIpAccess``` is not completely rolled out.
 
 NOTE: Similarly if the error occurs for any other org policies then the workaround is same as above.  
 
