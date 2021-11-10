@@ -22,7 +22,7 @@ To create a module in an existing GCP environment, please click on the “Open I
 * [gcloud](https://cloud.google.com/sdk/docs/install) SDK version 360.0.0 or higher. (ONLY for [Installer](./radlab-installer))
 * [python](https://www.python.org/downloads/) version 3.7.3 or higher. (ONLY for [Installer](./radlab-installer))
 
-Users can run `installer_prereq.py` included in the [radlab-installer scripts directory](./radlab-installer) to validate these prerequisites and install any missing dependencies. If running via Cloud Shell, the above prerequisites will all be pre-installed.
+Users can run `installer_prereq.py` included in the [radlab-installer scripts directory](./radlab-installer) to validate these prerequisites and install any missing dependencies.
 
 ### Installer
 An installation script is included to enable users without prior cloud or Terraform experience to explore the advantages of GCP.  The installation wizard will create the necessary infrastructure for each module.  More instructions on the installer can be found [here](./radlab-installer).
