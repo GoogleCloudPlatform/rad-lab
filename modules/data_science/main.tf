@@ -22,6 +22,18 @@ locals {
   )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
+  network = (
+    var.create_network
+    ? try(module.vpc_ai_notebook.0.network.network, null)
+    : try(data.google_compute_network.default.0, null)
+  )
+
+  subnet = (
+    var.create_network
+    ? try(module.vpc_ai_notebook.0.subnets["${local.region}/${var.subnet_name}"], null)
+    : try(data.google_compute_subnetwork.default.0, null)
+  )
+
   notebook_sa_project_roles = [
     "roles/compute.instanceAdmin",
     "roles/notebooks.admin",
@@ -29,12 +41,12 @@ locals {
     "roles/storage.objectViewer"
   ]
 
-  project_services = [
+  project_services = var.enable_services ? [
     "compute.googleapis.com",
     "bigquery.googleapis.com",
     "notebooks.googleapis.com",
     "bigquerystorage.googleapis.com"
-  ]
+  ] : []
 }
 
 resource "random_id" "default" {
@@ -76,18 +88,31 @@ resource "google_project_service" "enabled_services" {
   ]
 }
 
+data "google_compute_network" "default" {
+  count   = var.create_network ? 0 : 1
+  project = local.project.project_id
+  name    = var.network_name
+}
+
+data "google_compute_subnetwork" "default" {
+  count   = var.create_network ? 0 : 1
+  project = local.project.project_id
+  name    = var.subnet_name
+}
+
 module "vpc_ai_notebook" {
+  count   = var.create_network ? 1 : 0
   source  = "terraform-google-modules/network/google"
   version = "~> 3.0"
 
   project_id   = local.project.project_id
-  network_name = "ai-notebook"
+  network_name = var.network_name
   routing_mode = "GLOBAL"
   description  = "VPC Network created via Terraform"
 
   subnets = [
     {
-      subnet_name           = "subnet-ai-notebook"
+      subnet_name           = var.subnet_name
       subnet_ip             = var.ip_cidr_range
       subnet_region         = local.region
       description           = "Subnetwork inside *vpc-analytics* VPC network, created via Terraform"
@@ -210,8 +235,8 @@ resource "google_notebooks_instance" "ai_notebook" {
   no_public_ip    = false
   no_proxy_access = false
 
-  network = module.vpc_ai_notebook.network_self_link
-  subnet  = module.vpc_ai_notebook.subnets_self_links.0
+  network = local.network.self_link
+  subnet  = local.subnet.self_link
 
   post_startup_script = var.startup_script
 
