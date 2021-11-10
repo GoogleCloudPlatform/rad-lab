@@ -1,1 +1,4 @@
 click
+python-dateutil
+pytz
+requests
