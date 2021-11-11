@@ -17,14 +17,12 @@
 import os
 import sys
 import json
+import shutil
 import requests
-# import datetime
 import check_boilerplate
 from pprint import pprint
-# import dateutil.parser
 from pytz import timezone
 
-# IGNOREPRABOVEMINUTES = 5
 
 def main(PR):
 
@@ -40,7 +38,6 @@ def main(PR):
         for pr in response.json():
             
             commentcheck = prcommentcheck(GITHUB_REPOSITORY, pr['number'])
-
             licensecheck(GITHUB_REPOSITORY,GITHUB_WORKSPACE, TOKEN, pr['number'],commentcheck)        
 
     else: 
@@ -62,13 +59,21 @@ def licensecheck(GITHUB_REPOSITORY,GITHUB_WORKSPACE, TOKEN, pr, commentcheck):
     # If commentcheck = 'false' i.e. License check has not run on the PR before.
     if(commentcheck == 'false'):
     # if(checkmindiff(pr['created_at']) and commentcheck == 'false'):
+
         print('PR # ' + str(pr) + ' : Run Licence check...')
         
+        # Get all pr files
         prfiles = pr_files(GITHUB_REPOSITORY,pr)
-        all_no_license_files = boilerplate(GITHUB_WORKSPACE)
-        pr_no_license_files = list(set.intersection(set(prfiles), set(all_no_license_files)))
 
-        # print(files)
+        # Download all prf files locally into ./tools/temp/ folder in the same directory structure
+        downloadprfiles(prfiles)
+
+        # Run lisence check on the downloaded files in temp directory
+        pr_no_license_files = boilerplate(os.getcwd()+'/temp')
+
+        # Delete temp directory and its contents
+        shutil.rmtree(os.getcwd()+'/temp')
+
         if pr_no_license_files:
             comment = '<!-- Boilerplate Check -->\nApache 2.0 License check failed!\n\nThe following files are missing the license boilerplate:\n'
             for x in range(len(pr_no_license_files)):
@@ -83,19 +88,6 @@ def licensecheck(GITHUB_REPOSITORY,GITHUB_WORKSPACE, TOKEN, pr, commentcheck):
     else:
         print('PR # ' + str(pr) + ' : Skip Licence check...')
 
-# def checkmindiff(pr_created_at):
-#     now = datetime.datetime.now().astimezone(timezone('America/Los_Angeles'))
-#     now = now.replace(microsecond=0)
-#     # print(now)
-#     d1 = dateutil.parser.parse(pr_created_at).astimezone(timezone('America/Los_Angeles'))
-#     # print(d1)
-#     # print(now - d1)
-#     minutes = (now - d1).total_seconds() / 60
-#     # print(minutes)
-#     if(minutes <= IGNOREPRABOVEMINUTES):
-#         return True
-#     else:
-#         return False
 
 def prcommentcheck(GITHUB_REPOSITORY, pr):
     print('Checking if the License check has already ran...')
@@ -113,14 +105,13 @@ def prcommentcheck(GITHUB_REPOSITORY, pr):
         raise SystemExit(e)
 
 
-def boilerplate(GITHUB_WORKSPACE):
-    all_no_license_files = []
-    allfiles = check_boilerplate.main(GITHUB_WORKSPACE)
-    # print(files)
+def boilerplate(local_temp):
+    pr_no_license_files = []
+    allfiles = check_boilerplate.main(local_temp)
     for x in range(len(allfiles)):
-        all_no_license_files.append(allfiles[x].replace(GITHUB_WORKSPACE+'/', ""))
-    # print(all_no_license_files)
-    return all_no_license_files
+        pr_no_license_files.append(allfiles[x].replace(local_temp+'/', ""))
+    # print(pr_no_license_files)
+    return pr_no_license_files
 
 def pr_files(GITHUB_REPOSITORY,pr):
     pr_files = []
@@ -128,13 +119,36 @@ def pr_files(GITHUB_REPOSITORY,pr):
         response = requests.get('https://api.github.com/repos/'+ GITHUB_REPOSITORY +'/pulls/'+ str(pr) +'/files')
         for file in response.json():
             if(file['status'] != 'removed'):
-                pr_files.append(file['filename'])
+                pr_files.append(file)
             else:
                 continue
         # print(pr_files)
         return pr_files
+
     except requests.exceptions.RequestException as e: 
         raise SystemExit(e)    
+
+def downloadprfiles(prfiles):
+    for file in prfiles:
+        # print('Create Temp Directory')
+        path = os.path.dirname(file['filename'])
+        path = os.getcwd() + '/temp/' + path
+        # print(path)
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        # print('Beginning file download with requests')
+        r = requests.get(file['raw_url'])
+
+        with open(path + '/' + os.path.basename(file['filename']), 'wb') as f:
+            f.write(r.content)
+
+        # # Retrieve HTTP meta-data
+        # print(r.status_code)
+        # print(r.headers['content-type'])
+        # print(r.encoding)
+
 
 def commentpr(GITHUB_REPOSITORY, pr, comment, TOKEN):
     headers = {'Authorization': f'token {TOKEN}', 'Accept': 'application/vnd.github.v3+json'}
