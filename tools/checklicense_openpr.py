@@ -20,14 +20,11 @@ import json
 import shutil
 import requests
 import check_boilerplate
-from pprint import pprint
-from pytz import timezone
 
 
 def main(PR):
 
     TOKEN             = os.getenv('GITHUB_TOKEN')
-    GITHUB_WORKSPACE  = os.getenv('GITHUB_WORKSPACE')
     GITHUB_REPOSITORY = os.getenv('GITHUB_REPOSITORY')
 
     if PR == 'All':
@@ -38,11 +35,11 @@ def main(PR):
         for pr in response.json():
             
             commentcheck = prcommentcheck(GITHUB_REPOSITORY, pr['number'])
-            licensecheck(GITHUB_REPOSITORY,GITHUB_WORKSPACE, TOKEN, pr['number'],commentcheck)        
+            licensecheck(GITHUB_REPOSITORY, TOKEN, pr['number'],commentcheck)        
 
     else: 
         print('Manual License check for: ' + PR)
-        licensecheck(GITHUB_REPOSITORY,GITHUB_WORKSPACE, TOKEN, int(PR),'false') 
+        licensecheck(GITHUB_REPOSITORY, TOKEN, int(PR),'false') 
 
 
 def open_pr(GITHUB_REPOSITORY):
@@ -54,7 +51,7 @@ def open_pr(GITHUB_REPOSITORY):
         raise SystemExit(e)
 
 
-def licensecheck(GITHUB_REPOSITORY,GITHUB_WORKSPACE, TOKEN, pr, commentcheck):   
+def licensecheck(GITHUB_REPOSITORY, TOKEN, pr, commentcheck):   
 
     # If commentcheck = 'false' i.e. License check has not run on the PR before.
     if(commentcheck == 'false'):
