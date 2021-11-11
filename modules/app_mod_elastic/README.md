@@ -108,20 +108,43 @@ module "elastic_search_project" {
 |---|---|:---: |:---:|:---:|
 | billing_account_id | Billing account ID that will be linked to the project. | <code title="">string</code> | ✓ |  |
 | organization_id | Organization ID where the project will be created. | <code title="">string</code> | ✓ |  |
+| *create_network* | Indicate if the deployment has to use a network that already exists. | <code title="">bool</code> |  | <code title="">true</code> |
+| *create_project* | Create a new project or use an existing project.  When set to true, variable project_name has to match the exact project ID of the existing project. | <code title="">bool</code> |  | <code title="">true</code> |
+| *deploy_elastic_search* | Deploy Elastic Search and Kibana. | <code title="">bool</code> |  | <code title="">true</code> |
+| *disk_size_gb_nodes* | Size of the disks attached to the nodes. | <code title="">number</code> |  | <code title="">256</code> |
+| *disk_type_nodes* | Type of disks to attach to the nodes. | <code title="">string</code> |  | <code title="">pd-standard</code> |
+| *elastic_search_instance_count* | Number of instances of the Elastic Search pod. | <code title="">string</code> |  | <code title="">1</code> |
+| *elk_version* | Version for Elastic Search and Kibana. | <code title="">string</code> |  | <code title="">7.15.1</code> |
+| *enable_internet_egress_traffic* | Enable egress traffic to the internet.  Necessary to download the Elastic Search pods. | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created.  Leave blank if the project should be created directly underneath the Organization node. | <code title="">string</code> |  | <code title=""></code> |
 | *gke_cluster_name* | Name that will be assigned to the GKE cluster. | <code title="">string</code> |  | <code title="">elastic-search-cluster</code> |
+| *gke_version* | Version to be used for the GKE cluster.  Ensure that the release channel is properly set when updating this variable. | <code title="">string</code> |  | <code title="">1.20.10-gke.1600</code> |
+| *kibana_instance_count* | Number of Kibana instances deployed in the cluster. | <code title="">string</code> |  | <code title="">1</code> |
 | *master_ipv4_cidr_block* | IPv4 CIDR block to assign to the Master cluster. | <code title="">string</code> |  | <code title="">10.200.0.0/28</code> |
 | *network_cidr_block* | CIDR block to be assigned to the network | <code title="">string</code> |  | <code title="">10.0.0.0/16</code> |
 | *network_name* | Name to be assigned to the network hosting the GKE cluster. | <code title="">string</code> |  | <code title="">elastic-search-nw</code> |
 | *node_pool_machine_type* | Machine type for the node pool. | <code title="">string</code> |  | <code title="">e2-medium</code> |
+| *node_pool_max_count* | Maximum instance count for the custom node pool. | <code title="">number</code> |  | <code title="">10</code> |
+| *node_pool_min_count* | Minimum instance count for the custom nodepool. | <code title="">number</code> |  | <code title="">1</code> |
 | *node_pool_name* | Name of the nodepool. | <code title="">string</code> |  | <code title="">elastic-search-pool</code> |
 | *pod_cidr_block* | CIDR block to be assigned to pods running in the GKE cluster. | <code title="">string</code> |  | <code title="">10.100.0.0/16</code> |
+| *pod_ip_range_name* | Range name for the pod IP addresses. | <code title="">string</code> |  | <code title="">pod-ip-range</code> |
+| *preemptible_nodes* | Use preemptible VMs for the node pools | <code title="">bool</code> |  | <code title="">true</code> |
 | *project_name* | Name that will be assigned to the project.  To ensure uniqueness, a random_id will be added to the name. | <code title="">string</code> |  | <code title="">elastic-search-demo</code> |
-| *random_id* | Random ID that will be used to suffix all resources.  Leave blank if you want to module to use a generated one. | <code title="">string</code> |  | <code title="">null</code> |
+| *random_id* | Random ID that will be used to suffix all resources.  Leave blank if you want the module to use a generated one. | <code title="">string</code> |  | <code title="">null</code> |
 | *region* | Region where the resources should be created. | <code title="">string</code> |  | <code title="">us-west1</code> |
+| *release_channel* | Enroll the GKE cluster in this release channel. | <code title="">string</code> |  | <code title="">REGULAR</code> |
 | *service_cidr_block* | CIDR block to be assigned to services running in the GKE cluster. | <code title="">string</code> |  | <code title="">10.150.0.0/16</code> |
+| *service_ip_range_name* | Name for the IP range for services. | <code title="">string</code> |  | <code title="">service-ip-range</code> |
+| *set_shielded_vm_policy* | Apply org policy to disable shielded VMs. | <code title="">bool</code> |  | <code title="">true</code> |
+| *set_vpc_peering_policy* | Enable org policy to VPC Peering | <code title="">bool</code> |  | <code title="">true</code> |
 | *subnet_name* | Name to be assigned to the subnet hosting the GKE cluster. | <code title="">string</code> |  | <code title="">elastic-search-snw</code> |
 
 ## Outputs
 
+| name | description | sensitive |
+|---|---|:---:|
+| cluster_credentials_cmd | None |  |
+| deployment_id | RADLab Module Deployment ID |  |
+| project_id | None |  |
 <!-- END TFDOC -->
