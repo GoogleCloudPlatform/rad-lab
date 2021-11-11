@@ -25,8 +25,7 @@
     }
   }
   depends_on = [
-    module.elastic_search_project,
-    google_project_service.enabled_services
+    module.elastic_search_project
   ]
 }
 
@@ -39,7 +38,6 @@ resource "google_project_organization_policy" "shielded_vm_policy" {
     enforced = false
   }
   depends_on = [
-    module.elastic_search_project,
-    google_project_service.enabled_services
+    module.elastic_search_project
   ]
 }
