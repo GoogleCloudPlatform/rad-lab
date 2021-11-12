@@ -286,7 +286,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
 
 def select_state():
     state = input("\nAction to perform for RAD Lab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RAD Lab Module Deployment Action"+ Style.RESET_ALL + ': ').strip()
-    if(state == '1' or state == '2' or state == '3' or state == '4'):
+    if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT or state == STATE_LIST_DEPLOYMENT):
         return state
     else: 
         sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
