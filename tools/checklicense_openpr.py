@@ -16,6 +16,7 @@
 
 import os
 import sys
+import glob
 import json
 import shutil
 import requests
@@ -64,6 +65,11 @@ def licensecheck(GITHUB_REPOSITORY, TOKEN, pr, commentcheck):
 
         # Download all prf files locally into ./tools/temp/ folder in the same directory structure
         downloadprfiles(prfiles)
+
+        print(os.getcwd()+'/temp')
+        print(glob.glob(os.getcwd()+'/temp/*'))
+        print(glob.glob(os.getcwd()+'/temp/*/*'))
+        print(glob.glob(os.getcwd()+'/temp/*/*/*'))
 
         # Run lisence check on the downloaded files in temp directory
         pr_no_license_files = boilerplate(os.getcwd()+'/temp')
