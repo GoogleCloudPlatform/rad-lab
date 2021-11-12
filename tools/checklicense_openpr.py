@@ -66,10 +66,10 @@ def licensecheck(GITHUB_REPOSITORY, TOKEN, pr, commentcheck):
         # Download all prf files locally into ./tools/temp/ folder in the same directory structure
         downloadprfiles(prfiles)
 
-        print(os.getcwd()+'/temp')
-        print(glob.glob(os.getcwd()+'/temp/*'))
-        print(glob.glob(os.getcwd()+'/temp/*/*'))
-        print(glob.glob(os.getcwd()+'/temp/*/*/*'))
+        # print(os.getcwd()+'/temp')
+        # print(glob.glob(os.getcwd()+'/temp/*'))
+        # print(glob.glob(os.getcwd()+'/temp/*/*'))
+        # print(glob.glob(os.getcwd()+'/temp/*/*/*'))
 
         # Run lisence check on the downloaded files in temp directory
         pr_no_license_files = boilerplate(os.getcwd()+'/temp')
@@ -111,6 +111,7 @@ def prcommentcheck(GITHUB_REPOSITORY, pr):
 def boilerplate(local_temp):
     pr_no_license_files = []
     allfiles = check_boilerplate.main(local_temp)
+    print(allfiles)
     for x in range(len(allfiles)):
         pr_no_license_files.append(allfiles[x].replace(local_temp+'/', ""))
     # print(pr_no_license_files)
