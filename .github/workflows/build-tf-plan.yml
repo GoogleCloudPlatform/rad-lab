@@ -36,8 +36,11 @@ jobs:
           readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
           for added_modified_file in "${added_modified_files[@]}"; do
             echo "File Added/Modified : ${added_modified_file}" 
+            if [[ "${added_modified_file}" == *".tf"* ]]; then
+              TFFILE=${added_modified_file}
+            fi
           done
-          DIR="$(dirname ${added_modified_files[0]})"
+          DIR="$(dirname ${TFFILE})"
           echo "ENV_DIR=${DIR}" >> $GITHUB_ENV
         continue-on-error: true
 
@@ -46,8 +49,11 @@ jobs:
           readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
           for removed_file in ${removed_files[@]}; do
             echo "File Removed : ${removed_file}" 
+            if [[ "${removed_file}" == *".tf"* ]]; then
+              TFFILE=${removed_file}
+            fi
           done
-          DIR="$(dirname ${removed_files[0]})"
+          DIR="$(dirname ${TFFILE})"
           echo "ENV_DIR=${DIR}" >> $GITHUB_ENV
         continue-on-error: true
 
