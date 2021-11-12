@@ -111,10 +111,12 @@ def prcommentcheck(GITHUB_REPOSITORY, pr):
 def boilerplate(local_temp):
     pr_no_license_files = []
     allfiles = check_boilerplate.main(local_temp)
-    print(allfiles)
-    for x in range(len(allfiles)):
-        pr_no_license_files.append(allfiles[x].replace(local_temp+'/', ""))
-    # print(pr_no_license_files)
+    try:
+        for x in range(len(allfiles)):
+            pr_no_license_files.append(allfiles[x].replace(local_temp+'/', ""))
+        # print(pr_no_license_files)
+    except:
+        print("All files have the Apache 2.0 Lisence")
     return pr_no_license_files
 
 def pr_files(GITHUB_REPOSITORY,pr):
