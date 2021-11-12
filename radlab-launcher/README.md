@@ -1,46 +1,60 @@
 # RAD Lab Launcher
 
-The RAD Lab Launcher provides an automated way to create the modules inside your Google Cloud environment.  
+The RAD Lab Launcher will guide you through the process of launching modules in your Google Cloud environment.  
 
-## Steps to Install RAD Lab Pre-requisites
+## Installation
 
-1. [Download](https://github.com/GoogleCloudPlatform/rad-lab/archive/refs/heads/main.zip) the Complete directory structure & its files on your **Cloud Shell** or Localhost.
+1. [Download](https://github.com/GoogleCloudPlatform/rad-lab/archive/refs/heads/main.zip) the content to your local machine. Alternatively, you can check it out directly into Google Cloud Shell by clicking the button below. NOTE: You will need to follow [these steps](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) to set up a GitHub Personal Access Token.
 
 [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/rad-lab&cloudshell_git_branch=main)
 
-NOTE: Alternatively if you want to deploy using the above **Open in Cloud Shell** button you will need to set up GitHup Personal Access Token following [these steps](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) and skip 1. Enter you GitHib credentials. (Enter your Personal Access Token for the password)
-
-NOTE: RAD Lab deployment is supported only via GCP Cloud Shell, MAC OS, Linux & Windows Operating system.
 
 NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and Run as Adminstrator`.
 
-2. Decompress the download: `unzip rad-lab-main.zip`
+2. Decompress the download:
+   ```
+   unzip rad-lab-main.zip
+   ```
 
-3. Make sure [CURL](https://curl.se/) & [BASH](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) is installed on the operating system from where you are running the deployment.
+3. You will need [CURL](https://curl.se/) & [BASH](https://en.wikipedia.org/wiki/Bash_(Unix_shell)). These come pre-installed in most linux terminals.
 
-NOTE: If you are using Cloud Shell then CURL & BASH comes pre-installed with it, thus you can skip this step.
+4. Navigate to the  `radlab-launcher` folder:
+    ```
+    cd ./rad-lab-main/radlab-launcher
+    ```
 
-4. Navigate to the RADLab `radlab-launcher` folder : `cd ./rad-lab-main/radlab-launcher`
+5. Run a script to install the prerequisites:
+    ```
+    python3 installer_prereq.py
+    ```
+    _NOTE:_ Currently the deployment is supported for `Python 3.7.3` and above.
 
-5. Install all the pre-requisites by running : `python3 installer_prereq.py`. _NOTE:_ Currently the deployment is supported for `Python 3.7.3` and above. List of Pre-requisites we are installing in this step:
+    This will install:
 
     * _[Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli#install-terraform)_ binary by downloading a pre-compiled binary or compiling it from source.
     * A _[Python module](https://pypi.org/project/python-terraform/)_ which provides a wrapper of terraform command line tool.
     * [Google API Python client library](https://cloud.google.com/apis/docs/client-libraries-explained#google_api_client_libraries) for Google's discovery based APIs.
 
-6. Verify the installation by running : `terraform -help`
+6. Verify the Terraform installation by running:
+    ```
+    terraform -help
+    ```
 
-7. From a Google Cloud perspective, every module requires a set of IAM permissions a _Cloud Admin_ persona requires to run the Terraform code. The individual [modules](../../modules) will list the minimum permissions users require to successfully create the infrastructure.
+    This should produce instructions on running `terraform`. If you get a `command not found` message, there was an error in the installation.    
 
-8. The _Cloud Admin_ should have the following information handy with them which will be used in the guided setup deployment of the RAD-Lab modules:
+## Launch Preparation
 
-   * GCP [Organization ID](https://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id)
-   * GCP [Billing Account](https://cloud.google.com/billing/docs/how-to/manage-billing-account) for RAD Lab deployments (projects/resources).
-   * [OPTIONAL] GCP [Folder ID](https://cloud.google.com/resource-manager/docs/creating-managing-folders#view) if you would like to deploy the RAD Lab Deployment within specific GCP folder.
-   * [OPTIONAL] GCS [Bucket](https://cloud.google.com/storage/docs/creating-buckets) with read/write access where the Terraform states will be saved.
+7. To launch infrastructure in Google Cloud, a user must have the appropriate [IAM](https://cloud.google.com/iam/docs/overview) permissions. Each [module](../../modules)'s `README.md` will list the permissions needed to launch the infrastructure. You can use the Google Cloud Console to [view](https://cloud.google.com/iam/docs/manage-access-other-resources) or [change](https://cloud.google.com/iam/docs/manage-access-other-resources#single-role) IAM permissions.
 
-     NOTE: If you don’t have the GCS bucket already, you will also get the option to create the same as part of the guided setup.
-   * Depending on how your Google Organization is configured and how your Project and Service quotas are set, you can run into errors during deployment. Please see the [Troubleshooting Common Problems](../../docs/TROUBLESHOOTING.md) section for a list of common problems and fixes.
+8. The following information about your Google Cloud Platform (GCP) environment is typically needed to launch RAD Lab modules:
+
+   * [Organization ID](https://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id)
+   * [Billing Account](https://cloud.google.com/billing/docs/how-to/manage-billing-account) for RAD Lab deployments (projects/resources).
+   * [OPTIONAL] [Folder ID](https://cloud.google.com/resource-manager/docs/creating-managing-folders#view) to deploy the module in an existing folder.
+   * [OPTIONAL] [Cloud Storage Bucket](https://cloud.google.com/storage/docs/creating-buckets) with read/write access to save the Terraform state. This bucket is used to save state for all active deployments. 
+   
+   
+   The launcher can create one for you if you do not have one already.
 
 9. Set the default project id where the GCS bucket exists, to store Terraform configs/state. You can use [gcloud config set](https://cloud.google.com/sdk/gcloud/reference/config/set) with project property to set the project.
 
@@ -50,35 +64,41 @@ gcloud config set project <myProject>
 
 NOTE: If the default project id is not set then in the guided setup you will need to manually enter the GCS bucket name (you would like to create) where you would like to store Terraform configs/state for RAD Lab configs and also the project ID where the GCS bucket will be created.
 
-## Steps to Deploy RAD Lab Modules
+## Deploy a RAD Lab Module
+**If you encounter errors during deployment, please see [Troubleshooting Common Problems](../../docs/TROUBLESHOOTING.md) section for a list of common problems and fixes.**  If you don't see a solution listed, please create an [Issue](https://github.com/GoogleCloudPlatform/rad-lab/issues). 
 
-Currently RAD Lab is only comprised of single module i.e. **Data Science** Module and new modules will be coming out soon.
 
-1. Navigate to the RAD Lab `radlab-launcher` folder : `cd ./rad-lab-main/radlab-launcher`.
+1. Navigate to the RAD Lab Launcher folder from the main directory:
+    ```
+    cd ./radlab-launcher/
+    ```
 
-2. Start the Guided setup by running : `python3 radlab.py` and follow the instructions.
+2. Start the guided setup:
+    ```
+    python3 radlab.py
+    ``` 
 
-NOTE: Save the **deployment_id** from the output of the above script execution for future reference, for making any updates or delete the RADLab Module created.
+NOTE: Save the **deployment_id** from the output for future reference. It is used to make updates or delete the RAD Lab module deployment.
 
-## Example Run of RAD-Lab Launcher 
+## Example Launch of Data Science Module
 
 1. Select the RAD Lab modules you would like to deploy
 
 ```
-List of available RADLab modules:
+List of available RAD Lab modules:
 [1] Data Science
 [2] Exit
-Choose a number for the RADLab Module: 
+Choose a number for the RAD Lab Module: 
 ```
 
 2. Select the `Action` you want to perform for the corresponding RAD Lab Model:
 
 ```
-Action to perform for RADLab Deployment ?
+Action to perform for RAD Lab Deployment ?
 [1] Create New
 [2] Update
 [3] Delete
-Choose a number for the RADLab Module Deployment Action: 1
+Choose a number for the RAD Lab Module Deployment Action: 1
 ```
 
 NOTE: If you are selecting Update/Delete action for RAD Lab Model then you will be required to provide the **deployment id** which is provided as the output of successfully newly created a RAD Lab Module deployment.
@@ -142,7 +162,7 @@ Enter verification code:
 
 9. This is where the Terraform module (example: Data Science module) will kick in and Terraform config scripts will be deployed which will spin up respective projects/services/sources, etc.
 
-10. Once the RAD Lab deployment is completed it will throw the below Outputs on the Cloud Shell Terminal for the _Cloud Admin_ to share with the _RADLab users_.
+10. Once the RAD Lab deployment is completed it will throw the below Outputs on the Cloud Shell Terminal for the _Cloud Admin_ to share with the _RAD Lab users_.
 
 ```
 Outputs:
@@ -158,7 +178,7 @@ GCS Bucket storing Terrafrom Configs: my-sample-bucket
 TERRAFORM DEPLOYMENT COMPLETED!!!
 ```
 
-NOTE: Save the **deployment_id** for future reference, for making any updates or delete the RADLab Module created.
+NOTE: Save the **deployment_id** for future reference, for making any updates or delete the RAD Lab Module created.
 
 NOTE: If you see any errors on your deployment run please follow the [Troubleshooting doc](../docs/TROUBLESHOOTING.md#rad-lab-troubleshooting) to lookup for errors and corresponding solutions.
 

@@ -61,11 +61,11 @@ def main():
         print("Login with Cloud Admin account...")
         os.system("gcloud auth application-default login")
 
-    selected_module = input("\nList of available RADLab modules:\n[1] Data Science\n[2] (APP MOD) Elastic Search\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module"+ Style.RESET_ALL + ': ').strip()
+    selected_module = input("\nList of available RAD Lab modules:\n[1] Data Science\n[2] (APP MOD) Elasticsarch\n[3] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RAD Lab Module"+ Style.RESET_ALL + ': ').strip()
 
     if(selected_module == OPTION_MODULE_DATA_SCIENCE):
 
-        print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
+        print("\nRAD Lab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
         
         module_name = 'data_science'
 
@@ -101,7 +101,7 @@ def main():
         elif(state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT):
             
             # Get Deployment ID
-            randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RADLab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
+            randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RAD Lab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
             randomid = randomid.strip()
 
             # Validating Deployment ID
@@ -134,7 +134,7 @@ def main():
             sys.exit()
 
         else:
-            sys.exit(Fore.RED + "\nInvalid RADLab Module State selected")
+            sys.exit(Fore.RED + "\nInvalid RAD Lab Module State selected")
 
         ###########################
         # Module Specific Options #
@@ -167,7 +167,7 @@ def main():
             # print(trusted_users)
     elif(selected_module ==  OPTION_MODULE_APP_MOD_ELASTIC_SEARCH):
 
-        print("\nRADLab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elastic Search"+ Style.RESET_ALL)
+        print("\nRAD Lab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elasticsearch"+ Style.RESET_ALL)
 
         module_name = 'app_mod_elastic'
 
@@ -203,7 +203,7 @@ def main():
         elif(state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT):
             
             # Get Deployment ID
-            randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RADLab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
+            randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RAD Lab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
             randomid = randomid.strip()
 
             # Validating Deployment ID
@@ -236,7 +236,7 @@ def main():
             sys.exit()
 
         else:
-            sys.exit(Fore.RED + "\nInvalid RADLab Module State selected")
+            sys.exit(Fore.RED + "\nInvalid RAD Lab Module State selected")
 
 
         ###########################
@@ -285,7 +285,7 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, notebook_count, t
     shutil.rmtree(env_path)
 
 def select_state():
-    state = input("\nAction to perform for RADLab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RADLab Module Deployment Action"+ Style.RESET_ALL + ': ').strip()
+    state = input("\nAction to perform for RAD Lab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RAD Lab Module Deployment Action"+ Style.RESET_ALL + ': ').strip()
     if(state == '1' or state == '2' or state == '3' or state == '4'):
         return state
     else: 
