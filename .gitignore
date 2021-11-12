@@ -10,3 +10,4 @@ credentials.json
 env/
 .envrc
 *.iml
+terraform.tfvars
