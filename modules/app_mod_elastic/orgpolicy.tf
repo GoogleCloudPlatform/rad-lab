@@ -41,3 +41,12 @@ resource "google_project_organization_policy" "shielded_vm_policy" {
     module.elastic_search_project
   ]
 }
+
+resource "time_sleep" "wait_120_seconds" {
+  depends_on = [
+      google_project_organization_policy.vpc_peering_policy,
+      google_project_organization_policy.shielded_vm_policy
+      ]
+
+  create_duration = "120s"
+}

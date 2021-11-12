@@ -83,7 +83,8 @@ module "gke_cluster" {
 
   depends_on = [
     module.elastic_search_project,
-    google_project_service.enabled_services
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds
   ]
 
 }
