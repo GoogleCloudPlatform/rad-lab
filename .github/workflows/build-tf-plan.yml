@@ -114,7 +114,7 @@ jobs:
         id: plan
         run: terraform plan -out workspace.plan
         env:
-          TF_VAR_billing_account: 'ABCD-EFGH-IJKL-MNOP'
+          TF_VAR_billing_account_id: 'ABCD-EFGH-IJKL-MNOP'
           TF_VAR_parent: 'organizations/1234567890'
 
       # - name: Post Plan
