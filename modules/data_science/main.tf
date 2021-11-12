@@ -143,45 +143,6 @@ module "vpc_ai_notebook" {
   ]
 }
 
-resource "google_project_organization_policy" "external_ip_policy" {
-  count      = var.set_external_ip_policy ? 1 : 0
-  constraint = "compute.vmExternalIpAccess"
-  project    = local.project.project_id
-
-  list_policy {
-    allow {
-      all = true
-    }
-  }
-}
-
-# - Shielded VMs: constraints/compute.requireShieldedVm
-resource "google_project_organization_policy" "shielded_vm_policy" {
-  count      = var.set_shielded_vm_policy ? 1 : 0
-  constraint = "compute.requireShieldedVm"
-  project    = local.project.project_id
-
-  boolean_policy {
-    enforced = false
-  }
-}
-
-# - Define trusted image projects: constraints/compute.trustedImageProjects
-# Use of images from project deeplearning-platform-release is prohibited in Argolis
-resource "google_project_organization_policy" "trustedimage_project_policy" {
-  count      = var.set_trustedimage_project_policy ? 1 : 0
-  constraint = "compute.trustedImageProjects"
-  project    = local.project.project_id
-
-  list_policy {
-    allow {
-      values = [
-        "is:projects/deeplearning-platform-release",
-      ]
-    }
-  }
-}
-
 resource "google_service_account" "sa_p_notebook" {
   project      = local.project.project_id
   account_id   = format("sa-p-notebook-%s", local.random_id)
@@ -248,11 +209,7 @@ resource "google_notebooks_instance" "ai_notebook" {
     terraform  = "true"
     proxy-mode = "mail"
   }
-  depends_on = [
-    google_project_organization_policy.external_ip_policy,
-    google_project_organization_policy.shielded_vm_policy,
-    google_project_organization_policy.trustedimage_project_policy
-  ]
+depends_on = [time_sleep.wait_120_seconds]
 }
 
 resource "google_storage_bucket" "user_scripts_bucket" {
