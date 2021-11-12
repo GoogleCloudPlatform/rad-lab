@@ -98,6 +98,7 @@ data "google_compute_subnetwork" "default" {
   count   = var.create_network ? 0 : 1
   project = local.project.project_id
   name    = var.subnet_name
+  region  = local.region
 }
 
 module "vpc_ai_notebook" {
@@ -129,9 +130,6 @@ module "vpc_ai_notebook" {
       direction   = "INGRESS"
 
       allow = [{
-        protocol = "tcp"
-        ports    = ["0-65535"]
-        }, {
         protocol = "tcp"
         ports    = ["0-65535"]
       }]
@@ -209,7 +207,7 @@ resource "google_notebooks_instance" "ai_notebook" {
     terraform  = "true"
     proxy-mode = "mail"
   }
-depends_on = [time_sleep.wait_120_seconds]
+  depends_on = [time_sleep.wait_120_seconds]
 }
 
 resource "google_storage_bucket" "user_scripts_bucket" {
