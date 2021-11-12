@@ -22,6 +22,79 @@ The lab need to be deployed by a _Cloud Admin_ persona with the following GCP ro
 * `Storage Object Viewer`
 * [OPTIONAL] `Organization Policy Administrator`
 
+## Using Terraform module
+Here are a couple of examples to use the module directly in your Terraform code, as opposed to using the RAD Lab Launcher.
+
+### Simple
+
+```hcl
+module "simple" {
+  source = "./modules/data_science"
+
+  billing_account_id = "123456-123456-123465"
+  organization_id    = "12345678901"
+  folder_id          = "1234567890"
+}
+```
+### Use existing project
+
+Make sure the identity running the Terraform code has the following IAM permissions on the project:
+* `roles/compute.admin`
+* `roles/resourcemanager.projectIamAdmin`
+* `roles/iam.serviceAccountAdmin`
+* `roles/storage.admin`
+* `roles/notebooks.admin`
+
+This example assumes that all the necessary APIs have been enabled as well.
+
+````hcl
+module "existing_project" {
+  source = "./modules/data_science"
+
+  billing_account_id = "123456-123456-123465"
+  organization_id    = "12345678901"
+  folder_id          = "1234567890"
+
+  create_project  = false
+  project_name    = "ds-project-id"
+  enable_services = false
+  
+  set_external_ip_policy          = false
+  set_shielded_vm_policy          = false
+  set_trustedimage_project_policy = false
+}
+````
+
+### Existing network
+Make sure the identity running the Terraform code has the following IAM permissions on the project:
+* `roles/resourcemanager.projectIamAdmin`
+* `roles/iam.serviceAccountAdmin`
+* `roles/storage.admin`
+* `roles/notebooks.admin`
+
+```hcl
+module "existing_project_and_network" {
+  source = "./modules/data_science"
+
+  billing_account_id = "123456-123456-123465"
+  organization_id    = "12345678901"
+  folder_id          = "1234567890"
+
+  create_project  = false
+  project_name    = "ds-project-id"
+  enable_services = false
+  enable_services = false
+  
+  create_network = false
+  network_name   = "data-science-network"
+  subnet_name    = "data-science-subnetwork"
+
+  set_external_ip_policy          = false
+  set_shielded_vm_policy          = false
+  set_trustedimage_project_policy = false
+}
+```
+
 <!-- BEGIN TFDOC -->
 ## Variables
 
