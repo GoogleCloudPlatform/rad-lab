@@ -99,6 +99,7 @@ def main(PR):
             commentpr(GITHUB_REPOSITORY, PR, comment, TOKEN)
             if(status == 'fail'):
                 sys.exit('Terraform Init or Terraform Plan FAILED for: '+ dir)
+
     except requests.exceptions.RequestException as e: 
         print('No working directory with TF configs in PR.')
         raise SystemExit(e)
@@ -171,13 +172,13 @@ def tf(dir):
   return_code_plan, stdout_plan, stderr_plan = tr.plan_cmd(capture_output=False,var={'billing_account_id':'ABCD-EFGH-IJKL-MNOP', 'organization_id':'1234567890', 'random_id': '1234'})
   
   if(return_code_init == 1):
-    comment = 'Terraform Init FAILED for: **' + dir.replace(os.getcwd()+'/temp/', '' +'** !')
+    comment = 'Terraform Init FAILED for: **' + dir.replace(os.getcwd()+'/temp/', '') + '** !'
     status = 'fail'
   if(return_code_plan == 1):
-    comment = 'Terraform Plan FAILED for: **' + dir.replace(os.getcwd()+'/temp/', '' +'** !')
+    comment = 'Terraform Plan FAILED for: **' + dir.replace(os.getcwd()+'/temp/', '') + '** !'
     status = 'fail'
   else: 
-    comment = 'Terraform Init & Terraform Plan SUCCESSFUL for: **' + dir.replace(os.getcwd()+'/temp/', '' +'** !')
+    comment = 'Terraform Init & Terraform Plan SUCCESSFUL for: **' + dir.replace(os.getcwd()+'/temp/', '') + '** !'
   
   return comment, status
 
