@@ -77,7 +77,7 @@ def main(PR):
 
                         if file in raw:
                             print("Downloading file: " + raw)
-                            downloadprfiles(raw, file, os.getcwd()+'/temp/'+dir)
+                            downloadprfiles(raw, file, os.getcwd()+'/temp/'+os.path.dirname(file))
                             break
 
     except requests.exceptions.RequestException as e: 
