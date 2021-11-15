@@ -95,7 +95,11 @@ def main(PR):
             # print('****************************')
             # print(glob.glob(os.getcwd() + '/temp/' + dir+'/*/*'))
 
+            # Running Terraform Init & Terraform Plan
             comment, status = tf(os.getcwd() + '/temp/' + dir)
+            comment = comment + ' for: **' + dir + '** !'
+
+            # Commenting on the PR
             commentpr(GITHUB_REPOSITORY, PR, comment, TOKEN)
             if(status == 'fail'):
                 sys.exit('Terraform Init or Terraform Plan FAILED for: '+ dir)
@@ -173,13 +177,14 @@ def tf(dir):
   
   path = os.getcwd()+'/temp/'
   if(return_code_init == 1):
-    comment = 'Terraform Init FAILED for: **' + dir.replace(path, '') + '** !'
+    comment = 'Terraform Init FAILED'
     status = 'fail'
   if(return_code_plan == 1):
-    comment = 'Terraform Plan FAILED for: **' + dir.replace(path, '') + '** !'
+    comment = 'Terraform Plan FAILED'
     status = 'fail'
   else: 
-    comment = 'Terraform Init & Terraform Plan SUCCESSFUL for: **' + dir.replace(path, '') + '** !'
+    comment = 'Terraform Init & Terraform Plan SUCCESSFUL'
+    status = 'pass'
   
   return comment, status
 
