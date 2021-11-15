@@ -83,7 +83,7 @@ def main(PR):
   try:
     for dir in working_directories:
       comment, status = tf(os.getcwd() + '/temp/' + dir)
-      commentpr(GITHUB_REPOSITORY, PR, comment, TOKEN)
+    #   commentpr(GITHUB_REPOSITORY, PR, comment, TOKEN)
       if(status == 'fail'):
         sys.exit('Terraform Init or Terraform Plan FAILED for: '+ dir)
   except requests.exceptions.RequestException as e: 
@@ -143,8 +143,7 @@ def get_updated_modules(modified_files, removed_files):
   print("Working Directories:")
   print(working_directories)
   
-  modules = [x for x in working_directories if 'module/' in x]
-  modules = [x for x in working_directories if x.count('/') == 1]
+  modules = [x for x in working_directories if x.startswith('module/') and x.count('/') == 1]
   print("Modules Updated:")
   print(modules)
 
