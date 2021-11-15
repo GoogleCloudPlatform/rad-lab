@@ -90,13 +90,13 @@ def main(PR):
     try:
         for dir in working_directories:
 
-            print('****************************')
-            print(glob.glob(os.getcwd() + '/temp/' + dir+'/*'))
-            print('****************************')
-            print(glob.glob(os.getcwd() + '/temp/' + dir+'/*/*'))
+            # print('****************************')
+            # print(glob.glob(os.getcwd() + '/temp/' + dir+'/*'))
+            # print('****************************')
+            # print(glob.glob(os.getcwd() + '/temp/' + dir+'/*/*'))
 
             comment, status = tf(os.getcwd() + '/temp/' + dir)
-            #   commentpr(GITHUB_REPOSITORY, PR, comment, TOKEN)
+            commentpr(GITHUB_REPOSITORY, PR, comment, TOKEN)
             if(status == 'fail'):
                 sys.exit('Terraform Init or Terraform Plan FAILED for: '+ dir)
     except requests.exceptions.RequestException as e: 

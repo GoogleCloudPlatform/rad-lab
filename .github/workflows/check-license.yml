@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 'BUILD - Check Lisence Boilerplate'
+name: 'CHECK - Check Lisence Boilerplate'
 
 on:
   schedule:
