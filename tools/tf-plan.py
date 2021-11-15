@@ -143,7 +143,8 @@ def get_updated_modules(modified_files, removed_files):
   print("Working Directories:")
   print(working_directories)
   
-  modules = [x for x in working_directories if x.startswith('module/') and x.count('/') == 1]
+  modules = [x for x in working_directories if x.startswith('modules/')]
+  modules = [x for x in modules if x.count('/') == 1]
   print("Modules Updated:")
   print(modules)
 
