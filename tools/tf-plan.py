@@ -171,14 +171,15 @@ def tf(dir):
   return_code_init, stdout_init, stderr_init = tr.init_cmd(capture_output=False)
   return_code_plan, stdout_plan, stderr_plan = tr.plan_cmd(capture_output=False,var={'billing_account_id':'ABCD-EFGH-IJKL-MNOP', 'organization_id':'1234567890', 'random_id': '1234'})
   
+  path = os.getcwd()+'/temp/'
   if(return_code_init == 1):
-    comment = 'Terraform Init FAILED for: **' + dir.replace(os.getcwd()+'/temp/', '') + '** !'
+    comment = 'Terraform Init FAILED for: **' + dir.replace(path, '') + '** !'
     status = 'fail'
   if(return_code_plan == 1):
-    comment = 'Terraform Plan FAILED for: **' + dir.replace(os.getcwd()+'/temp/', '') + '** !'
+    comment = 'Terraform Plan FAILED for: **' + dir.replace(path, '') + '** !'
     status = 'fail'
   else: 
-    comment = 'Terraform Init & Terraform Plan SUCCESSFUL for: **' + dir.replace(os.getcwd()+'/temp/', '') + '** !'
+    comment = 'Terraform Init & Terraform Plan SUCCESSFUL for: **' + dir.replace(path, '') + '** !'
   
   return comment, status
 
