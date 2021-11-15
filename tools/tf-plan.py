@@ -78,7 +78,7 @@ def main(PR):
                         if file in raw:
                             print("Downloading file: " + raw)
                             downloadprfiles(raw, file, os.getcwd()+'/temp/'+dir)
-                        break
+                            break
 
     except requests.exceptions.RequestException as e: 
         print('No working directory with TF configs in PR.')
