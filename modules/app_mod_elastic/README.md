@@ -7,6 +7,12 @@ This module allows the user to create an Elasticsearch cluster, deployed on a GK
 * Google Kubernetes Engine
 * Virtual Private Cloud (VPC)
 
+## Reference Architecture Diagram
+
+Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../radlab-launcher).
+
+![](../../docs/images/AppModElasticSearch.png)
+
 ## Prerequisites
 
 Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
