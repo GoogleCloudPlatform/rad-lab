@@ -38,21 +38,26 @@ def main(PR):
   # Deleting added/modified & removed files
   try:
     for dir in working_directories:
-      
-      print("----------> RUN FOR: " + dir)
-      # Copying main directory
-      shutil.copytree(GITHUB_WORKSPACE+'/'+dir, os.getcwd()+'/temp/'+dir)
+        print("----------> RUN FOR: " + dir)
 
-      # Deleting added/modified & removed files
-      for mfile in modified_files:
-        if os.path.exists(os.getcwd()+'/temp/'+mfile):
-          print("Deleting file: " + mfile)
-          os.remove(os.getcwd()+'/temp/'+mfile)
 
-      for rfile in removed_files:
-        if os.path.exists(os.getcwd()+'/temp/'+rfile):
-          print("Deleting file: " + rfile)
-          os.remove(os.getcwd()+'/temp/'+rfile)
+        try:
+            # IF MODULE EXISTS: Copying main directory in temp folder
+            shutil.copytree(GITHUB_WORKSPACE+'/'+dir, os.getcwd()+'/temp/'+dir)
+
+            # Deleting added/modified & removed files
+            for mfile in modified_files:
+                if os.path.exists(os.getcwd()+'/temp/'+mfile):
+                    print("Deleting file: " + mfile)
+                    os.remove(os.getcwd()+'/temp/'+mfile)
+
+            for rfile in removed_files:
+                if os.path.exists(os.getcwd()+'/temp/'+rfile):
+                    print("Deleting file: " + rfile)
+                    os.remove(os.getcwd()+'/temp/'+rfile)
+        except:
+            # IF MODULE DONOT EXISTS: Creating temp module folder
+            os.makedirs(os.getcwd()+'/temp/'+dir)
 
   except requests.exceptions.RequestException as e: 
     print('No working directory with TF configs in PR.')
