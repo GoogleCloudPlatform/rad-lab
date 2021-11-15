@@ -17,83 +17,91 @@
 import os
 import sys
 import json
+import glob
 import shutil
 import requests
 from python_terraform import Terraform
 
 def main(PR):
 
-  TOKEN             = os.getenv('GITHUB_TOKEN')
-  GITHUB_WORKSPACE  = os.getenv('GITHUB_WORKSPACE')
-  GITHUB_REPOSITORY = os.getenv('GITHUB_REPOSITORY')
-  
-
-  # Get Added / Modified files in PR
-  modified_files, modified_files_raw, removed_files = pr_files(GITHUB_REPOSITORY, PR)
-
-  # Get Working directories to run TF Plan on
-  working_directories = get_updated_modules(modified_files, removed_files)
-
-  # Loop through all the identified working directories
-  # Deleting added/modified & removed files
-  try:
-    for dir in working_directories:
-        print("----------> RUN FOR: " + dir)
+    TOKEN             = os.getenv('GITHUB_TOKEN')
+    GITHUB_WORKSPACE  = os.getenv('GITHUB_WORKSPACE')
+    GITHUB_REPOSITORY = os.getenv('GITHUB_REPOSITORY')
 
 
-        try:
-            # IF MODULE EXISTS: Copying main directory in temp folder
-            shutil.copytree(GITHUB_WORKSPACE+'/'+dir, os.getcwd()+'/temp/'+dir)
+    # Get Added / Modified files in PR
+    modified_files, modified_files_raw, removed_files = pr_files(GITHUB_REPOSITORY, PR)
 
-            # Deleting added/modified & removed files
-            for mfile in modified_files:
-                if os.path.exists(os.getcwd()+'/temp/'+mfile):
-                    print("Deleting file: " + mfile)
-                    os.remove(os.getcwd()+'/temp/'+mfile)
+    # Get Working directories to run TF Plan on
+    working_directories = get_updated_modules(modified_files, removed_files)
 
-            for rfile in removed_files:
-                if os.path.exists(os.getcwd()+'/temp/'+rfile):
-                    print("Deleting file: " + rfile)
-                    os.remove(os.getcwd()+'/temp/'+rfile)
-        except:
-            # IF MODULE DONOT EXISTS: Creating temp module folder
-            os.makedirs(os.getcwd()+'/temp/'+dir)
+    # Loop through all the identified working directories
+    # Deleting added/modified & removed files
+    try:
+        for dir in working_directories:
+            print("----------> RUN FOR: " + dir)
 
-  except requests.exceptions.RequestException as e: 
-    print('No working directory with TF configs in PR.')
-    raise SystemExit(e)
 
-  # Loop through all the identified working directories
-  # Download added/modified files
-  try:
-    for dir in working_directories:
-      
-      # Download added/modified files
-      for file in modified_files:
+            try:
+                # IF MODULE EXISTS: Copying main directory in temp folder
+                shutil.copytree(GITHUB_WORKSPACE+'/'+dir, os.getcwd()+'/temp/'+dir)
 
-        if dir in file:
-          for raw in modified_files_raw:
+                # Deleting added/modified & removed files
+                for mfile in modified_files:
+                    if os.path.exists(os.getcwd()+'/temp/'+mfile):
+                        print("Deleting file: " + mfile)
+                        os.remove(os.getcwd()+'/temp/'+mfile)
 
-            if file in raw:
-              print("Downloading file: " + raw)
-              downloadprfiles(raw, file, os.getcwd()+'/temp/'+dir)
-              break
+                for rfile in removed_files:
+                    if os.path.exists(os.getcwd()+'/temp/'+rfile):
+                        print("Deleting file: " + rfile)
+                        os.remove(os.getcwd()+'/temp/'+rfile)
+            except:
+                # IF MODULE DONOT EXISTS: Creating temp module folder
+                os.makedirs(os.getcwd()+'/temp/'+dir)
 
-  except requests.exceptions.RequestException as e: 
-    print('No working directory with TF configs in PR.')
-    raise SystemExit(e)
+    except requests.exceptions.RequestException as e: 
+        print('No working directory with TF configs in PR.')
+        raise SystemExit(e)
 
-  # Loop through all the identified working directories
-  # Run Terraform Plan
-  try:
-    for dir in working_directories:
-      comment, status = tf(os.getcwd() + '/temp/' + dir)
-    #   commentpr(GITHUB_REPOSITORY, PR, comment, TOKEN)
-      if(status == 'fail'):
-        sys.exit('Terraform Init or Terraform Plan FAILED for: '+ dir)
-  except requests.exceptions.RequestException as e: 
-    print('No working directory with TF configs in PR.')
-    raise SystemExit(e)
+    # Loop through all the identified working directories
+    # Download added/modified files
+    try:
+        for dir in working_directories:
+
+            # Download added/modified files
+            for file in modified_files:
+        
+                if dir in file:
+                    for raw in modified_files_raw:
+
+                        if file in raw:
+                            print("Downloading file: " + raw)
+                            downloadprfiles(raw, file, os.getcwd()+'/temp/'+dir)
+                        break
+
+    except requests.exceptions.RequestException as e: 
+        print('No working directory with TF configs in PR.')
+        raise SystemExit(e)
+
+
+    # Loop through all the identified working directories
+    # Run Terraform Plan
+    try:
+        for dir in working_directories:
+
+            print('****************************')
+            print(glob.glob(os.getcwd() + '/temp/' + dir+'/*'))
+            print('****************************')
+            print(glob.glob(os.getcwd() + '/temp/' + dir+'/*/*'))
+
+            comment, status = tf(os.getcwd() + '/temp/' + dir)
+            #   commentpr(GITHUB_REPOSITORY, PR, comment, TOKEN)
+            if(status == 'fail'):
+                sys.exit('Terraform Init or Terraform Plan FAILED for: '+ dir)
+    except requests.exceptions.RequestException as e: 
+        print('No working directory with TF configs in PR.')
+        raise SystemExit(e)
 
 def pr_files(GITHUB_REPOSITORY,pr):
     removed_files = []
@@ -145,8 +153,8 @@ def get_updated_modules(modified_files, removed_files):
   working_directories = modified_files_dir + removed_files_dir
   working_directories = list(set(working_directories))
 
-  print("Working Directories:")
-  print(working_directories)
+#   print("Working Directories:")
+#   print(working_directories)
   
   modules = [x for x in working_directories if x.startswith('modules/')]
   modules = [x for x in modules if x.count('/') == 1]
