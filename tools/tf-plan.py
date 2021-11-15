@@ -142,8 +142,13 @@ def get_updated_modules(modified_files, removed_files):
 
   print("Working Directories:")
   print(working_directories)
+  
+  modules = [x for x in working_directories if 'module/' in x]
+  modules = [x for x in working_directories if x.count('/') == 1]
+  print("Modules Updated:")
+  print(modules)
 
-  return working_directories
+  return modules
 
 
 def tf(dir):
