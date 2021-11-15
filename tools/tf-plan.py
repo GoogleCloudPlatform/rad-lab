@@ -160,7 +160,7 @@ def tf(dir):
   tr = Terraform(working_dir=dir)
 
   return_code_init, stdout_init, stderr_init = tr.init_cmd(capture_output=False)
-  return_code_plan, stdout_plan, stderr_plan = tr.plan_cmd(capture_output=False,var={'parent':'organizations/1234567890', 'billing_account':'ABCD-EFGH-IJKL-MNOP'})
+  return_code_plan, stdout_plan, stderr_plan = tr.plan_cmd(capture_output=False,var={'parent':'organizations/1234567890', 'billing_account_id':'ABCD-EFGH-IJKL-MNOP'})
   
   if(return_code_init == 1):
     comment = 'Terraform Init FAILED!\nFor Module: ' + dir.replace(os.getenv('TERRAFORM_CLI_PATH')+'/', '')
