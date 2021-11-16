@@ -2,3 +2,4 @@ click
 python-dateutil
 pytz
 requests
+python-terraform>=0.10.1

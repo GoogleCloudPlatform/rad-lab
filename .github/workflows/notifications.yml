@@ -3,7 +3,7 @@
 name: BUILD - RAD Lab Notifications
 on:
   issues:
-    types: [opened, reopened]
+    types: [opened]
   pull_request:
     branches:
       - main

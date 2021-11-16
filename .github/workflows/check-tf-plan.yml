@@ -1,4 +1,4 @@
-# .github/workflows/check-license.yml
+# .github/workflows/check-tf-plan.yml
 
 # Copyright 2021 Google LLC
 #
@@ -14,19 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 'CHECK - License Boilerplate'
+name: 'CHECK - Terraform Plan'
 
 on:
-  schedule:
-    - cron:  '*/30 * * * *' 
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - 'modules/**/*.tf'
   workflow_dispatch:
     inputs:
-          PRNumber:
-            description: 'PR #'     
-            required: true
+      PRNumber:
+        description: 'PR #'     
+        required: true
+
 jobs:
-  license:
-    name: 'Files with no License'
+  terraform:
+    name: 'Terraform'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,26 +43,38 @@ jobs:
         with:
           python-version: 3.8 #install the python needed
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          terraform_version: 1.0.11
+
+      - name: Set environment
+        run: |
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${GITHUB_WORKSPACE}/.github/workflows/fake-key.json" >> $GITHUB_ENV
+          echo $GOOGLE_APPLICATION_CREDENTIALS # This will print the file path in GOOGLE_APPLICATION_CREDENTIALS variable
+          # cat $GOOGLE_APPLICATION_CREDENTIALS # This will print the file content
+
       - name: install python packages
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
         working-directory: tools
 
-      - name: execute py script (scheduled) # run the checklicense_openpr.py
-        id: boilerplate-scheduled
-        if: github.event_name == 'schedule'
+      - name: execute py script (auto) # run the tf-plan.py
+        id: tf-plan-auto
+        if: github.event_name == 'pull_request'
         run: |
-          python checklicense_openpr.py
+          python tf-plan.py ${{ github.event.number }}
         working-directory: tools
 
-      - name: execute py script (manual) # run the checklicense_openpr.py
-        id: boilerplate-manual
+      - name: execute py script (manual) # run the tf-plan.py
+        id: tf-plan-manual
         if: github.event_name == 'workflow_dispatch'
         run: |
-          if [[ "${{ github.event.inputs.PRNumber }}" =~ ^[0-9]+$ ]] || [[ "${{ github.event.inputs.PRNumber }}" == "All" ]]
+          if [[ "${{ github.event.inputs.PRNumber }}" =~ ^[0-9]+$ ]]
           then
-            python checklicense_openpr.py ${{ github.event.inputs.PRNumber }}
+            python tf-plan.py ${{ github.event.inputs.PRNumber }}
           else
             echo "INVALID PR Number ENTERED..."
             exit 1

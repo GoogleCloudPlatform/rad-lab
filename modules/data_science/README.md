@@ -131,4 +131,4 @@ NOTE: `variables.tf` would list some defaults. If you would like to override or 
 
 ## Access RAD Lab Data Science Notebooks
 
-Follow the instructions under [gcp-ai-nootbook-tools Readme](./scripts/gcp-ai-notebook-tools/README.md).
+Follow the instructions under [gcp-ai-nootbook-tools Readme](../../scripts/gcp-ai-notebook-tools).
