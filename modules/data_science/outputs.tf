@@ -16,12 +16,12 @@
 
 output "deployment_id" {
   description = "RADLab Module Deployment ID"
-  value       = var.random_id
+  value       = local.random_id
 }
 
 output "project-radlab-ds-analytics-id" {
   description = "Analytics Project ID"
-  value       =  module.project_radlab_ds_analytics.project_id
+  value       = local.project.project_id
 }
 
 output "notebooks-instance-names" {
