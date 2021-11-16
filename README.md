@@ -1,6 +1,6 @@
 # RAD Lab
 
-RAD Lab enables users to deploy infrastructure on Google Cloud Platform (GCP) to support specific use cases. Infrastructure is created and managed through [Terraform](https://www.terraform.io/) in conjunction with support scripts written in Python. The templates, code, and documentation for each use case are bunded into [modules](./modules).
+RAD Lab enables users to deploy infrastructure on Google Cloud Platform (GCP) to support specific use cases. Infrastructure is created and managed through [Terraform](https://www.terraform.io/) in conjunction with support scripts written in Python. The templates, code, and documentation for each use case are bundled into [modules](./modules).
 
 Each module comes with an initial sample configuration that can be deployed via the [RAD Lab Launcher](./radlab-launcher). Teams with experience in Terraform can use the Terraform modules in the [/modules-directory](./modules) directly, to integrate the codebase with their existing CI/CD infrastructure.
 
