@@ -24,6 +24,8 @@
 
 /tools/                         @guptamukul-google
 
+/.github/                       @guptamukul-google
+
 # Below are the owners of individual file types
 
 *.json   @guptamukul-google 

@@ -161,4 +161,3 @@ variable "zone" {
   type        = string
   default     = "us-east4-c"
 }
-

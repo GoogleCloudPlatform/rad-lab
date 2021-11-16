@@ -9,7 +9,7 @@
 
 ## Reference Architechture Diagram
 
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../scripts/radlab.py).
+Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
 ![](../../docs/images/V1_DataScience.png)
 
@@ -115,7 +115,7 @@ module "existing_project_and_network" {
 | *set_shielded_vm_policy* | Apply org policy to disable shielded VMs. | <code title="">bool</code> |  | <code title="">true</code> |
 | *set_trustedimage_project_policy* | Apply org policy to set the trusted image projects. | <code title="">bool</code> |  | <code title="">true</code> |
 | *trusted_users* | The list of trusted users. | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
-| *zone* | Cloud Zone associated to the AI Notebooks | <code title="">string</code> |  | <code title="us-east4-c&#10;&#125;&#10;locals &#123;&#10;region &#61; join&#40;&#34;-&#34;, &#91;split&#40;&#34;-&#34;, var.zone&#41;&#91;0&#93;, split&#40;&#34;-&#34;, var.zone&#41;&#91;1&#93;&#93;&#41;">...</code> |
+| *zone* | Cloud Zone associated to the AI Notebooks | <code title="">string</code> |  | <code title="">us-east4-c</code> |
 
 ## Outputs
 
@@ -131,4 +131,4 @@ NOTE: `variables.tf` would list some defaults. If you would like to override or 
 
 ## Access RAD Lab Data Science Notebooks
 
-Follow the instructions under [gcp-ai-nootbook-tools Readme](../../scripts/gcp-ai-notebook-tools).
+Follow the instructions under [gcp-ai-nootbook-tools Readme](./scripts/usage/README.md).
