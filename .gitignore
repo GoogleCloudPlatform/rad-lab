@@ -10,3 +10,8 @@ credentials.json
 env/
 .envrc
 *.iml
+terraform.tfvars
+*.lock.hcl
+elk/
+test/**
+**/deployments

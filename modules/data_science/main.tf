@@ -184,7 +184,7 @@ resource "google_notebooks_instance" "ai_notebook" {
   network = module.vpc_ai_notebook.network_self_link
   subnet  = module.vpc_ai_notebook.subnets_self_links.0
 
-  post_startup_script = "gs://radlab-solution-bucket/Data_Science_Model/samplenotebook.sh"
+  post_startup_script = "${path.module}/scripts/build/samplenotebook.sh"
 
   labels = {
     module = "data-science"
