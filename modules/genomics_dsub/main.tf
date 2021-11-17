@@ -215,7 +215,7 @@ resource "google_storage_bucket" "source_code_bucket" {
 resource "google_storage_bucket_object" "archive" {
   name   = "function-source.zip"
   bucket = google_storage_bucket.source_code_bucket.name
-  source = "${path.module}/scripts/cloud_functions/function-source/function-source.zip"
+  source = "${path.module}/scripts/build/cloud_functions/function-source/function-source.zip"
 }
 
 # Create cloud functions from source code (Zip) stored in Bucket #
@@ -257,14 +257,14 @@ resource "google_cloudfunctions_function" "function" {
 # Locally build container for bioinformatics tool and push to container registry #
 resource "null_resource" "build_and_push_image" {
   triggers = {
-    cloudbuild_yaml_sha = sha1(file("${path.module}/scripts/container/fastqc-0.11.9a/cloudbuild.yaml"))
-    entrypoint_sha      = sha1(file("${path.module}/scripts/container/fastqc-0.11.9a/entrypoint.bash"))
-    dockerfile_sha      = sha1(file("${path.module}/scripts/container/fastqc-0.11.9a/Dockerfile"))
-    build_script_sha    = sha1(file("${path.module}/scripts/container/fastqc-0.11.9a/build-container.sh"))
+    cloudbuild_yaml_sha = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml"))
+    entrypoint_sha      = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/entrypoint.bash"))
+    dockerfile_sha      = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/Dockerfile"))
+    build_script_sha    = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh"))
   }
 
   provisioner "local-exec" {
     working_dir = "${path.module}"
-    command     = "${path.module}/scripts/container/fastqc-0.11.9a/build-container.sh ${module.project_radlab_genomics.project_id}"
+    command     = "${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh ${module.project_radlab_genomics.project_id}"
   }
 }
