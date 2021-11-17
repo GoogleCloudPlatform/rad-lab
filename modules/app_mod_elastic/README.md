@@ -38,9 +38,12 @@ Below Architechture Diagram is the base representation of what will be created a
 ### Deploy Elasticsearch
 The module deploys both the ECK CRDs and Operators.  As this module can be used to demo Elasticsearch, it also deploys an ES and Kibana pod in the cluster.  This behaviour can be switched off by setting `deploy_elastic_search` to false.  This will only deploy the CRDs and Operators.
 
-## Access Elasticsearch 
+## Access Deployment 
 
-It's currently not possible to run `kubectl port-forward` and access it via the web preview **in Cloud Shell**.  The commands below have to be run from a local terminal instead.  If you use the RAD Lab launcher from Cloud Shell, you will have to execute the following commands in a terminal on your local machine.  Make sure that you are logged in with the same user locally, as the one you used to run the launcher.  You can do this by running `gcloud auth login`.
+If the user follows the standard flow of the installation, the module will deploy a pod with Kibana and a pod with ElasticSearch.  Kibana exposes a UI that can be accessed via a web browser and ElasticSearch exposes an API server that can be queried via `curl`.
+
+### General Commands
+Regardless of which service you are trying to access, these commands will have to be run in a Terminal or Cloud Shell.  
 
 ```shell
 # Retrieve credentials to query the Kubernetes API server.  Replace REGION and PROJECTID with the actual values.  You can copy/paste this command from the Terraform output.
@@ -52,15 +55,38 @@ kubectl get elasticsearch -n elastic-search-demo
 # Check status Kibana.  The health column should show status green.  It can take a while for the pod to become available.
 kubectl get kibana -n elastic-search-demo
 
-# Retrieve password
-kubectl get secret elastic-search-es-elastic-user -n elastic-search-demo -o go-template='{{.data.elastic | base64decode}}'
+# Retrieve password.  Not that this stores the password as an environment variable, so only use this for testing purposes.
+ES_PWD=$(kubectl get secret elastic-search-es-elastic-user -n elastic-search-demo -o go-template='{{.data.elastic | base64decode}}')
+```
+
+### ElasticSearch
+ElasticSearch itself exposes an API server which can't be accessed in a web browser.  The commands listed below can be run in both a local terminal or Cloud Shell, provided that the commands listed in [General Commands](#general-commands).
+
+```shell
+# Start port-forwarding tunnel in the background
+kubectl port-forward -n elastic-search-demo service/elastic-search-es-http 9200 &> /tmp/elastic_search_fwd &
+
+# Access the API server via command line
+curl -X GET -k -u elastic:$ES_PWD https://localhost:9200
+```
+
+The Elastic Search API server is now accessible on https://localhost:9200, so you can run additional commands against this endpoint, if desired.  
+
+### Kibana
+
+It's currently not possible to run `kubectl port-forward` and access the endpoint via the web preview **in Cloud Shell**.  The commands below have to be run from a local terminal instead.  If you use the RAD Lab launcher from Cloud Shell, you will have to execute the following commands in a terminal on your local machine.  Make sure that you are logged in with the same user locally, as the one you used to run the launcher.  You can do this by running `gcloud auth login`.
+
+Ensure that all commands listed in [General Commands](#general-commands) have been run **before** running the command below.
+
+```shell
+# If pbcopy is not installed, only run echo $ES_PWD and copy the password manually
+echo $ES_PWD | pbcopy
 
 # Start port-forwarding tunnel
 kubectl port-forward -n elastic-search-demo service/kibana-kb-http 5601
 
 # Open a browser window and point it to https://localhost:5601. Login with username elastic and the password copied from the command above.
 ```
-
 ### Using Terraform module
 Here are a couple of examples to directly use the Terraform module, as opposed to using the RAD Lab Launcher.
 
