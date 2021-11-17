@@ -9,7 +9,7 @@ This module allows the user to create an Elasticsearch cluster, deployed on a GK
 
 ## Reference Architecture Diagram
 
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Installer](../../radlab-launcher).
+Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher).
 
 ![](../../docs/images/AppModElasticSearch.png)
 
@@ -30,10 +30,6 @@ When deploying in an existing project, ensure the identity has the following per
 - `roles/serviceusage.serviceUsageAdmin`
 
 Also ensure that the identity creating the resources has access to a billing account, via `roles/billing.user`.
-
-## Reference Architechture Diagram
-
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
 ### Deploy Elasticsearch
 The module deploys both the ECK CRDs and Operators.  As this module can be used to demo Elasticsearch, it also deploys an ES and Kibana pod in the cluster.  This behaviour can be switched off by setting `deploy_elastic_search` to false.  This will only deploy the CRDs and Operators.
