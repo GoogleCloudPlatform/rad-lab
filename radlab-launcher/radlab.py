@@ -38,6 +38,7 @@ STATE_LIST_DEPLOYMENT = "4"
 
 OPTION_MODULE_APP_MOD_ELASTIC_SEARCH = "1"
 OPTION_MODULE_DATA_SCIENCE = "2"
+OPTION_MODULE_GENOMICS = "3"
 OPTION_QUIT = ""
 
 def main():
@@ -68,7 +69,7 @@ def main():
         notebook_count  = ""
         trusted_users   = []
         state,env_path,tfbucket,orgid,billing_acc,folderid,domain,randomid = module_deploy_common_settings(module_name,setup_path)
-        notebook_count, trusted_users = module_deploy_specific_setting(selected_module,state,domain,notebook_count,trusted_users)
+        notebook_count, trusted_users = module_deploy_specific_setting(selected_module,state,domain,trusted_users,notebook_count)
         env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module, trusted_users, notebook_count)
 
     elif(selected_module ==  OPTION_MODULE_APP_MOD_ELASTIC_SEARCH):
@@ -77,6 +78,14 @@ def main():
         state,env_path,tfbucket,orgid,billing_acc,folderid,domain,randomid = module_deploy_common_settings(module_name,setup_path)
         env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module)
 
+    elif(selected_module == OPTION_MODULE_GENOMICS):
+        print("\nRAD Lab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Genomincs"+ Style.RESET_ALL)
+        module_name = 'genomics_dsub'
+        trusted_users   = []
+        state,env_path,tfbucket,orgid,billing_acc,folderid,domain,randomid = module_deploy_common_settings(module_name,setup_path)
+        trusted_users = module_deploy_specific_setting(selected_module,state,domain,trusted_users)
+        env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module, trusted_users)
+
     elif(selected_module == OPTION_QUIT):
         sys.exit(Fore.GREEN + "\nExiting Installer")
 
@@ -84,8 +93,6 @@ def main():
         print(OPTION_QUIT)
         sys.exit(Fore.RED + "\nInvalid module")
 
-
-    # env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module, trusted_users, notebook_count)
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
 	
@@ -493,11 +500,10 @@ def module_deploy_common_settings(module_name,setup_path):
     else:
         sys.exit(Fore.RED + "\nInvalid RAD Lab Module State selected")
 
-def module_deploy_specific_setting(selected_module,state,domain,notebook_count,trusted_users):
+def module_deploy_specific_setting(selected_module,state,domain,trusted_users=[], notebook_count=""):
 
     if(selected_module == OPTION_MODULE_DATA_SCIENCE):
 
-        # No. of AI Notebooks and assigning trusted users
         if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
             # Requesting Number of AI Notebooks
             notebook_count = input(Fore.YELLOW + Style.BRIGHT + "\nNumber of AI Notebooks required [Default is 1 & Maximum is 10]"+ Style.RESET_ALL + ': ')
@@ -511,18 +517,33 @@ def module_deploy_specific_setting(selected_module,state,domain,notebook_count,t
                 sys.exit(Fore.RED + "\nInvalid Notbooks count")
 
             # Requesting Trusted Users
-            new_name = ''
-            while new_name != 'quit':
-                # Ask the user for a name.
-                new_name = input(Fore.YELLOW + Style.BRIGHT + "Enter the username of trusted users needing access to AI Notebooks, or enter 'quit'"+ Style.RESET_ALL + ': ')
-                new_name = new_name.strip()
-                # Add the new name to our list.
-                if(new_name != 'quit' and len(new_name.strip()) != 0):
-                    if "@" in new_name:
-                        new_name = new_name.split("@")[0]
-                    trusted_users.append("user:" + new_name + "@" + domain)
-            # print(trusted_users)
-        return notebook_count,trusted_users
+            trusted_users = get_trusted_users(trusted_users, domain)
+
+            return notebook_count,trusted_users
+
+    elif(selected_module == OPTION_MODULE_GENOMICS):
+
+        if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
+
+            # Requesting Trusted Users
+            trusted_users = get_trusted_users(trusted_users, domain)
+            
+            return trusted_users
+
+def get_trusted_users(trusted_users, domain):
+    # Requesting Trusted Users
+    new_name = ''
+    while new_name != 'quit':
+        # Ask the user for a name.
+        new_name = input(Fore.YELLOW + Style.BRIGHT + "Enter the username of trusted users needing access to AI Notebooks, or enter 'quit'"+ Style.RESET_ALL + ': ')
+        new_name = new_name.strip()
+        # Add the new name to our list.
+        if(new_name != 'quit' and len(new_name.strip()) != 0):
+            if "@" in new_name:
+                new_name = new_name.split("@")[0]
+            trusted_users.append("user:" + new_name + "@" + domain)
+    # print(trusted_users)
+    return trusted_users
 
 if __name__ == "__main__":
     main()
