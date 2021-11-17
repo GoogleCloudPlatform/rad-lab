@@ -46,20 +46,20 @@ jobs:
           pip install -r requirements.txt
         working-directory: tools
 
-      - name: execute py script (scheduled) # run the checklicense_openpr.py
+      - name: execute py script (scheduled) # run the check-license.py
         id: boilerplate-scheduled
         if: github.event_name == 'schedule'
         run: |
-          python checklicense_openpr.py
+          python check-license.py
         working-directory: tools
 
-      - name: execute py script (manual) # run the checklicense_openpr.py
+      - name: execute py script (manual) # run the check-license.py
         id: boilerplate-manual
         if: github.event_name == 'workflow_dispatch'
         run: |
           if [[ "${{ github.event.inputs.PRNumber }}" =~ ^[0-9]+$ ]] || [[ "${{ github.event.inputs.PRNumber }}" == "All" ]]
           then
-            python checklicense_openpr.py ${{ github.event.inputs.PRNumber }}
+            python check-license.py ${{ github.event.inputs.PRNumber }}
           else
             echo "INVALID PR Number ENTERED..."
             exit 1

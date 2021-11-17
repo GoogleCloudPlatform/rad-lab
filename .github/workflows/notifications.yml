@@ -40,10 +40,10 @@ jobs:
           pip install -r requirements.txt
         working-directory: tools
 
-      - name: execute py script # run the issue-notif.py
+      - name: execute py script # run the notifications.py
         env:
           WEBHOOK: ${{ secrets.WEBHOOK }}
         id: issue-notif
         run: |
-          python issue-notif.py
+          python notifications.py
         working-directory: tools
