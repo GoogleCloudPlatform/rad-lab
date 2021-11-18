@@ -145,7 +145,7 @@ resource "google_project_iam_member" "sa_p_ngs_permissions" {
   role     = each.value
 }
 
-resource "google_project_iam_member" "sa_p_ngs_permissions" {
+resource "google_project_iam_member" "sa_compute_default_permissions" {
   for_each = toset(local.ngs_sa_project_roles)
   project  = module.project_radlab_genomics.project_id
   member   = "serviceAccount:${data.google_compute_default_service_account.default.email}"
