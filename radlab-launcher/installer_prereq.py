@@ -21,8 +21,7 @@ def main():
     # Install production dependencies.
     os.system("pip3 install --no-cache-dir -r requirements.txt")
     os.system("python3 terraform_installer.py")
-    os.system("python3 cloud_sdk_installer.py")
-    os.system("sudo gcloud components install kubectl")
+    os.system("python3 cloudsdk_kubectl_installer.py")
     print("\nPRE-REQ INSTALLTION COMPLETED\n")
 
 if __name__ == "__main__":

@@ -27,10 +27,11 @@ def main():
   node = platform.node().lower()
 
   if('linux' in system and 'cs-' in node):
-    print("Detected Cloud Shell, skipping cloud sdk installation...")
+    print("Detected Cloud Shell, skipping cloud sdk & kubectl installation...")
   else:
     os.system("curl https://sdk.cloud.google.com > install.sh")
     os.system("bash install.sh --disable-prompts")
+    os.system("sudo gcloud components install kubectl")
 
 
 if __name__ == "__main__":
