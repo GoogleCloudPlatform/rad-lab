@@ -41,7 +41,7 @@ def ngs_qc_trigger(event, context):
     print(file)
 
     dsub_params = f"dsub --provider google-cls-v2 --project {GCP_PROJECT} --network {NETWORK} --subnetwork {SUBNETWORK} --disk-size {DISK_SIZE} --logging {GCS_LOG_LOCATION} --location {REGION} --zones {ZONES} --input FASTQ=gs://{GCS_INPUT_BUCKET}/{GCS_INPUT_FASTQ_FILE} --output HTML={GCS_OUTPUT_BUCKET}/*  --image {CONTAINER_IMAGE}  "
-    fastq_cmd = "--command 'fastqc ${FASTQ} --outdir=$(dirname ${HTML})' --enable-stackdriver-monitoring --wait"
+    fastq_cmd = "--command 'fastqc ${FASTQ} --outdir=$(dirname ${HTML})' --enable-stackdriver-monitoring"
     cmd = dsub_params + fastq_cmd
     print(cmd)
     p = subprocess.run(cmd, shell=True)

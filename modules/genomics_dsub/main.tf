@@ -23,6 +23,7 @@ locals {
     "roles/storage.objectViewer",
     "roles/storage.admin",
     "roles/lifesciences.serviceAgent",
+    "roles/lifesciences.workflowsRunner",
     "roles/iam.serviceAccountUser"
   ]
 
