@@ -24,7 +24,3 @@ output "project-radlab-genomics-id" {
   value       =  module.project_radlab_genomics.project_id
 }
 
-output "default_account" {
-  description = "default compute service account"
-  value = data.google_compute_default_service_account.default.email
-}

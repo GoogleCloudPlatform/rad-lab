@@ -27,8 +27,6 @@ locals {
   ]
 
   radlab_genomics_project_id = "radlab-genomics-${var.random_id}"
-
-  radlab_genomics_data_project_id = "radlab-genomics-data-${var.random_id}"
 }
 
 #####################
