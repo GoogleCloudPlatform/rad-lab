@@ -17,4 +17,4 @@
 PROJECT_ID=$1
 
 gcloud config set project ${PROJECT_ID}
-gcloud builds submit . --config ./scripts/container/fastqc-0.11.9a/cloudbuild.yaml
+gcloud builds submit . --config ./scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml
