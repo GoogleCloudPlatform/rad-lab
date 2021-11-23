@@ -70,23 +70,6 @@ module "vpc_ngs" {
     }
   ]
 
-  firewall_rules = [
-    {
-      name        = "fw-ngs-allow-internal"
-      description = "Firewall rule to allow traffic on all ports inside *vpc-ngs* VPC network."
-      priority    = 65534
-      ranges      = ["10.0.0.0/8"]
-      direction   = "INGRESS"
-
-      allow = [{
-        protocol = "tcp"
-        ports    = ["0-65535"]
-        }, {
-        protocol = "tcp"
-        ports    = ["0-65535"]
-      }]
-    }
-  ]
 }
 
 resource "google_project_organization_policy" "external_ip_policy" {
