@@ -78,6 +78,23 @@ NOTE: If the default project id is not set then in the guided setup you will nee
     python3 radlab.py
     ``` 
 
+3. To set any module specific variables, use `--varfile` argument while running **radlab.py** and pass a file with variables content:
+
+```
+% python3 radlab.py -h
+usage: radlab.py [-h] [--varfile FILE]
+
+optional arguments:
+  -h, --help      show this help message and exit
+  --varfile FILE  Input file (with complete path) for terraform.tfvars contents
+% 
+```
+NOTE: When the above parameter is not passed then the modules are deployed with module's default variable values.
+
+Example :
+```
+python3 radlab.py --varfile /<path_to_file>/<file_with_terraform.tfvars_contents>
+```
 NOTE: Save the **deployment_id** from the output for future reference. It is used to make updates or delete the RAD Lab module deployment.
 
 ## Example Launch of Data Science Module
@@ -86,8 +103,9 @@ NOTE: Save the **deployment_id** from the output for future reference. It is use
 
 ```
 List of available RAD Lab modules:
-[1] Data Science
-[2] Exit
+[1] # RAD Lab Application Mordernization Module (w/ Elasticsearch) (app_mod_elastic)
+[2] # RAD Lab Data Science Module (data_science)
+[3] Exit
 Choose a number for the RAD Lab Module: 
 ```
 
@@ -98,6 +116,7 @@ Action to perform for RAD Lab Deployment ?
 [1] Create New
 [2] Update
 [3] Delete
+[4] List
 Choose a number for the RAD Lab Module Deployment Action: 1
 ```
 
@@ -106,7 +125,7 @@ NOTE: If you are selecting Update/Delete action for RAD Lab Model then you will 
 ```
 Enter RAD Lab Module Deployment ID (example 'ioi9' is the id for project with id - radlab-ds-analytics-ioi9):
 ```
-3. If you selected _Create New/Update_ of RAD Lab deployment, follow the guided set up and provide user inputs like - Organization ID, Billing Account, Folder ID, Trusted users for the RAD Lab Module which you are setting up.
+3. If you selected _Create New/Update_ of RAD Lab deployment, follow the guided set up and provide user inputs like - Organization ID, Billing Account, Folder ID for the RAD Lab Module which you are setting up.
 
 4. If you selected _Create New_ of RAD Lab deployment, follow the guided setup and provide the name of the **GCS bucket** and its **Project ID** where you would like to store the terraform deployment state.  Keep in mind you cannot use UPPER case characters, spaces, underscore ** _ ** or contain the word "google". See [Bucket Naming Guidelines](https://cloud.google.com/storage/docs/naming-buckets) for a full list of bucket namming guidelines.
 
@@ -116,20 +135,7 @@ Enter the GCS Bucket name where Terraform States will be stored:
 
 NOTE: There should be a Billing associated to the above selected project for the successful creation of the GCS bucket.
 
-5. Enter the `Number of AI Notebooks` required for the specific model.
-
-```
-Number of AI Notebooks required [Default is 1 & Maximum is 10] :
-```
-
-6. Enter the username of the user whom you would like to provide access to the AI Notebooks.
-
-```
-Enter the username of trusted users needing access to AI Notebooks, or enter 'quit': testuser1
-Enter the username of trusted users needing access to AI Notebooks, or enter 'quit': quit
-```
-
-7. _[Can be Skipped when running on Cloud Shell]_ Set up Application Default Credentials. When you run deployment on cloud shell you see a _Warning_ about using the same credentials as the service credentials associated to the GCE VM where cloud shell is running. If you are using the same _Cloud Admin_ account for RAD Lab deployment with which you have logged in to the cloud shell then you may enter **N** or **n** or **No**, etc.
+5. _[Can be Skipped when running on Cloud Shell]_ Set up Application Default Credentials. When you run deployment on cloud shell you see a _Warning_ about using the same credentials as the service credentials associated to the GCE VM where cloud shell is running. If you are using the same _Cloud Admin_ account for RAD Lab deployment with which you have logged in to the cloud shell then you may enter **N** or **n** or **No**, etc.
 
 NOTE: There wont be any issues if you enter **Y** or **y** or **yes**, etc even if you are using the same accounts as you will again get to authenticate in next step as part of guided set up.
 
@@ -146,7 +152,7 @@ to authenticate with your personal account?
 **Do you want to continue (Y/n)?**
 ```
 
-8. _[Can be Skipped when running on Cloud Shell]_ Authenticate as the user of whom you want to have the Application Default Credentials configured to the cloud shell. These credentials should be of the _Cloud Admin_.
+6. _[Can be Skipped when running on Cloud Shell]_ Authenticate as the user of whom you want to have the Application Default Credentials configured to the cloud shell. These credentials should be of the _Cloud Admin_.
 
    * Follw the link (from the cloud shell terminal) in your browser.
 
@@ -160,9 +166,9 @@ Go to the following link in your browser:  https://accounts.google.com/o/oauth2/
 Enter verification code:
 ```
 
-9. This is where the Terraform module (example: Data Science module) will kick in and Terraform config scripts will be deployed which will spin up respective projects/services/sources, etc.
+7. This is where the Terraform RAD Lab module (example: Data Science module) will kick in and Terraform config scripts will be deployed which will spin up respective projects/services/sources, etc.
 
-10. Once the RAD Lab deployment is completed it will throw the below Outputs on the Cloud Shell Terminal for the _Cloud Admin_ to share with the _RAD Lab users_.
+8. Once the RAD Lab deployment is completed it will throw the below Outputs on the Cloud Shell Terminal for the _Cloud Admin_ to share with the _RAD Lab users_.
 
 ```
 Outputs:
