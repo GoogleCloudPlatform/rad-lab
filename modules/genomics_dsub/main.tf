@@ -240,7 +240,7 @@ resource "google_cloudfunctions_function" "function" {
 resource "null_resource" "build_and_push_image" {
   triggers = {
     cloudbuild_yaml_sha = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml"))
-    entrypoint_sha      = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/entrypoint.bash"))
+    # entrypoint_sha      = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/entrypoint.bash"))
     dockerfile_sha      = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/Dockerfile"))
     build_script_sha    = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh"))
   }
