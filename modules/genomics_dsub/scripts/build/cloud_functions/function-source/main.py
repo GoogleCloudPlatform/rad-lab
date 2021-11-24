@@ -36,11 +36,12 @@ def ngs_qc_trigger(event, context):
     SUBNETWORK = os.environ.get('SUBNETWORK', 'SUBNETWORK for lifesciences api not set')
     ZONES =os.environ.get('ZONES', 'ZONES for lifesciences api not set')
     DISK_SIZE =os.environ.get('DISK_SIZE', 'ZONES for lifesciences api not set')
+    SERVICE_ACCOUNT = os.environ.get('SERVICE_ACCOUNT','NGS Service Account not set')
 
     print(f"Processing fastq file: {GCS_INPUT_FASTQ_FILE}.")
     print(file)
 
-    dsub_params = f"dsub --provider google-cls-v2 --project {GCP_PROJECT} --network {NETWORK} --subnetwork {SUBNETWORK} --disk-size {DISK_SIZE} --logging {GCS_LOG_LOCATION} --location {REGION} --zones {ZONES} --input FASTQ=gs://{GCS_INPUT_BUCKET}/{GCS_INPUT_FASTQ_FILE} --output HTML={GCS_OUTPUT_BUCKET}/*  --image {CONTAINER_IMAGE}  "
+    dsub_params = f"dsub --provider google-cls-v2 --project {GCP_PROJECT} --network {NETWORK} --subnetwork {SUBNETWORK} --disk-size {DISK_SIZE} --logging {GCS_LOG_LOCATION} --location {REGION} --zones {ZONES} --input FASTQ=gs://{GCS_INPUT_BUCKET}/{GCS_INPUT_FASTQ_FILE} --output HTML={GCS_OUTPUT_BUCKET}/*  --image {CONTAINER_IMAGE} --service-account {SERVICE_ACCOUNT} "
     fastq_cmd = "--command 'fastqc ${FASTQ} --outdir=$(dirname ${HTML})' --enable-stackdriver-monitoring"
     cmd = dsub_params + fastq_cmd
     print(cmd)

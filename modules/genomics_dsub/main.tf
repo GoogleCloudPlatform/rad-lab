@@ -237,6 +237,7 @@ resource "google_cloudfunctions_function" "function" {
     SUBNETWORK        = var.subnet
     ZONES             = var.zone
     DISK_SIZE         = var.boot_disk_size_gb
+    SERVICE_ACCOUNT   = google_service_account.sa_p_ngs.email
   }
 }
 
