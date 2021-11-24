@@ -21,6 +21,6 @@ output "deployment_id" {
 
 output "project-radlab-genomics-id" {
   description = "Genomics Project ID"
-  value       =  module.project_radlab_genomics.project_id
+  value       = module.project_radlab_genomics.project_id
 }
 
