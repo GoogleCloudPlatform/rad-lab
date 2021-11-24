@@ -69,7 +69,7 @@ variable "organization_id" {
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
   type        = string
-  default     = "226"
+  default     = null
 }
 
 variable "set_external_ip_policy" {
