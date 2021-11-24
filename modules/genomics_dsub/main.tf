@@ -114,8 +114,9 @@ resource "google_project_organization_policy" "trustedimage_project_policy" {
   }
 }
 
-# data "google_compute_default_service_account" "default" {
-# }
+data "google_compute_default_service_account" "default" {
+  project = module.project_radlab_genomics.project_id
+}
 
 
 resource "google_service_account" "sa_p_ngs" {
@@ -131,12 +132,11 @@ resource "google_project_iam_member" "sa_p_ngs_permissions" {
   role     = each.value
 }
 
-# resource "google_project_iam_member" "sa_compute_default_permissions" {
-#   for_each = toset(local.ngs_sa_project_roles)
-#   project  = module.project_radlab_genomics.project_id
-#   member   = "serviceAccount:${data.google_compute_default_service_account.default.email}"
-#   role     = each.value
-# }
+ resource "google_project_iam_member" "sa_compute_default_permissions" {
+   project  = module.project_radlab_genomics.project_id
+   member   = "serviceAccount:${data.google_compute_default_service_account.default.email}"
+   role     = "roles/storage.admin"
+ }
 
 resource "google_service_account_iam_member" "sa_ngs_user_iam" {
   for_each           = var.trusted_users
