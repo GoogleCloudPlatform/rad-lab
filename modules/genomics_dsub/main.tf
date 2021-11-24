@@ -15,8 +15,8 @@
  */
 
 locals {
-  
-  region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
+  random_id = var.random_id != null ? var.random_id : random_id.random_id.hex
+  region    = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   ngs_sa_project_roles = [
     "roles/compute.instanceAdmin",
@@ -28,6 +28,10 @@ locals {
   ]
 
   radlab_genomics_project_id = "radlab-genomics-${var.random_id}"
+}
+
+resource "random_id" "random_id" {
+  byte_length = 2
 }
 
 #####################
@@ -161,36 +165,36 @@ resource "google_project_iam_binding" "genomics_ngs_user_role2" {
 
 # Bucket to store sequence inputs and processed outputs #
 resource "google_storage_bucket" "input_bucket" {
-  project  = module.project_radlab_genomics.project_id
-  name     = join("", ["ngs-input-bucket-", var.random_id])
-  location = "EU"
+  project                     = module.project_radlab_genomics.project_id
+  name                        = join("", ["ngs-input-bucket-", var.random_id])
+  location                    = "EU"
   uniform_bucket_level_access = true
 }
 
 resource "google_storage_bucket_iam_binding" "binding1" {
-  bucket = google_storage_bucket.input_bucket.name
-  role = "roles/storage.admin"
+  bucket  = google_storage_bucket.input_bucket.name
+  role    = "roles/storage.admin"
   members = var.trusted_users
 }
 
 resource "google_storage_bucket" "output_bucket" {
-  project  = module.project_radlab_genomics.project_id
-  name     = join("", ["ngs-output-bucket-", var.random_id])
-  location = "EU"
+  project                     = module.project_radlab_genomics.project_id
+  name                        = join("", ["ngs-output-bucket-", var.random_id])
+  location                    = "EU"
   uniform_bucket_level_access = true
 }
 
 resource "google_storage_bucket_iam_binding" "binding2" {
-  bucket = google_storage_bucket.output_bucket.name
-  role = "roles/storage.admin"
+  bucket  = google_storage_bucket.output_bucket.name
+  role    = "roles/storage.admin"
   members = var.trusted_users
 }
 
 # Bucket to store Cloud functions #
 resource "google_storage_bucket" "source_code_bucket" {
-  project  = module.project_radlab_genomics.project_id
-  name     = join("", ["radlab-source-code-bucket-", var.random_id])
-  location = "EU"
+  project                     = module.project_radlab_genomics.project_id
+  name                        = join("", ["radlab-source-code-bucket-", var.random_id])
+  location                    = "EU"
   uniform_bucket_level_access = true
 }
 
@@ -203,12 +207,12 @@ resource "google_storage_bucket_object" "archive" {
 # Create cloud functions from source code (Zip) stored in Bucket #
 
 resource "google_cloudfunctions_function" "function" {
-  name        = "ngs-qc-fastqc-fn"
-  description = "Cloud function that uses dsub to execute pipeline jobs using lifesciences api in GCP."
-  project  = module.project_radlab_genomics.project_id
-  runtime     = "python38"
-  region      = var.region
-  ingress_settings = "ALLOW_INTERNAL_AND_GCLB"
+  name                  = "ngs-qc-fastqc-fn"
+  description           = "Cloud function that uses dsub to execute pipeline jobs using lifesciences api in GCP."
+  project               = module.project_radlab_genomics.project_id
+  runtime               = "python38"
+  region                = var.region
+  ingress_settings      = "ALLOW_INTERNAL_AND_GCLB"
   available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.source_code_bucket.name
   source_archive_object = google_storage_bucket_object.archive.name
@@ -224,15 +228,15 @@ resource "google_cloudfunctions_function" "function" {
   }
 
   environment_variables = {
-    GCP_PROJECT = module.project_radlab_genomics.project_id
-    GCS_OUTPUT_BUCKET = join("", ["gs://",google_storage_bucket.output_bucket.name])
-    GCS_LOG_LOCATION = join("", ["gs://",google_storage_bucket.output_bucket.name, "/logs"])
-    CONTAINER_IMAGE = join("", ["gcr.io/",module.project_radlab_genomics.project_id, "/fastqc:latest"])
-    REGION = var.region
-    NETWORK = var.network
-    SUBNETWORK = var.subnet
-    ZONES = var.zone
-    DISK_SIZE = var.boot_disk_size_gb
+    GCP_PROJECT       = module.project_radlab_genomics.project_id
+    GCS_OUTPUT_BUCKET = join("", ["gs://", google_storage_bucket.output_bucket.name])
+    GCS_LOG_LOCATION  = join("", ["gs://", google_storage_bucket.output_bucket.name, "/logs"])
+    CONTAINER_IMAGE   = join("", ["gcr.io/", module.project_radlab_genomics.project_id, "/fastqc:latest"])
+    REGION            = var.region
+    NETWORK           = var.network
+    SUBNETWORK        = var.subnet
+    ZONES             = var.zone
+    DISK_SIZE         = var.boot_disk_size_gb
   }
 }
 
@@ -241,12 +245,12 @@ resource "null_resource" "build_and_push_image" {
   triggers = {
     cloudbuild_yaml_sha = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml"))
     # entrypoint_sha      = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/entrypoint.bash"))
-    dockerfile_sha      = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/Dockerfile"))
-    build_script_sha    = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh"))
+    dockerfile_sha   = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/Dockerfile"))
+    build_script_sha = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh"))
   }
 
   provisioner "local-exec" {
-    working_dir = "${path.module}"
+    working_dir = path.module
     command     = "${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh ${module.project_radlab_genomics.project_id}"
   }
 }
