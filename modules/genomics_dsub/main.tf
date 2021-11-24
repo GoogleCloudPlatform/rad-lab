@@ -15,8 +15,9 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.random_id.hex
-  region    = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
+  random_id                  = var.random_id != null ? var.random_id : random_id.random_id.hex
+  radlab_genomics_project_id = "radlab-genomics-${local.random_id}"
+  region                     = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   ngs_sa_project_roles = [
     "roles/compute.instanceAdmin",
@@ -27,7 +28,6 @@ locals {
     "roles/iam.serviceAccountUser"
   ]
 
-  radlab_genomics_project_id = "radlab-genomics-${var.random_id}"
 }
 
 resource "random_id" "random_id" {
@@ -120,7 +120,7 @@ resource "google_project_organization_policy" "trustedimage_project_policy" {
 
 resource "google_service_account" "sa_p_ngs" {
   project      = module.project_radlab_genomics.project_id
-  account_id   = format("sa-p-ngs-%s", var.random_id)
+  account_id   = format("sa-p-ngs-%s", local.random_id)
   display_name = "NGS in trusted environment"
 }
 
@@ -166,9 +166,10 @@ resource "google_project_iam_binding" "genomics_ngs_user_role2" {
 # Bucket to store sequence inputs and processed outputs #
 resource "google_storage_bucket" "input_bucket" {
   project                     = module.project_radlab_genomics.project_id
-  name                        = join("", ["ngs-input-bucket-", var.random_id])
+  name                        = join("", ["ngs-input-bucket-", local.random_id])
   location                    = "EU"
   uniform_bucket_level_access = true
+  force_destroy               = true
 }
 
 resource "google_storage_bucket_iam_binding" "binding1" {
@@ -179,7 +180,7 @@ resource "google_storage_bucket_iam_binding" "binding1" {
 
 resource "google_storage_bucket" "output_bucket" {
   project                     = module.project_radlab_genomics.project_id
-  name                        = join("", ["ngs-output-bucket-", var.random_id])
+  name                        = join("", ["ngs-output-bucket-", local.random_id])
   location                    = "EU"
   uniform_bucket_level_access = true
 }
@@ -193,7 +194,7 @@ resource "google_storage_bucket_iam_binding" "binding2" {
 # Bucket to store Cloud functions #
 resource "google_storage_bucket" "source_code_bucket" {
   project                     = module.project_radlab_genomics.project_id
-  name                        = join("", ["radlab-source-code-bucket-", var.random_id])
+  name                        = join("", ["radlab-source-code-bucket-", local.random_id])
   location                    = "EU"
   uniform_bucket_level_access = true
 }
