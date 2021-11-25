@@ -16,7 +16,7 @@
 
 locals {
   random_id                  = var.random_id != null ? var.random_id : random_id.random_id.hex
-  radlab_genomics_project_id = "radlab-genomics-${local.random_id}"
+  radlab_genomics_project_id = format("%s-%s", var.project_name, local.random_id)
   region                     = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   ngs_sa_project_roles = [
@@ -182,6 +182,7 @@ resource "google_storage_bucket" "output_bucket" {
   name                        = join("", ["ngs-output-bucket-", local.random_id])
   location                    = "EU"
   uniform_bucket_level_access = true
+  force_destroy               = true
 }
 
 resource "google_storage_bucket_iam_binding" "binding2" {
@@ -198,10 +199,16 @@ resource "google_storage_bucket" "source_code_bucket" {
   uniform_bucket_level_access = true
 }
 
+data "archive_file" "source_zip" {
+  type        = "zip"
+  output_path = "${path.module}/function-source.zip"
+  source_dir  = "${path.module}/scripts/build/cloud_functions/function-source/"
+}
+
 resource "google_storage_bucket_object" "archive" {
   name   = "function-source.zip"
   bucket = google_storage_bucket.source_code_bucket.name
-  source = "${path.module}/scripts/build/cloud_functions/function-source/function-source.zip"
+  source = data.archive_file.source_zip.output_path
 }
 
 # Create cloud functions from source code (Zip) stored in Bucket #
@@ -219,9 +226,11 @@ resource "google_cloudfunctions_function" "function" {
   timeout               = 60
   entry_point           = "ngs_qc_trigger"
   service_account_email = google_service_account.sa_p_ngs.email
+
   labels = {
     my-label = "my-label-value"
   }
+
   event_trigger {
     event_type = "google.storage.object.finalize"
     resource   = google_storage_bucket.input_bucket.name
@@ -233,8 +242,8 @@ resource "google_cloudfunctions_function" "function" {
     GCS_LOG_LOCATION  = join("", ["gs://", google_storage_bucket.output_bucket.name, "/logs"])
     CONTAINER_IMAGE   = join("", ["gcr.io/", module.project_radlab_genomics.project_id, "/fastqc:latest"])
     REGION            = var.region
-    NETWORK           = var.network
-    SUBNETWORK        = var.subnet
+    NETWORK           = module.vpc_ngs.network_name
+    SUBNETWORK        = module.vpc_ngs.subnets_names.0
     ZONES             = var.zone
     DISK_SIZE         = var.boot_disk_size_gb
     SERVICE_ACCOUNT   = google_service_account.sa_p_ngs.email
@@ -245,8 +254,8 @@ resource "google_cloudfunctions_function" "function" {
 resource "null_resource" "build_and_push_image" {
   triggers = {
     cloudbuild_yaml_sha = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml"))
-    dockerfile_sha   = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/Dockerfile"))
-    build_script_sha = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh"))
+    dockerfile_sha      = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/Dockerfile"))
+    build_script_sha    = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh"))
   }
 
   provisioner "local-exec" {

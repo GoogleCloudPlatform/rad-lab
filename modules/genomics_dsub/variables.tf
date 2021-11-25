@@ -66,10 +66,22 @@ variable "organization_id" {
   type        = string
 }
 
+variable "project_name" {
+  description = "Name of the project that should be used."
+  type        = string
+  default     = "radlab-genomics"
+}
+
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
   type        = string
   default     = null
+}
+
+variable "region" {
+  description = "Cloud Zone associated to the project"
+  type        = string
+  default     = "europe-west2"
 }
 
 variable "set_external_ip_policy" {
@@ -102,11 +114,6 @@ variable "trusted_users" {
   default     = []
 }
 
-variable "region" {
-  description = "Cloud Zone associated to the project"
-  type        = string
-  default     = "europe-west2"
-}
 
 variable "zone" {
   description = "Cloud Zone associated to the project"
