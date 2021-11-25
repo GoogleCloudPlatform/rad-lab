@@ -9,7 +9,7 @@ The RAD Lab Launcher will guide you through the process of launching modules in 
 [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/rad-lab&cloudshell_git_branch=main)
 
 
-NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and Run as Adminstrator`.
+NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and Run as Administrator`.
 
 2. Decompress the download:
    ```
