@@ -43,26 +43,14 @@ variable "create_project" {
   default     = true
 }
 
-variable "domain" {
-  description = "Display Name of Organization where GCP Resources need to get spin up"
-  type        = string
-  default     = ""
-}
-
 variable "enable_services" {
   description = "Enable the necessary APIs on the project.  When using an existing project, this can be set to false."
   type        = bool
   default     = true
 }
 
-variable "file_path" {
-  description = "Environment path to the respective modules (like DataScience module) which contains TF files for the same."
-  type        = string
-  default     = ""
-}
-
 variable "folder_id" {
-  description = "Folder ID in which GCP Resources need to get spin up"
+  description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. "
   type        = string
   default     = ""
 }
@@ -104,8 +92,9 @@ variable "notebook_count" {
 }
 
 variable "organization_id" {
-  description = "Organization ID where GCP Resources need to get spin up"
+  description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id"
   type        = string
+  default     = ""
 }
 
 variable "project_name" {
@@ -135,12 +124,6 @@ variable "set_trustedimage_project_policy" {
   description = "Apply org policy to set the trusted image projects."
   type        = bool
   default     = true
-}
-
-variable "startup_script" {
-  description = "Startup script of the AI Notebooks."
-  type        = string
-  default     = "gs://radlab-solution-bucket/Data_Science_Model/samplenotebook.sh"
 }
 
 variable "subnet_name" {
