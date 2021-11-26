@@ -125,7 +125,7 @@ def basic_input(orgid, billing_acc, folderid, randomid):
     if (folderid.strip() and folderid.strip().isdecimal() == False):
         sys.exit(Fore.RED + "\nError Occured - INVALID FOLDER ID ACCOUNT\n")
 
-    print("\Folder ID (Selected) : " + Fore.GREEN + Style.BRIGHT + folderid + Style.RESET_ALL )
+    print("\nFolder ID (Selected) : " + Fore.GREEN + Style.BRIGHT + folderid + Style.RESET_ALL )
 
     # Check if either Org ID or Folder ID is set.
     if(orgid == '' and folderid == ''):
