@@ -114,10 +114,6 @@ resource "google_project_organization_policy" "trustedimage_project_policy" {
   }
 }
 
-# data "google_compute_default_service_account" "default" {
-#   project = module.project_radlab_genomics.project_id
-# }
-
 resource "google_service_account" "sa_p_ngs" {
   project      = module.project_radlab_genomics.project_id
   account_id   = format("sa-p-ngs-%s", local.random_id)
@@ -131,24 +127,12 @@ resource "google_project_iam_member" "sa_p_ngs_permissions" {
   role     = each.value
 }
 
-#  resource "google_project_iam_member" "sa_compute_default_permissions" {
-#    project  = module.project_radlab_genomics.project_id
-#    member   = "serviceAccount:${data.google_compute_default_service_account.default.email}"
-#    role     = "roles/storage.admin"
-#  }
-
 resource "google_service_account_iam_member" "sa_ngs_user_iam" {
   for_each           = var.trusted_users
   member             = each.value
   role               = "roles/iam.serviceAccountUser"
   service_account_id = google_service_account.sa_p_ngs.id
 }
-
-# resource "google_project_iam_binding" "genomics_ngs_lifesciences_role" {
-#   project = module.project_radlab_genomics.project_id
-#   members = join("", ["serviceAccount:service-", module.project_radlab_genomics.project_id, "@gcp-sa-lifesciences.iam.gserviceaccount.com"])
-#   role    = "roles/lifesciences.serviceAgent"
-# }
 
 resource "google_project_iam_binding" "genomics_ngs_user_role1" {
   project = module.project_radlab_genomics.project_id
