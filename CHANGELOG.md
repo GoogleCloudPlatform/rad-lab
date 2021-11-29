@@ -15,6 +15,17 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [2.1.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v2.1.0) (2021-11-23)
+ 
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v2.0.0...v2.1.0)
+
+### Added
+- _RAD Lab Launcher:_ Added optional Input file parameter to set variables & create terraform.tfvars file [(dfdb270)](https://github.com/GoogleCloudPlatform/rad-lab/commit/dfdb270f3cdb25fc57715e14ba7cdc83edbe9e95)
+
+### Changed
+- _RAD Lab Launcher:_ Changed how module selection works [(#7)](https://github.com/GoogleCloudPlatform/rad-lab/issues/7)
+
+
 ## [2.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v2.0.0) (2021-11-15)
 
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v1.1.0...v2.0.0)
