@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 # Copyright 2021 Google LLC
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     https://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,12 +17,13 @@
 #  PREREQ: installer_prereq.py
 
 import os
-import shutil
 import sys
 import json
 import glob
-import random
+import shutil
 import string
+import random
+import argparse
 import platform
 from os import path
 from google.cloud import storage
@@ -36,13 +37,8 @@ STATE_UPDATE_DEPLOYMENT = "2"
 STATE_DELETE_DEPLOYMENT = "3"
 STATE_LIST_DEPLOYMENT = "4"
 
-OPTION_MODULE_APP_MOD_ELASTIC_SEARCH = "1"
-OPTION_MODULE_DATA_SCIENCE = "2"
-OPTION_MODULE_GENOMICS = "3"
-OPTION_QUIT = ""
+def main(varcontents={}):
 
-def main():
-    
     orgid           = ""
     folderid        = ""
     billing_acc     = ""
@@ -58,53 +54,23 @@ def main():
         print("Login with Cloud Admin account...")
         os.system("gcloud auth application-default login")
 
-    modules, c = list_modules()
-    OPTION_QUIT = c
-
-    selected_module = input("\nList of available RAD Lab modules:\n"+modules+"["+ str(c) +"] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RAD Lab Module"+ Style.RESET_ALL + ': ').strip()
-    
-    if(selected_module == OPTION_MODULE_DATA_SCIENCE):
-        print("\nRAD Lab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Data Science"+ Style.RESET_ALL)
-        module_name = 'data_science'
-        notebook_count  = ""
-        trusted_users   = []
-        state,env_path,tfbucket,orgid,billing_acc,folderid,domain,randomid = module_deploy_common_settings(module_name,setup_path)
-        notebook_count, trusted_users = module_deploy_specific_setting(selected_module,state,domain,trusted_users,notebook_count)
-        env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module, trusted_users, notebook_count)
-
-    elif(selected_module ==  OPTION_MODULE_APP_MOD_ELASTIC_SEARCH):
-        print("\nRAD Lab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"(APP MOD) Elasticsearch"+ Style.RESET_ALL)
-        module_name = 'app_mod_elastic'
-        state,env_path,tfbucket,orgid,billing_acc,folderid,domain,randomid = module_deploy_common_settings(module_name,setup_path)
-        env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module)
-
-    elif(selected_module == OPTION_MODULE_GENOMICS):
-        print("\nRAD Lab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +"Genomincs"+ Style.RESET_ALL)
-        module_name = 'genomics_dsub'
-        trusted_users   = []
-        state,env_path,tfbucket,orgid,billing_acc,folderid,domain,randomid = module_deploy_common_settings(module_name,setup_path)
-        trusted_users = module_deploy_specific_setting(selected_module,state,domain,trusted_users)
-        env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module, trusted_users)
-
-    elif(selected_module == OPTION_QUIT):
-        sys.exit(Fore.GREEN + "\nExiting Installer")
-
-    else:
-        print(OPTION_QUIT)
-        sys.exit(Fore.RED + "\nInvalid module")
+    module_name = list_modules()
+    validate_tfvars(varcontents, module_name)
+    state,env_path,tfbucket,orgid,billing_acc,folderid,domain,randomid = module_deploy_common_settings(module_name,setup_path,varcontents)
+    env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module)
 
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
-	
 
-def env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module, trusted_users = [], notebook_count = ""):
+
+def env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucket, selected_module):
     tr = Terraform(working_dir=env_path)
     return_code, stdout, stderr = tr.init_cmd(capture_output=False)
-    
+
     if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
-        return_code, stdout, stderr = tr.apply_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'domain':domain, 'file_path':env_path, 'notebook_count':notebook_count, 'trusted_users': trusted_users, 'random_id':randomid})
+        return_code, stdout, stderr = tr.apply_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'domain':domain, 'random_id':randomid})
     elif(state == STATE_DELETE_DEPLOYMENT):
-        return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'file_path':env_path,'random_id':randomid})
+        return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid,'random_id':randomid})
 
     # return_code - 0 Success & 1 Error
     if(return_code == 1):
@@ -113,12 +79,16 @@ def env(state, orgid, billing_acc, folderid, domain, env_path, randomid, tfbucke
     else:
         target_path = 'gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments'
         if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
-            os.system('gsutil -q -m cp -r ' + env_path + '/*.tf ' + target_path)
-            os.system('gsutil -q -m cp -r ' + env_path + '/*.json ' + target_path)
 
-            if(selected_module == OPTION_MODULE_APP_MOD_ELASTIC_SEARCH): # Module specific folders
+            if glob.glob(env_path + '/*.tf'):
+                os.system('gsutil -q -m cp -r ' + env_path + '/*.tf ' + target_path)
+            if glob.glob(env_path + '/*.json'):
+                os.system('gsutil -q -m cp -r ' + env_path + '/*.json ' + target_path)
+            if glob.glob(env_path + '/elk'):
                 os.system('gsutil -q -m cp -r ' + env_path + '/elk ' + target_path)
+            if glob.glob(env_path + '/scripts'):
                 os.system('gsutil -q -m cp -r -P ' + env_path + '/scripts ' + target_path)
+            if glob.glob(env_path + '/templates'):
                 os.system('gsutil -q -m cp -r ' + env_path + '/templates ' + target_path)
 
         elif(state == STATE_DELETE_DEPLOYMENT):
@@ -131,41 +101,46 @@ def select_state():
     state = input("\nAction to perform for RAD Lab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RAD Lab Module Deployment Action"+ Style.RESET_ALL + ': ').strip()
     if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT or state == STATE_LIST_DEPLOYMENT):
         return state
-    else: 
+    else:
         sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
 
-def basic_input():
+def basic_input(orgid, billing_acc, folderid, domain, randomid):
 
     print("\nEnter following info to start the setup and use the user which have Project Owner & Billing Account User roles:-")
 
     # Selecting Org ID
-    orgid = getorgid()
+    if(orgid == ''):
+        orgid = getorgid()
     print("\nOrg ID (Selected) : " + Fore.GREEN + Style.BRIGHT + orgid + Style.RESET_ALL )
 
     # Org ID Validation
     if (orgid.strip().isdecimal() == False) :
         sys.exit(Fore.RED + "\nError Occured - INVALID ORG ID\n")
-    
+
     # Selecting Billing Account
-    billing_acc = getbillingacc()
-    print("\nBilling Account (Selected) : " + Fore.GREEN + Style.BRIGHT + billing_acc + Style.RESET_ALL )  
-    
+    if(billing_acc == ''):
+        billing_acc = getbillingacc()
+    print("\nBilling Account (Selected) : " + Fore.GREEN + Style.BRIGHT + billing_acc + Style.RESET_ALL )
+
     # Billing Account Validation
     if (billing_acc.count('-') != 2) :
         sys.exit(Fore.RED + "\nError Occured - INVALID Billing Account\n")
 
     # Selecting Folder ID
-    folderid = input(Fore.YELLOW + Style.BRIGHT + "\nFolder ID [Optional]"+ Style.RESET_ALL + ': ')
+    if(folderid == ''):
+        folderid = input(Fore.YELLOW + Style.BRIGHT + "\nFolder ID [Optional]"+ Style.RESET_ALL + ': ')
 
     # Folder ID Validation
     if (folderid.strip() and folderid.strip().isdecimal() == False):
         sys.exit(Fore.RED + "\nError Occured - INVALID FOLDER ID ACCOUNT\n")
 
-    # Fetching Domain name 
-    domain = getdomain(orgid)
-    
+    # Fetching Domain name
+    if(folderid == ''):
+        domain = getdomain(orgid)
+
     # Create Random Deployment ID
-    randomid = get_random_alphanumeric_string(4)
+    if(randomid == ''):
+        randomid = get_random_alphanumeric_string(4)
 
     return orgid, billing_acc, folderid, domain, randomid
 
@@ -190,7 +165,7 @@ def get_env(env_path):
     f = open(my_path,)
     # returns JSON object as a dictionary
     data = json.load(f)
-    
+
     orgid       = data[0]['orgid']
     billing_acc = data[0]['billing_acc']
     folderid    = data[0]['folderid']
@@ -218,7 +193,7 @@ def setlocaldeployment(tfbucket,prefix, env_path):
 
     elif(os.path.isdir(env_path)):
         print("Terraform state exist locally...")
-    
+
     else:
         sys.exit(Fore.RED + "\nThe deployment with the entered ID do not exist !\n")
 
@@ -246,16 +221,16 @@ def getbillingacc():
     if(x == '1'):
         billing_acc = input(Fore.YELLOW + Style.BRIGHT + "Enter the Billing Account ( Example format - ABCDEF-GHIJKL-MNOPQR )" + Style.RESET_ALL + ': ').strip()
         return billing_acc
-    
+
     elif(x == '2'):
         credentials = GoogleCredentials.get_application_default()
         service = discovery.build('cloudbilling', 'v1', credentials=credentials)
-    
+
         request = service.billingAccounts().list()
         response = request.execute()
 
         print("\nList of Billing account you have access to: \n")
-        billing_accounts = []    
+        billing_accounts = []
         # Print out Billing accounts
         for x in range(len(response['billingAccounts'])):
             print("[" + str(x+1) + "] " + response['billingAccounts'][x]['name'] + "    " + response['billingAccounts'][x]['displayName'])
@@ -266,7 +241,7 @@ def getbillingacc():
         if inp in range(1, len(billing_accounts)+1):
             inp = billing_accounts[inp-1]
 
-            billing_acc = inp.split('/')        
+            billing_acc = inp.split('/')
             # print(billing_acc[1])
             return billing_acc[1]
         else:
@@ -277,7 +252,7 @@ def getbillingacc():
 def getorgid():
 
     x = input("\nHow would you like to fetch the Org ID ?\n[1] Enter Manually\n[2] Select from the List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
-    
+
     if(x == '1'):
         orgid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Org ID ( Example format - 1234567890 )" + Style.RESET_ALL + ': ').strip()
         return orgid
@@ -292,7 +267,7 @@ def getorgid():
         # pprint(response)
 
         print("\nList of Org ID you have access to: \n")
-        org_ids = []    
+        org_ids = []
         # Print out Org IDs accounts
         for x in range(len(response['organizations'])):
             print("[" + str(x+1) + "] " + response['organizations'][x]['organizationId'] + "    " + response['organizations'][x]['displayName']+ "    " + response['organizations'][x]['lifecycleState'])
@@ -301,7 +276,7 @@ def getorgid():
         # Take user input and get the corresponding item from the list
         inp = int(input(Fore.YELLOW + Style.BRIGHT + "Choose a number for Organization ID" + Style.RESET_ALL + ': '))
         if inp in range(1, len(org_ids)+1):
-            orgid = org_ids[inp-1]   
+            orgid = org_ids[inp-1]
             # print(orgid)
             return orgid
         else:
@@ -322,12 +297,12 @@ def getbucket(state):
 
     if(state == '1'):
         bucketoption = input("\nWant to use existing GCS Bucket for Terraform configs or Create Bucket ?:\n[1] Use Existing Bucket\n[2] Create New Bucket\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ')
-    
+
     if(bucketoption == '1' or state == '2' or state == '3' or state == '4'):
         try:
             buckets = storage_client.list_buckets()
 
-            barray = []    
+            barray = []
             x = 0
             print("\nSelect a bucket for Terraform Configs & States... \n")
             # Print out Buckets in the default project
@@ -335,13 +310,13 @@ def getbucket(state):
                 print("[" + str(x+1) + "] " + bucket.name)
                 barray.append(bucket.name)
                 x=x+1
-            
+
             # Take user input and get the corresponding item from the list
             try:
                 inp = int(input(Fore.YELLOW + Style.BRIGHT + "Choose a number for Bucket Name" + Style.RESET_ALL + ': '))
             except:
                 print(Fore.RED + "\nINVALID or NO OPTION SELECTED FOR BUCKET NAME.\n\nEnter the Bucket name Manually...\n"+ Style.RESET_ALL)
-            
+
             if inp in range(1, len(barray)+1):
                 tfbucket = barray[inp-1]
                 return tfbucket
@@ -358,7 +333,7 @@ def getbucket(state):
         print("CREATE BUCKET")
         bucketprefix = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the prefix for the bucket name i.e. radlab-[PREFIX] " + Style.RESET_ALL + ': ')
         # Creates the new bucket
-        # Note: These samples create a bucket in the default US multi-region with a default storage class of Standard Storage. 
+        # Note: These samples create a bucket in the default US multi-region with a default storage class of Standard Storage.
         # To create a bucket outside these defaults, see [Creating storage buckets](https://cloud.google.com/storage/docs/creating-buckets).
         projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the project ID under which the bucket is to be created " + Style.RESET_ALL + ': ')
         bucket = storage_client.create_bucket('radlab-'+bucketprefix,project=projid)
@@ -379,7 +354,7 @@ def settfstategcs(env_path, prefix, tfbucket):
         # print(bucket)
     except:
         sys.exit(Fore.RED + "\nError Occured - INVALID BUCKET NAME or NO ACCESS\n"+ Style.RESET_ALL)
-    
+
     # Create backend.tf file
     f=open( env_path+'/backend.tf', 'w+')
     f.write('terraform {\n  backend "gcs"{\n    bucket="'+tfbucket+'"\n    prefix="'+prefix+'"\n  }\n}')
@@ -420,15 +395,39 @@ def list_modules():
     modules = sorted(modules)
     c = 1
     print_list = ''
+
+    # Printing List of Modules
     for module in modules:
-        print_list = print_list + "["+ str(c) +"] " + module + "\n"
-        # print("["+ str(c) +"] " + module + "\n")
+        first_line = ''
+        # Fetch Module name
+        try:
+            with open(os.path.dirname(os.getcwd()) + '/modules/'+ module + '/README.md', "r") as file:
+                first_line = file.readline()
+        except:
+            print(Fore.RED +'Missing README.md file for module: ' + module + Style.RESET_ALL)
+        print_list = print_list + "["+ str(c) +"] " + first_line.strip() + Fore.GREEN + " (" +module + ")\n" + Style.RESET_ALL
         c = c+1
-    # print(print_list)
-    return print_list, str(c)
+
+    # Selecting Module
+    try:
+        selected_module = input("\nList of available RAD Lab modules:\n"+print_list+"["+ str(c) +"] Exit\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for the RAD Lab Module"+ Style.RESET_ALL + ': ').strip()
+        selected_module = int(selected_module)
+    except:
+        sys.exit(Fore.RED + "\nInvalid module")
+
+    # Validating User Module selection
+    if selected_module > 0 and selected_module < c:
+        # print(modules)
+        module_name = modules[selected_module-1]
+        print("\nRAD Lab Module (selected) : "+ Fore.GREEN + Style.BRIGHT +module_name+ Style.RESET_ALL)
+        return module_name
+    elif selected_module == c:
+        sys.exit(Fore.GREEN + "\nExiting Installer")
+    else:
+        sys.exit(Fore.RED + "\nInvalid module")
 
 
-def module_deploy_common_settings(module_name,setup_path):
+def module_deploy_common_settings(module_name,setup_path,varcontents):
     # Select Action to perform
     state = select_state()
 
@@ -439,8 +438,11 @@ def module_deploy_common_settings(module_name,setup_path):
     # Setting Org ID, Billing Account, Folder ID, Domain
     if(state == STATE_CREATE_DEPLOYMENT):
 
+        # Check for any overides of basic inputs from terraform.tfvars file
+        orgid, billing_acc, folderid, domain, randomid = check_basic_inputs_tfvars(varcontents)
+
         # Getting Base Inputs
-        orgid, billing_acc, folderid, domain, randomid = basic_input()
+        orgid, billing_acc, folderid, domain, randomid = basic_input(orgid, billing_acc, folderid, domain, randomid)
 
         # Set environment path as deployment directory
         prefix = module_name+'_'+randomid
@@ -451,9 +453,12 @@ def module_deploy_common_settings(module_name,setup_path):
 
         # Copy module directory
         shutil.copytree(os.path.dirname(os.getcwd()) + '/modules/'+module_name, env_path)
-        
+
         # Set Terraform states remote backend as GCS
         settfstategcs(env_path,prefix,tfbucket)
+
+        # Create file with billing/org/folder details
+        create_tfvars(env_path,varcontents)
 
         # Create file with billing/org/folder details
         create_env(env_path, orgid, billing_acc, folderid)
@@ -461,18 +466,18 @@ def module_deploy_common_settings(module_name,setup_path):
         return state,env_path,tfbucket,orgid,billing_acc,folderid,domain,randomid
 
     elif(state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT):
-        
+
         # Get Deployment ID
         randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RAD Lab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
         randomid = randomid.strip()
 
         # Validating Deployment ID
         if(len(randomid) == 4 and randomid.isalnum()):
-            
+
             # Set environment path as deployment directory
             prefix = module_name+'_'+randomid
             env_path = setup_path+'/deployments/'+prefix
-            
+
             # Setting Local Deployment
             setlocaldeployment(tfbucket,prefix,env_path)
 
@@ -482,11 +487,17 @@ def module_deploy_common_settings(module_name,setup_path):
         # Get env values
         orgid, billing_acc, folderid = get_env(env_path)
 
-        # Fetching Domain name 
+        # Fetching Domain name
         domain = getdomain(orgid)
-        
+
         # Set Terraform states remote backend as GCS
         settfstategcs(env_path,prefix,tfbucket)
+
+        # Create file with billing/org/folder details
+        if(state == STATE_UPDATE_DEPLOYMENT):
+            if os.path.exists(env_path + '/terraform.tfvars'):
+                os.remove(env_path + '/terraform.tfvars')
+            create_tfvars(env_path,varcontents)
 
         if(state == STATE_DELETE_DEPLOYMENT):
             print("DELETING DEPLOYMENT...")
@@ -500,50 +511,95 @@ def module_deploy_common_settings(module_name,setup_path):
     else:
         sys.exit(Fore.RED + "\nInvalid RAD Lab Module State selected")
 
-def module_deploy_specific_setting(selected_module,state,domain,trusted_users=[], notebook_count=""):
+def validate_tfvars(varcontents, module_name):
 
-    if(selected_module == OPTION_MODULE_DATA_SCIENCE):
+    keys = list(varcontents.keys())
+    print("Variables in file:")
+    print(keys)
 
-        if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
-            # Requesting Number of AI Notebooks
-            notebook_count = input(Fore.YELLOW + Style.BRIGHT + "\nNumber of AI Notebooks required [Default is 1 & Maximum is 10]"+ Style.RESET_ALL + ': ')
-            if(len(notebook_count.strip()) == 0):
-                notebook_count = '1'
-                print("\nNumber of AI Notebooks (Selected) : " + Fore.GREEN + Style.BRIGHT + notebook_count + "\n"+ Style.RESET_ALL)
-            elif(int(notebook_count) > 0 and int(notebook_count) <= 10):
-                print("\nNumber of AI Notebooks (Selected) : " + Fore.GREEN + Style.BRIGHT + notebook_count + "\n"+ Style.RESET_ALL)
-            else:
-                # shutil.rmtree(env_path)
-                sys.exit(Fore.RED + "\nInvalid Notbooks count")
+    for key in keys:
+        status = False
+        try:
+            with open(os.path.dirname(os.getcwd())+'/modules/'+module_name+'/variables.tf', 'r') as myfile:
+                for line in myfile:
+                    if ('variable "'+key+'"' in line):
+                        # print (key + ": Found")
+                        status = True
+                        break
+        except:
+            sys.exit(Fore.RED + 'variables.tf missing for module: ' + module_name)
 
-            # Requesting Trusted Users
-            trusted_users = get_trusted_users(trusted_users, domain)
+        # Check if an invalid variable is passed!
+        if(status == False):
+            sys.exit(Fore.RED + 'Variable: ' + key + ' passed in input file, do not exist in variables.tf file of '+ module_name +' module.')
+    # print(varcontents)
+    return True
 
-            return notebook_count,trusted_users
+def create_tfvars(env_path,varcontents):
 
-    elif(selected_module == OPTION_MODULE_GENOMICS):
+    #Check if any variable exist
+    if(bool(varcontents) == True):
+        #Creating terraform.tfvars file in deployment folder
+        f=open(env_path + "/terraform.tfvars", "w+")
+        for var in varcontents:
+            f.write(var.strip()+"="+varcontents[var].strip()+"\n" )
+        f.close()
+    else:
+        print("Skipping creation of terraform.tfvars as no input file for variables...")
 
-        if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
 
-            # Requesting Trusted Users
-            trusted_users = get_trusted_users(trusted_users, domain)
-            
-            return trusted_users
+def check_basic_inputs_tfvars(varcontents):
+    try:
+        orgid = varcontents['organization_id'].strip('"')
+    except:
+        orgid = ''
+    try:
+        billing_acc = varcontents['billing_account_id'].strip('"')
+    except:
+        billing_acc = ''
+    try:
+        folderid = varcontents['folder_id'].strip('"')
+    except:
+        folderid = ''
+    try:
+        domain = varcontents['domain'].strip('"')
+    except:
+        domain = ''
+    try:
+        randomid = varcontents['random_id'].strip('"')
+    except:
+        randomid = ''
 
-def get_trusted_users(trusted_users, domain):
-    # Requesting Trusted Users
-    new_name = ''
-    while new_name != 'quit':
-        # Ask the user for a name.
-        new_name = input(Fore.YELLOW + Style.BRIGHT + "Enter the username of trusted users needing access to AI Notebooks, or enter 'quit'"+ Style.RESET_ALL + ': ')
-        new_name = new_name.strip()
-        # Add the new name to our list.
-        if(new_name != 'quit' and len(new_name.strip()) != 0):
-            if "@" in new_name:
-                new_name = new_name.split("@")[0]
-            trusted_users.append("user:" + new_name + "@" + domain)
-    # print(trusted_users)
-    return trusted_users
+    return orgid, billing_acc, folderid, domain, randomid
+
+def fetchvariables(filecontents):
+    variables = {}
+    # Check if there is any variable; If NOT do not create terraform.tfvars file
+    for x in filecontents:
+        # Skipping for commented lines
+        if x.startswith('#') or x.startswith('//'):
+            continue
+        else:
+            x = x.strip()
+            # print(x)
+            variables[x.split("=")[0].strip()] = x.split("=")[1].strip()
+
+    # print(variables)
+    if(bool(variables) == True):
+        return variables
+    else:
+        sys.exit(Fore.RED + 'No variables in the input file')
+
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents", required=False)
+    args = parser.parse_args()
+
+    if args.file is not None:
+        print("Checking input file...")
+        filecontents = args.file.readlines()
+        variables = fetchvariables(filecontents)
+    else:
+         variables  = {}
+    main(variables)
