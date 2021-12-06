@@ -24,7 +24,7 @@ Cloud Life Sciences API provides a simple way to execute a series of Compute Eng
 
 FastQC tool is built as a container and stored in the Google cloud Container registry from where it can be called. 
 
-* Once the module is deployed, to start using the pipelines, upload your fastqc files to the input GCS bucket (ngs-input-bucket-xxx), this automatically triggers the FastQC pipeline and the output QC reports and exeuction logs are stored in the output bucket (ngs-output-bucket-xxx)
+* Once the module is deployed, to start using the pipelines, upload your fastq or fastq.qz files to the input GCS bucket (ngs-input-bucket-xxx), this automatically triggers the FastQC pipeline and the output QC reports and exeuction logs are stored in the output bucket (ngs-output-bucket-xxx)
 
 
 ## Reference Architechture Diagram
