@@ -15,6 +15,13 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [3.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v3.0.0) (2021-12-06)
+
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v2.1.0...v3.0.0)
+
+### Added
+- New module to build a genomics pipeline in GCP
+
 ## [2.1.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v2.1.0) (2021-11-23)
  
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v2.0.0...v2.1.0)
