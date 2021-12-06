@@ -135,7 +135,6 @@ module "elastic_search_project" {
 | name | description | type | required | default |
 |---|---|:---: |:---:|:---:|
 | billing_account_id | Billing account ID that will be linked to the project. | <code title="">string</code> | ✓ |  |
-| organization_id | Organization ID where the project will be created. | <code title="">string</code> | ✓ |  |
 | *create_network* | Indicate if the deployment has to use a network that already exists. | <code title="">bool</code> |  | <code title="">true</code> |
 | *create_project* | Create a new project or use an existing project.  When set to true, variable project_name has to match the exact project ID of the existing project. | <code title="">bool</code> |  | <code title="">true</code> |
 | *deploy_elastic_search* | Deploy Elastic Search and Kibana. | <code title="">bool</code> |  | <code title="">true</code> |
@@ -144,7 +143,7 @@ module "elastic_search_project" {
 | *elastic_search_instance_count* | Number of instances of the Elastic Search pod. | <code title="">string</code> |  | <code title="">1</code> |
 | *elk_version* | Version for Elastic Search and Kibana. | <code title="">string</code> |  | <code title="">7.15.1</code> |
 | *enable_internet_egress_traffic* | Enable egress traffic to the internet.  Necessary to download the Elastic Search pods. | <code title="">bool</code> |  | <code title="">true</code> |
-| *folder_id* | Folder ID where the project should be created.  Leave blank if the project should be created directly underneath the Organization node. | <code title="">string</code> |  | <code title=""></code> |
+| *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node.  | <code title="">string</code> |  | <code title=""></code> |
 | *gke_cluster_name* | Name that will be assigned to the GKE cluster. | <code title="">string</code> |  | <code title="">elastic-search-cluster</code> |
 | *gke_version* | Version to be used for the GKE cluster.  Ensure that the release channel is properly set when updating this variable. | <code title="">string</code> |  | <code title="">1.20.10-gke.1600</code> |
 | *kibana_instance_count* | Number of Kibana instances deployed in the cluster. | <code title="">string</code> |  | <code title="">1</code> |
@@ -155,6 +154,7 @@ module "elastic_search_project" {
 | *node_pool_max_count* | Maximum instance count for the custom node pool. | <code title="">number</code> |  | <code title="">10</code> |
 | *node_pool_min_count* | Minimum instance count for the custom nodepool. | <code title="">number</code> |  | <code title="">1</code> |
 | *node_pool_name* | Name of the nodepool. | <code title="">string</code> |  | <code title="">elastic-search-pool</code> |
+| *organization_id* | Organization ID where the project will be created. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
 | *pod_cidr_block* | CIDR block to be assigned to pods running in the GKE cluster. | <code title="">string</code> |  | <code title="">10.100.0.0/16</code> |
 | *pod_ip_range_name* | Range name for the pod IP addresses. | <code title="">string</code> |  | <code title="">pod-ip-range</code> |
 | *preemptible_nodes* | Use preemptible VMs for the node pools | <code title="">bool</code> |  | <code title="">true</code> |

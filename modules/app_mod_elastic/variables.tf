@@ -68,7 +68,7 @@ variable "enable_internet_egress_traffic" {
 }
 
 variable "folder_id" {
-  description = "Folder ID where the project should be created.  Leave blank if the project should be created directly underneath the Organization node."
+  description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. "
   type        = string
   default     = ""
 }
@@ -135,8 +135,9 @@ variable "node_pool_name" {
 }
 
 variable "organization_id" {
-  description = "Organization ID where the project will be created."
+  description = "Organization ID where the project will be created. It can be skipped if already setting folder_id"
   type        = string
+  default     = ""
 }
 
 variable "pod_cidr_block" {
