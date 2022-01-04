@@ -197,7 +197,7 @@ resource "google_notebooks_instance" "ai_notebook" {
   network = local.network.self_link
   subnet  = local.subnet.self_link
 
-  post_startup_script = "${path.module}/scripts/build/samplenotebook.sh"
+  post_startup_script = "https://github.com/GoogleCloudPlatform/rad-lab/blob/main/modules/data_science/scripts/build/samplenotebook.sh"
 
   labels = {
     module = "data-science"
