@@ -16,11 +16,21 @@
 
 # A bash script to create folders with subfolders all in one go.
 
+# Update the image
+echo "Updating Jupyter libraries"
+jupyter lab build --dev-build=False --minimize=False
+
+# Create dir for sample scripts
+echo "Creating directory to store samples."
 mkdir -p sample/bigquery-public-data
 
+# Copy samples to the notebook
+echo "Copying sample notebooks to the instance."
 gsutil cp gs://radlab-solution-bucket/Data_Science_Model/bigquery-public-data/BigQuery_tutorial.ipynb /home/jupyter/sample/bigquery-public-data/BigQuery_tutorial.ipynb
 gsutil cp gs://radlab-solution-bucket/Data_Science_Model/bigquery-public-data/Exploring_gnomad_on_BigQuery.ipynb /home/jupyter/sample/bigquery-public-data/Exploring_gnomad_on_BigQuery.ipynb
 gsutil cp gs://radlab-solution-bucket/Data_Science_Model/bigquery-public-data/Quantum_Simulation_qsimcirq.ipynb /home/jupyter/sample/bigquery-public-data/Quantum_Simulation_qsimcirq.ipynb
+
+echo "Startup script finished."
 
 #auto-shutdown script - enable if needed
 
