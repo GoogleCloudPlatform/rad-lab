@@ -10,6 +10,9 @@ on:
       - 'modules/**/variables.tf'
       - 'modules/**/outputs.tf'
   workflow_dispatch:
+permissions:
+  pull-requests: write
+  contents: write
 
 jobs:
   build:

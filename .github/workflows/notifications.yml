@@ -19,6 +19,9 @@ on:
   schedule:
     - cron:  '*/30 * * * *' 
   workflow_dispatch:
+permissions:
+  issues: write
+
 jobs:
   build:
     runs-on: ubuntu-latest

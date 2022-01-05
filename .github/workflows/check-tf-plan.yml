@@ -26,6 +26,9 @@ on:
       PRNumber:
         description: 'PR #'     
         required: true
+permissions:
+  pull-requests: write
+  contents: read
 
 jobs:
   terraform:
