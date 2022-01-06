@@ -39,6 +39,7 @@ STATE_LIST_DEPLOYMENT = "4"
 
 def main(varcontents={}):
     
+    projid          = ""
     orgid           = ""
     folderid        = ""
     billing_acc     = ""
@@ -53,14 +54,37 @@ def main(varcontents={}):
         print("Login with Cloud Admin account...")
         os.system("gcloud auth application-default login")
 
+    # Setting up Project-ID
+    set_proj(projid)
+
+    # Listing / Selecting from available RAD Lab modules
     module_name = list_modules()
+    
+    # Validating user input Terraform variables against selected module
     validate_tfvars(varcontents, module_name)
+
+    # Setting up required attributes for any RAD Lab module deployment
     state,env_path,tfbucket,orgid,billing_acc,folderid,randomid = module_deploy_common_settings(module_name,setup_path,varcontents)
+    
+    # Utilizing Terraform Wrapper for init / apply / destroy
     env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, selected_module)
 
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
 	
+def set_proj(projid):
+    projid = os.popen("gcloud config list --format 'value(core.project)' 2>/dev/null").read().strip()
+    if(projid != ""):
+        select_proj = input("\nWhich Project would you like to use for RAD Lab management (Example - Creating/Utilizing GCS bucket where Terraform states will be stored) ? :" + "\n[1] Currently set project - " + Fore.GREEN + projid + Style.RESET_ALL + "\n[2] Enter a different Project ID" +Fore.YELLOW + Style.BRIGHT + "\nChoose a number for the RAD Lab management Project" + Style.RESET_ALL + ': ').strip()
+        if(select_proj == '2'):
+            projid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Project ID" + Style.RESET_ALL + ': ').strip()
+            os.system("gcloud config set project " + projid)
+        elif(select_proj != '1' and select_proj != '2'):
+            sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
+    else:
+        projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the Project ID for RAD Lab management" + Style.RESET_ALL + ': ').strip()
+        os.system("gcloud config set project " + projid)
+    print("\nProject ID (Selected) : " + Fore.GREEN + Style.BRIGHT + projid + Style.RESET_ALL)
 
 def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, selected_module):
     tr = Terraform(working_dir=env_path)
