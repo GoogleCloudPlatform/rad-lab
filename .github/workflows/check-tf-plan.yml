@@ -27,8 +27,9 @@ on:
         description: 'PR #'     
         required: true
 permissions:
-  pull-requests: write
   contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   terraform:
