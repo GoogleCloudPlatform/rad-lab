@@ -1,0 +1,156 @@
+/**
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+locals {
+  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  project = (var.create_project
+    ? try(module.project_radlab_gen_cromwell.0, null)
+    : try(data.google_project.existing_project.0, null)
+  )
+
+  region = var.default_region
+
+  network = (
+    var.create_network
+    ? try(module.vpc_cromwell.0.network.network, null)
+    : try(data.google_compute_network.default.0, null)
+  )
+
+  subnet = (
+    var.create_network
+    ? try(module.vpc_cromwell.0.subnets["${local.region}/${var.network_name}"], null)
+    : try(data.google_compute_subnetwork.default.0, null)
+  )
+  cromwell_sa_project_roles = [
+    "roles/lifesciences.workflowsRunner",
+    "roles/serviceusage.serviceUsageConsumer",
+    "roles/storage.objectAdmin",
+    "roles/cloudsql.client"
+  ]
+
+  project_services = var.enable_services ? [
+    "compute.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "serviceusage.googleapis.com",
+    "servicenetworking.googleapis.com",
+    "sql-component.googleapis.com",
+    "sqladmin.googleapis.com",
+    "iam.googleapis.com",
+    "lifesciences.googleapis.com"
+  ] : []
+}
+
+resource "random_id" "default" {
+  byte_length = 2
+}
+
+####################
+# Cromwell Project #
+####################
+
+data "google_project" "existing_project" {
+  count      = var.create_project ? 0 : 1
+  project_id = var.project_name
+}
+
+module "project_radlab_gen_cromwell" {
+  count   = var.create_project ? 1 : 0
+  source  = "terraform-google-modules/project-factory/google"
+  version = "~> 11.0"
+
+  name              = format("%s-%s", var.project_name, local.random_id)
+  random_project_id = false
+  folder_id         = var.folder_id
+  billing_account   = var.billing_account_id
+  org_id            = var.organization_id
+  labels = {
+    vpc-network = var.network_name
+  }
+
+  activate_apis = []
+}
+
+
+
+resource "google_project_service" "enabled_services" {
+  for_each                   = toset(local.project_services)
+  project                    = local.project.project_id
+  service                    = each.value
+  disable_dependent_services = true
+  disable_on_destroy         = true
+
+  depends_on = [
+    module.project_radlab_gen_cromwell
+  ]
+}
+
+
+//Create Cromwell service account and assign required roles
+resource "google_service_account" "cromwell_service_account" {
+  project      = local.project.project_id
+  account_id   = format("cromwell-sa-%s", local.random_id)
+  display_name = "Cromwell Service account"
+}
+
+resource "google_project_iam_member" "service_account_roles" {
+  for_each = toset(local.cromwell_sa_project_roles)
+  project  = local.project.project_id
+  role     = each.value
+  member   = "serviceAccount:${google_service_account.cromwell_service_account.email}"
+}
+
+resource "google_storage_bucket" "cromwell_workflow_bucket" {
+  name                        = "${local.project.project_id}-cromwell-wf-exec"
+  location                    = var.default_region
+  force_destroy               = true
+  uniform_bucket_level_access = true
+  project                     = local.project.project_id
+
+  cors {
+    origin          = ["http://user-scripts"]
+    method          = ["GET", "HEAD", "PUT", "POST", "DELETE"]
+    response_header = ["*"]
+    max_age_seconds = 3600
+  }
+}
+
+resource "google_storage_bucket_object" "config" {
+  name   = "provisioning/cromwell.conf"
+  bucket = google_storage_bucket.cromwell_workflow_bucket.name
+  content = templatefile("scripts/cromwell.conf", {
+    cromwell_PAPI_location = var.cromwell_PAPI_location,
+    cromwell_PAPI_endpoint = var.cromwell_PAPI_endpoint,
+    requester_pay_project  = local.project.project_id,
+    cromwell_zones         = "['${join("', '", var.cromwell_zones)}']"
+    cromwell_port          = var.cromwell_port,
+    cromwell_db_ip         = module.cromwell-mysql-db.instance_ip_address[0].ip_address,
+    cromwell_db_pass       = random_password.cromwell_db_pass.result
+  })
+}
+
+resource "google_storage_bucket_object" "bootstrap" {
+  name   = "provisioning/bootstrap.sh"
+  bucket = google_storage_bucket.cromwell_workflow_bucket.name
+  content = templatefile("scripts/bootstrap.sh", {
+    cromwell_version = var.cromwell_version,
+    bucket_url       = google_storage_bucket.cromwell_workflow_bucket.url
+  })
+}
+resource "google_storage_bucket_object" "service" {
+  name   = "provisioning/cromwell.service"
+  source = "scripts/cromwell.service"
+  bucket = google_storage_bucket.cromwell_workflow_bucket.name
+}
