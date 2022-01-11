@@ -18,7 +18,7 @@ resource "random_password" "cromwell_db_pass" {
   length  = 16
   special = false
 }
-module "cromwell-mysql-db" {
+module "cromwell_mysql_db" {
   source  = "GoogleCloudPlatform/sql-db/google//modules/mysql"
   version = "8.0.0"
 

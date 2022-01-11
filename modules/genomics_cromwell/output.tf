@@ -22,6 +22,10 @@ output "cromwell_server_instance_id" {
   description = "VM instance name running the Cromwell server"
   value       = google_compute_instance.cromwell_server.name
 }
+output "cromwell_server_zone" {
+  description = "Google Cloud zone in which the server was provisioned"
+  value       = var.default_zone
+}
 output "cromell_server_internal_IP" {
   description = "Cromwell server private IP address"
   value       = google_compute_instance.cromwell_server.network_interface[0].network_ip
@@ -35,5 +39,10 @@ output "cromwell_service_account_email" {
 output "GCS_Bucket_URL" {
   description = "Google Cloud Storage Bucket configured for workflow execution"
   value       = google_storage_bucket.cromwell_workflow_bucket.url
+}
+
+output "gcloud_iap_command" {
+  description = "To connect to the Cromwell server using Identity Aware Proxy, run the following command"
+  value       = "gcloud compute start-iap-tunnel ${google_compute_instance.cromwell_server.name} 8000 --local-host-port=localhost:8080 --zone=${var.default_zone} --project ${local.project.project_id}"
 }
 

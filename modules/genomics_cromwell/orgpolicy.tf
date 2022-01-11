@@ -37,7 +37,9 @@ resource "google_project_organization_policy" "restrict_vpc_peering_policy" {
 
   list_policy {
     allow {
-      all = true
+      values = [
+        "under:organizations/433637338589"
+      ]
     }
   }
   depends_on = [

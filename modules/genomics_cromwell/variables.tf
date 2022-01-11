@@ -62,7 +62,8 @@ variable "cromwell_sa_roles" {
     "roles/lifesciences.workflowsRunner",
     "roles/serviceusage.serviceUsageConsumer",
     "roles/storage.objectAdmin",
-    "roles/cloudsql.client"
+    "roles/cloudsql.client",
+    "roles/browser"
   ]
 }
 

@@ -97,21 +97,6 @@ resource "google_project_service" "enabled_services" {
   ]
 }
 
-
-//Create Cromwell service account and assign required roles
-resource "google_service_account" "cromwell_service_account" {
-  project      = local.project.project_id
-  account_id   = format("cromwell-sa-%s", local.random_id)
-  display_name = "Cromwell Service account"
-}
-
-resource "google_project_iam_member" "service_account_roles" {
-  for_each = toset(local.cromwell_sa_project_roles)
-  project  = local.project.project_id
-  role     = each.value
-  member   = "serviceAccount:${google_service_account.cromwell_service_account.email}"
-}
-
 resource "google_storage_bucket" "cromwell_workflow_bucket" {
   name                        = "${local.project.project_id}-cromwell-wf-exec"
   location                    = var.default_region
@@ -131,13 +116,13 @@ resource "google_storage_bucket_object" "config" {
   name   = "provisioning/cromwell.conf"
   bucket = google_storage_bucket.cromwell_workflow_bucket.name
   content = templatefile("scripts/cromwell.conf", {
-    cromwell_PAPI_location = var.cromwell_PAPI_location,
-    cromwell_PAPI_endpoint = var.cromwell_PAPI_endpoint,
-    requester_pay_project  = local.project.project_id,
-    cromwell_zones         = "['${join("', '", var.cromwell_zones)}']"
-    cromwell_port          = var.cromwell_port,
-    cromwell_db_ip         = module.cromwell-mysql-db.instance_ip_address[0].ip_address,
-    cromwell_db_pass       = random_password.cromwell_db_pass.result
+    CROMWELL_PAPI_LOCATION = var.cromwell_PAPI_location,
+    CROMWELL_PAPI_ENDPOINT = var.cromwell_PAPI_endpoint,
+    REQUESTER_PAY_PROJECT  = local.project.project_id,
+    CROMWELL_ZONES         = "['${join("', '", var.cromwell_zones)}']"
+    CROMWELL_PORT          = var.cromwell_port,
+    CROMWELL_DB_IP         = module.cromwell_mysql_db.instance_ip_address[0].ip_address,
+    CROMWELL_DB_PASS       = random_password.cromwell_db_pass.result
   })
 }
 

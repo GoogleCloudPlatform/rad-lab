@@ -13,6 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+data "google_compute_image" "debian" {
+  project = "debian-cloud"
+  family  = "debian-9"
+}
+
+//Create Cromwell service account and assign required roles
+resource "google_service_account" "cromwell_service_account" {
+  project      = local.project.project_id
+  account_id   = format("cromwell-sa-%s", local.random_id)
+  display_name = "Cromwell Service account"
+}
+
+resource "google_project_iam_member" "service_account_roles" {
+  for_each = toset(local.cromwell_sa_project_roles)
+  project  = local.project.project_id
+  role     = each.value
+  member   = "serviceAccount:${google_service_account.cromwell_service_account.email}"
+}
 
 resource "google_compute_instance" "cromwell_server" {
   project                   = local.project.project_id
@@ -23,14 +41,9 @@ resource "google_compute_instance" "cromwell_server" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-9"
+      image = data.google_compute_image.debian.self_link
     }
   }
-
-  # // Local SSD disk
-  # scratch_disk {
-  #   interface = "SCSI"
-  # }
 
   network_interface {
     network    = module.vpc_cromwell.0.network_name

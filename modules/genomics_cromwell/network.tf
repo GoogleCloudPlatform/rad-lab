@@ -100,9 +100,9 @@ module "private-service-access" {
   address       = split("/", var.db_service_network_cidr_range)[0]
   prefix_length = split("/", var.db_service_network_cidr_range)[1]
 
-  depends_on    = [
+  depends_on = [
     google_project_service.enabled_services,
     time_sleep.wait_120_seconds
-    ]
+  ]
 
 }
