@@ -75,5 +75,3 @@ The lab need to be deployed by a _Cloud Admin_ persona with the following GCP ro
 | deployment_id | RADLab Module Deployment ID |  |
 | project-radlab-genomics-id | Genomics Project ID |  |
 <!-- END TFDOC -->
-
-NOTE: `variables.tf` would list some defaults. If you would like to override or hardcode any variables, please create the `terraform.tfvars` file and set the variables there under each RAD-Lab module's folder.

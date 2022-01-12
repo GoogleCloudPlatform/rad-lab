@@ -133,8 +133,6 @@ module "existing_project_and_network" {
 | user-scripts-bucket-uri | User Script Bucket URI |  |
 <!-- END TFDOC -->
 
-NOTE: `variables.tf` would list some defaults. If you would like to override or hardcode any variables, please create the `terraform.tfvars` file and set the variables there under each RAD-Lab module's folder.
-
 ## Access RAD Lab Data Science Notebooks
 
 Follow the instructions under [gcp-ai-nootbook-tools Readme](./scripts/usage/README.md).

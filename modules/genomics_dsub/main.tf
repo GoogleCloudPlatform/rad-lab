@@ -76,44 +76,6 @@ module "vpc_ngs" {
 
 }
 
-resource "google_project_organization_policy" "external_ip_policy" {
-  count      = var.set_external_ip_policy ? 1 : 0
-  constraint = "compute.vmExternalIpAccess"
-  project    = module.project_radlab_genomics.project_id
-
-  list_policy {
-    allow {
-      all = true
-    }
-  }
-}
-
-# - Shielded VMs: constraints/compute.requireShieldedVm
-resource "google_project_organization_policy" "shielded_vm_policy" {
-  count      = var.set_shielded_vm_policy ? 1 : 0
-  constraint = "compute.requireShieldedVm"
-  project    = module.project_radlab_genomics.project_id
-
-  boolean_policy {
-    enforced = false
-  }
-}
-
-# - Define trusted image projects: constraints/compute.trustedImageProjects
-resource "google_project_organization_policy" "trustedimage_project_policy" {
-  count      = var.set_trustedimage_project_policy ? 1 : 0
-  constraint = "compute.trustedImageProjects"
-  project    = module.project_radlab_genomics.project_id
-  list_policy {
-    allow {
-      values = [
-        "is:projects/deeplearning-platform-release",
-        "is:projects/cloud-lifesciences",
-      ]
-    }
-  }
-}
-
 resource "google_service_account" "sa_p_ngs" {
   project      = module.project_radlab_genomics.project_id
   account_id   = format("sa-p-ngs-%s", local.random_id)

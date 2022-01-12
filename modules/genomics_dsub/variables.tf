@@ -61,6 +61,12 @@ variable "machine_type" {
   default     = "n1-standard-2"
 }
 
+variable "network" {
+  description = "Network associated to the project"
+  type        = string
+  default     = "ngs-network"
+}
+
 variable "organization_id" {
   description = "Organization ID where GCP Resources need to get spin up"
   type        = string
@@ -87,25 +93,31 @@ variable "region" {
 variable "set_external_ip_policy" {
   description = "Enable org policy to allow External (Public) IP addresses on virtual machines."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "set_shielded_vm_policy" {
   description = "Apply org policy to disable shielded VMs."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "set_trustedimage_project_policy" {
   description = "Apply org policy to set the trusted image projects."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "set_cloudfunctions_ingress_project_policy" {
   description = "Apply org policy to set the ingress settings for cloud functions"
   type        = bool
-  default     = true
+  default     = false
+}
+
+variable "subnet" {
+  description = "Subnet associated with the Network"
+  type        = string
+  default     = "subnet-ngs-network"
 }
 
 variable "trusted_users" {
@@ -114,21 +126,8 @@ variable "trusted_users" {
   default     = []
 }
 
-
 variable "zone" {
   description = "Cloud Zone associated to the project"
   type        = string
   default     = "europe-west2-*"
-}
-
-variable "network" {
-  description = "Network associated to the project"
-  type        = string
-  default     = "ngs-network"
-}
-
-variable "subnet" {
-  description = "Subnet associated with the Network"
-  type        = string
-  default     = "subnet-ngs-network"
 }
