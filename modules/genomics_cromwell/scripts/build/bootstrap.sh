@@ -27,13 +27,13 @@ if [[ -f /etc/startup_was_launched ]]; then exit 0; fi
 # Install Packages needed
 apt-get update
 apt-get install -y git wget openjdk-11-jdk
-wget https://github.com/broadinstitute/cromwell/releases/download/${cromwell_version}/cromwell-${cromwell_version}.jar
+wget https://github.com/broadinstitute/cromwell/releases/download/${CROMWELL_VERSION}/cromwell-${CROMWELL_VERSION}.jar
 mkdir /opt/cromwell
-mv cromwell-${cromwell_version}.jar /opt/cromwell/cromwell.jar
+mv cromwell-${CROMWELL_VERSION}.jar /opt/cromwell/cromwell.jar
 
 # Copy Config and Service files from Bucket
-gsutil cp ${bucket_url}/provisioning/cromwell.conf /opt/cromwell/cromwell.conf
-gsutil cp ${bucket_url}/provisioning/cromwell.service /etc/systemd/system/cromwell.service
+gsutil cp ${BUCKET_URL}/provisioning/cromwell.conf /opt/cromwell/cromwell.conf
+gsutil cp ${BUCKET_URL}/provisioning/cromwell.service /etc/systemd/system/cromwell.service
 
 # Reload linux daemons and start the service
 systemctl daemon-reload

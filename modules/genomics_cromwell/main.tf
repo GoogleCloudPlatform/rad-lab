@@ -115,27 +115,30 @@ resource "google_storage_bucket" "cromwell_workflow_bucket" {
 resource "google_storage_bucket_object" "config" {
   name   = "provisioning/cromwell.conf"
   bucket = google_storage_bucket.cromwell_workflow_bucket.name
-  content = templatefile("scripts/cromwell.conf", {
-    CROMWELL_PAPI_LOCATION = var.cromwell_PAPI_location,
-    CROMWELL_PAPI_ENDPOINT = var.cromwell_PAPI_endpoint,
-    REQUESTER_PAY_PROJECT  = local.project.project_id,
-    CROMWELL_ZONES         = "['${join("', '", var.cromwell_zones)}']"
-    CROMWELL_PORT          = var.cromwell_port,
-    CROMWELL_DB_IP         = module.cromwell_mysql_db.instance_ip_address[0].ip_address,
-    CROMWELL_DB_PASS       = random_password.cromwell_db_pass.result
+  content = templatefile("scripts/build/cromwell.conf", {
+    CROMWELL_PROJECT         = local.project.project_id,
+    CROMWELL_ROOT_BUCKET     = google_storage_bucket.cromwell_workflow_bucket.url,
+    CROMWELL_SERVICE_ACCOUNT = google_service_account.cromwell_service_account.email,
+    CROMWELL_PAPI_LOCATION   = var.cromwell_PAPI_location,
+    CROMWELL_PAPI_ENDPOINT   = var.cromwell_PAPI_endpoint,
+    REQUESTER_PAY_PROJECT    = local.project.project_id,
+    CROMWELL_ZONES           = "['${join("', '", var.cromwell_zones)}']"
+    CROMWELL_PORT            = var.cromwell_port,
+    CROMWELL_DB_IP           = module.cromwell_mysql_db.instance_ip_address[0].ip_address,
+    CROMWELL_DB_PASS         = random_password.cromwell_db_pass.result
   })
 }
 
 resource "google_storage_bucket_object" "bootstrap" {
   name   = "provisioning/bootstrap.sh"
   bucket = google_storage_bucket.cromwell_workflow_bucket.name
-  content = templatefile("scripts/bootstrap.sh", {
-    cromwell_version = var.cromwell_version,
-    bucket_url       = google_storage_bucket.cromwell_workflow_bucket.url
+  content = templatefile("scripts/build/bootstrap.sh", {
+    CROMWELL_VERSION = var.cromwell_version,
+    BUCKET_URL       = google_storage_bucket.cromwell_workflow_bucket.url
   })
 }
 resource "google_storage_bucket_object" "service" {
   name   = "provisioning/cromwell.service"
-  source = "scripts/cromwell.service"
+  source = "scripts/build/cromwell.service"
   bucket = google_storage_bucket.cromwell_workflow_bucket.name
 }
