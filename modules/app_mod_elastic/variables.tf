@@ -197,13 +197,13 @@ variable "service_ip_range_name" {
 variable "set_shielded_vm_policy" {
   description = "Apply org policy to disable shielded VMs."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "set_vpc_peering_policy" {
   description = "Enable org policy to VPC Peering"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "subnet_name" {

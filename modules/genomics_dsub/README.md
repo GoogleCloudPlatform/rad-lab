@@ -57,7 +57,8 @@ The lab need to be deployed by a _Cloud Admin_ persona with the following GCP ro
 | *ip_cidr_range* | Unique IP CIDR Range for ngs subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
 | *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-2</code> |
 | *network* | Network associated to the project | <code title="">string</code> |  | <code title="">ngs-network</code> |
-| *random_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">226</code> |
+| *project_name* | Name of the project that should be used. | <code title="">string</code> |  | <code title="">radlab-genomics</code> |
+| *random_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *region* | Cloud Zone associated to the project | <code title="">string</code> |  | <code title="">europe-west2</code> |
 | *set_cloudfunctions_ingress_project_policy* | Apply org policy to set the ingress settings for cloud functions | <code title="">bool</code> |  | <code title="">true</code> |
 | *set_external_ip_policy* | Enable org policy to allow External (Public) IP addresses on virtual machines. | <code title="">bool</code> |  | <code title="">true</code> |
@@ -71,7 +72,6 @@ The lab need to be deployed by a _Cloud Admin_ persona with the following GCP ro
 
 | name | description | sensitive |
 |---|---|:---:|
-| default_account | default compute service account |  |
 | deployment_id | RADLab Module Deployment ID |  |
 | project-radlab-genomics-id | Genomics Project ID |  |
 <!-- END TFDOC -->

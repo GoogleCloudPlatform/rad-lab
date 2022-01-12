@@ -111,19 +111,19 @@ variable "random_id" {
 variable "set_external_ip_policy" {
   description = "Enable org policy to allow External (Public) IP addresses on virtual machines."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "set_shielded_vm_policy" {
   description = "Apply org policy to disable shielded VMs."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "set_trustedimage_project_policy" {
   description = "Apply org policy to set the trusted image projects."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "subnet_name" {

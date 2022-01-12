@@ -49,6 +49,9 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
 8. The following information about your Google Cloud Platform (GCP) environment is typically needed to launch RAD Lab modules:
 
    * [Organization ID](https://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id)
+
+   NOTE: If you like to spin up a RAD Lab module in a GCP project without any **Organization**, make sure to disable _orgpolicy.tf_ under modules/[MODULE-NAME]/ either by deleting it or by manually setting the default value of Orgpolicy variables (example: _set_shielded_vm_policy_ & _set_vpc_peering_policy_ in [app_mod_elastic module](../modules/app_mod_elastic) in _variables.tf_ under modules/[MODULE-NAME]/ to **false**
+
    * [Billing Account](https://cloud.google.com/billing/docs/how-to/manage-billing-account) for RAD Lab deployments (projects/resources).
    * [OPTIONAL] [Folder ID](https://cloud.google.com/resource-manager/docs/creating-managing-folders#view) to deploy the module in an existing folder.
    * [OPTIONAL] [Cloud Storage Bucket](https://cloud.google.com/storage/docs/creating-buckets) with read/write access to save the Terraform state. This bucket is used to save state for all active deployments. 
