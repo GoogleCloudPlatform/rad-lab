@@ -61,6 +61,12 @@ variable "machine_type" {
   default     = "n1-standard-2"
 }
 
+variable "network" {
+  description = "Network associated to the project"
+  type        = string
+  default     = "ngs-network"
+}
+
 variable "organization_id" {
   description = "Organization ID where GCP Resources need to get spin up"
   type        = string
@@ -108,27 +114,20 @@ variable "set_cloudfunctions_ingress_project_policy" {
   default     = true
 }
 
+variable "subnet" {
+  description = "Subnet associated with the Network"
+  type        = string
+  default     = "subnet-ngs-network"
+}
+
 variable "trusted_users" {
   description = "The list of trusted users."
   type        = set(string)
   default     = []
 }
 
-
 variable "zone" {
   description = "Cloud Zone associated to the project"
   type        = string
   default     = "europe-west2-*"
-}
-
-variable "network" {
-  description = "Network associated to the project"
-  type        = string
-  default     = "ngs-network"
-}
-
-variable "subnet" {
-  description = "Subnet associated with the Network"
-  type        = string
-  default     = "subnet-ngs-network"
 }
