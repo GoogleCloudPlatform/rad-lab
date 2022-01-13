@@ -55,7 +55,7 @@ def main(varcontents={}):
         os.system("gcloud auth application-default login")
 
     # Setting up Project-ID
-    set_proj(projid)
+    projid = set_proj(projid)
 
     # Listing / Selecting from available RAD Lab modules
     module_name = list_modules()
@@ -64,10 +64,10 @@ def main(varcontents={}):
     validate_tfvars(varcontents, module_name)
 
     # Setting up required attributes for any RAD Lab module deployment
-    state,env_path,tfbucket,orgid,billing_acc,folderid,randomid = module_deploy_common_settings(module_name,setup_path,varcontents)
+    state,env_path,tfbucket,orgid,billing_acc,folderid,randomid = module_deploy_common_settings(module_name,setup_path,varcontents,projid)
     
     # Utilizing Terraform Wrapper for init / apply / destroy
-    env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, selected_module)
+    env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, projid)
 
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
@@ -85,8 +85,9 @@ def set_proj(projid):
         projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the Project ID for RAD Lab management" + Style.RESET_ALL + ': ').strip()
         os.system("gcloud config set project " + projid)
     print("\nProject ID (Selected) : " + Fore.GREEN + Style.BRIGHT + projid + Style.RESET_ALL)
+    return projid
 
-def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, selected_module):
+def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, projid):
     tr = Terraform(working_dir=env_path)
     return_code, stdout, stderr = tr.init_cmd(capture_output=False)
     
@@ -100,25 +101,39 @@ def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, selec
         print(stderr)
         sys.exit(Fore.RED + Style.BRIGHT + "\nError Occured - Deployment failed for ID: "+ randomid+"\n"+ "Retry using above Deployment ID" +Style.RESET_ALL )
     else:
-        target_path = 'gs://'+ tfbucket +'/radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments'
+        target_path = 'radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments'
+
         if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
 
             if glob.glob(env_path + '/*.tf'):
-                os.system('gsutil -q -m cp -r ' + env_path + '/*.tf ' + target_path)
+                upload_from_directory(projid, env_path, '/*.tf', tfbucket, target_path)
             if glob.glob(env_path + '/*.json'):   
-                os.system('gsutil -q -m cp -r ' + env_path + '/*.json ' + target_path)
+                upload_from_directory(projid, env_path, '/*.json', tfbucket, target_path)
             if glob.glob(env_path + '/elk'):
-                os.system('gsutil -q -m cp -r ' + env_path + '/elk ' + target_path)
+                upload_from_directory(projid, env_path, '/elk/**', tfbucket, target_path)
             if glob.glob(env_path + '/scripts'):
-                os.system('gsutil -q -m cp -r -P ' + env_path + '/scripts ' + target_path)
+                upload_from_directory(projid, env_path, '/scripts/**', tfbucket, target_path)
             if glob.glob(env_path + '/templates'):
-                os.system('gsutil -q -m cp -r ' + env_path + '/templates ' + target_path)
+                upload_from_directory(projid, env_path, '/templates/**', tfbucket, target_path)
 
         elif(state == STATE_DELETE_DEPLOYMENT):
-            deltfgcs(tfbucket, 'radlab/'+ env_path.split('/')[len(env_path.split('/'))-1])
+            deltfgcs(tfbucket, 'radlab/'+ env_path.split('/')[len(env_path.split('/'))-1], projid)
 
     # Deleting Local deployment config
     shutil.rmtree(env_path)
+
+
+def upload_from_directory(projid, directory_path: str, content: str, dest_bucket_name: str, dest_blob_name: str):
+    rel_paths = glob.glob(directory_path + content, recursive=True)
+
+    bucket = storage.Client(project=projid).get_bucket(dest_bucket_name)
+    for local_file in rel_paths:
+        file = local_file.replace(directory_path,'')
+        remote_path = f'{dest_blob_name}/{"/".join(file.split(os.sep)[1:])}'
+
+        if os.path.isfile(local_file):
+            blob = bucket.blob(remote_path)
+            blob.upload_from_filename(local_file)
 
 def select_state():
     state = input("\nAction to perform for RAD Lab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RAD Lab Module Deployment Action"+ Style.RESET_ALL + ': ').strip()
@@ -143,17 +158,19 @@ def basic_input(orgid, billing_acc, folderid, randomid):
 
     # Selecting Folder ID
     if(folderid == ''):
-        folderid = input(Fore.YELLOW + Style.BRIGHT + "\nFolder ID"+ Style.RESET_ALL + ': ').strip()
+        x = input("\nSet Folder ID ?\n[1] Enter Manually\n[2] Skip setting Folder ID\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
+        if(x == '1'):
+            folderid = input(Fore.YELLOW + Style.BRIGHT + "\nFolder ID"+ Style.RESET_ALL + ': ').strip()
+        elif(x == '2'):
+            print("Skipped setting Folder ID...")
+        else:
+            sys.exit(Fore.RED + "\nError Occured - INVALID CHOICE\n"+ Style.RESET_ALL)
 
     # Folder ID Validation
     if (folderid.strip() and folderid.strip().isdecimal() == False):
         sys.exit(Fore.RED + "\nError Occured - INVALID FOLDER ID ACCOUNT\n")
 
     print("\nFolder ID (Selected) : " + Fore.GREEN + Style.BRIGHT + folderid + Style.RESET_ALL )
-
-    # Check if either Org ID or Folder ID is set.
-    if(orgid == '' and folderid == ''):
-        sys.exit(Fore.RED + "\nNeither Org ID nor Folder ID configured!\n")
 
     # Selecting Billing Account
     if(billing_acc == ''):
@@ -201,9 +218,9 @@ def get_env(env_path):
 
     return orgid, billing_acc, folderid
 
-def setlocaldeployment(tfbucket,prefix, env_path):
+def setlocaldeployment(tfbucket, prefix, env_path, projid):
 
-    if(blob_exists(tfbucket, prefix)):
+    if(blob_exists(tfbucket, prefix, projid)):
 
         # Checking if 'deployment' folder exist in local. If YES, delete the same.
         delifexist(env_path)
@@ -212,7 +229,7 @@ def setlocaldeployment(tfbucket,prefix, env_path):
         os.makedirs(env_path)
 
         # Copy Terraform deployment configs from GCS to Local
-        if(os.system('gsutil -q -m cp -r -P gs://'+ tfbucket +'/radlab/'+ prefix +'/deployments/* ' + env_path) == 0):
+        if(download_blob(projid, tfbucket, prefix, env_path) == True):
             print("Terraform state downloaded to local...")
         else:
             print(Fore.RED + "\nError Occured whiled downloading Deployment Configs from GCS. Checking if the deployment exist locally...\n")
@@ -223,26 +240,38 @@ def setlocaldeployment(tfbucket,prefix, env_path):
     else:
         sys.exit(Fore.RED + "\nThe deployment with the entered ID do not exist !\n")
 
+def download_blob(projid, tfbucket, prefix, env_path):
+    """Downloads a blob from the bucket."""
+    try:
+        bucket_dir = 'radlab/'+ prefix + '/deployments/'
+        local_dir = env_path + '/'
+
+        storage_client = storage.Client(project=projid)
+        bucket = storage_client.get_bucket(tfbucket)
+        blobs = bucket.list_blobs(prefix = bucket_dir) # Get list of files
+
+        for blob in blobs:
+            content = blob.name.replace(bucket_dir,'')
+            # Create Nested Folders structure in Local Directory
+            if '/' in content:
+                if(os.path.isdir(local_dir + os.path.dirname(content)) == False):
+                    os.makedirs(local_dir + os.path.dirname(content)) 
+            # Download file
+            blob.download_to_filename(local_dir + content) # Download
+        return True
+        
+    except: 
+        return False
+
 def get_random_alphanumeric_string(length):
 	letters_and_digits = string.ascii_lowercase + string.digits
 	result_str = ''.join((random.choice(letters_and_digits) for i in range(length)))
 	# print("Random alphanumeric String is:", result_str)
 	return result_str
 
-# def getdomain(orgid):
-#     credentials = GoogleCredentials.get_application_default()
-#     service = discovery.build('cloudresourcemanager', 'v1', credentials=credentials)
-#     # The resource name of the Organization to fetch, e.g. "organizations/1234".
-#     name = 'organizations/'+orgid
-
-#     request = service.organizations().get(name=name)
-#     response = request.execute()
-#     # print(response['displayName'])
-#     return response['displayName']
-
 def getbillingacc():
 
-    x = input("\nHow would you like to fetch the Billing Account ?\n[1] Enter Manually\n[2] Select from the List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
+    x = input("\nSet Billing Account ?\n[1] Enter Manually\n[2] Select from the List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
 
     if(x == '1'):
         billing_acc = input(Fore.YELLOW + Style.BRIGHT + "Enter the Billing Account ( Example format - ABCDEF-GHIJKL-MNOPQR )" + Style.RESET_ALL + ': ').strip()
@@ -277,7 +306,7 @@ def getbillingacc():
 
 def getorgid():
 
-    x = input("\nHow would you like to fetch the Org ID ?\n[1] Enter Manually\n[2] Select from the List\n[3] Skip setting Org ID\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
+    x = input("\nSet Org ID ?\n[1] Enter Manually\n[2] Select from the List\n[3] Skip setting Org ID\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
     
     if(x == '1'):
         orgid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Org ID ( Example format - 1234567890 )" + Style.RESET_ALL + ': ').strip()
@@ -309,7 +338,7 @@ def getorgid():
             sys.exit(Fore.RED + "\nError Occured - INVALID ORG ID SELECTED\n"+ Style.RESET_ALL)
             
     elif(x == '3'):
-        print("Skipped setting Org ID. Its now mandatory to set the Folder ID")
+        print("Skipped setting Org ID...")
         return ''
 
     else:
@@ -320,16 +349,15 @@ def delifexist(env_path):
     if(os.path.isdir(env_path)):
         shutil.rmtree(env_path)
 
-def getbucket(state):
+def getbucket(state,projid):
     """Lists all buckets."""
-
-    storage_client = storage.Client()
+    storage_client = storage.Client(project=projid)
     bucketoption = ''
 
-    if(state == '1'):
-        bucketoption = input("\nWant to use existing GCS Bucket for Terraform configs or Create Bucket ?:\n[1] Use Existing Bucket\n[2] Create New Bucket\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ')
+    if(state == STATE_CREATE_DEPLOYMENT):
+        bucketoption = input("\nWant to use existing GCS Bucket for Terraform configs or Create Bucket ?:\n[1] Use Existing Bucket\n[2] Create New Bucket\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
     
-    if(bucketoption == '1' or state == '2' or state == '3' or state == '4'):
+    if(bucketoption == '1' or state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT or state == STATE_LIST_DEPLOYMENT):
         try:
             buckets = storage_client.list_buckets()
 
@@ -366,20 +394,19 @@ def getbucket(state):
         # Creates the new bucket
         # Note: These samples create a bucket in the default US multi-region with a default storage class of Standard Storage. 
         # To create a bucket outside these defaults, see [Creating storage buckets](https://cloud.google.com/storage/docs/creating-buckets).
-        projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the project ID under which the bucket is to be created " + Style.RESET_ALL + ': ')
-        bucket = storage_client.create_bucket('radlab-'+bucketprefix,project=projid)
+        bucket = storage_client.create_bucket('radlab-'+bucketprefix)
 
         print("Bucket {} created.".format(bucket.name))
         return bucket.name
     else:
         sys.exit(Fore.RED + "\nInvalid Choice")
 
-def settfstategcs(env_path, prefix, tfbucket):
+def settfstategcs(env_path, prefix, tfbucket, projid):
 
     prefix   = "radlab/"+prefix+"/terraform_state"
 
     # Validate Terraform Bucket ID
-    client = storage.Client()
+    client = storage.Client(project=projid)
     try:
         bucket = client.get_bucket(tfbucket)
         # print(bucket)
@@ -391,8 +418,8 @@ def settfstategcs(env_path, prefix, tfbucket):
     f.write('terraform {\n  backend "gcs"{\n    bucket="'+tfbucket+'"\n    prefix="'+prefix+'"\n  }\n}')
     f.close()
 
-def deltfgcs(tfbucket, prefix):
-    storage_client = storage.Client()
+def deltfgcs(tfbucket, prefix,projid):
+    storage_client = storage.Client(project=projid)
     bucket = storage_client.get_bucket(tfbucket)
 
     blobs = bucket.list_blobs(prefix=prefix)
@@ -400,17 +427,17 @@ def deltfgcs(tfbucket, prefix):
     for blob in blobs:
         blob.delete()
 
-def blob_exists(tfbucket, prefix):
-    storage_client = storage.Client()
+def blob_exists(tfbucket, prefix, projid):
+    storage_client = storage.Client(project=projid)
     bucket = storage_client.get_bucket(tfbucket)
     blob = bucket.blob('radlab/'+ prefix+'/deployments/main.tf')
     # print(blob.exists())
     return blob.exists()
 
-def list_radlab_deployments(tfbucket, module_name):
+def list_radlab_deployments(tfbucket, module_name, projid):
     """Lists all the blobs in the bucket that begin with the prefix."""
 
-    storage_client = storage.Client()
+    storage_client = storage.Client(project=projid)
     bucket = storage_client.get_bucket(tfbucket)
     iterator = bucket.list_blobs(prefix='radlab/',delimiter='/')
     response = iterator._get_next_page_response()
@@ -419,7 +446,6 @@ def list_radlab_deployments(tfbucket, module_name):
     for prefix in response['prefixes']:
         if module_name in prefix:
             print(Fore.GREEN + Style.BRIGHT + prefix.split('/')[1] + Style.RESET_ALL)
-
 
 def list_modules():
     modules = [s.replace(os.path.dirname(os.getcwd()) + '/modules/', "") for s in glob.glob(os.path.dirname(os.getcwd()) + '/modules/*')]
@@ -457,13 +483,12 @@ def list_modules():
     else:
         sys.exit(Fore.RED + "\nInvalid module")
 
-
-def module_deploy_common_settings(module_name,setup_path,varcontents):
+def module_deploy_common_settings(module_name,setup_path,varcontents,projid):
     # Select Action to perform
     state = select_state()
 
     # Get Terraform Bucket Details
-    tfbucket = getbucket(state.strip())
+    tfbucket = getbucket(state.strip(),projid)
     print("\nGCS bucket for Terraform config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
     # Setting Org ID, Billing Account, Folder ID
@@ -486,7 +511,7 @@ def module_deploy_common_settings(module_name,setup_path,varcontents):
         shutil.copytree(os.path.dirname(os.getcwd()) + '/modules/'+module_name, env_path)
         
         # Set Terraform states remote backend as GCS
-        settfstategcs(env_path,prefix,tfbucket)
+        settfstategcs(env_path,prefix,tfbucket,projid)
 
         # Create file with billing/org/folder details
         create_tfvars(env_path,varcontents)
@@ -510,7 +535,7 @@ def module_deploy_common_settings(module_name,setup_path,varcontents):
             env_path = setup_path+'/deployments/'+prefix
             
             # Setting Local Deployment
-            setlocaldeployment(tfbucket,prefix,env_path)
+            setlocaldeployment(tfbucket,prefix,env_path,projid)
 
         else:
             sys.exit(Fore.RED + "\nInvalid deployment ID!\n")
@@ -519,7 +544,7 @@ def module_deploy_common_settings(module_name,setup_path,varcontents):
         orgid, billing_acc, folderid = get_env(env_path)
         
         # Set Terraform states remote backend as GCS
-        settfstategcs(env_path,prefix,tfbucket)
+        settfstategcs(env_path,prefix,tfbucket,projid)
 
         # Create file with billing/org/folder details
         if(state == STATE_UPDATE_DEPLOYMENT):
@@ -533,7 +558,7 @@ def module_deploy_common_settings(module_name,setup_path,varcontents):
         return state,env_path,tfbucket,orgid,billing_acc,folderid,randomid
 
     elif(state == STATE_LIST_DEPLOYMENT):
-        list_radlab_deployments(tfbucket, module_name)
+        list_radlab_deployments(tfbucket, module_name, projid)
         sys.exit()
 
     else:
@@ -542,8 +567,9 @@ def module_deploy_common_settings(module_name,setup_path,varcontents):
 def validate_tfvars(varcontents, module_name):
 
     keys = list(varcontents.keys())
-    print("Variables in file:")
-    print(keys)
+    if keys:
+        print("Variables in file:")
+        print(keys)
 
     for key in keys:
         status = False
@@ -574,7 +600,6 @@ def create_tfvars(env_path,varcontents):
         f.close()
     else: 
         print("Skipping creation of terraform.tfvars as no input file for variables...")
-
 
 def check_basic_inputs_tfvars(varcontents):
     try:
