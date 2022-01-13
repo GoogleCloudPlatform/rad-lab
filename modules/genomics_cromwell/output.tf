@@ -15,7 +15,7 @@
  */
 
 output "project_id" {
-  description = "Project ID where resrouces where created"
+  description = "Project ID where resources where created"
   value       = local.project.project_id
 }
 output "cromwell_server_instance_id" {
