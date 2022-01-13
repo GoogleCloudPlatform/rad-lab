@@ -34,12 +34,7 @@ locals {
     ? try(module.vpc_cromwell.0.subnets["${local.region}/${var.network_name}"], null)
     : try(data.google_compute_subnetwork.default.0, null)
   )
-  cromwell_sa_project_roles = [
-    "roles/lifesciences.workflowsRunner",
-    "roles/serviceusage.serviceUsageConsumer",
-    "roles/storage.objectAdmin",
-    "roles/cloudsql.client"
-  ]
+  cromwell_sa_project_roles = formatlist("${local.project.project_id}=>%s", var.cromwell_sa_roles)
 
   project_services = var.enable_services ? [
     "compute.googleapis.com",
@@ -118,11 +113,12 @@ resource "google_storage_bucket_object" "config" {
   content = templatefile("scripts/build/cromwell.conf", {
     CROMWELL_PROJECT         = local.project.project_id,
     CROMWELL_ROOT_BUCKET     = google_storage_bucket.cromwell_workflow_bucket.url,
-    CROMWELL_SERVICE_ACCOUNT = google_service_account.cromwell_service_account.email,
+    CROMWELL_VPC             = var.network_name
+    CROMWELL_SERVICE_ACCOUNT = module.cromwell_service_account.email,
     CROMWELL_PAPI_LOCATION   = var.cromwell_PAPI_location,
     CROMWELL_PAPI_ENDPOINT   = var.cromwell_PAPI_endpoint,
     REQUESTER_PAY_PROJECT    = local.project.project_id,
-    CROMWELL_ZONES           = "['${join("', '", var.cromwell_zones)}']"
+    CROMWELL_ZONES           = "[${join(", ", var.cromwell_zones)}]"
     CROMWELL_PORT            = var.cromwell_port,
     CROMWELL_DB_IP           = module.cromwell_mysql_db.instance_ip_address[0].ip_address,
     CROMWELL_DB_PASS         = random_password.cromwell_db_pass.result

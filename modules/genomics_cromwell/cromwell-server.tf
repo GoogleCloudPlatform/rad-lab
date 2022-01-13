@@ -15,21 +15,23 @@
  */
 data "google_compute_image" "debian" {
   project = "debian-cloud"
-  family  = "debian-9"
+  family  = "debian-10"
 }
-
 //Create Cromwell service account and assign required roles
-resource "google_service_account" "cromwell_service_account" {
-  project      = local.project.project_id
-  account_id   = format("cromwell-sa-%s", local.random_id)
-  display_name = "Cromwell Service account"
+module "cromwell_service_account" {
+  source        = "terraform-google-modules/service-accounts/google"
+  version       = "4.0.3"
+  project_id    = local.project.project_id
+  names         = [format("cromwell-sa-%s", local.random_id)]
+  display_name  = "Cromwell Service account"
+  description   = "Service Account used to run Cromwell server and worker VMs"
+  project_roles = local.cromwell_sa_project_roles
 }
 
-resource "google_project_iam_member" "service_account_roles" {
-  for_each = toset(local.cromwell_sa_project_roles)
-  project  = local.project.project_id
-  role     = each.value
-  member   = "serviceAccount:${google_service_account.cromwell_service_account.email}"
+resource "google_service_account_iam_member" "cromwell_account_iam" {
+  service_account_id = module.cromwell_service_account.service_account.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${module.cromwell_service_account.email}"
 }
 
 resource "google_compute_instance" "cromwell_server" {
@@ -58,7 +60,7 @@ resource "google_compute_instance" "cromwell_server" {
 
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-    email  = google_service_account.cromwell_service_account.email
+    email  = module.cromwell_service_account.email
     scopes = ["cloud-platform"]
   }
   depends_on = [

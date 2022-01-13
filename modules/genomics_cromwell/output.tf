@@ -33,7 +33,7 @@ output "cromell_server_internal_IP" {
 
 output "cromwell_service_account_email" {
   description = "Email address of service account running the server and worker nodes"
-  value       = google_service_account.cromwell_service_account.email
+  value       = module.cromwell_service_account.email
 }
 
 output "GCS_Bucket_URL" {
