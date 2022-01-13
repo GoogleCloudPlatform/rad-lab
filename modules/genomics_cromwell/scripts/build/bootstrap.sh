@@ -35,6 +35,10 @@ mv cromwell-${CROMWELL_VERSION}.jar /opt/cromwell/cromwell.jar
 gsutil cp ${BUCKET_URL}/provisioning/cromwell.conf /opt/cromwell/cromwell.conf
 gsutil cp ${BUCKET_URL}/provisioning/cromwell.service /etc/systemd/system/cromwell.service
 
+#Delete Config file as no longer needed on the bucket
+gsutil rm ${BUCKET_URL}/provisioning/cromwell.conf
+gsutil rm ${BUCKET_URL}/provisioning/cromwell.service
+
 # Reload linux daemons and start the service
 systemctl daemon-reload
 systemctl start cromwell.service
