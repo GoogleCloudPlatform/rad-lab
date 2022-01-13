@@ -38,7 +38,7 @@ resource "google_project_organization_policy" "restrict_vpc_peering_policy" {
   list_policy {
     allow {
       values = [
-        "under:organizations/433637338589"
+        "under:organizations/433637338589" // Google organization ID, where the Cloud SQL instance is created.
       ]
     }
   }
