@@ -22,10 +22,17 @@ module "cromwell_service_account" {
   source        = "terraform-google-modules/service-accounts/google"
   version       = "4.0.3"
   project_id    = local.project.project_id
-  names         = [format("cromwell-sa-%s", local.random_id)]
+  names         = ["cromwell-sa"]
   display_name  = "Cromwell Service account"
   description   = "Service Account used to run Cromwell server and worker VMs"
-  project_roles = local.cromwell_sa_project_roles
+}
+
+
+resource "google_project_iam_member" "service_account_roles" {
+  for_each = toset(var.cromwell_sa_roles)
+  project  = local.project.project_id
+  role     = each.value
+  member   = "serviceAccount:${module.cromwell_service_account.email}"
 }
 
 resource "google_service_account_iam_member" "cromwell_account_iam" {

@@ -34,7 +34,6 @@ locals {
     ? try(module.vpc_cromwell.0.subnets["${local.region}/${var.network_name}"], null)
     : try(data.google_compute_subnetwork.default.0, null)
   )
-  cromwell_sa_project_roles = formatlist("${local.project.project_id}=>%s", var.cromwell_sa_roles)
 
   project_services = var.enable_services ? [
     "compute.googleapis.com",
