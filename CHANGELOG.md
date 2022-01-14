@@ -15,12 +15,28 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [4.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v4.0.0) (2022-01-14)
+
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v3.0.0...v4.0.0)
+
+### Added
+- _RAD Lab Module:_ RAD Lab Genomics-Cromwell Module [(039d522)](https://github.com/GoogleCloudPlatform/rad-lab/commit/039d52256d82d166ba03c4787e28ea6ebd7b0bae)
+- _RAD Lab Launcher:_ Spinning up radlab modules via RAD Lab Launcher without an Organization [(f48cd8c)](https://github.com/GoogleCloudPlatform/rad-lab/commit/f48cd8c8a187ba5ed2e9d7a96e175f3327d406c3) [(#29)](https://github.com/GoogleCloudPlatform/rad-lab/issues/29)
+
+### Changed
+- _Repo:_ Setting up permissions in the GitHub Action workflows [(9351b47)](https://github.com/GoogleCloudPlatform/rad-lab/commit/9351b475ce29fe0809009c3030a8917287805cba)
+- _RAD Lab Launcher:_ Launcher to prompt for Project ID for RAD Lab management [(a2c42af)](https://github.com/GoogleCloudPlatform/rad-lab/commit/a2c42af9f272adad6aa9fa5d2aa5d4a3949d7cee) [(#9)](https://github.com/GoogleCloudPlatform/rad-lab/issues/9)
+- _RAD Lab Module:_ Updated AI Notebook Image to include sample notebook for Data Science RAD Lab Module [(05985fa)](https://github.com/GoogleCloudPlatform/rad-lab/commit/05985faa0d18b5ebb132e7cd138422e3e00c6a8f)
+
+### Fixed
+- _Repo:_ Fixed GitHub Action Workflow - Build Module README [(3d7e7b8)](https://github.com/GoogleCloudPlatform/rad-lab/commit/3d7e7b81060e05f41a6b12ad79f95eae93ab10a8) [(#38)](https://github.com/GoogleCloudPlatform/rad-lab/issues/38)
+
 ## [3.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v3.0.0) (2021-12-06)
 
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v2.1.0...v3.0.0)
 
 ### Added
-- New module to build a genomics pipeline in GCP
+- _RAD Lab Module:_ RAD Lab Genomics-databiosphere dsub Module [(febc5f2)](https://github.com/GoogleCloudPlatform/rad-lab/commit/febc5f28d1b9c2fb91b4992ce2884f575d16d8a2)
 
 ## [2.1.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v2.1.0) (2021-11-23)
  
