@@ -1,5 +1,19 @@
 # .github/workflows/build-module-readme.yml
 
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: 'BUILD - Module README.md'
 
 on:
@@ -11,7 +25,6 @@ on:
       - 'modules/**/outputs.tf'
   workflow_dispatch:
 permissions:
-  pull-requests: write
   contents: write
 
 jobs:
@@ -19,39 +32,16 @@ jobs:
     name: 'Module README Variables/Outputs'
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      TF_IN_AUTOMATION: true
+      WORKFLOW_EMAIL: ${{ secrets.WORKFLOW_EMAIL }}
+      WORKFLOW_USERNAME: ${{ secrets.WORKFLOW_USERNAME }}
+      WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.WORKFLOW_PAT }}
-
-      - id: files
-        uses: jitterbit/get-changed-files@v1
-        with:
-          format: 'json'
-        continue-on-error: true
-
-      - name: Get added and modified files
-        run: |
-          readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
-          for added_modified_file in "${added_modified_files[@]}"; do
-            echo "File Added/Modified : ${added_modified_file}" 
-          done
-          DIR="$(dirname ${added_modified_files[0]})"
-          echo "ENV_DIR=${DIR}" >> $GITHUB_ENV
-        continue-on-error: true
-
-      - name: Get removed files
-        run: |
-          readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
-          for removed_file in ${removed_files[@]}; do
-            echo "File Removed : ${removed_file}" 
-          done
-          DIR="$(dirname ${removed_files[0]})"
-          echo "ENV_DIR=${DIR}" >> $GITHUB_ENV
-        continue-on-error: true
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
 
       - name: setup python
         uses: actions/setup-python@v2
@@ -63,19 +53,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
         working-directory: tools
-
-      - name: execute py script # run the tfdoc.py
+        
+      - name: execute py script # run the build_readme.py
         run: |
-          python tfdoc.py ${GITHUB_WORKSPACE}/${{ env.ENV_DIR }}
-        working-directory: tools
-
-      - name: commit files
-        run: |
-          git config --local user.email ${{ secrets.WORKFLOW_EMAIL }}
-          git config --local user.name ${{ secrets.WORKFLOW_USERNAME }}
-          git add -A
-          git commit -m "[WORKFLOW] Auto updating RAD-Lab Module README.md" -a
-
-      - name: push changes
-        run: |
-          git push -u origin main
+          python build_readme.py
+        working-directory: tools   
