@@ -11,7 +11,7 @@ This module allows the user to create an Elasticsearch cluster, deployed on a GK
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher).
 
-![](../../docs/images/AppModElasticSearch.png)
+![](../../docs/images/V2_AppModElasticSearch.png)
 
 ## Prerequisites
 
