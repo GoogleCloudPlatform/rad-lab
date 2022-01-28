@@ -23,6 +23,7 @@ import glob
 import shutil
 import string
 import random
+import requests
 import argparse
 import platform
 from os import path
@@ -57,9 +58,12 @@ def main(varcontents={}):
     # Setting up Project-ID
     projid = set_proj(projid)
 
+    # Checking for User Permissions
+    checkperm(projid)
+
     # Listing / Selecting from available RAD Lab modules
     module_name = list_modules()
-    
+ 
     # Validating user input Terraform variables against selected module
     validate_tfvars(varcontents, module_name)
 
@@ -86,6 +90,44 @@ def set_proj(projid):
         os.system("gcloud config set project " + projid)
     print("\nProject ID (Selected) : " + Fore.GREEN + Style.BRIGHT + projid + Style.RESET_ALL)
     return projid
+
+def checkperm(projid):
+
+    credentials = GoogleCredentials.get_application_default()
+
+    try:
+        service1 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
+        request1 = service1.projects().get(name='projects/'+projid)
+        response1 = request1.execute()
+        print(response1['parent'])
+
+    except:
+        print('\nNo Organization associated with the project: ' + projid)
+
+    else:
+        service2 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
+        request2 = service2.organizations().getIamPolicy(resource=response1['parent'])
+        response2 = request2.execute()
+        # print(response2)
+
+        # print(response2['bindings'])
+        for x in range(len(response2['bindings'])):
+
+            if(response2['bindings'][x]['role'] == 'roles/billing.user' or response2['bindings'][x]['role'] == 'roles/resourcemanager.organizationViewer'):
+                # print("ROLE --->")
+                # print(response2['bindings'][x]['role'])
+                # print("MEMBERS --->")
+                # print(response2['bindings'][x]['members'])
+
+                token = os.popen('gcloud auth application-default print-access-token').read().strip()
+                r = requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+token)
+                currentusr = r.json()["email"]
+                # print(currentusr)
+
+                if 'user:'+currentusr in response2['bindings'][x]['members']:
+                    print('USER FOUND - Permission check passed')
+                else:
+                    sys.exit(Fore.RED + "\nError Occured - USER DO NOT HAVE REQUIRED PERMISSIONS TO SPIN UP RAD LAB MODULES\n(Review https://github.com/GoogleCloudPlatform/rad-lab#permissions for more details)" +Style.RESET_ALL )
 
 def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, projid):
     tr = Terraform(working_dir=env_path)
@@ -121,7 +163,6 @@ def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, proji
 
     # Deleting Local deployment config
     shutil.rmtree(env_path)
-
 
 def upload_from_directory(projid, directory_path: str, content: str, dest_bucket_name: str, dest_blob_name: str):
     rel_paths = glob.glob(directory_path + content, recursive=True)
