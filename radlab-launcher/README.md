@@ -50,22 +50,11 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
 
    * [Organization ID](https://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id)
 
-   NOTE: If you like to spin up a RAD Lab module in a GCP project without any **Organization**, make sure to disable _orgpolicy.tf_ under modules/[MODULE-NAME]/ either by deleting it or by manually setting the default value of Orgpolicy variables (example: _set_shielded_vm_policy_ & _set_vpc_peering_policy_ in [app_mod_elastic module](../modules/app_mod_elastic) in _variables.tf_ under modules/[MODULE-NAME]/ to **false**
+   NOTE: If you like to spin up a RAD Lab module in a GCP project without any **Organization**, make sure to disable _orgpolicy.tf_ under `modules/[MODULE-NAME]/` either by deleting it or by manually setting the default value of Orgpolicy variables (example: _set_shielded_vm_policy_ & _set_vpc_peering_policy_ in [app_mod_elastic module](../modules/app_mod_elastic) in _variables.tf_ under `modules/[MODULE-NAME]/` to **false**
 
    * [Billing Account](https://cloud.google.com/billing/docs/how-to/manage-billing-account) for RAD Lab deployments (projects/resources).
    * [OPTIONAL] [Folder ID](https://cloud.google.com/resource-manager/docs/creating-managing-folders#view) to deploy the module in an existing folder.
-   * [OPTIONAL] [Cloud Storage Bucket](https://cloud.google.com/storage/docs/creating-buckets) with read/write access to save the Terraform state. This bucket is used to save state for all active deployments. 
-   
-   
-   The launcher can create one for you if you do not have one already.
-
-9. Set the default project id where the GCS bucket exists, to store Terraform configs/state. You can use [gcloud config set](https://cloud.google.com/sdk/gcloud/reference/config/set) with project property to set the project.
-
-```
-gcloud config set project <myProject>
-```
-
-NOTE: If the default project id is not set then in the guided setup you will need to manually enter the GCS bucket name (you would like to create) where you would like to store Terraform configs/state for RAD Lab configs and also the project ID where the GCS bucket will be created.
+   * [OPTIONAL] [Cloud Storage Bucket](https://cloud.google.com/storage/docs/creating-buckets) with read/write access to save the Terraform state. This bucket is used to save state for all active deployments. The launcher can create one for you if you do not have one already.
 
 ## Deploy a RAD Lab Module
 **If you encounter errors during deployment, please see [Troubleshooting Common Problems](../../docs/TROUBLESHOOTING.md) section for a list of common problems and fixes.**  If you don't see a solution listed, please create an [Issue](https://github.com/GoogleCloudPlatform/rad-lab/issues). 
@@ -138,40 +127,9 @@ Enter the GCS Bucket name where Terraform States will be stored:
 
 NOTE: There should be a Billing associated to the above selected project for the successful creation of the GCS bucket.
 
-5. _[Can be Skipped when running on Cloud Shell]_ Set up Application Default Credentials. When you run deployment on cloud shell you see a _Warning_ about using the same credentials as the service credentials associated to the GCE VM where cloud shell is running. If you are using the same _Cloud Admin_ account for RAD Lab deployment with which you have logged in to the cloud shell then you may enter **N** or **n** or **No**, etc.
+5. This is where the Terraform RAD Lab module (example: Data Science module) will kick in and Terraform config scripts will be deployed which will spin up respective projects/services/sources, etc.
 
-NOTE: There wont be any issues if you enter **Y** or **y** or **yes**, etc even if you are using the same accounts as you will again get to authenticate in next step as part of guided set up.
-
-```
-You are running on a Google Compute Engine virtual machine.
-The service credentials associated with this virtual machine
-will automatically be used by Application Default
-Credentials, so it is not necessary to use this command.
-
-If you decide to proceed anyway, your user credentials may be visible
-to others with access to this virtual machine. Are you sure you want
-to authenticate with your personal account?
-
-**Do you want to continue (Y/n)?**
-```
-
-6. _[Can be Skipped when running on Cloud Shell]_ Authenticate as the user of whom you want to have the Application Default Credentials configured to the cloud shell. These credentials should be of the _Cloud Admin_.
-
-   * Follw the link (from the cloud shell terminal) in your browser.
-
-   * Complete the OAuth flow by Authenticating  as _Cloud Admin_ user.
-
-   * Copy the verification code from the browser and paste it on the Cloud Shell terminal waiting for the input.
-
-```
-Go to the following link in your browser:  https://accounts.google.com/o/oauth2/auth?....
-
-Enter verification code:
-```
-
-7. This is where the Terraform RAD Lab module (example: Data Science module) will kick in and Terraform config scripts will be deployed which will spin up respective projects/services/sources, etc.
-
-8. Once the RAD Lab deployment is completed it will throw the below Outputs on the Cloud Shell Terminal for the _Cloud Admin_ to share with the _RAD Lab users_.
+6. Once the RAD Lab deployment is completed it will throw the below Outputs on the Cloud Shell Terminal for the _RAD Lab Admin_ to share with the _RAD Lab users_.
 
 ```
 Outputs:

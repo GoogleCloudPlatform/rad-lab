@@ -26,6 +26,7 @@ import random
 import requests
 import argparse
 import platform
+import subprocess
 from os import path
 from google.cloud import storage
 from googleapiclient import discovery
@@ -44,22 +45,19 @@ def main(varcontents={}):
     orgid           = ""
     folderid        = ""
     billing_acc     = ""
-    selected_module = ""
+    currentusr      = ""
     state           = ""
 
     setup_path = os.getcwd()
 
-    # Setting Credentials for non Cloud Shell CLI
-    if(platform.system() != 'Linux' and platform.processor() !='' and not platform.system().startswith('cs-')):
-        # countdown(5)
-        print("Login with Cloud Admin account...")
-        os.system("gcloud auth application-default login")
+    # Setting "gcloud auth application-default" to deploy RAD Lab Modules
+    currentusr = radlabauth(currentusr)
 
     # Setting up Project-ID
     projid = set_proj(projid)
 
     # Checking for User Permissions
-    checkperm(projid)
+    checkperm(projid,currentusr)
 
     # Listing / Selecting from available RAD Lab modules
     module_name = list_modules()
@@ -76,6 +74,40 @@ def main(varcontents={}):
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
 	
+def radlabauth(currentusr):
+
+    try:
+        token = subprocess.Popen(["gcloud auth application-default print-access-token"],shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.read().strip().decode('utf-8')
+        r = requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+token)
+        currentusr = r.json()["email"]
+    
+        # Setting Credentials for non Cloud Shell CLI
+        if(platform.system() != 'Linux' and platform.processor() !='' and not platform.system().startswith('cs-')):
+            # countdown(5)
+            x = input("\nWould you like to proceed the RAD Lab deployment with user - " + Fore.YELLOW + Style.BRIGHT + currentusr + Style.RESET_ALL + ' ?\n[1] Yes\n[2] No\nChoose a number : ').strip()
+            if(x == '1'):
+                pass
+            elif(x == '2'):
+                print("\nLogin with User account with which you would like to deploy RAD Lab Modules...\n")
+                os.system("gcloud auth application-default login")  
+            else:
+                currentusr = '0'
+
+    except:
+        print("\nLogin with User account with which you would like to deploy RAD Lab Modules...\n")
+        os.system("gcloud auth application-default login")
+    
+    finally:
+        if(currentusr == '0'):
+            sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
+        else:
+            token = subprocess.Popen(["gcloud auth application-default print-access-token"],shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.read().strip().decode('utf-8')
+            r = requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+token)
+            currentusr = r.json()["email"]
+
+            print("\nUser to deploy RAD Lab Modules (Selected) : " + Fore.GREEN + Style.BRIGHT + currentusr + Style.RESET_ALL )        
+            return currentusr
+
 def set_proj(projid):
     projid = os.popen("gcloud config list --format 'value(core.project)' 2>/dev/null").read().strip()
     if(projid != ""):
@@ -91,7 +123,7 @@ def set_proj(projid):
     print("\nProject ID (Selected) : " + Fore.GREEN + Style.BRIGHT + projid + Style.RESET_ALL)
     return projid
 
-def checkperm(projid):
+def checkperm(projid,currentusr):
 
     credentials = GoogleCredentials.get_application_default()
 
@@ -108,9 +140,7 @@ def checkperm(projid):
         service2 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
         request2 = service2.organizations().getIamPolicy(resource=response1['parent'])
         response2 = request2.execute()
-        # print(response2)
 
-        # print(response2['bindings'])
         for x in range(len(response2['bindings'])):
 
             if(response2['bindings'][x]['role'] == 'roles/billing.user' or response2['bindings'][x]['role'] == 'roles/resourcemanager.organizationViewer'):
@@ -118,11 +148,6 @@ def checkperm(projid):
                 # print(response2['bindings'][x]['role'])
                 # print("MEMBERS --->")
                 # print(response2['bindings'][x]['members'])
-
-                token = os.popen('gcloud auth application-default print-access-token').read().strip()
-                r = requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+token)
-                currentusr = r.json()["email"]
-                # print(currentusr)
 
                 if 'user:'+currentusr in response2['bindings'][x]['members']:
                     print('USER FOUND - Permission check passed')
