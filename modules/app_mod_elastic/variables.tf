@@ -161,7 +161,7 @@ variable "preemptible_nodes" {
 variable "project_name" {
   description = "Name that will be assigned to the project.  To ensure uniqueness, a random_id will be added to the name."
   type        = string
-  default     = "elastic-search-demo"
+  default     = "radlab-app-mod-elastic"
 }
 
 variable "random_id" {
