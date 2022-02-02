@@ -137,7 +137,7 @@ variable "organization_id" {
 variable "project_name" {
   description = "Project name or ID, if it's an existing project."
   type        = string
-  default     = "radlab-gen-cromwell"
+  default     = "radlab-genomics-cromwell"
 }
 
 variable "random_id" {
