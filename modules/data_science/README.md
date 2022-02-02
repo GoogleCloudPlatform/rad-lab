@@ -109,7 +109,7 @@ module "existing_project_and_network" {
 | *network_name* | Name of the network to be created. | <code title="">string</code> |  | <code title="">ai-notebook</code> |
 | *notebook_count* | Number of AI Notebooks requested | <code title="">string</code> |  | <code title="">1</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
-| *project_name* | Project name or ID, if it's an existing project. | <code title="">string</code> |  | <code title="">radlab-ds-analytics</code> |
+| *project_name* | Project name or ID, if it's an existing project. | <code title="">string</code> |  | <code title="">radlab-data-science</code> |
 | *random_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *set_external_ip_policy* | Enable org policy to allow External (Public) IP addresses on virtual machines. | <code title="">bool</code> |  | <code title="">true</code> |
 | *set_shielded_vm_policy* | Apply org policy to disable shielded VMs. | <code title="">bool</code> |  | <code title="">true</code> |
