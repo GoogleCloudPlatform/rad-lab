@@ -61,7 +61,7 @@ Below Architechture Diagram is the base representation of what will be created a
 | *ip_cidr_range* | Unique IP CIDR Range for cromwell subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
 | *network_name* | This name will be used for VPC and subnets created | <code title="">string</code> |  | <code title="">cromwell-vpc</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
-| *project_name* | Project name or ID, if it's an existing project. | <code title="">string</code> |  | <code title="">radlab-gen-cromwell</code> |
+| *project_name* | Project name or ID, if it's an existing project. | <code title="">string</code> |  | <code title="">radlab-genomics-cromwell</code> |
 | *random_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *set_external_ip_policy* | If true external IP Policy will be set to allow all | <code title="">bool</code> |  | <code title="">false</code> |
 | *set_restrict_vpc_peering_policy* | If true restrict VPC peering will be set to allow all | <code title="">bool</code> |  | <code title="">true</code> |
