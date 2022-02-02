@@ -35,11 +35,7 @@ The [modules](./modules) directory contains Terraform modules that can be integr
 
 Each module will list the minimum IAM permissions users require to successfully create the infrastructure.
 
-<<<<<<< Updated upstream
-Additional permissions are required when creating a new Project as part of the deployment. The user will need access to a billing account via the `roles/billing.user` IAM role and permission to create the Project under the parent Organization or Folder.
-=======
 Additional permissions are required when creating a new Project as part of the deployment. The user will need access to a billing account via the `roles/billing.user` & would be able to view the organization via `roles/iam.organizationRoleViewer` IAM roles and permission to create the Project under the parent Organization or Folder.
->>>>>>> Stashed changes
 
 ## Repository Structure
 
