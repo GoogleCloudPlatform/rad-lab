@@ -57,7 +57,7 @@ Also ensure that the identity creating the resources has access to a billing acc
 | *ip_cidr_range* | Unique IP CIDR Range for ngs subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
 | *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-2</code> |
 | *network* | Network associated to the project | <code title="">string</code> |  | <code title="">ngs-network</code> |
-| *project_name* | Name of the project that should be used. | <code title="">string</code> |  | <code title="">radlab-genomics</code> |
+| *project_name* | Name of the project that should be used. | <code title="">string</code> |  | <code title="">radlab-genomics-dsub</code> |
 | *random_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *region* | Cloud Zone associated to the project | <code title="">string</code> |  | <code title="">europe-west2</code> |
 | *set_cloudfunctions_ingress_project_policy* | Apply org policy to set the ingress settings for cloud functions | <code title="">bool</code> |  | <code title="">true</code> |
