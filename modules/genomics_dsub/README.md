@@ -33,14 +33,14 @@ Below Architechture Diagram is the base representation of what will be created a
 
 ![](../../docs/images/V3_Genomics.png)
 
-## IAM permissions to run the Terraform deployment
+## IAM Permissions Prerequisites
 
-The lab need to be deployed by a _Cloud Admin_ persona with the following GCP roles:
-* `Billing Account User`
-* `Organization Viewer`
-* `Project Creator`
-* `Storage Object Viewer`
-* [OPTIONAL] `Organization Policy Administrator`
+Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
+- Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only when setting the Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
+- Parent: `roles/resourcemanager.projectCreator`
+- Project: `roles/storage.objectViewer`
+
+Also ensure that the identity creating the resources has access to a billing account, via `roles/billing.user` and also able to view the Organization recources via, `roles/iam.organizationRoleViewer`
 
 <!-- BEGIN TFDOC -->
 ## Variables
