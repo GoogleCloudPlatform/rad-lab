@@ -23,7 +23,7 @@ steps:
     source env/bin/activate
     docker pull gcr.io/$PROJECT_ID/openlane-pdk:$_OPENLANE_VERSION || make -C OpenLane OPENLANE_IMAGE_NAME=gcr.io/$PROJECT_ID/openlane-pdk:$_OPENLANE_VERSION openlane
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/openlane-jupyterlab:$BUILD_ID', '--build-arg', 'PROJECT_ID=$PROJECT_ID', '--build-arg', 'OPENLANE_VERSION=$_OPENLANE_VERSION', '.']
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/openlane-jupyterlab:$BUILD_ID', '--build-arg', 'PROJECT_ID=$PROJECT_ID', '--build-arg', 'OPENLANE_VERSION=$_OPENLANE_VERSION', '-f', './scripts/build/container/jupyterlab/Dockerfile', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['tag', 'gcr.io/$PROJECT_ID/openlane-jupyterlab:$BUILD_ID', 'gcr.io/$PROJECT_ID/openlane-jupyterlab:latest']  
 images:
