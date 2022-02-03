@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2021 Google LLC
+# Copyright 2022 Google LLC
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@
 # \_| |_/\___/  \_| \_/\___/ \__\___|_.__/ \___/ \___/|_|\_\
 
 
-
-export INSTANCE_NAME="AI_NOTEBOOK_INSTANCE_NAME"
-export PROJECT="PROJECT_ID"
-export LOCATION="ZONE"
+export INSTANCE_NAME="notebooks-instance-0"
+export PROJECT="proppy-eda"
+export LOCATION="us-east4-c"
 
 
 function stop_notebook() {

@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ variable "create_network" {
 variable "create_project" {
   description = "Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "enable_services" {
@@ -88,7 +88,7 @@ variable "organization_id" {
 variable "project_name" {
   description = "Project name or ID, if it's an existing project."
   type        = string
-  default     = "radlab-silicon"
+  default     = "proppy-eda"
 }
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
@@ -99,13 +99,13 @@ variable "random_id" {
 variable "set_external_ip_policy" {
   description = "Enable org policy to allow External (Public) IP addresses on virtual machines."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "set_shielded_vm_policy" {
   description = "Apply org policy to disable shielded VMs."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "subnet_name" {
