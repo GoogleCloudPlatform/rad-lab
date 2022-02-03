@@ -17,7 +17,7 @@
 locals {
   random_id = var.random_id != null ? var.random_id : random_id.default.hex
   project = (var.create_project
-    ? try(module.project_radlab_ds_analytics.0, null)
+    ? try(module.project_radlab_silicon.0, null)
     : try(data.google_project.existing_project.0, null)
   )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
@@ -37,15 +37,13 @@ locals {
   notebook_sa_project_roles = [
     "roles/compute.instanceAdmin",
     "roles/notebooks.admin",
-    "roles/bigquery.user",
     "roles/storage.objectViewer"
   ]
 
   project_services = var.enable_services ? [
     "compute.googleapis.com",
-    "bigquery.googleapis.com",
     "notebooks.googleapis.com",
-    "bigquerystorage.googleapis.com"
+    "cloudbuild.googleapis.com",    
   ] : []
 }
 
@@ -62,7 +60,7 @@ data "google_project" "existing_project" {
   project_id = var.project_name
 }
 
-module "project_radlab_ds_analytics" {
+module "project_radlab_silicon" {
   count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 11.0"
@@ -84,7 +82,7 @@ resource "google_project_service" "enabled_services" {
   disable_on_destroy         = true
 
   depends_on = [
-    module.project_radlab_ds_analytics
+    module.project_radlab_silicon
   ]
 }
 
@@ -116,7 +114,7 @@ module "vpc_ai_notebook" {
       subnet_name           = var.subnet_name
       subnet_ip             = var.ip_cidr_range
       subnet_region         = local.region
-      description           = "Subnetwork inside *vpc-analytics* VPC network, created via Terraform"
+      description           = "Subnetwork inside *vpc-silicon* VPC network, created via Terraform"
       subnet_private_access = true
     }
   ]
@@ -124,7 +122,7 @@ module "vpc_ai_notebook" {
   firewall_rules = [
     {
       name        = "fw-ai-notebook-allow-internal"
-      description = "Firewall rule to allow traffic on all ports inside *vpc-analytics* VPC network."
+      description = "Firewall rule to allow traffic on all ports inside *vpc-silicon* VPC network."
       priority    = 65534
       ranges      = ["10.0.0.0/8"]
       direction   = "INGRESS"
@@ -180,10 +178,10 @@ resource "google_notebooks_instance" "ai_notebook" {
   location     = var.zone
   machine_type = var.machine_type
 
-  vm_image {
-    project      = var.image_project
-    image_family = var.image_family
-  }
+   container_image {
+    repository = "gcr.io/${local.project.project_id}/openlane-jupyterlab"
+    tag = "latest"
+   }
 
   service_account = google_service_account.sa_p_notebook.email
 
@@ -197,10 +195,8 @@ resource "google_notebooks_instance" "ai_notebook" {
   network = local.network.self_link
   subnet  = local.subnet.self_link
 
-  post_startup_script = "https://github.com/GoogleCloudPlatform/rad-lab/blob/main/modules/data_science/scripts/build/samplenotebook.sh"
-
   labels = {
-    module = "data-science"
+    module = "silicon"
   }
 
   metadata = {
@@ -210,23 +206,17 @@ resource "google_notebooks_instance" "ai_notebook" {
   depends_on = [time_sleep.wait_120_seconds]
 }
 
-resource "google_storage_bucket" "user_scripts_bucket" {
-  project                     = local.project.project_id
-  name                        = join("", ["user-scripts-notebooks-instance-", local.random_id])
-  location                    = "US"
-  force_destroy               = true
-  uniform_bucket_level_access = true
 
-  cors {
-    origin          = ["http://user-scripts"]
-    method          = ["GET", "HEAD", "PUT", "POST", "DELETE"]
-    response_header = ["*"]
-    max_age_seconds = 3600
+# Locally build container for notebook container and push to container registry #
+resource "null_resource" "build_and_push_image" {
+  triggers = {
+    cloudbuild_yaml_sha = sha1(file("${path.module}/scripts/build/container/jupyterlab/cloudbuild.yaml"))
+    dockerfile_sha      = sha1(file("${path.module}/scripts/build/container/jupyterlab/Dockerfile"))
+    build_script_sha    = sha1(file("${path.module}/scripts/build/container/jupyterlab/build-container.sh"))
   }
-}
 
-resource "google_storage_bucket_iam_binding" "binding" {
-  bucket  = google_storage_bucket.user_scripts_bucket.name
-  role    = "roles/storage.admin"
-  members = var.trusted_users
+  provisioner "local-exec" {
+    working_dir = path.module
+    command     = "${path.module}/scripts/build/container/jupyterlab/build-container.sh ${local.project.project_id}"
+  }
 }

@@ -19,7 +19,7 @@ output "deployment_id" {
   value       = local.random_id
 }
 
-output "project-radlab-ds-analytics-id" {
+output "project-radlab-silicon-id" {
   description = "Analytics Project ID"
   value       = local.project.project_id
 }
@@ -27,9 +27,4 @@ output "project-radlab-ds-analytics-id" {
 output "notebooks-instance-names" {
   description = "Notebook Instance Names"
   value       = join(", ", google_notebooks_instance.ai_notebook[*].name)
-}
-
-output "user-scripts-bucket-uri" {
-  description = "User Script Bucket URI"
-  value       = google_storage_bucket.user_scripts_bucket.self_link
 }

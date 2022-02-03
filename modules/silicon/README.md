@@ -1,4 +1,4 @@
-# RAD Lab Data Science Module
+# RAD Lab Silicon Module
 
 ## GCP Products/Services 
 
@@ -36,7 +36,7 @@ Here are a couple of examples to use the module directly in your Terraform code,
 
 ```hcl
 module "simple" {
-  source = "./modules/data_science"
+  source = "./modules/silicon"
 
   billing_account_id = "123456-123456-123465"
   organization_id    = "12345678901"
@@ -49,7 +49,7 @@ This example assumes that all the necessary APIs have been enabled as well.
 
 ````hcl
 module "existing_project" {
-  source = "./modules/data_science"
+  source = "./modules/silicon"
 
   billing_account_id = "123456-123456-123465"
   organization_id    = "12345678901"
@@ -61,7 +61,6 @@ module "existing_project" {
   
   set_external_ip_policy          = false
   set_shielded_vm_policy          = false
-  set_trustedimage_project_policy = false
 }
 ````
 
@@ -69,7 +68,7 @@ module "existing_project" {
 
 ```hcl
 module "existing_project_and_network" {
-  source = "./modules/data_science"
+  source = "./modules/silicon"
 
   billing_account_id = "123456-123456-123465"
   organization_id    = "12345678901"
@@ -81,12 +80,11 @@ module "existing_project_and_network" {
   enable_services = false
   
   create_network = false
-  network_name   = "data-science-network"
-  subnet_name    = "data-science-subnetwork"
+  network_name   = "silicon-network"
+  subnet_name    = "silicon-subnetwork"
 
   set_external_ip_policy          = false
   set_shielded_vm_policy          = false
-  set_trustedimage_project_policy = false
 }
 ```
 
@@ -109,11 +107,10 @@ module "existing_project_and_network" {
 | *network_name* | Name of the network to be created. | <code title="">string</code> |  | <code title="">ai-notebook</code> |
 | *notebook_count* | Number of AI Notebooks requested | <code title="">string</code> |  | <code title="">1</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
-| *project_name* | Project name or ID, if it's an existing project. | <code title="">string</code> |  | <code title="">radlab-data-science</code> |
+| *project_name* | Project name or ID, if it's an existing project. | <code title="">string</code> |  | <code title="">radlab-silicon</code> |
 | *random_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *set_external_ip_policy* | Enable org policy to allow External (Public) IP addresses on virtual machines. | <code title="">bool</code> |  | <code title="">true</code> |
 | *set_shielded_vm_policy* | Apply org policy to disable shielded VMs. | <code title="">bool</code> |  | <code title="">true</code> |
-| *set_trustedimage_project_policy* | Apply org policy to set the trusted image projects. | <code title="">bool</code> |  | <code title="">true</code> |
 | *subnet_name* | Name of the subnet where to deploy the Notebooks. | <code title="">string</code> |  | <code title="">subnet-ai-notebook</code> |
 | *trusted_users* | The list of trusted users. | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *zone* | Cloud Zone associated to the AI Notebooks | <code title="">string</code> |  | <code title="">us-east4-c</code> |
@@ -124,7 +121,7 @@ module "existing_project_and_network" {
 |---|---|:---:|
 | deployment_id | RADLab Module Deployment ID |  |
 | notebooks-instance-names | Notebook Instance Names |  |
-| project-radlab-ds-analytics-id | Analytics Project ID |  |
+| project-radlab-silicon-id | Analytics Project ID |  |
 | user-scripts-bucket-uri | User Script Bucket URI |  |
 <!-- END TFDOC -->
 

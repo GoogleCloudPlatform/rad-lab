@@ -55,18 +55,6 @@ variable "folder_id" {
   default     = ""
 }
 
-variable "image_family" {
-  description = "Image of the AI notebook."
-  type        = string
-  default     = "tf-latest-cpu"
-}
-
-variable "image_project" {
-  description = "Google Cloud project where the image is hosted."
-  type        = string
-  default     = "deeplearning-platform-release"
-}
-
 variable "ip_cidr_range" {
   description = "Unique IP CIDR Range for AI Notebooks subnet"
   type        = string
@@ -100,7 +88,7 @@ variable "organization_id" {
 variable "project_name" {
   description = "Project name or ID, if it's an existing project."
   type        = string
-  default     = "radlab-data-science"
+  default     = "radlab-silicon"
 }
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
@@ -116,12 +104,6 @@ variable "set_external_ip_policy" {
 
 variable "set_shielded_vm_policy" {
   description = "Apply org policy to disable shielded VMs."
-  type        = bool
-  default     = true
-}
-
-variable "set_trustedimage_project_policy" {
-  description = "Apply org policy to set the trusted image projects."
   type        = bool
   default     = true
 }
