@@ -1,12 +1,11 @@
 timeout: 3600s
+substitutions:
+  _OPENLANE_VERSION: 2022.02.01_02.19.58
 steps:
 - name: 'gcr.io/cloud-builders/git'
-  args: ['clone', '-b', '2022.02.01_02.19.58', 'https://github.com/The-OpenROAD-Project/OpenLane']
+  args: ['clone', '-b', $_OPENLANE_VERSION, 'https://github.com/The-OpenROAD-Project/OpenLane']
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: '/bin/bash'
-  env:
-  - EXTERNAL_PDK_INSTALLATION=0
-  - NO_PDKS=0
   args:
   - '-c'
   - |-
@@ -22,17 +21,12 @@ steps:
   - '-c'
   - |-
     source env/bin/activate
-    make -C OpenLane openlane
+    docker pull gcr.io/$PROJECT_ID/openlane-pdk:$_OPENLANE_VERSION || make -C OpenLane OPENLANE_IMAGE_NAME=gcr.io/$PROJECT_ID/openlane-pdk:$_OPENLANE_VERSION openlane
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'efabless/openlane:current', 'gcr.io/$PROJECT_ID/openlane-pdk:$BUILD_ID']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'efabless/openlane:current', 'gcr.io/$PROJECT_ID/openlane-pdk:latest']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/openlane-jupyterlab:$BUILD_ID', '--build-arg', 'PROJECT_ID=$PROJECT_ID', '--build-arg', 'BUILD_ID=$BUILD_ID', '.']
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/openlane-jupyterlab:$BUILD_ID', '--build-arg', 'PROJECT_ID=$PROJECT_ID', '--build-arg', 'OPENLANE_VERSION=$_OPENLANE_VERSION', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['tag', 'gcr.io/$PROJECT_ID/openlane-jupyterlab:$BUILD_ID', 'gcr.io/$PROJECT_ID/openlane-jupyterlab:latest']  
 images:
-- 'gcr.io/$PROJECT_ID/openlane-pdk:$BUILD_ID'
-- 'gcr.io/$PROJECT_ID/openlane-pdk:latest'
+- 'gcr.io/$PROJECT_ID/openlane-pdk:$_OPENLANE_VERSION'
 - 'gcr.io/$PROJECT_ID/openlane-jupyterlab:$BUILD_ID'
 - 'gcr.io/$PROJECT_ID/openlane-jupyterlab:latest'

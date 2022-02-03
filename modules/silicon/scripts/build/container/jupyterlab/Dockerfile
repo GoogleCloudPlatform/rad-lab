@@ -1,6 +1,6 @@
 ARG PROJECT_ID
-ARG BUILD_ID
-FROM gcr.io/$PROJECT_ID/openlane:$BUILD_ID
+ARG OPENLANE_VERSION
+FROM gcr.io/$PROJECT_ID/openlane-pdk:$OPENLANE_VERSION
 
 RUN pip install jupyterlab
 RUN groupadd --gid 1001 jupyter
