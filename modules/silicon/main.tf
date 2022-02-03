@@ -201,7 +201,7 @@ resource "google_notebooks_instance" "ai_notebook" {
 
   metadata = {
     terraform  = "true"
-    proxy-mode = "mail"
+    proxy-mode = "service_account"
   }
   depends_on = [time_sleep.wait_120_seconds]
 }
