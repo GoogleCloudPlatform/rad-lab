@@ -43,7 +43,8 @@ locals {
   project_services = var.enable_services ? [
     "compute.googleapis.com",
     "notebooks.googleapis.com",
-    "cloudbuild.googleapis.com",    
+    "cloudbuild.googleapis.com",
+    "artifactregistry.googleapis.com",
   ] : []
 }
 
@@ -178,10 +179,10 @@ resource "google_notebooks_instance" "ai_notebook" {
   location     = var.zone
   machine_type = var.machine_type
 
-   container_image {
-    repository = "gcr.io/${local.project.project_id}/openlane-jupyterlab"
+  container_image {
+    repository = "${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/openlane-jupyterlab"
     tag = "latest"
-   }
+ }
 
   service_account = google_service_account.sa_p_notebook.email
 
@@ -206,6 +207,15 @@ resource "google_notebooks_instance" "ai_notebook" {
   depends_on = [time_sleep.wait_120_seconds]
 }
 
+resource "google_artifact_registry_repository" "containers_repo" {
+  provider = google-beta
+
+  project = local.project.project_id
+  location = local.region
+  repository_id = "containers"
+  description = "container image repository"
+  format = "DOCKER"
+}
 
 # Locally build container for notebook container and push to container registry #
 resource "null_resource" "build_and_push_image" {
@@ -217,6 +227,6 @@ resource "null_resource" "build_and_push_image" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "${path.module}/scripts/build/container/jupyterlab/build-container.sh ${local.project.project_id}"
+    command     = "${path.module}/scripts/build/container/jupyterlab/build-container.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.repository_id} ${google_artifact_registry_repository.containers_repo.location}"
   }
 }

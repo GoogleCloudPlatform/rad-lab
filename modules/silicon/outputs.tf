@@ -19,12 +19,22 @@ output "deployment_id" {
   value       = local.random_id
 }
 
-output "project-radlab-silicon-id" {
+output "project_radlab_silicon_id" {
   description = "Analytics Project ID"
   value       = local.project.project_id
 }
 
-output "notebooks-instance-names" {
+output "notebooks_instance_names" {
   description = "Notebook Instance Names"
   value       = join(", ", google_notebooks_instance.ai_notebook[*].name)
+}
+
+output "artifact_registry_repository_id" {
+  description = "Artifact registry repository ID"
+  value       = google_artifact_registry_repository.containers_repo.repository_id
+}
+
+output "notebooks_container_image" {
+  description = "Artifact registry repository ID"
+  value       = "${google_notebooks_instance.ai_notebook[0].container_image[0].repository}:${google_notebooks_instance.ai_notebook[0].container_image[0].tag}"
 }
