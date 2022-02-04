@@ -210,9 +210,9 @@ resource "google_notebooks_instance" "ai_notebook" {
 # Locally build container for notebook container and push to container registry #
 resource "null_resource" "build_and_push_image" {
   triggers = {
-    cloudbuild_yaml_sha = sha1(file("${path.module}/scripts/build/container/jupyterlab/cloudbuild.yaml"))
-    dockerfile_sha      = sha1(file("${path.module}/scripts/build/container/jupyterlab/Dockerfile"))
-    build_script_sha    = sha1(file("${path.module}/scripts/build/container/jupyterlab/build-container.sh"))
+    cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/container/jupyterlab/cloudbuild.yaml")
+    dockerfile_sha      = filesha1("${path.module}/scripts/build/container/jupyterlab/Dockerfile")
+    build_script_sha    = filesha1("${path.module}/scripts/build/container/jupyterlab/build-container.sh")
   }
 
   provisioner "local-exec" {
