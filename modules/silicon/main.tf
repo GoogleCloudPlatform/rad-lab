@@ -204,7 +204,10 @@ resource "google_notebooks_instance" "ai_notebook" {
     terraform  = "true"
     proxy-mode = "service_account"
   }
-  depends_on = [time_sleep.wait_120_seconds]
+  depends_on = [
+    time_sleep.wait_120_seconds,
+    null_resource.build_and_push_image,
+  ]
 }
 
 resource "google_artifact_registry_repository" "containers_repo" {
@@ -215,6 +218,10 @@ resource "google_artifact_registry_repository" "containers_repo" {
   repository_id = "containers"
   description = "container image repository"
   format = "DOCKER"
+
+  depends_on = [
+    google_project_service.enabled_services
+  ]  
 }
 
 # Locally build container for notebook container and push to container registry #
@@ -229,4 +236,8 @@ resource "null_resource" "build_and_push_image" {
     working_dir = path.module
     command     = "${path.module}/scripts/build/container/jupyterlab/build-container.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.repository_id} ${google_artifact_registry_repository.containers_repo.location}"
   }
+
+  depends_on = [
+    google_artifact_registry_repository.containers_repo
+  ]  
 }
