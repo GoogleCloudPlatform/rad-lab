@@ -19,4 +19,4 @@ REPOSITORY_LOCATION=$2
 REPOSITORY_ID=$3
 
 gcloud config set project ${PROJECT_ID}
-gcloud builds submit --config=./scripts/build/container/jupyterlab/cloudbuild.yaml _REPOSITORY_LOCATION="$REPOSITORY_LOCATION",_REPOSITORY_ID="$REPOSITORY_ID" .
+gcloud builds submit . --config ./scripts/build/container/jupyterlab/cloudbuild.yaml --substitutions _REPOSITORY_LOCATION=$REPOSITORY_LOCATION,_REPOSITORY_ID=$REPOSITORY_ID

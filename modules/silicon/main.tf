@@ -234,7 +234,7 @@ resource "null_resource" "build_and_push_image" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "${path.module}/scripts/build/container/jupyterlab/build-container.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.repository_id} ${google_artifact_registry_repository.containers_repo.location}"
+    command     = "${path.module}/scripts/build/container/jupyterlab/build-container.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.location} ${google_artifact_registry_repository.containers_repo.repository_id}"
   }
 
   depends_on = [
