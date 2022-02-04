@@ -3,28 +3,24 @@
 ## GCP Products/Services 
 
 * AI Platform Notebooks
-* BigQuery
-* Cloud Storage
 * Virtual Private Cloud (VPC)
 
-## Reference Architechture Diagram
+## Reference Architecture Diagram
 
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
+Below Architecture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V1_DataScience.png)
+![](../../docs/images/V1_Silicon.png)
 
 ## IAM Permissions Prerequisites
 
 Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
 - Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only when setting the Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
 - Parent: `roles/resourcemanager.projectCreator`
-- Project: `roles/storage.objectViewer`
 
 When deploying in an existing project, ensure the identity has the following permissions on the project:
 - `roles/compute.admin`
 - `roles/resourcemanager.projectIamAdmin`
 - `roles/iam.serviceAccountAdmin`
-- `roles/storage.admin`
 - `roles/notebooks.admin`
 
 Also ensure that the identity creating the resources has access to a billing account, via `roles/billing.user` and also able to view the Organization recources via, `roles/iam.organizationRoleViewer`
@@ -56,7 +52,7 @@ module "existing_project" {
   folder_id          = "1234567890"
 
   create_project  = false
-  project_name    = "ds-project-id"
+  project_name    = "silicon-project-id"
   enable_services = false
   
   set_external_ip_policy          = false
@@ -75,7 +71,7 @@ module "existing_project_and_network" {
   folder_id          = "1234567890"
 
   create_project  = false
-  project_name    = "ds-project-id"
+  project_name    = "silicon-project-id"
   enable_services = false
   enable_services = false
   
@@ -122,7 +118,6 @@ module "existing_project_and_network" {
 | deployment_id | RADLab Module Deployment ID |  |
 | notebooks-instance-names | Notebook Instance Names |  |
 | project-radlab-silicon-id | Analytics Project ID |  |
-| user-scripts-bucket-uri | User Script Bucket URI |  |
 <!-- END TFDOC -->
 
 ## Access RAD Lab Data Science Notebooks
