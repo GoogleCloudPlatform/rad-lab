@@ -12,6 +12,8 @@ This RAD Lab module provides a managed environment for custom silicon design usi
 
 - [Inverter](scripts/build/container/jupyterlab/inverter.ipynb)
 
+![gds render](scripts/build/container/jupyterlab/inverter.svg)
+
 ## GCP Products/Services 
 
 * AI Platform Notebooks
