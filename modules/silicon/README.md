@@ -1,5 +1,17 @@
 # RAD Lab Silicon Module
 
+This RAD Lab module provides a managed environment for custom silicon design using Open Source ASIC toolchains.
+
+## Tools
+
+- [JupyterLab](https://jupyter.org/)
+- [SkyWater Open Source PDK](https://github.com/google/skywater-pdk)
+- [OpenLane](https://github.com/The-OpenROAD-Project/OpenLane)
+
+## Samples notebooks
+
+- [Inverter](scripts/build/container/jupyterlab/inverter.ipynb)
+
 ## GCP Products/Services 
 
 * AI Platform Notebooks
