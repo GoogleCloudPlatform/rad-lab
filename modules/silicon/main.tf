@@ -35,9 +35,10 @@ locals {
   )
 
   notebook_sa_project_roles = [
-    "roles/compute.instanceAdmin",
+    "roles/artifactregistry.reader",
     "roles/notebooks.admin",
-    "roles/storage.objectViewer"
+    "roles/compute.instanceAdmin",
+    "roles/iam.serviceAccountUser",
   ]
 
   project_services = var.enable_services ? [
