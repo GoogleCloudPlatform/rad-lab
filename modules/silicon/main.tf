@@ -181,7 +181,6 @@ resource "google_notebooks_instance" "ai_notebook" {
 
   container_image {
     repository = "${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/openlane-jupyterlab"
-    tag = "latest"
  }
 
   service_account = google_service_account.sa_p_notebook.email
@@ -230,11 +229,12 @@ resource "null_resource" "build_and_push_image" {
     cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/container/jupyterlab/cloudbuild.yaml")
     dockerfile_sha      = filesha1("${path.module}/scripts/build/container/jupyterlab/Dockerfile")
     build_script_sha    = filesha1("${path.module}/scripts/build/container/jupyterlab/build-container.sh")
+    notebook_sha    = filesha1("${path.module}/scripts/build/container/jupyterlab/inverter.ipynb")    
   }
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "${path.module}/scripts/build/container/jupyterlab/build-container.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.location} ${google_artifact_registry_repository.containers_repo.repository_id}"
+    command     = "scripts/build/container/jupyterlab/build-container.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.location} ${google_artifact_registry_repository.containers_repo.repository_id}"
   }
 
   depends_on = [

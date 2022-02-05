@@ -36,5 +36,5 @@ output "artifact_registry_repository_id" {
 
 output "notebooks_container_image" {
   description = "Artifact registry repository ID"
-  value       = "${google_notebooks_instance.ai_notebook[0].container_image[0].repository}:${google_notebooks_instance.ai_notebook[0].container_image[0].tag}"
+  value       = "${google_notebooks_instance.ai_notebook[0].container_image[0].repository}:latest}"
 }
