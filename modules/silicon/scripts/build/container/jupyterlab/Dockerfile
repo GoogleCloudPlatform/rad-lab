@@ -16,11 +16,16 @@ ARG PROJECT_ID
 ARG OPENLANE_VERSION
 FROM gcr.io/$PROJECT_ID/openlane-pdk:$OPENLANE_VERSION
 
-RUN pip install jupyterlab
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+RUN bash Miniconda3-latest-Linux-x86_64.sh -b -f -p /conda-env
+RUN /conda-env/bin/conda install -c conda-forge -y jupyterlab gdstk
+
 RUN groupadd --gid 1001 jupyter
 RUN useradd --uid 1000 --gid 1001 jupyter
 USER jupyter
 EXPOSE 8080
 ENV JUPYTER_PORT 8080
+WORKDIR /home/jupyter
+COPY inverter.ipynb /home/jupyter/
 
-ENTRYPOINT ["/usr/local/bin/jupyter", "lab", "--ip", "0.0.0.0", "--allow-root", "--ServerApp.token=''", "--ServerApp.allow_origin_pat='^https?://.*\\.notebooks\\.googleusercontent\\.com'", "--ServerApp.allow_remote_access=True"]
+ENTRYPOINT ["/conda-env/bin/jupyter", "lab", "--ip", "0.0.0.0", "--allow-root", "--ServerApp.token=''", "--ServerApp.allow_origin_pat='^https?://.*\\.notebooks\\.googleusercontent\\.com'", "--ServerApp.allow_remote_access=True"]
