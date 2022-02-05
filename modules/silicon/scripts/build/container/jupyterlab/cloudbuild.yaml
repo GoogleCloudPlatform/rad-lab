@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-timeout: 5400s
+timeout: 7200s
 substitutions:
   _OPENLANE_VERSION: 2022.02.01_02.19.58
   _REPOSITORY_LOCATION: $LOCATION
