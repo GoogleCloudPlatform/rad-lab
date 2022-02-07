@@ -17,6 +17,7 @@
 PROJECT_ID=$1
 REPOSITORY_LOCATION=$2
 REPOSITORY_ID=$3
+NOTEBOOKS_BUCKET=$4
 
 gcloud config set project ${PROJECT_ID}
-gcloud builds submit . --config ./scripts/build/container/jupyterlab/cloudbuild.yaml --substitutions _REPOSITORY_LOCATION=$REPOSITORY_LOCATION,_REPOSITORY_ID=$REPOSITORY_ID
+gcloud builds submit . --config ./scripts/build/cloudbuild.yaml --substitutions _REPOSITORY_LOCATION=$REPOSITORY_LOCATION,_REPOSITORY_ID=$REPOSITORY_ID,_NOTEBOOKS_BUCKET=$NOTEBOOKS_BUCKET

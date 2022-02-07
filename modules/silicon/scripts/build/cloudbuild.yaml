@@ -17,17 +17,19 @@ substitutions:
   _OPENLANE_VERSION: 2022.02.01_02.19.58
   _REPOSITORY_LOCATION: $LOCATION
   _REPOSITORY_ID: gcr.io
+  _NOTEBOOKS_BUCKET: $PROJECT_ID-silicon-notebooks
 steps:
-- name: 'gcr.io/cloud-builders/git'
-  args: ['clone', '-b', $_OPENLANE_VERSION, 'https://github.com/The-OpenROAD-Project/OpenLane']
-- name: 'gcr.io/cloud-builders/docker'
+- name: 'python'
   entrypoint: '/bin/bash'
   args:
   - '-c'
   - |-
-    apt-get update && apt install -yq python3-venv
-    python3 -m venv env
-    env/bin/python -m pip install pyyaml click
+    python3 -m venv env-jupytext/
+    env-jupytext/bin/python -m pip install jupytext
+    env-jupytext/bin/jupytext --to notebook scripts/build/notebooks/*.md
+    echo 'gsutil cp gs://$_NOTEBOOKS_BUCKET/*.ipynb /home/jupyter/' > scripts/build/notebooks/copy-silicon-notebooks.sh
+- name: 'gcr.io/cloud-builders/git'
+  args: ['clone', '-b', $_OPENLANE_VERSION, 'https://github.com/The-OpenROAD-Project/OpenLane']
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: '/bin/bash'
   env:
@@ -36,13 +38,22 @@ steps:
   args:
   - '-c'
   - |-
-    source env/bin/activate
+    apt-get update && apt install -yq python3-venv
+    python3 -m venv env-openlane/
+    env-openlane/bin/python -m pip install pyyaml click    
+    source env-openlane/bin/activate
     docker pull $_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-pdk:$_OPENLANE_VERSION || make -C OpenLane OPENLANE_IMAGE_NAME=$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-pdk:$_OPENLANE_VERSION openlane
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID', '--build-arg', 'PROJECT_ID=$PROJECT_ID', '--build-arg', 'OPENLANE_VERSION=$_OPENLANE_VERSION', '-f', './scripts/build/container/jupyterlab/Dockerfile', '.']
+  args: ['build', '-t', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID', '--build-arg', 'PROJECT_ID=$PROJECT_ID', '--build-arg', 'OPENLANE_VERSION=$_OPENLANE_VERSION', '-f', './scripts/build/containers/openlane-jupyterlab/Dockerfile', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['tag', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:latest']  
 images:
 - '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-pdk:$_OPENLANE_VERSION'
 - '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID'
 - '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:latest'
+artifacts:
+  objects:
+    location: gs://$_NOTEBOOKS_BUCKET/
+    paths:
+    - 'scripts/build/notebooks/copy-silicon-notebooks.sh'
+    - 'scripts/build/notebooks/*.ipynb'

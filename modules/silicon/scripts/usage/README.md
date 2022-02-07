@@ -14,7 +14,7 @@
 
 2. Navigate to the directory where the bash script is downloaded.
 
-3. Update line 25 - 27 of `ai-notebook-desktop-script.sh` script based on the deployment output information provided by the _Cloud Admin_ as per [RADLab Readme](../../../../radlab-installer/README.md##steps-to-install-rad-lab-modules).
+3. Update line 25 - 27 of `ai-notebook-desktop-script.sh` script based on the deployment output information provided by the _Cloud Admin_ as per [RAD Lab Readme](../../../../radlab-installer/README.md##steps-to-install-rad-lab-modules).
 ```
 export INSTANCE_NAME="AI_NOTEBOOK_INSTANCE_NAME"
 export PROJECT="PROJECT_ID"

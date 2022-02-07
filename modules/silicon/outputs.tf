@@ -15,12 +15,12 @@
  */
 
 output "deployment_id" {
-  description = "RADLab Module Deployment ID"
+  description = "RAD Lab Module Deployment ID"
   value       = local.random_id
 }
 
 output "project_radlab_silicon_id" {
-  description = "Analytics Project ID"
+  description = "Silicon RAD Lab Project ID"
   value       = local.project.project_id
 }
 
@@ -29,12 +29,17 @@ output "notebooks_instance_names" {
   value       = join(", ", google_notebooks_instance.ai_notebook[*].name)
 }
 
+output "notebooks_bucket_name" {
+  description = "Notebooks GCS Bucket Name"
+  value       = google_storage_bucket.notebooks_bucket.name
+}
+
 output "artifact_registry_repository_id" {
-  description = "Artifact registry repository ID"
+  description = "Artifact Registry Repository ID"
   value       = google_artifact_registry_repository.containers_repo.repository_id
 }
 
 output "notebooks_container_image" {
-  description = "Artifact registry repository ID"
-  value       = "${google_notebooks_instance.ai_notebook[0].container_image[0].repository}:latest}"
+  description = "Container Image URI"
+  value       = "${google_notebooks_instance.ai_notebook[0].container_image[0].repository}:${google_notebooks_instance.ai_notebook[0].container_image[0].tag}"
 }

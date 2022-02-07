@@ -39,6 +39,7 @@ locals {
     "roles/notebooks.admin",
     "roles/compute.instanceAdmin",
     "roles/iam.serviceAccountUser",
+    "roles/storage.objectViewer",    
   ]
 
   project_services = var.enable_services ? [
@@ -54,7 +55,7 @@ resource "random_id" "default" {
 }
 
 #####################
-# ANALYTICS PROJECT #
+#  SILICON PROJECT  #
 #####################
 
 data "google_project" "existing_project" {
@@ -123,7 +124,7 @@ module "vpc_ai_notebook" {
 
   firewall_rules = [
     {
-      name        = "fw-ai-notebook-allow-internal"
+      name        = "fw-silicon-notebook-allow-internal"
       description = "Firewall rule to allow traffic on all ports inside *vpc-silicon* VPC network."
       priority    = 65534
       ranges      = ["10.0.0.0/8"]
@@ -176,12 +177,13 @@ resource "google_project_iam_binding" "ai_notebook_user_role2" {
 resource "google_notebooks_instance" "ai_notebook" {
   count        = var.notebook_count
   project      = local.project.project_id
-  name         = "notebooks-instance-${count.index}"
+  name         = "silicon-notebook-${count.index}"
   location     = var.zone
   machine_type = var.machine_type
 
   container_image {
     repository = "${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/openlane-jupyterlab"
+    tag = "latest"
  }
 
   service_account = google_service_account.sa_p_notebook.email
@@ -195,6 +197,8 @@ resource "google_notebooks_instance" "ai_notebook" {
 
   network = local.network.self_link
   subnet  = local.subnet.self_link
+
+  post_startup_script = "gs://${google_storage_bucket.notebooks_bucket.name}/copy-silicon-notebooks.sh"
 
   labels = {
     module = "silicon"
@@ -224,21 +228,31 @@ resource "google_artifact_registry_repository" "containers_repo" {
   ]  
 }
 
+resource "google_storage_bucket" "notebooks_bucket" {
+  project                     = local.project.project_id
+  name                        = "${local.project.project_id}-silicon-notebooks"
+  location                    = local.region
+  force_destroy               = true
+  uniform_bucket_level_access = true
+}
+
+
 # Locally build container for notebook container and push to container registry #
 resource "null_resource" "build_and_push_image" {
   triggers = {
-    cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/container/jupyterlab/cloudbuild.yaml")
-    dockerfile_sha      = filesha1("${path.module}/scripts/build/container/jupyterlab/Dockerfile")
-    build_script_sha    = filesha1("${path.module}/scripts/build/container/jupyterlab/build-container.sh")
-    notebook_sha    = filesha1("${path.module}/scripts/build/container/jupyterlab/inverter.ipynb")    
+    cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/cloudbuild.yaml")
+    build_script_sha    = filesha1("${path.module}/scripts/build/build.sh")
+    dockerfile_sha      = filesha1("${path.module}/scripts/build/containers/openlane-jupyterlab/Dockerfile")
+    notebook_sha    = filesha1("${path.module}/scripts/build/notebooks/inverter.md")    
   }
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "scripts/build/container/jupyterlab/build-container.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.location} ${google_artifact_registry_repository.containers_repo.repository_id}"
+    command     = "scripts/build/build.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.location} ${google_artifact_registry_repository.containers_repo.repository_id} ${google_storage_bucket.notebooks_bucket.name}"
   }
 
   depends_on = [
-    google_artifact_registry_repository.containers_repo
+    google_artifact_registry_repository.containers_repo,
+    google_storage_bucket.notebooks_bucket,
   ]  
 }

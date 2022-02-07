@@ -10,9 +10,9 @@ This RAD Lab module provides a managed environment for custom silicon design usi
 
 ## Samples notebooks
 
-- [Inverter](scripts/build/container/jupyterlab/inverter.ipynb)
+- [Inverter](scripts/build/notebooks/inverter.md)
 
-![gds render](scripts/build/container/jupyterlab/inverter.svg)
+![gds render](scripts/build/notebooks/inverter.svg)
 
 ## GCP Products/Services 
 
@@ -130,9 +130,9 @@ module "existing_project_and_network" {
 
 | name | description | sensitive |
 |---|---|:---:|
-| deployment_id | RADLab Module Deployment ID |  |
+| deployment_id | RAD Lab Module Deployment ID |  |
 | notebooks-instance-names | Notebook Instance Names |  |
-| project-radlab-silicon-id | Analytics Project ID |  |
+| project-radlab-silicon-id | Silicon Project ID |  |
 <!-- END TFDOC -->
 
 ## Access RAD Lab Data Science Notebooks
