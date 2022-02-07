@@ -39,7 +39,7 @@ locals {
     "roles/notebooks.admin",
     "roles/compute.instanceAdmin",
     "roles/iam.serviceAccountUser",
-    "roles/storage.objectViewer",    
+    "roles/storage.objectViewer",
   ]
 
   project_services = var.enable_services ? [
@@ -183,8 +183,8 @@ resource "google_notebooks_instance" "ai_notebook" {
 
   container_image {
     repository = "${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/openlane-jupyterlab"
-    tag = "latest"
- }
+    tag        = "latest"
+  }
 
   service_account = google_service_account.sa_p_notebook.email
 
@@ -217,15 +217,15 @@ resource "google_notebooks_instance" "ai_notebook" {
 resource "google_artifact_registry_repository" "containers_repo" {
   provider = google-beta
 
-  project = local.project.project_id
-  location = local.region
+  project       = local.project.project_id
+  location      = local.region
   repository_id = "containers"
-  description = "container image repository"
-  format = "DOCKER"
+  description   = "container image repository"
+  format        = "DOCKER"
 
   depends_on = [
     google_project_service.enabled_services
-  ]  
+  ]
 }
 
 resource "google_storage_bucket" "notebooks_bucket" {
@@ -243,7 +243,7 @@ resource "null_resource" "build_and_push_image" {
     cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/cloudbuild.yaml")
     build_script_sha    = filesha1("${path.module}/scripts/build/build.sh")
     dockerfile_sha      = filesha1("${path.module}/scripts/build/containers/openlane-jupyterlab/Dockerfile")
-    notebook_sha    = filesha1("${path.module}/scripts/build/notebooks/inverter.md")    
+    notebook_sha        = filesha1("${path.module}/scripts/build/notebooks/inverter.md")
   }
 
   provisioner "local-exec" {
@@ -254,5 +254,5 @@ resource "null_resource" "build_and_push_image" {
   depends_on = [
     google_artifact_registry_repository.containers_repo,
     google_storage_bucket.notebooks_bucket,
-  ]  
+  ]
 }
