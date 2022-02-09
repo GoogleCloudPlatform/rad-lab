@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ARG REPOSITORY_LOCATION
 ARG PROJECT_ID
+ARG REPOSITORY_ID
 ARG OPENLANE_VERSION
-FROM gcr.io/$PROJECT_ID/openlane-pdk:$OPENLANE_VERSION
+FROM $REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_ID/openlane-pdk:$OPENLANE_VERSION
 
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN bash Miniconda3-latest-Linux-x86_64.sh -b -f -p /conda-env

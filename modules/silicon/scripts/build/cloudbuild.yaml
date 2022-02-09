@@ -44,7 +44,7 @@ steps:
     source env-openlane/bin/activate
     docker pull $_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-pdk:$_OPENLANE_VERSION || make -C OpenLane OPENLANE_IMAGE_NAME=$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-pdk:$_OPENLANE_VERSION openlane
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID', '--build-arg', 'PROJECT_ID=$PROJECT_ID', '--build-arg', 'OPENLANE_VERSION=$_OPENLANE_VERSION', '-f', './scripts/build/containers/openlane-jupyterlab/Dockerfile', '.']
+  args: ['build', '-t', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID', '--build-arg=', 'REPOSITORY_LOCATION=$_REPOSITORY_LOCATION', '--build-arg', 'PROJECT_ID=$PROJECT_ID', '--build-arg', 'REPOSITORY_ID=$_REPOSITORY_ID', '--build-arg', 'OPENLANE_VERSION=$_OPENLANE_VERSION', '-f', './scripts/build/containers/openlane-jupyterlab/Dockerfile', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['tag', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:latest']  
 images:
