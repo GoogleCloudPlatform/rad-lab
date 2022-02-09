@@ -32,11 +32,14 @@ Ensure that the identity executing this module has the following IAM permissions
 - Parent: `roles/resourcemanager.projectCreator`
 
 When deploying in an existing project, ensure the identity has the following permissions on the project:
+- `roles/notebooks.admin`
 - `roles/compute.admin`
+- `roles/cloudbuild.builds.editor`
+- `roles/artifactregistry.admin`
+- `roles/storage.admin`
 - `roles/resourcemanager.projectIamAdmin`
 - `roles/iam.serviceAccountAdmin`
 - `roles/iam.serviceAccountUser`
-- `roles/notebooks.admin`
 
 Also ensure that the identity creating the resources has access to a billing account, via `roles/billing.user` and also able to view the Organization recources via, `roles/iam.organizationRoleViewer`
 
