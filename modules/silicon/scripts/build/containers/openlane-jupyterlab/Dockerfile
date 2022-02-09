@@ -29,4 +29,4 @@ EXPOSE 8080
 ENV JUPYTER_PORT 8080
 
 WORKDIR /home/jupyter
-ENTRYPOINT ["/conda-env/bin/jupyter", "lab", "--ip", "0.0.0.0", "--allow-root", "--ServerApp.token=''", "--ServerApp.allow_origin_pat='^https?://.*\\.notebooks\\.googleusercontent\\.com'", "--ServerApp.allow_remote_access=True"]
+ENTRYPOINT ["/bin/bash", "-c", "source /conda-env/bin/activate && jupyter lab --ip 0.0.0.0 --allow-root --ServerApp.token='' --ServerApp.allow_origin_pat='^https?://.*\\.notebooks\\.googleusercontent\\.com' --ServerApp.allow_remote_access=True"]
