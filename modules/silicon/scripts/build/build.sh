@@ -12,7 +12,9 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
+# limitations under the Lpicense.
+
+set -ex
 
 PROJECT_ID=$1
 REPOSITORY_LOCATION=$2
@@ -20,4 +22,4 @@ REPOSITORY_ID=$3
 NOTEBOOKS_BUCKET=$4
 
 gcloud config set project ${PROJECT_ID}
-gcloud builds submit . --config ./scripts/build/cloudbuild.yaml --substitutions _REPOSITORY_LOCATION=$REPOSITORY_LOCATION,_REPOSITORY_ID=$REPOSITORY_ID,_NOTEBOOKS_BUCKET=$NOTEBOOKS_BUCKET
+gcloud builds submit . --config ./scripts/build/cloudbuild.yaml --substitutions "_REPOSITORY_LOCATION=${REPOSITORY_LOCATION},_REPOSITORY_ID=${REPOSITORY_ID},_NOTEBOOKS_BUCKET=${NOTEBOOKS_BUCKET}"

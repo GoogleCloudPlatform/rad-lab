@@ -18,6 +18,8 @@ substitutions:
   _REPOSITORY_LOCATION: $LOCATION
   _REPOSITORY_ID: gcr.io
   _NOTEBOOKS_BUCKET: $PROJECT_ID-silicon-notebooks
+options:
+  logging: CLOUD_LOGGING_ONLY
 steps:
 - name: 'python'
   entrypoint: '/bin/bash'

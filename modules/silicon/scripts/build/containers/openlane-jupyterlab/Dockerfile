@@ -20,6 +20,10 @@ FROM $REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_ID/openlane-pdk
 
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN bash Miniconda3-latest-Linux-x86_64.sh -b -f -p /conda-env
+# install openlane dependencies in conda environment
+RUN /conda-env/bin/conda install -c conda-forge -y python pip
+# install openlane dependencies in conda environment
+RUN /conda-env/bin/python -m pip install click pyyaml matplotlib "jinja2<3.0.0" pandas install XlsxWriter
 RUN /conda-env/bin/conda install -c conda-forge -y jupyterlab gdstk
 
 RUN groupadd --gid 1001 jupyter
