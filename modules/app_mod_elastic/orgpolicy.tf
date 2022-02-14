@@ -43,6 +43,9 @@ resource "google_project_organization_policy" "shielded_vm_policy" {
 }
 
 resource "time_sleep" "wait_120_seconds" {
+  
+  count = var.set_vpc_peering_policy || var.set_shielded_vm_policy ? 1 : 0
+
   depends_on = [
       google_project_organization_policy.vpc_peering_policy,
       google_project_organization_policy.shielded_vm_policy

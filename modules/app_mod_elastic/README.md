@@ -18,7 +18,7 @@ Below Architechture Diagram is the base representation of what will be created a
 Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
 - Parent: `roles/billing.user`
 - Parent: `roles/resourcemanager.projectCreator`
-- Parent: `roles/orgpolicy.policyAdmin` [OPTIONAL - Only required if setting Org Policies via **orgpolicy.tf** for the module]
+- Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only required if setting any Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
 - Project: `roles/compute.admin`
 
 When deploying in an existing project, ensure the identity has the following permissions on the project:
@@ -160,7 +160,7 @@ module "elastic_search_project" {
 | *pod_cidr_block* | CIDR block to be assigned to pods running in the GKE cluster. | <code title="">string</code> |  | <code title="">10.100.0.0/16</code> |
 | *pod_ip_range_name* | Range name for the pod IP addresses. | <code title="">string</code> |  | <code title="">pod-ip-range</code> |
 | *preemptible_nodes* | Use preemptible VMs for the node pools | <code title="">bool</code> |  | <code title="">true</code> |
-| *project_name* | Name that will be assigned to the project.  To ensure uniqueness, a random_id will be added to the name. | <code title="">string</code> |  | <code title="">elastic-search-demo</code> |
+| *project_name* | Name that will be assigned to the project.  To ensure uniqueness, a random_id will be added to the name. | <code title="">string</code> |  | <code title="">radlab-app-mod-elastic</code> |
 | *random_id* | Random ID that will be used to suffix all resources.  Leave blank if you want the module to use a generated one. | <code title="">string</code> |  | <code title="">null</code> |
 | *region* | Region where the resources should be created. | <code title="">string</code> |  | <code title="">us-west1</code> |
 | *release_channel* | Enroll the GKE cluster in this release channel. | <code title="">string</code> |  | <code title="">REGULAR</code> |

@@ -29,7 +29,7 @@ FastQC tool is built as a container and stored in the Google cloud Container reg
 
 ## Reference Architecture Diagram
 
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
+Below Architecture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
 ![](../../docs/images/V3_Genomics.png)
 
@@ -38,7 +38,7 @@ Below Architechture Diagram is the base representation of what will be created a
 Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
 - Parent: `roles/billing.user`
 - Parent: `roles/resourcemanager.projectCreator`
-- Parent: `roles/orgpolicy.policyAdmin` [OPTIONAL - Only required if setting Org Policies via **orgpolicy.tf** for the module]
+- Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only required if setting any Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
 
 When deploying in an existing project, ensure the identity has the following permissions on the project:
 - `roles/compute.admin`
@@ -63,7 +63,7 @@ NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prere
 | *ip_cidr_range* | Unique IP CIDR Range for ngs subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
 | *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-2</code> |
 | *network* | Network associated to the project | <code title="">string</code> |  | <code title="">ngs-network</code> |
-| *project_name* | Name of the project that should be used. | <code title="">string</code> |  | <code title="">radlab-genomics</code> |
+| *project_name* | Name of the project that should be used. | <code title="">string</code> |  | <code title="">radlab-genomics-dsub</code> |
 | *random_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *region* | Cloud Zone associated to the project | <code title="">string</code> |  | <code title="">europe-west2</code> |
 | *set_cloudfunctions_ingress_project_policy* | Apply org policy to set the ingress settings for cloud functions | <code title="">bool</code> |  | <code title="">true</code> |
