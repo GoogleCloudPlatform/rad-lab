@@ -7,20 +7,28 @@
 * Cloud Storage
 * Virtual Private Cloud (VPC)
 
-## Reference Architechture Diagram
+## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
 ![](../../docs/images/V1_DataScience.png)
 
-## IAM permissions to run the Terraform deployment
+## IAM Permissions Prerequisites
 
-The lab need to be deployed by a _Cloud Admin_ persona with the following GCP roles:
-* `Billing Account User`
-* `Organization Viewer`
-* `Project Creator`
-* `Storage Object Viewer`
-* [OPTIONAL] `Organization Policy Administrator`
+Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
+- Parent: `roles/billing.user`
+- Parent: `roles/resourcemanager.projectCreator`
+- Parent: `roles/orgpolicy.policyAdmin` [OPTIONAL - Only required if setting Org Policies via **orgpolicy.tf** for the module]
+
+When deploying in an existing project, ensure the identity has the following permissions on the project:
+- `roles/compute.admin`
+- `roles/resourcemanager.projectIamAdmin`
+- `roles/iam.serviceAccountAdmin`
+- `roles/storage.admin`
+- `roles/notebooks.admin`
+
+NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](./radlab-launcher)
+
 
 ## Using Terraform module
 Here are a couple of examples to use the module directly in your Terraform code, as opposed to using the RAD Lab Launcher.
@@ -37,13 +45,6 @@ module "simple" {
 }
 ```
 ### Use existing project
-
-Make sure the identity running the Terraform code has the following IAM permissions on the project:
-* `roles/compute.admin`
-* `roles/resourcemanager.projectIamAdmin`
-* `roles/iam.serviceAccountAdmin`
-* `roles/storage.admin`
-* `roles/notebooks.admin`
 
 This example assumes that all the necessary APIs have been enabled as well.
 
@@ -67,10 +68,6 @@ module "existing_project" {
 
 ### Existing network
 Make sure the identity running the Terraform code has the following IAM permissions on the project:
-* `roles/resourcemanager.projectIamAdmin`
-* `roles/iam.serviceAccountAdmin`
-* `roles/storage.admin`
-* `roles/notebooks.admin`
 
 ```hcl
 module "existing_project_and_network" {

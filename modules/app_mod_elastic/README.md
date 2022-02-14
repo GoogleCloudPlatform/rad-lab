@@ -13,10 +13,12 @@ Below Architechture Diagram is the base representation of what will be created a
 
 ![](../../docs/images/V2_AppModElasticSearch.png)
 
-## Prerequisites
+## IAM Permissions Prerequisites
 
 Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
+- Parent: `roles/billing.user`
 - Parent: `roles/resourcemanager.projectCreator`
+- Parent: `roles/orgpolicy.policyAdmin` [OPTIONAL - Only required if setting Org Policies via **orgpolicy.tf** for the module]
 - Project: `roles/compute.admin`
 
 When deploying in an existing project, ensure the identity has the following permissions on the project:
@@ -29,7 +31,7 @@ When deploying in an existing project, ensure the identity has the following per
 - `roles/resourcemanager.projectIamAdmin`
 - `roles/serviceusage.serviceUsageAdmin`
 
-Also ensure that the identity creating the resources has access to a billing account, via `roles/billing.user`.
+NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](./radlab-launcher)
 
 ### Deploy Elasticsearch
 The module deploys both the ECK CRDs and Operators.  As this module can be used to demo Elasticsearch, it also deploys an ES and Kibana pod in the cluster.  This behaviour can be switched off by setting `deploy_elastic_search` to false.  This will only deploy the CRDs and Operators.

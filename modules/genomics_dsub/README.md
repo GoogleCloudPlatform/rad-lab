@@ -27,20 +27,26 @@ FastQC tool is built as a container and stored in the Google cloud Container reg
 * Once the module is deployed, to start using the pipelines, upload your fastq or fastq.qz files to the input GCS bucket (ngs-input-bucket-xxx), this automatically triggers the FastQC pipeline and the output QC reports and exeuction logs are stored in the output bucket (ngs-output-bucket-xxx)
 
 
-## Reference Architechture Diagram
+## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
 ![](../../docs/images/V3_Genomics.png)
 
-## IAM permissions to run the Terraform deployment
+## IAM Permissions Prerequisites
 
-The lab need to be deployed by a _Cloud Admin_ persona with the following GCP roles:
-* `Billing Account User`
-* `Organization Viewer`
-* `Project Creator`
-* `Storage Object Viewer`
-* [OPTIONAL] `Organization Policy Administrator`
+Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
+- Parent: `roles/billing.user`
+- Parent: `roles/resourcemanager.projectCreator`
+- Parent: `roles/orgpolicy.policyAdmin` [OPTIONAL - Only required if setting Org Policies via **orgpolicy.tf** for the module]
+
+When deploying in an existing project, ensure the identity has the following permissions on the project:
+- `roles/compute.admin`
+- `roles/resourcemanager.projectIamAdmin`
+- `roles/iam.serviceAccountAdmin`
+- `roles/storage.admin`
+
+NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](./radlab-launcher)
 
 <!-- BEGIN TFDOC -->
 ## Variables

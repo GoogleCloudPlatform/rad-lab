@@ -44,7 +44,7 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
 
 ## Launch Preparation
 
-7. To launch infrastructure in Google Cloud, a user must have the appropriate [IAM](https://cloud.google.com/iam/docs/overview) permissions. Each [module](../../modules)'s `README.md` will list the permissions needed to launch the infrastructure. You can use the Google Cloud Console to [view](https://cloud.google.com/iam/docs/manage-access-other-resources) or [change](https://cloud.google.com/iam/docs/manage-access-other-resources#single-role) IAM permissions.
+7. GCP Project for RAD Lab management. (Example - Creating/Utilizing GCS bucket where Terraform states will be stored) 
 
 8. The following information about your Google Cloud Platform (GCP) environment is typically needed to launch RAD Lab modules:
 
@@ -55,6 +55,15 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
    * [Billing Account](https://cloud.google.com/billing/docs/how-to/manage-billing-account) for RAD Lab deployments (projects/resources).
    * [OPTIONAL] [Folder ID](https://cloud.google.com/resource-manager/docs/creating-managing-folders#view) to deploy the module in an existing folder.
    * [OPTIONAL] [Cloud Storage Bucket](https://cloud.google.com/storage/docs/creating-buckets) with read/write access to save the Terraform state. This bucket is used to save state for all active deployments. The launcher can create one for you if you do not have one already.
+
+### IAM Permissions Prerequisites
+
+In addition to the [module](../../modules) specific minimum [IAM](https://cloud.google.com/iam/docs/overview) permissions (listed in Each [module](../../modules)'s `README.md`), entity deploying RAD Lab modules via **RAD Lab Launcher** will also need to have below permission:
+- Parent: `roles/iam.organizationRoleViewer` [OPTIONAL: This permission is not required if *no parent (organization/folder)* exists]
+- RAD Lab Management Project: `roles/storage.admin`
+- RAD Lab Management Project: `roles/serviceusage.serviceUsageConsumer`
+
+You can use the Google Cloud Console to [view](https://cloud.google.com/iam/docs/manage-access-other-resources) or [change](https://cloud.google.com/iam/docs/manage-access-other-resources#single-role) IAM permissions.
 
 ## Deploy a RAD Lab Module
 **If you encounter errors during deployment, please see [Troubleshooting Common Problems](../../docs/TROUBLESHOOTING.md) section for a list of common problems and fixes.**  If you don't see a solution listed, please create an [Issue](https://github.com/GoogleCloudPlatform/rad-lab/issues). 
