@@ -17,15 +17,19 @@
 #  PREREQ: installer_prereq.py
 
 import os
+import re
 import sys
 import json
 import glob
 import shutil
 import string
 import random
+import requests
 import argparse
 import platform
+import subprocess
 from os import path
+from pprint import pprint
 from google.cloud import storage
 from googleapiclient import discovery
 from colorama import Fore, Back, Style
@@ -43,23 +47,26 @@ def main(varcontents={}):
     orgid           = ""
     folderid        = ""
     billing_acc     = ""
-    selected_module = ""
+    currentusr      = ""
     state           = ""
 
     setup_path = os.getcwd()
 
-    # Setting Credentials for non Cloud Shell CLI
-    if(platform.system() != 'Linux' and platform.processor() !='' and not platform.system().startswith('cs-')):
-        # countdown(5)
-        print("Login with Cloud Admin account...")
-        os.system("gcloud auth application-default login")
+    # Setting "gcloud auth application-default" to deploy RAD Lab Modules
+    currentusr = radlabauth(currentusr)
 
     # Setting up Project-ID
     projid = set_proj(projid)
 
+    # Checking for User Permissions
+    launcherperm(projid,currentusr)
+
     # Listing / Selecting from available RAD Lab modules
     module_name = list_modules()
-    
+
+    # Checking Module specific permissions
+    moduleperm(projid,module_name,currentusr)
+
     # Validating user input Terraform variables against selected module
     validate_tfvars(varcontents, module_name)
 
@@ -72,6 +79,40 @@ def main(varcontents={}):
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
 	
+def radlabauth(currentusr):
+
+    try:
+        token = subprocess.Popen(["gcloud auth application-default print-access-token"],shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.read().strip().decode('utf-8')
+        r = requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+token)
+        currentusr = r.json()["email"]
+    
+        # Setting Credentials for non Cloud Shell CLI
+        if(platform.system() != 'Linux' and platform.processor() !='' and not platform.system().startswith('cs-')):
+            # countdown(5)
+            x = input("\nWould you like to proceed the RAD Lab deployment with user - " + Fore.YELLOW + currentusr + Style.RESET_ALL + ' ?\n[1] Yes\n[2] No\n'+ Fore.YELLOW + Style.BRIGHT + 'Choose a number : ' + Style.RESET_ALL ).strip()
+            if(x == '1'):
+                pass
+            elif(x == '2'):
+                print("\nLogin with User account with which you would like to deploy RAD Lab Modules...\n")
+                os.system("gcloud auth application-default login")  
+            else:
+                currentusr = '0'
+
+    except:
+        print("\nLogin with User account with which you would like to deploy RAD Lab Modules...\n")
+        os.system("gcloud auth application-default login")
+    
+    finally:
+        if(currentusr == '0'):
+            sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
+        else:
+            token = subprocess.Popen(["gcloud auth application-default print-access-token"],shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.read().strip().decode('utf-8')
+            r = requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+token)
+            currentusr = r.json()["email"]
+
+            print("\nUser to deploy RAD Lab Modules (Selected) : " + Fore.GREEN + Style.BRIGHT + currentusr + Style.RESET_ALL )        
+            return currentusr
+
 def set_proj(projid):
     projid = os.popen("gcloud config list --format 'value(core.project)' 2>/dev/null").read().strip()
     if(projid != ""):
@@ -86,6 +127,277 @@ def set_proj(projid):
         os.system("gcloud config set project " + projid)
     print("\nProject ID (Selected) : " + Fore.GREEN + Style.BRIGHT + projid + Style.RESET_ALL)
     return projid
+
+def launcherperm(projid,currentusr):
+    # Hardcoded Project level required RAD Lab Launcher roles
+    launcherprojroles = ['roles/storage.admin','roles/serviceusage.serviceUsageConsumer']
+    # Hardcoded Org level required RAD Lab Launcher roles
+    launcherorgroles = ['roles/iam.organizationRoleViewer']
+    
+    credentials = GoogleCredentials.get_application_default()
+
+    service0 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
+    request0 = service0.projects().getIamPolicy(resource='projects/'+projid)
+    response0 = request0.execute()
+    
+    projiam = True
+    for role in launcherprojroles:
+        rolefound = False
+        for y in range(len(response0['bindings'])):
+            # print("ROLE --->")
+            # print(response0['bindings'][y]['role'])
+            # print("MEMBERS --->")
+            # print(response0['bindings'][y]['members'])
+            if(role == response0['bindings'][y]['role']):
+                rolefound = True
+                if('user:'+currentusr not in response0['bindings'][y]['members']):
+                    projiam = False
+                    sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )
+                else:
+                    pass
+        
+        if rolefound == False:
+            sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n((Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )
+    
+    if projiam == True:
+        print(Fore.GREEN + '\nRADLAB MODULE - Project Permission check passed\n' + Style.RESET_ALL)
+
+    service1 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
+    request1 = service1.projects().get(name='projects/'+projid)
+    response1 = request1.execute()
+
+    if 'parent' in response1.keys():
+        service2 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
+        request2 = service2.organizations().getIamPolicy(resource=response1['parent'])
+        response2 = request2.execute()
+
+        orgiam = True
+        for role in launcherorgroles:
+            rolefound = False
+            for x in range(len(response2['bindings'])):
+                    # print("ROLE --->")
+                    # print(response2['bindings'][x]['role'])
+                    # print("MEMBERS --->")
+                    # print(response2['bindings'][x]['members'])
+                if(role == response2['bindings'][x]['role']):
+                    rolefound = True
+                    if('user:'+currentusr not in response2['bindings'][x]['members']):
+                        orgiam = False
+                        sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                    else:
+                        pass  
+            
+            if rolefound == False:
+                sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                    
+        if orgiam == True:
+                print(Fore.GREEN + '\nRADLAB MODULE - Organization Permission check passed\n' + Style.RESET_ALL)
+    else:
+        print(Fore.YELLOW + '\nRADLAB LAUNCHER - Skipping Organization Permission check. No Organization associated with the project: ' + projid + Style.RESET_ALL)
+
+
+def moduleperm(projid,module_name,currentusr):
+
+    # Check if any of the org policy is used in orgpolicy.tf
+    setorgpolicy = True
+    try:
+        ## Finding policy variables in orgpolicy.tf
+        with open(os.path.dirname(os.getcwd()) + '/modules/'+ module_name + '/orgpolicy.tf', "r") as file:
+            policy_vars = []
+            for line in file:
+                if('count' in line and 'var.' in line and '||' not in line):
+                    policy_vars.append(line[line.find("var.")+len("var."):line.find("?")].strip())
+        # print("Org Policy Variables:")
+        # print(policy_vars)
+
+        ## [CHECK 1] Checking for commented orgpolicy resource in orgpolicy.tf
+        numCommentedOrgPolicy = 0
+        for policy in policy_vars:
+            with open(os.path.dirname(os.getcwd()) + '/modules/'+ module_name + '/orgpolicy.tf', "r") as file:
+                for line in file:
+                    # Finding Org policy resource block
+                    if('count' in line and 'var.' + policy in line and '?' in line):
+                        # Checking for commented resource block line
+                        if(line.startswith('#') or line.startswith('//')):
+                            numCommentedOrgPolicy = numCommentedOrgPolicy +1
+       
+        # If No. of commented Org Policies are equal to total policies; No Org policy set
+        if(numCommentedOrgPolicy == len(policy_vars)):
+            setorgpolicy = False
+
+        ## [CHECK 2] Checking if policy variables in variables.tf are set to 'false'
+        numDisabledOrgPolicyVar = 0
+        for var in policy_vars:
+            varblock = ""
+            block = False
+            with open(os.path.dirname(os.getcwd()) + '/modules/'+ module_name + '/variables.tf', "r") as file:
+                for line in file:
+                    if(var in line):
+                        block = True
+                    elif('}' in line):
+                        block = False
+
+                    if(block == True):
+                        varblock = varblock + line
+                
+            # print(varblock + '}')
+
+            # Count number of disabled policies
+            if('false' in varblock.split('default')[1]):
+                numDisabledOrgPolicyVar = numDisabledOrgPolicyVar +1
+        
+        # If No. of disabled Org Policies are equal to total policies; No Org policy set
+        if(numDisabledOrgPolicyVar == len(policy_vars)):
+            setorgpolicy = False
+        
+        ## [CHECK 3] Checking if policy variables in variables.tf are commented
+        numCommentedOrgPolicyVar = 0
+        for var in policy_vars:
+            with open(os.path.dirname(os.getcwd()) + '/modules/'+ module_name + '/variables.tf', "r") as file:
+                for line in file:
+                    # Finding Org policy resource block
+                    if('variable' in line and policy in line):
+                        # Checking for commented resource block line
+                        if(line.startswith('#') or line.startswith('//') or line.startswith('/*')):
+                            numCommentedOrgPolicyVar = numCommentedOrgPolicyVar +1
+
+        # If No. of commented Org Policies Variables are equal to total policies; No Org policy set
+        if(numCommentedOrgPolicyVar == len(policy_vars)):
+            setorgpolicy = False
+
+    except:
+        setorgpolicy = False
+
+    # Check if reusing project
+    create_project = True
+    try:
+        ## Finding 'create_project' variable in variables.tf
+        varblock = ""
+        block = False
+        with open(os.path.dirname(os.getcwd()) + '/modules/'+ module_name + '/variables.tf', "r") as file:
+            for line in file:
+                if('create_project' in line ):
+                    block = True
+                elif('}' in line):
+                    block = False
+
+                if(block == True):
+                    varblock = varblock + line
+
+        # print(varblock + '}')
+        if('false' in varblock.split('default')[1]):
+            create_project = False
+
+    except Exception as e: 
+        print(e)
+
+    print("SET ORG POLICY: " + str(setorgpolicy))
+    print("CREATE PROJECT: " + str(create_project))
+    
+    # Scrape out Module specific permissions for the module
+    try:
+        with open(os.path.dirname(os.getcwd()) + '/modules/'+ module_name + '/README.md', "r") as file:
+            section = False
+            orgroles = []
+            projroles = []
+
+            for line in file:
+                if(line.startswith("## IAM Permissions Prerequisites")):
+                    section = True
+
+                # Identifying Roles if New Project is supposed to be created
+                if(create_project == True):
+                    if(section == True and line.startswith('- Parent: `')):
+                        orgroles.append(re.search("\`(.*?)\`",line).group(1))
+                    if(section == True and line.startswith('- Project: `')):
+                        projroles.append(re.search("\`(.*?)\`",line).group(1))    
+
+                # Identifying Roles if Reusing any Existing project
+                else:
+                    if(section == True and (line.startswith('- `') or line.startswith('- `'))):
+                        projroles.append(re.search("\`(.*?)\`",line).group(1))
+
+                if(line.startswith('#') and not line.startswith("## IAM Permissions Prerequisites")):
+                    section = False
+
+        # Removing optional role 'roles/orgpolicy.policyAdmin' if Org Policy is not set
+        if(setorgpolicy == False and 'roles/orgpolicy.policyAdmin' in orgroles):
+            orgroles.remove('roles/orgpolicy.policyAdmin')
+    
+    except:
+        print(Fore.RED +'IAM Permissions Prerequisites are missing in the README.md or the README.md file do not exisits for module : ' + module_name + Style.RESET_ALL)
+
+   # Check Module permissions permission 
+    credentials = GoogleCredentials.get_application_default()
+    service = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
+
+    # Check Project level permissions
+    if len(projroles) != 0:
+        # print("Project Roles to check:")
+        # print(projroles)
+        # print("/*************** PROJECT IAM POLICY *************/")
+        request1 = service.projects().getIamPolicy(resource='projects/'+projid)
+        response1 = request1.execute()
+        projiam = True
+
+        for role in projroles:
+            rolefound = False
+            for y in range(len(response1['bindings'])):
+                # print("ROLE --->")
+                # print(response1['bindings'][y]['role'])
+                # print("MEMBERS --->")
+                # print(response1['bindings'][y]['members'])
+                if (role == response1['bindings'][y]['role']):
+                    rolefound = True
+                    if('user:'+currentusr not in response1['bindings'][y]['members']):
+                        projiam = False
+                        sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                    else:
+                        pass
+            
+            if rolefound == False:
+                sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+     
+
+        if projiam == True:
+            print(Fore.GREEN + '\nRADLAB MODULE - Project Permission check passed\n' + Style.RESET_ALL)
+
+    # Check Org level permissions 
+    if len(orgroles) != 0:
+        # print("Org Roles to check:")
+        # print(orgroles)
+        request = service.projects().get(name='projects/'+projid)
+        response = request.execute()
+
+        if 'parent' in response.keys():
+            # print("/*************** ORG IAM POLICY *************/")
+            request2 = service.organizations().getIamPolicy(resource=response['parent'])
+            response2 = request2.execute()
+            # pprint(response2)
+            orgiam = True
+            for role in orgroles:
+                rolefound = False
+                for x in range(len(response2['bindings'])):
+                    # print("ROLE --->")
+                    # print(response2['bindings'][x]['role'])
+                    # print("MEMBERS --->")
+                    # print(response2['bindings'][x]['members'])
+
+                    if (role == response2['bindings'][x]['role']):
+                        rolefound = True
+                        if('user:'+currentusr not in response2['bindings'][x]['members']):
+                            orgiam = False
+                            sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                        else:
+                            pass   
+
+                if rolefound == False:
+                    sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                     
+            if orgiam == True:
+                    print(Fore.GREEN + '\nRADLAB MODULE - Organization Permission check passed\n' + Style.RESET_ALL)
+        else:
+            print(Fore.YELLOW + '\nRADLAB LAUNCHER - Skipping Organization Permission check. No Organization associated with the project: ' + projid + Style.RESET_ALL)
 
 def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, projid):
     tr = Terraform(working_dir=env_path)
@@ -121,7 +433,6 @@ def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, proji
 
     # Deleting Local deployment config
     shutil.rmtree(env_path)
-
 
 def upload_from_directory(projid, directory_path: str, content: str, dest_bucket_name: str, dest_blob_name: str):
     rel_paths = glob.glob(directory_path + content, recursive=True)
@@ -283,6 +594,7 @@ def getbillingacc():
     
         request = service.billingAccounts().list()
         response = request.execute()
+        # print(response['billingAccounts'])
 
         print("\nList of Billing account you have access to: \n")
         billing_accounts = []    
@@ -383,10 +695,13 @@ def getbucket(state,projid):
                 print(Fore.RED + "\nINVALID or NO OPTION SELECTED FOR BUCKET NAME.\n\nEnter the Bucket name Manually...\n"+ Style.RESET_ALL)
                 sys.exit(1)
 
-        except:
-            tfbucket = input(Fore.YELLOW + Style.BRIGHT +"Enter the GCS Bucket name where Terraform Configs & States will be stored"+ Style.RESET_ALL + ": ")
-            tfbucket = tfbucket.lower().strip()
-            return tfbucket
+        except Exception as e: 
+            print(e)
+
+        # except:
+        #     tfbucket = input(Fore.YELLOW + Style.BRIGHT +"Enter the GCS Bucket name where Terraform Configs & States will be stored"+ Style.RESET_ALL + ": ")
+        #     tfbucket = tfbucket.lower().strip()
+        #     return tfbucket
 
     elif(bucketoption == '2'):
         print("CREATE BUCKET")
@@ -639,7 +954,6 @@ def fetchvariables(filecontents):
     else:
         sys.exit(Fore.RED + 'No variables in the input file')
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents", required=False)
@@ -652,3 +966,4 @@ if __name__ == "__main__":
     else:
          variables  = {}
     main(variables)
+    # moduleperm("radlab-solution","app_mod_elastic","radlab-admin@guptamukul.altostrat.com")

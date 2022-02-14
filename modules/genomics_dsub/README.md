@@ -36,11 +36,17 @@ Below Architecture Diagram is the base representation of what will be created as
 ## IAM Permissions Prerequisites
 
 Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
-- Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only when setting the Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
+- Parent: `roles/billing.user`
 - Parent: `roles/resourcemanager.projectCreator`
-- Project: `roles/storage.objectViewer`
+- Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only required if setting any Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
 
-Also ensure that the identity creating the resources has access to a billing account, via `roles/billing.user` and also able to view the Organization recources via, `roles/iam.organizationRoleViewer`
+When deploying in an existing project, ensure the identity has the following permissions on the project:
+- `roles/compute.admin`
+- `roles/resourcemanager.projectIamAdmin`
+- `roles/iam.serviceAccountAdmin`
+- `roles/storage.admin`
+
+NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](./radlab-launcher)
 
 <!-- BEGIN TFDOC -->
 ## Variables

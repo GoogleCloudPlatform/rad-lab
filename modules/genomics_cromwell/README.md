@@ -28,12 +28,26 @@ Once you run the command above simply click on the web preview button in the top
 * On your local device
 You can start an IAP tunnel on your local device from the terminal and then from the broswer browse to http://localhost:8080 . This would also work on Chromebooks with running the command from the Linux container, note that port 8080 is already mapped to localhost, so you only need to browse to  http://localhost:8080. you can also use CLI as shown above.
 
-## Reference Architechture Diagram
+## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
 ![](../../docs/images/V4_Genomics_Cromwell.png)
 
+## IAM Permissions Prerequisites
+
+Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
+- Parent: `roles/billing.user`
+- Parent: `roles/resourcemanager.projectCreator`
+- Parent: `roles/orgpolicy.policyAdmin` [OPTIONAL - Only required if setting Org Policies via **orgpolicy.tf** for the module]
+
+When deploying in an existing project, ensure the identity has the following permissions on the project:
+- `roles/compute.admin`
+- `roles/resourcemanager.projectIamAdmin`
+- `roles/iam.serviceAccountAdmin`
+- `roles/storage.admin`
+
+NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](./radlab-launcher)
 
 <!-- BEGIN TFDOC -->
 ## Variables

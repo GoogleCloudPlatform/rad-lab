@@ -102,6 +102,7 @@ variable "project_name" {
   type        = string
   default     = "radlab-data-science"
 }
+
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
   type        = string
@@ -137,7 +138,6 @@ variable "trusted_users" {
   type        = set(string)
   default     = []
 }
-
 
 variable "zone" {
   description = "Cloud Zone associated to the AI Notebooks"
