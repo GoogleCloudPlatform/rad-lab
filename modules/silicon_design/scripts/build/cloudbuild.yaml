@@ -17,7 +17,7 @@ substitutions:
   _OPENLANE_VERSION: 2022.02.01_02.19.58
   _REPOSITORY_LOCATION: $LOCATION
   _REPOSITORY_ID: gcr.io
-  _NOTEBOOKS_BUCKET: $PROJECT_ID-silicon-notebooks
+  _NOTEBOOKS_BUCKET: $PROJECT_ID-silicon-design-notebooks
 options:
   logging: CLOUD_LOGGING_ONLY
 steps:
@@ -29,7 +29,7 @@ steps:
     python3 -m venv env-jupytext/
     env-jupytext/bin/python -m pip install jupytext
     env-jupytext/bin/jupytext --to notebook scripts/build/notebooks/*.md
-    echo 'gsutil cp gs://$_NOTEBOOKS_BUCKET/*.ipynb /home/jupyter/' > scripts/build/notebooks/copy-silicon-notebooks.sh
+    echo 'gsutil cp gs://$_NOTEBOOKS_BUCKET/*.ipynb /home/jupyter/' > scripts/build/notebooks/copy-notebooks.sh
 - name: 'gcr.io/cloud-builders/git'
   args: ['clone', '-b', $_OPENLANE_VERSION, 'https://github.com/The-OpenROAD-Project/OpenLane']
 - name: 'gcr.io/cloud-builders/docker'
@@ -57,5 +57,5 @@ artifacts:
   objects:
     location: gs://$_NOTEBOOKS_BUCKET/
     paths:
-    - 'scripts/build/notebooks/copy-silicon-notebooks.sh'
+    - 'scripts/build/notebooks/copy-notebooks.sh'
     - 'scripts/build/notebooks/*.ipynb'
