@@ -43,12 +43,31 @@ resource "google_project_organization_policy" "shielded_vm_policy" {
   ]
 }
 
+resource "google_project_organization_policy" "trustedimage_project_policy" {
+  count      = var.set_trustedimage_project_policy ? 1 : 0
+  constraint = "compute.trustedImageProjects"
+  project    = local.project.project_id
+
+  list_policy {
+    allow {
+      values = [
+        "is:projects/deeplearning-platform-release",
+      ]
+    }
+  }
+
+  depends_on = [
+    module.project_radlab_silicon_design
+  ]
+}
+
 resource "time_sleep" "wait_120_seconds" {
-  count = var.set_shielded_vm_policy || var.set_external_ip_policy ? 1 : 0
+  count = var.set_trustedimage_project_policy || var.set_shielded_vm_policy || var.set_external_ip_policy ? 1 : 0
 
   depends_on = [
     google_project_organization_policy.external_ip_policy,
     google_project_organization_policy.shielded_vm_policy,
+    google_project_organization_policy.trustedimage_project_policy
   ]
 
   create_duration = "120s"

@@ -108,6 +108,12 @@ variable "set_shielded_vm_policy" {
   default     = true
 }
 
+variable "set_trustedimage_project_policy" {
+  description = "Apply org policy to set the trusted image projects."
+  type        = bool
+  default     = true
+}
+
 variable "subnet_name" {
   description = "Name of the subnet where to deploy the Notebooks."
   type        = string

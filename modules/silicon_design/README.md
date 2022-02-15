@@ -46,6 +46,7 @@ NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prere
 
 ## Using Terraform module
 Here are a couple of examples to use the module directly in your Terraform code, as opposed to using the RAD Lab Launcher.
+> NOTE: This module can take upto **50 minutes** to get completely deployed.
 
 ### Simple
 
