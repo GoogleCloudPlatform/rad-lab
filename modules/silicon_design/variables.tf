@@ -88,7 +88,7 @@ variable "organization_id" {
 variable "project_name" {
   description = "Project name or ID, if it's an existing project."
   type        = string
-  default     = ""
+  default     = "radlab-silicon-design"
 }
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
