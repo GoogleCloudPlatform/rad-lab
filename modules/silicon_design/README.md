@@ -137,7 +137,7 @@ module "existing_project_and_network" {
 | notebooks_bucket_name | Notebooks GCS Bucket Name |  |
 | notebooks_container_image | Container Image URI |  |
 | notebooks_instance_names | Notebook Instance Names |  |
-| project_radlab_silicon_design_id | Silicon Project ID |  |
+| project_radlab_silicon_design_id | Silicon Design RAD Lab Project ID |  |
 <!-- END TFDOC -->
 
 ## Access RAD Lab Silicon Design Notebooks
