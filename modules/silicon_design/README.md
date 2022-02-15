@@ -51,7 +51,7 @@ Here are a couple of examples to use the module directly in your Terraform code,
 
 ```hcl
 module "simple" {
-  source = "./modules/silicon"
+  source = "./modules/silicon_design"
 
   billing_account_id = "123456-123456-123465"
   organization_id    = "12345678901"
@@ -64,14 +64,14 @@ This example assumes that all the necessary APIs have been enabled as well.
 
 ````hcl
 module "existing_project" {
-  source = "./modules/silicon"
+  source = "./modules/silicon_design"
 
   billing_account_id = "123456-123456-123465"
   organization_id    = "12345678901"
   folder_id          = "1234567890"
 
   create_project  = false
-  project_name    = "silicon-project-id"
+  project_name    = "silicon-design-project-id"
   enable_services = false
   
   set_external_ip_policy          = false
@@ -83,20 +83,20 @@ module "existing_project" {
 
 ```hcl
 module "existing_project_and_network" {
-  source = "./modules/silicon"
+  source = "./modules/silicon_design"
 
   billing_account_id = "123456-123456-123465"
   organization_id    = "12345678901"
   folder_id          = "1234567890"
 
   create_project  = false
-  project_name    = "silicon-project-id"
+  project_name    = "silicon-design-project-id"
   enable_services = false
   enable_services = false
   
   create_network = false
-  network_name   = "silicon-network"
-  subnet_name    = "silicon-subnetwork"
+  network_name   = "silicon-design-network"
+  subnet_name    = "silicon-design-subnetwork"
 
   set_external_ip_policy          = false
   set_shielded_vm_policy          = false
@@ -137,7 +137,7 @@ module "existing_project_and_network" {
 | notebooks_bucket_name | Notebooks GCS Bucket Name |  |
 | notebooks_container_image | Container Image URI |  |
 | notebooks_instance_names | Notebook Instance Names |  |
-| project_radlab_silicon_id | Silicon RAD Lab Project ID |  |
+| project_radlab_silicon_design_id | Silicon Project ID |  |
 <!-- END TFDOC -->
 
 ## Access RAD Lab Silicon Design Notebooks

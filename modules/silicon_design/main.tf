@@ -17,7 +17,7 @@
 locals {
   random_id = var.random_id != null ? var.random_id : random_id.default.hex
   project = (var.create_project
-    ? try(module.project_radlab_silicon.0, null)
+    ? try(module.project_radlab_silicon_design.0, null)
     : try(data.google_project.existing_project.0, null)
   )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
@@ -54,16 +54,16 @@ resource "random_id" "default" {
   byte_length = 2
 }
 
-#####################
-#  SILICON PROJECT  #
-#####################
+############################
+#  SILICON DESIGN PROJECT  #
+############################
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
   project_id = var.project_name
 }
 
-module "project_radlab_silicon" {
+module "project_radlab_silicon_design" {
   count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 11.0"
@@ -85,7 +85,7 @@ resource "google_project_service" "enabled_services" {
   disable_on_destroy         = true
 
   depends_on = [
-    module.project_radlab_silicon
+    module.project_radlab_silicon_design
   ]
 }
 
@@ -117,15 +117,15 @@ module "vpc_ai_notebook" {
       subnet_name           = var.subnet_name
       subnet_ip             = var.ip_cidr_range
       subnet_region         = local.region
-      description           = "Subnetwork inside *vpc-silicon* VPC network, created via Terraform"
+      description           = "Subnetwork inside *vpc-silicon-design* VPC network, created via Terraform"
       subnet_private_access = true
     }
   ]
 
   firewall_rules = [
     {
-      name        = "fw-silicon-notebook-allow-internal"
-      description = "Firewall rule to allow traffic on all ports inside *vpc-silicon* VPC network."
+      name        = "fw-silicon-design-notebook-allow-internal"
+      description = "Firewall rule to allow traffic on all ports inside *vpc-silicon-design* VPC network."
       priority    = 65534
       ranges      = ["10.0.0.0/8"]
       direction   = "INGRESS"
@@ -177,7 +177,7 @@ resource "google_project_iam_binding" "ai_notebook_user_role2" {
 resource "google_notebooks_instance" "ai_notebook" {
   count        = var.notebook_count
   project      = local.project.project_id
-  name         = "silicon-notebook-${count.index}"
+  name         = "silicon-design-notebook-${count.index}"
   location     = var.zone
   machine_type = var.machine_type
 
@@ -198,10 +198,10 @@ resource "google_notebooks_instance" "ai_notebook" {
   network = local.network.self_link
   subnet  = local.subnet.self_link
 
-  post_startup_script = "gs://${google_storage_bucket.notebooks_bucket.name}/copy-silicon-notebooks.sh"
+  post_startup_script = "gs://${google_storage_bucket.notebooks_bucket.name}/copy-notebooks.sh"
 
   labels = {
-    module = "silicon"
+    module = "silicon-design"
   }
 
   metadata = {
@@ -230,7 +230,7 @@ resource "google_artifact_registry_repository" "containers_repo" {
 
 resource "google_storage_bucket" "notebooks_bucket" {
   project                     = local.project.project_id
-  name                        = "${local.project.project_id}-silicon-notebooks"
+  name                        = "${local.project.project_id}-silicon-design-notebooks"
   location                    = local.region
   force_destroy               = true
   uniform_bucket_level_access = true

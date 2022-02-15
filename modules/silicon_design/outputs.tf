@@ -19,8 +19,8 @@ output "deployment_id" {
   value       = local.random_id
 }
 
-output "project_radlab_silicon_id" {
-  description = "Silicon RAD Lab Project ID"
+output "project_radlab_silicon_design_id" {
+  description = "Silicon Design RAD Lab Project ID"
   value       = local.project.project_id
 }
 
