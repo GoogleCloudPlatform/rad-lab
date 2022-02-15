@@ -15,6 +15,17 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [4.1.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v4.1.0) (2022-02-15)
+
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v4.0.0...v4.1.0)
+
+### Added
+- _RAD Lab Launcher:_ Pre-Check IAM Permissions before deploying RAD Lab Modules. [(a28dbd2)](https://github.com/GoogleCloudPlatform/rad-lab/commit/a28dbd20145842db52a47a753a2d4a46d301a721) [(#10)](https://github.com/GoogleCloudPlatform/rad-lab/issues/10)[(#42)](https://github.com/GoogleCloudPlatform/rad-lab/issues/42)
+
+### Changed
+- _RAD Lab Launcher:_ Launcher to prompt for either proceeding with the existing GOOGLE_APPLICATION_CREDENTIALS or go through the login again. [(44cfae1)](https://github.com/GoogleCloudPlatform/rad-lab/commit/44cfae1eff7f5831b7e3712906edebf1eec7be89)
+- _RAD Lab Module:_ Standardized Project ID prefix for all RAD Lab Module [(baba1f1)](https://github.com/GoogleCloudPlatform/rad-lab/commit/baba1f1484add9c0f88dd6b3efb0bc4104df23ec)[(992f8d5)](https://github.com/GoogleCloudPlatform/rad-lab/commit/992f8d5ae63e4c2295b651084982123c0ae01cfc)[(7dfe944)](https://github.com/GoogleCloudPlatform/rad-lab/commit/7dfe944efe074d91ed3c022b97c031aec49ddd91)[(827df14)](https://github.com/GoogleCloudPlatform/rad-lab/commit/827df141738ca264f1e785739a1973c7c2de53fc)
+
 ## [4.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v4.0.0) (2022-01-14)
 
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v3.0.0...v4.0.0)
