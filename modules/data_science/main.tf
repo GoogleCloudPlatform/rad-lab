@@ -161,16 +161,18 @@ resource "google_service_account_iam_member" "sa_ai_notebook_user_iam" {
   service_account_id = google_service_account.sa_p_notebook.id
 }
 
-resource "google_project_iam_binding" "ai_notebook_user_role1" {
-  project = local.project.project_id
-  members = var.trusted_users
-  role    = "roles/notebooks.admin"
+resource "google_project_iam_member" "ai_notebook_user_role1" {
+  for_each = var.trusted_users
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/notebooks.admin"
 }
 
-resource "google_project_iam_binding" "ai_notebook_user_role2" {
-  project = local.project.project_id
-  members = var.trusted_users
-  role    = "roles/viewer"
+resource "google_project_iam_member" "ai_notebook_user_role2" {
+  for_each = var.trusted_users
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/viewer"
 }
 
 resource "google_notebooks_instance" "ai_notebook" {
