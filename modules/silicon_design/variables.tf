@@ -75,8 +75,14 @@ variable "network_name" {
 
 variable "notebook_count" {
   description = "Number of AI Notebooks requested"
-  type        = string
-  default     = "1"
+  type        = number
+  default     = 1
+}
+
+variable "notebook_names" {
+  description = "Names of AI Notebooks requested"
+  type        = list(string)
+  default     = []
 }
 
 variable "organization_id" {
@@ -125,7 +131,6 @@ variable "trusted_users" {
   type        = set(string)
   default     = []
 }
-
 
 variable "zone" {
   description = "Cloud Zone associated to the AI Notebooks"

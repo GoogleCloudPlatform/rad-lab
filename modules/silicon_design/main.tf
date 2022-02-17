@@ -48,6 +48,8 @@ locals {
     "cloudbuild.googleapis.com",
     "artifactregistry.googleapis.com",
   ] : []
+
+  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-design-notebook-${i}"]
 }
 
 resource "random_id" "default" {
@@ -179,7 +181,7 @@ resource "google_project_iam_member" "ai_notebook_user_role2" {
 resource "google_notebooks_instance" "ai_notebook" {
   count        = var.notebook_count
   project      = local.project.project_id
-  name         = "silicon-design-notebook-${count.index}"
+  name         = local.notebook_names[count.index]
   location     = var.zone
   machine_type = var.machine_type
 
