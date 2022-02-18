@@ -15,14 +15,32 @@
 # limitations under the License.
 
 import os
+import subprocess
+from colorama import Fore, Back, Style
 
 def main():
 
-    # Install production dependencies.
+    # Install python dependencies.
+    print(Fore.BLUE + "\nInstalling Libraries..." + Style.RESET_ALL)
     os.system("pip3 install --no-cache-dir -r requirements.txt")
-    os.system("python3 terraform_installer.py")
+
+    # Set up Terraform binaries
+    tfOutput = subprocess.Popen(["terraform -version"],shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.read().strip().decode('utf-8')
+  
+    ## Check if Terrafrom binaries are already installed
+    if "command not found" in tfOutput:
+        print(Fore.YELLOW + "\nTerraform binaries not installed. Starting installation...\n" + Style.RESET_ALL)
+        os.system("python3 terraform_installer.py")
+    else:
+        print(Fore.YELLOW + "\nTerraform binaries already installed. Skipping installation...\n" + Style.RESET_ALL)
+    
+    # Printing Terraform Version
+    os.system("terraform -version")
+
+    # Set up Cloud sdk & Kubectl libraries
     os.system("python3 cloudsdk_kubectl_installer.py")
-    print("\nPRE-REQ INSTALLTION COMPLETED\n")
+
+    print(Fore.BLUE + "\nPRE-REQ INSTALLTION COMPLETED\n" + Style.RESET_ALL)
 
 if __name__ == "__main__":
     main()
