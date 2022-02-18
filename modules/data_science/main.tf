@@ -199,7 +199,7 @@ resource "google_notebooks_instance" "ai_notebook" {
   network = local.network.self_link
   subnet  = local.subnet.self_link
 
-  post_startup_script = "https://github.com/GoogleCloudPlatform/rad-lab/blob/main/modules/data_science/scripts/build/samplenotebook.sh"
+  post_startup_script = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name,google_storage_bucket_object.notebook_post_startup_script.name)
 
   labels = {
     module = "data-science"
@@ -214,7 +214,7 @@ resource "google_notebooks_instance" "ai_notebook" {
 
 resource "google_storage_bucket" "user_scripts_bucket" {
   project                     = local.project.project_id
-  name                        = join("", ["user-scripts-notebooks-instance-", local.random_id])
+  name                        = join("", ["user-scripts-", local.project.project_id])
   location                    = "US"
   force_destroy               = true
   uniform_bucket_level_access = true

@@ -14,21 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# A bash script to create folders with subfolders all in one go.
-
-# Update the image
-echo "Updating Jupyter libraries"
-jupyter lab build --dev-build=False --minimize=False
-
-# Create dir for sample scripts
+# Create dir for sample notebooks
 echo "Creating directory to store samples."
 mkdir -p sample/bigquery-public-data
 
+# Setting environment variabled for Project ID
+echo "Setting Project ID variable."
+export PROJECT_ID=$(gcloud config get-value project)
+
 # Copy samples to the notebook
 echo "Copying sample notebooks to the instance."
-gsutil cp gs://radlab-solution-bucket/Data_Science_Model/bigquery-public-data/BigQuery_tutorial.ipynb /home/jupyter/sample/bigquery-public-data/BigQuery_tutorial.ipynb
-gsutil cp gs://radlab-solution-bucket/Data_Science_Model/bigquery-public-data/Exploring_gnomad_on_BigQuery.ipynb /home/jupyter/sample/bigquery-public-data/Exploring_gnomad_on_BigQuery.ipynb
-gsutil cp gs://radlab-solution-bucket/Data_Science_Model/bigquery-public-data/Quantum_Simulation_qsimcirq.ipynb /home/jupyter/sample/bigquery-public-data/Quantum_Simulation_qsimcirq.ipynb
+gsutil cp gs://user-scripts-${PROJECT_ID}/notebooks/BigQuery_tutorial.ipynb /home/jupyter/sample/bigquery-public-data/BigQuery_tutorial.ipynb
+gsutil cp gs://user-scripts-${PROJECT_ID}/notebooks/Exploring_gnomad_on_BigQuery.ipynb /home/jupyter/sample/bigquery-public-data/Exploring_gnomad_on_BigQuery.ipynb
+gsutil cp gs://user-scripts-${PROJECT_ID}/notebooks/Quantum_Simulation_qsimcirq.ipynb /home/jupyter/sample/bigquery-public-data/Quantum_Simulation_qsimcirq.ipynb
 
 echo "Startup script finished."
 

@@ -14,7 +14,8 @@ Example AI notebooks (jupyter notebook) in a GCS location that gets added to you
 The notebooks available in this workspace are listed below. If you are entirely new to Jupyter and are not sure where to start, try the first  notebooks at the top of the list (italics)!
 
 * **Python**
-    * *Py3 - Exploring_gnomad_on_BigQuery.ipynb
+    * Py3 - _BigQuery_tutorial.ipynb_
+    * Py3 - Exploring_gnomad_on_BigQuery.ipynb
     * Py3 - Quantum_Simulation_qsimcirq.ipynb
 
 PLEASE NOTE:
