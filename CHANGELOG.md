@@ -15,6 +15,16 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [4.2.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v4.2.1) (2022-02-17)
+ 
+ [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v4.1.0...v4.2.1)
+
+### Changed
+- _RAD Lab Launcher:_ Skipping installation of Terraform binaries on Cloud Shell as TF is automatically authenticated and is integrated with Cloud Shell [(294c096)](https://github.com/GoogleCloudPlatform/rad-lab/commit/294c0961ac24f666f55f6726a813cf8d47d80924)
+
+### Fixed
+- _RAD Lab Module:_ Resolved conflicting iam binding of notebooks.admin for `data_science` module. [(#43)](https://github.com/GoogleCloudPlatform/rad-lab/issues/43)
+
 ## [4.1.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v4.1.0) (2022-02-15)
 
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v4.0.0...v4.1.0)
