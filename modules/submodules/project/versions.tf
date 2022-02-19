@@ -14,27 +14,18 @@
  * limitations under the License.
  */
 
-locals {
-  labels = length(var.labels) == 0 ? {
-    origin = "rad-lab"
-  } : merge(var.labels, { origin = "rad-lab" })
-}
+terraform {
+  required_version = "~> 1.0"
 
-resource "random_id" "default" {
-  byte_length = 2
-}
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.11"
+    }
 
-module "slurm_project" {
-  source = "../submodules/project"
-
-  create_project     = var.create_project
-  parent             = var.parent
-  project_name       = var.project_name
-  project_id         = format("%s-%s", var.project_name, random_id.default.hex)
-  billing_account_id = var.billing_account_id
-  labels             = local.labels
-
-  project_services = [
-    "compute.googleapis.com"
-  ]
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 4.11"
+    }
+  }
 }

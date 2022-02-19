@@ -14,27 +14,14 @@
  * limitations under the License.
  */
 
-locals {
-  labels = length(var.labels) == 0 ? {
-    origin = "rad-lab"
-  } : merge(var.labels, { origin = "rad-lab" })
+output "project_id" {
+  value = local.project.project_id
 }
 
-resource "random_id" "default" {
-  byte_length = 2
+output "project_number" {
+  value = local.project.project_number
 }
 
-module "slurm_project" {
-  source = "../submodules/project"
-
-  create_project     = var.create_project
-  parent             = var.parent
-  project_name       = var.project_name
-  project_id         = format("%s-%s", var.project_name, random_id.default.hex)
-  billing_account_id = var.billing_account_id
-  labels             = local.labels
-
-  project_services = [
-    "compute.googleapis.com"
-  ]
+output "project_services" {
+  value = google_project_service.default
 }

@@ -15,30 +15,42 @@
  */
 
 variable "billing_account_id" {
-  description = "Billing Account ID to be assigned to the project."
+  description = "Billing account ID to attach to the project."
   type        = string
 }
 
 variable "create_project" {
-  description = "Whether or not to create a project or use an existing one."
+  description = "Whether to create the project or not."
   type        = bool
   default     = true
 }
 
 variable "labels" {
-  description = "Labels to be assigned to the resources."
+  description = "Labels to attach to the project."
   type        = map(string)
   default     = {}
 }
 
 variable "parent" {
-  description = "Organization or Folder ID where the project should be created.  Has to be in the form organizations/XYZ or folders/XYZ."
+  description = "Parent where the project should be created.  Should be in the form folders/XYZ or organization/XYZ"
+  type        = string
+  default     = null
+}
+
+variable "project_id" {
+  description = "Project ID to be assigned to the project."
   type        = string
   default     = null
 }
 
 variable "project_name" {
-  description = "Name to be used for the project."
+  description = "Name to be assigned to the project.  When create_project = false, this should match the existing Project ID."
   type        = string
-  default     = "radlab-hpc-slurm"
+  default     = null
+}
+
+variable "project_services" {
+  description = "List of APIs to enable on the project."
+  type        = set(string)
+  default     = []
 }
