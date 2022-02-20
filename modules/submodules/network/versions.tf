@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-output "project_id" {
-  value = module.slurm_project.project_id
-}
+terraform {
+  required_version = "~> 1.0"
 
-output "random_id" {
-  value = random_id.default.hex
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.11"
+    }
+
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 4.11"
+    }
+  }
 }

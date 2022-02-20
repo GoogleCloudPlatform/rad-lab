@@ -19,6 +19,12 @@ variable "billing_account_id" {
   type        = string
 }
 
+variable "create_network" {
+  description = "Whether or not to create a network or use an existing one."
+  type        = bool
+  default     = true
+}
+
 variable "create_project" {
   description = "Whether or not to create a project or use an existing one."
   type        = bool
@@ -31,6 +37,12 @@ variable "labels" {
   default     = {}
 }
 
+variable "network_name" {
+  description = "Name for the network where HPC resources will be deployed."
+  type        = string
+  default     = "rad-hpc-slurm-nw"
+}
+
 variable "parent" {
   description = "Organization or Folder ID where the project should be created.  Has to be in the form organizations/XYZ or folders/XYZ."
   type        = string
@@ -40,5 +52,22 @@ variable "parent" {
 variable "project_name" {
   description = "Name to be used for the project."
   type        = string
-  default     = "radlab-hpc-slurm"
+  default     = "rad-hpc-slurm"
 }
+
+variable "subnets" {
+  description = "List of subnets to create on the network."
+  type = list(object({
+    name               = string
+    cidr_range         = string
+    region             = string
+    secondary_ip_range = map(string)
+  }))
+  default = [{
+    name               = "rad-hpc-slurm-snw-use1"
+    cidr_range         = "10.0.0.0/16"
+    region             = "us-east1"
+    secondary_ip_range = null
+  }]
+}
+

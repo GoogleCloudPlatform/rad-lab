@@ -13,11 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-output "project_id" {
-  value = module.slurm_project.project_id
-}
-
-output "random_id" {
-  value = random_id.default.hex
-}

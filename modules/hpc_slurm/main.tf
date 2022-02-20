@@ -38,3 +38,12 @@ module "slurm_project" {
     "compute.googleapis.com"
   ]
 }
+
+module "network" {
+  source = "../submodules/network"
+
+  create_vpc   = var.create_network
+  network_name = var.network_name
+  project_id   = module.slurm_project.project_id
+  subnets      = var.subnets
+}
