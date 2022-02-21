@@ -20,16 +20,6 @@ variable "create_vpc" {
   default     = true
 }
 
-variable "egress_regions" {
-  description = "Regions where egress traffic to the public internet is allowed."
-  type = set(object({
-    router_name = string
-    region      = string
-    bgp_asn     = number
-  }))
-  default = []
-}
-
 variable "enable_internet_access" {
   description = "Enable routing and NAT towards the public internet."
   type        = bool
