@@ -55,6 +55,12 @@ variable "project_name" {
   default     = "rad-hpc-slurm"
 }
 
+variable "random_id" {
+  description = "Random ID to add to resources."
+  type        = string
+  default     = null
+}
+
 variable "subnets" {
   description = "List of subnets to create on the network."
   type = list(object({

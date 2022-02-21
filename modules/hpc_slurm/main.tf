@@ -15,6 +15,8 @@
  */
 
 locals {
+  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+
   labels = length(var.labels) == 0 ? {
     origin = "rad-lab"
   } : merge(var.labels, { origin = "rad-lab" })
@@ -30,7 +32,7 @@ module "slurm_project" {
   create_project     = var.create_project
   parent             = var.parent
   project_name       = var.project_name
-  project_id         = format("%s-%s", var.project_name, random_id.default.hex)
+  project_id         = format("%s-%s", var.project_name, local.random_id)
   billing_account_id = var.billing_account_id
   labels             = local.labels
 

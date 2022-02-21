@@ -18,6 +18,10 @@ output "project_id" {
   value = module.slurm_project.project_id
 }
 
+output "project_number" {
+  value = module.slurm_project.project_number
+}
+
 output "random_id" {
   value = random_id.default.hex
 }
