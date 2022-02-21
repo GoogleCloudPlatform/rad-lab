@@ -42,10 +42,11 @@ module "slurm_project" {
 }
 
 module "network" {
-  source = "../../helpers/tf_modules/network"
+  source = "../../helpers/tf_modules/net-vpc"
 
   create_vpc   = var.create_network
   network_name = var.network_name
   project_id   = module.slurm_project.project_id
   subnets      = var.subnets
+
 }
