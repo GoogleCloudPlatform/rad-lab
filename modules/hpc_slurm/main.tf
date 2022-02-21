@@ -25,7 +25,7 @@ resource "random_id" "default" {
 }
 
 module "slurm_project" {
-  source = "../submodules/project"
+  source = "../../helpers/tf_modules/project"
 
   create_project     = var.create_project
   parent             = var.parent
@@ -40,7 +40,7 @@ module "slurm_project" {
 }
 
 module "network" {
-  source = "../submodules/network"
+  source = "../../helpers/tf_modules/network"
 
   create_vpc   = var.create_network
   network_name = var.network_name
