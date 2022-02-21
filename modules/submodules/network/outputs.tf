@@ -13,3 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+output "network" {
+  value = local.network
+}
+
+output "network_selflink" {
+  value = local.network.self_link
+}
+
+output "subnets" {
+  value = local.subnets
+}
