@@ -18,6 +18,9 @@ This RAD Lab module provides a managed environment for custom silicon design usi
 
 * AI Platform Notebooks
 * Virtual Private Cloud (VPC)
+* Cloud Storage
+* Cloud Build
+* Container Registry
 
 ## Reference Architecture Diagram
 
