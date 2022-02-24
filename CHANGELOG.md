@@ -15,6 +15,15 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [5.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v5.0.0) (2022-02-23)
+
+ [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v4.2.1...v5.0.0)
+
+### Added
+   
+- _RAD Lab Module:_ RAD-Lab Silicon Design Module [(#39)](https://github.com/GoogleCloudPlatform/rad-lab/pull/39)
+ 
+
 ## [4.2.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v4.2.1) (2022-02-17)
  
  [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v4.1.0...v4.2.1)
