@@ -966,4 +966,3 @@ if __name__ == "__main__":
     else:
          variables  = {}
     main(variables)
-    # moduleperm("radlab-solution","app_mod_elastic","radlab-admin@guptamukul.altostrat.com")
