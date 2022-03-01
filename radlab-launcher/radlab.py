@@ -172,7 +172,8 @@ def launcherperm(projid,currentusr):
 
     if 'parent' in response1.keys():
         service2 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
-        request2 = service2.organizations().getIamPolicy(resource=response1['parent'])
+        org = findorg(response1['parent'])
+        request2 = service2.organizations().getIamPolicy(org)        
         response2 = request2.execute()
 
         orgiam = True
@@ -199,6 +200,17 @@ def launcherperm(projid,currentusr):
     else:
         print(Fore.YELLOW + '\nRADLAB LAUNCHER - Skipping Organization Permission check. No Organization associated with the project: ' + projid + Style.RESET_ALL)
 
+def findorg(parent):
+
+    if 'folders' in parent:
+        credentials = GoogleCredentials.get_application_default()
+        s = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
+        req = s.folders().get(name=parent)
+        res = req.execute()
+        return findorg(res['parent'])
+    else:
+        print(Fore.GREEN + "Org identified: " + Style.BRIGHT + parent + Style.RESET_ALL)
+        return parent
 
 def moduleperm(projid,module_name,currentusr):
 
@@ -375,7 +387,8 @@ def moduleperm(projid,module_name,currentusr):
 
         if 'parent' in response.keys():
             # print("/*************** ORG IAM POLICY *************/")
-            request2 = service.organizations().getIamPolicy(resource=response['parent'])
+            org = findorg(response['parent'])
+            request2 = service.organizations().getIamPolicy(org)
             response2 = request2.execute()
             # pprint(response2)
             orgiam = True
