@@ -98,10 +98,16 @@ module "existing_project_and_network" {
 | billing_account_id | Billing Account associated to the GCP Resources | <code title="">string</code> | ✓ |  |
 | *boot_disk_size_gb* | The size of the boot disk in GB attached to this instance | <code title="">number</code> |  | <code title="">100</code> |
 | *boot_disk_type* | Disk types for notebook instances | <code title="">string</code> |  | <code title="">PD_SSD</code> |
+| *container_image_repository* | Container Image Repo, only set if creating container image notebook instance by setting `create_container_image` variable to true | <code title="">string</code> |  | <code title=""></code> |
+| *container_image_tag* | Container Image Tag, only set if creating container image notebook instance by setting `create_container_image` variable to true | <code title="">string</code> |  | <code title=""></code> |
+| *create_container_image* | If the notebook needs to have image type as Container set this variable to true, set it to false when using dafault image type i.e. VM. | <code title="">bool</code> |  | <code title="">false</code> |
 | *create_network* | If the module has to be deployed in an existing network, set this variable to false. | <code title="">bool</code> |  | <code title="">true</code> |
 | *create_project* | Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false. | <code title="">bool</code> |  | <code title="">true</code> |
+| *enable_gpu_driver* | Install GPU driver on the instance | <code title="">bool</code> |  | <code title="">false</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false. | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node.  | <code title="">string</code> |  | <code title=""></code> |
+| *gpu_accelerator_core_count* | Number of of GPU core count | <code title="">number</code> |  | <code title="">null</code> |
+| *gpu_accelerator_type* | Type of GPU you would like to spin up | <code title="">string</code> |  | <code title=""></code> |
 | *image_family* | Image of the AI notebook. | <code title="">string</code> |  | <code title="">tf-latest-cpu</code> |
 | *image_project* | Google Cloud project where the image is hosted. | <code title="">string</code> |  | <code title="">deeplearning-platform-release</code> |
 | *ip_cidr_range* | Unique IP CIDR Range for AI Notebooks subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |

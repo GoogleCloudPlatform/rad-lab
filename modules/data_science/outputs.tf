@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ output "project-radlab-ds-analytics-id" {
 
 output "notebooks-instance-names" {
   description = "Notebook Instance Names"
-  value       = join(", ", google_notebooks_instance.ai_notebook[*].name)
+  value       = join(", ", google_notebooks_instance.ai_notebook_vm[*].name, google_notebooks_instance.ai_notebook_container[*].name)
 }
 
 output "user-scripts-bucket-uri" {

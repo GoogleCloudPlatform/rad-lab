@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,12 @@ variable "boot_disk_type" {
   default     = "PD_SSD"
 }
 
+variable "create_container_image" {
+  description = "If the notebook needs to have image type as Container set this variable to true, set it to false when using dafault image type i.e. VM."
+  type        = bool
+  default     = false
+}
+
 variable "create_network" {
   description = "If the module has to be deployed in an existing network, set this variable to false."
   type        = bool
@@ -43,6 +49,24 @@ variable "create_project" {
   default     = true
 }
 
+variable "container_image_repository" {
+  description = "Container Image Repo, only set if creating container image notebook instance by setting `create_container_image` variable to true"
+  type        = string
+  default     = ""
+}
+
+variable "container_image_tag" {
+  description = "Container Image Tag, only set if creating container image notebook instance by setting `create_container_image` variable to true"
+  type        = string
+  default     = ""
+}
+
+variable "enable_gpu_driver" {
+  description = "Install GPU driver on the instance"
+  type        = bool
+  default     = false
+}
+
 variable "enable_services" {
   description = "Enable the necessary APIs on the project.  When using an existing project, this can be set to false."
   type        = bool
@@ -53,6 +77,18 @@ variable "folder_id" {
   description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. "
   type        = string
   default     = ""
+}
+
+variable "gpu_accelerator_type" {
+  description = "Type of GPU you would like to spin up"
+  type        = string
+  default     = ""
+}
+
+variable "gpu_accelerator_core_count" {
+  description = "Number of of GPU core count"
+  type        = number
+  default     = null
 }
 
 variable "image_family" {
