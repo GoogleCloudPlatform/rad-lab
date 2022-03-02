@@ -28,6 +28,7 @@ import requests
 import argparse
 import platform
 import subprocess
+from art import *
 from os import path
 from pprint import pprint
 from google.cloud import storage
@@ -36,19 +37,17 @@ from colorama import Fore, Back, Style
 from python_terraform import Terraform
 from oauth2client.client import GoogleCredentials
 
-STATE_CREATE_DEPLOYMENT = "1"
-STATE_UPDATE_DEPLOYMENT = "2"
-STATE_DELETE_DEPLOYMENT = "3"
-STATE_LIST_DEPLOYMENT = "4"
+ACTION_CREATE_DEPLOYMENT = "1"
+ACTION_UPDATE_DEPLOYMENT = "2"
+ACTION_DELETE_DEPLOYMENT = "3"
+ACTION_LIST_DEPLOYMENT = "4"
 
-def main(varcontents={}):
-    
-    projid          = ""
+def main(varcontents={}, module_name=None , action=None, projid=None, tfbucket=None):
+
     orgid           = ""
     folderid        = ""
     billing_acc     = ""
     currentusr      = ""
-    state           = ""
 
     setup_path = os.getcwd()
 
@@ -62,7 +61,8 @@ def main(varcontents={}):
     launcherperm(projid,currentusr)
 
     # Listing / Selecting from available RAD Lab modules
-    module_name = list_modules()
+    if module_name is None:
+        module_name = list_modules()
 
     # Checking Module specific permissions
     moduleperm(projid,module_name,currentusr)
@@ -70,11 +70,15 @@ def main(varcontents={}):
     # Validating user input Terraform variables against selected module
     validate_tfvars(varcontents, module_name)
 
+    # Select Action to perform
+    if action is None or action == "":
+        action = select_action().strip()
+
     # Setting up required attributes for any RAD Lab module deployment
-    state,env_path,tfbucket,orgid,billing_acc,folderid,randomid = module_deploy_common_settings(module_name,setup_path,varcontents,projid)
+    env_path,tfbucket,orgid,billing_acc,folderid,randomid = module_deploy_common_settings(action,module_name,setup_path,varcontents,projid,tfbucket)
     
     # Utilizing Terraform Wrapper for init / apply / destroy
-    env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, projid)
+    env(action, orgid, billing_acc, folderid, env_path, randomid, tfbucket, projid)
 
     print("\nGCS Bucket storing Terrafrom Configs: "+ tfbucket +"\n")
     print("\nTERRAFORM DEPLOYMENT COMPLETED!!!\n")
@@ -114,16 +118,19 @@ def radlabauth(currentusr):
             return currentusr
 
 def set_proj(projid):
-    projid = os.popen("gcloud config list --format 'value(core.project)' 2>/dev/null").read().strip()
-    if(projid != ""):
-        select_proj = input("\nWhich Project would you like to use for RAD Lab management (Example - Creating/Utilizing GCS bucket where Terraform states will be stored) ? :" + "\n[1] Currently set project - " + Fore.GREEN + projid + Style.RESET_ALL + "\n[2] Enter a different Project ID" +Fore.YELLOW + Style.BRIGHT + "\nChoose a number for the RAD Lab management Project" + Style.RESET_ALL + ': ').strip()
-        if(select_proj == '2'):
-            projid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Project ID" + Style.RESET_ALL + ': ').strip()
+    if projid is None:
+        projid = os.popen("gcloud config list --format 'value(core.project)' 2>/dev/null").read().strip()
+        if(projid != ""):
+            select_proj = input("\nWhich Project would you like to use for RAD Lab management (Example - Creating/Utilizing GCS bucket where Terraform states will be stored) ? :" + "\n[1] Currently set project - " + Fore.GREEN + projid + Style.RESET_ALL + "\n[2] Enter a different Project ID" +Fore.YELLOW + Style.BRIGHT + "\nChoose a number for the RAD Lab management Project" + Style.RESET_ALL + ': ').strip()
+            if(select_proj == '2'):
+                projid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Project ID" + Style.RESET_ALL + ': ').strip()
+                os.system("gcloud config set project " + projid)
+            elif(select_proj != '1' and select_proj != '2'):
+                sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
+        else:
+            projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the Project ID for RAD Lab management" + Style.RESET_ALL + ': ').strip()
             os.system("gcloud config set project " + projid)
-        elif(select_proj != '1' and select_proj != '2'):
-            sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
     else:
-        projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the Project ID for RAD Lab management" + Style.RESET_ALL + ': ').strip()
         os.system("gcloud config set project " + projid)
     print("\nProject ID (Selected) : " + Fore.GREEN + Style.BRIGHT + projid + Style.RESET_ALL)
     return projid
@@ -157,10 +164,10 @@ def launcherperm(projid,currentusr):
                     pass
         
         if rolefound == False:
-            sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n((Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )
+            sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n((Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )
     
     if projiam == True:
-        print(Fore.GREEN + '\nRADLAB MODULE - Project Permission check passed\n' + Style.RESET_ALL)
+        print(Fore.GREEN + '\nRADLAB LAUNCHER - Project Permission check passed' + Style.RESET_ALL)
 
     service1 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
     request1 = service1.projects().get(name='projects/'+projid)
@@ -168,17 +175,18 @@ def launcherperm(projid,currentusr):
 
     if 'parent' in response1.keys():
         service2 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
-        request2 = service2.organizations().getIamPolicy(resource=response1['parent'])
+        org = findorg(response1['parent'])
+        request2 = service2.organizations().getIamPolicy(resource=org)        
         response2 = request2.execute()
 
         orgiam = True
         for role in launcherorgroles:
             rolefound = False
             for x in range(len(response2['bindings'])):
-                    # print("ROLE --->")
-                    # print(response2['bindings'][x]['role'])
-                    # print("MEMBERS --->")
-                    # print(response2['bindings'][x]['members'])
+                # print("ROLE --->")
+                # print(response2['bindings'][x]['role'])
+                # print("MEMBERS --->")
+                # print(response2['bindings'][x]['members'])
                 if(role == response2['bindings'][x]['role']):
                     rolefound = True
                     if('user:'+currentusr not in response2['bindings'][x]['members']):
@@ -191,10 +199,21 @@ def launcherperm(projid,currentusr):
                 sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
                     
         if orgiam == True:
-                print(Fore.GREEN + '\nRADLAB MODULE - Organization Permission check passed\n' + Style.RESET_ALL)
+                print(Fore.GREEN + '\nRADLAB LAUNCHER - Organization Permission check passed' + Style.RESET_ALL)
     else:
         print(Fore.YELLOW + '\nRADLAB LAUNCHER - Skipping Organization Permission check. No Organization associated with the project: ' + projid + Style.RESET_ALL)
 
+def findorg(parent):
+
+    if 'folders' in parent:
+        credentials = GoogleCredentials.get_application_default()
+        s = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
+        req = s.folders().get(name=parent)
+        res = req.execute()
+        return findorg(res['parent'])
+    else:
+        # print(Fore.GREEN + "Org identified: " + Style.BRIGHT + parent + Style.RESET_ALL)
+        return parent
 
 def moduleperm(projid,module_name,currentusr):
 
@@ -291,7 +310,7 @@ def moduleperm(projid,module_name,currentusr):
     except Exception as e: 
         print(e)
 
-    print("SET ORG POLICY: " + str(setorgpolicy))
+    print("\nSET ORG POLICY: " + str(setorgpolicy))
     print("CREATE PROJECT: " + str(create_project))
     
     # Scrape out Module specific permissions for the module
@@ -360,7 +379,7 @@ def moduleperm(projid,module_name,currentusr):
      
 
         if projiam == True:
-            print(Fore.GREEN + '\nRADLAB MODULE - Project Permission check passed\n' + Style.RESET_ALL)
+            print(Fore.GREEN + '\nRADLAB MODULE ('+module_name+')- Project Permission check passed' + Style.RESET_ALL)
 
     # Check Org level permissions 
     if len(orgroles) != 0:
@@ -371,7 +390,8 @@ def moduleperm(projid,module_name,currentusr):
 
         if 'parent' in response.keys():
             # print("/*************** ORG IAM POLICY *************/")
-            request2 = service.organizations().getIamPolicy(resource=response['parent'])
+            org = findorg(response['parent'])
+            request2 = service.organizations().getIamPolicy(resource=org) 
             response2 = request2.execute()
             # pprint(response2)
             orgiam = True
@@ -387,25 +407,25 @@ def moduleperm(projid,module_name,currentusr):
                         rolefound = True
                         if('user:'+currentusr not in response2['bindings'][x]['members']):
                             orgiam = False
-                            sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                            sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE ("+ module_name + ") PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
                         else:
                             pass   
 
                 if rolefound == False:
-                    sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                    sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE ("+ module_name + ") PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
                      
             if orgiam == True:
-                    print(Fore.GREEN + '\nRADLAB MODULE - Organization Permission check passed\n' + Style.RESET_ALL)
+                    print(Fore.GREEN + '\nRADLAB MODULE ('+ module_name + ') - Organization Permission check passed' + Style.RESET_ALL)
         else:
             print(Fore.YELLOW + '\nRADLAB LAUNCHER - Skipping Organization Permission check. No Organization associated with the project: ' + projid + Style.RESET_ALL)
 
-def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, projid):
+def env(action, orgid, billing_acc, folderid, env_path, randomid, tfbucket, projid):
     tr = Terraform(working_dir=env_path)
     return_code, stdout, stderr = tr.init_cmd(capture_output=False)
     
-    if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
+    if(action == ACTION_CREATE_DEPLOYMENT or action == ACTION_UPDATE_DEPLOYMENT):
         return_code, stdout, stderr = tr.apply_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid, 'random_id':randomid})
-    elif(state == STATE_DELETE_DEPLOYMENT):
+    elif(action == ACTION_DELETE_DEPLOYMENT):
         return_code, stdout, stderr = tr.destroy_cmd(capture_output=False,auto_approve=True,var={'organization_id':orgid, 'billing_account_id':billing_acc, 'folder_id':folderid,'random_id':randomid})
 
     # return_code - 0 Success & 1 Error
@@ -415,7 +435,7 @@ def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, proji
     else:
         target_path = 'radlab/'+ env_path.split('/')[len(env_path.split('/'))-1] +'/deployments'
 
-        if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT):
+        if(action == ACTION_CREATE_DEPLOYMENT or action == ACTION_UPDATE_DEPLOYMENT):
 
             if glob.glob(env_path + '/*.tf'):
                 upload_from_directory(projid, env_path, '/*.tf', tfbucket, target_path)
@@ -428,7 +448,7 @@ def env(state, orgid, billing_acc, folderid, env_path, randomid, tfbucket, proji
             if glob.glob(env_path + '/templates'):
                 upload_from_directory(projid, env_path, '/templates/**', tfbucket, target_path)
 
-        elif(state == STATE_DELETE_DEPLOYMENT):
+        elif(action == ACTION_DELETE_DEPLOYMENT):
             deltfgcs(tfbucket, 'radlab/'+ env_path.split('/')[len(env_path.split('/'))-1], projid)
 
     # Deleting Local deployment config
@@ -446,10 +466,10 @@ def upload_from_directory(projid, directory_path: str, content: str, dest_bucket
             blob = bucket.blob(remote_path)
             blob.upload_from_filename(local_file)
 
-def select_state():
-    state = input("\nAction to perform for RAD Lab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RAD Lab Module Deployment Action"+ Style.RESET_ALL + ': ').strip()
-    if(state == STATE_CREATE_DEPLOYMENT or state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT or state == STATE_LIST_DEPLOYMENT):
-        return state
+def select_action():
+    action = input("\nAction to perform for RAD Lab Deployment ?\n[1] Create New\n[2] Update\n[3] Delete\n[4] List\n" + Fore.YELLOW + Style.BRIGHT + "Choose a number for the RAD Lab Module Deployment Action"+ Style.RESET_ALL + ': ').strip()
+    if(action == ACTION_CREATE_DEPLOYMENT or action == ACTION_UPDATE_DEPLOYMENT or action == ACTION_DELETE_DEPLOYMENT or action == ACTION_LIST_DEPLOYMENT):
+        return action
     else: 
         sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
 
@@ -661,15 +681,15 @@ def delifexist(env_path):
     if(os.path.isdir(env_path)):
         shutil.rmtree(env_path)
 
-def getbucket(state,projid):
+def getbucket(action,projid):
     """Lists all buckets."""
     storage_client = storage.Client(project=projid)
     bucketoption = ''
 
-    if(state == STATE_CREATE_DEPLOYMENT):
+    if(action == ACTION_CREATE_DEPLOYMENT):
         bucketoption = input("\nWant to use existing GCS Bucket for Terraform configs or Create Bucket ?:\n[1] Use Existing Bucket\n[2] Create New Bucket\n"+ Fore.YELLOW + Style.BRIGHT + "Choose a number for your choice"+ Style.RESET_ALL + ': ').strip()
     
-    if(bucketoption == '1' or state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT or state == STATE_LIST_DEPLOYMENT):
+    if(bucketoption == '1' or action == ACTION_UPDATE_DEPLOYMENT or action == ACTION_DELETE_DEPLOYMENT or action == ACTION_LIST_DEPLOYMENT):
         try:
             buckets = storage_client.list_buckets()
 
@@ -798,16 +818,15 @@ def list_modules():
     else:
         sys.exit(Fore.RED + "\nInvalid module")
 
-def module_deploy_common_settings(module_name,setup_path,varcontents,projid):
-    # Select Action to perform
-    state = select_state()
+def module_deploy_common_settings(action,module_name,setup_path,varcontents,projid,tfbucket):
 
     # Get Terraform Bucket Details
-    tfbucket = getbucket(state.strip(),projid)
+    if tfbucket is None:
+        tfbucket = getbucket(action,projid)
     print("\nGCS bucket for Terraform config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
     # Setting Org ID, Billing Account, Folder ID
-    if(state == STATE_CREATE_DEPLOYMENT):
+    if(action == ACTION_CREATE_DEPLOYMENT):
 
         # Check for any overides of basic inputs from terraform.tfvars file
         orgid, billing_acc, folderid, randomid = check_basic_inputs_tfvars(varcontents)
@@ -834,9 +853,9 @@ def module_deploy_common_settings(module_name,setup_path,varcontents,projid):
         # Create file with billing/org/folder details
         create_env(env_path, orgid, billing_acc, folderid)
 
-        return state,env_path,tfbucket,orgid,billing_acc,folderid,randomid
+        return env_path,tfbucket,orgid,billing_acc,folderid,randomid
 
-    elif(state == STATE_UPDATE_DEPLOYMENT or state == STATE_DELETE_DEPLOYMENT):
+    elif(action == ACTION_UPDATE_DEPLOYMENT or action == ACTION_DELETE_DEPLOYMENT):
         
         # Get Deployment ID
         randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RAD Lab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
@@ -862,22 +881,22 @@ def module_deploy_common_settings(module_name,setup_path,varcontents,projid):
         settfstategcs(env_path,prefix,tfbucket,projid)
 
         # Create file with billing/org/folder details
-        if(state == STATE_UPDATE_DEPLOYMENT):
+        if(action == ACTION_UPDATE_DEPLOYMENT):
             if os.path.exists(env_path + '/terraform.tfvars'):
                 os.remove(env_path + '/terraform.tfvars')
             create_tfvars(env_path,varcontents)
 
-        if(state == STATE_DELETE_DEPLOYMENT):
+        if(action == ACTION_DELETE_DEPLOYMENT):
             print("DELETING DEPLOYMENT...")
 
-        return state,env_path,tfbucket,orgid,billing_acc,folderid,randomid
+        return env_path,tfbucket,orgid,billing_acc,folderid,randomid
 
-    elif(state == STATE_LIST_DEPLOYMENT):
+    elif(action == ACTION_LIST_DEPLOYMENT):
         list_radlab_deployments(tfbucket, module_name, projid)
         sys.exit()
 
     else:
-        sys.exit(Fore.RED + "\nInvalid RAD Lab Module State selected")
+        sys.exit(Fore.RED + "\nInvalid RAD Lab Module Action selected")
 
 def validate_tfvars(varcontents, module_name):
 
@@ -955,14 +974,39 @@ def fetchvariables(filecontents):
         sys.exit(Fore.RED + 'No variables in the input file')
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents", required=False)
-    args = parser.parse_args()
+    try:
+        print('\n'+text2art("RADLAB",font="larry3d"))
 
-    if args.file is not None:
-        print("Checking input file...")
-        filecontents = args.file.readlines()
-        variables = fetchvariables(filecontents)
-    else:
-         variables  = {}
-    main(variables)
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-f','--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents", required=False)
+        parser.add_argument('-m','--module', dest="module_name", choices=sorted([s.replace(os.path.dirname(os.getcwd()) + '/modules/', "") for s in glob.glob(os.path.dirname(os.getcwd()) + '/modules/*')]), help="RADLab Module name under ../../modules folder", required=False)
+        parser.add_argument('-a','--action', dest="action", choices=['create', 'update', 'delete','list'], help="Type of action you want to perform for the selected RADLab module", required=False)
+        parser.add_argument('-p','--rad-project', dest="projid", help="RAD Lab management GCP Project.", required=False)
+        parser.add_argument('-b','--rad-bucket', dest="tfbucket", help="RAD Lab management GCS Bucket where Terraform states for the modules will be stored.", required=False)
+       
+        args = parser.parse_args()
+
+        # File Argument
+        if args.file is not None:
+            print("Checking input file...")
+            filecontents = args.file.readlines()
+            variables = fetchvariables(filecontents)
+        else:
+            variables  = {}
+
+        # Action Argument
+        if args.action == 'create':
+            action = ACTION_CREATE_DEPLOYMENT
+        elif args.action == 'update':
+            action = ACTION_UPDATE_DEPLOYMENT
+        elif args.action == 'delete':
+            action = ACTION_DELETE_DEPLOYMENT
+        elif args.action == 'list':
+             action = ACTION_LIST_DEPLOYMENT
+        else:
+            action = None
+
+        main(variables, args.module_name, action, args.projid, args.tfbucket)
+
+    except Exception as e: 
+        print(e)
