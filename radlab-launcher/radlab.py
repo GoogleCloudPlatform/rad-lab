@@ -28,6 +28,7 @@ import requests
 import argparse
 import platform
 import subprocess
+from art import *
 from os import path
 from pprint import pprint
 from google.cloud import storage
@@ -974,6 +975,7 @@ def fetchvariables(filecontents):
 
 if __name__ == "__main__":
     try:
+        print('\n'+text2art("RADLAB",font="larry3d"))
 
         parser = argparse.ArgumentParser()
         parser.add_argument('-f','--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents", required=False)
