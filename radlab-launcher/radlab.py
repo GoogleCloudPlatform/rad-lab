@@ -176,17 +176,17 @@ def launcherperm(projid,currentusr):
     if 'parent' in response1.keys():
         service2 = discovery.build('cloudresourcemanager', 'v3', credentials=credentials)
         org = findorg(response1['parent'])
-        request2 = service2.organizations().getIamPolicy(org)        
+        request2 = service2.organizations().getIamPolicy(resource=org)        
         response2 = request2.execute()
 
         orgiam = True
         for role in launcherorgroles:
             rolefound = False
             for x in range(len(response2['bindings'])):
-                    # print("ROLE --->")
-                    # print(response2['bindings'][x]['role'])
-                    # print("MEMBERS --->")
-                    # print(response2['bindings'][x]['members'])
+                # print("ROLE --->")
+                # print(response2['bindings'][x]['role'])
+                # print("MEMBERS --->")
+                # print(response2['bindings'][x]['members'])
                 if(role == response2['bindings'][x]['role']):
                     rolefound = True
                     if('user:'+currentusr not in response2['bindings'][x]['members']):
@@ -212,7 +212,7 @@ def findorg(parent):
         res = req.execute()
         return findorg(res['parent'])
     else:
-        print(Fore.GREEN + "Org identified: " + Style.BRIGHT + parent + Style.RESET_ALL)
+        # print(Fore.GREEN + "Org identified: " + Style.BRIGHT + parent + Style.RESET_ALL)
         return parent
 
 def moduleperm(projid,module_name,currentusr):
@@ -391,7 +391,7 @@ def moduleperm(projid,module_name,currentusr):
         if 'parent' in response.keys():
             # print("/*************** ORG IAM POLICY *************/")
             org = findorg(response['parent'])
-            request2 = service.organizations().getIamPolicy(org)
+            request2 = service.organizations().getIamPolicy(resource=org) 
             response2 = request2.execute()
             # pprint(response2)
             orgiam = True
