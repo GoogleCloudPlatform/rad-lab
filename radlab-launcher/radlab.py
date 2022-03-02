@@ -41,9 +41,8 @@ ACTION_UPDATE_DEPLOYMENT = "2"
 ACTION_DELETE_DEPLOYMENT = "3"
 ACTION_LIST_DEPLOYMENT = "4"
 
-def main(varcontents={}, module_name=None , action=None):
-    
-    projid          = ""
+def main(varcontents={}, module_name=None , action=None, projid=None, tfbucket=None):
+
     orgid           = ""
     folderid        = ""
     billing_acc     = ""
@@ -75,7 +74,7 @@ def main(varcontents={}, module_name=None , action=None):
         action = select_action().strip()
 
     # Setting up required attributes for any RAD Lab module deployment
-    env_path,tfbucket,orgid,billing_acc,folderid,randomid = module_deploy_common_settings(action,module_name,setup_path,varcontents,projid)
+    env_path,tfbucket,orgid,billing_acc,folderid,randomid = module_deploy_common_settings(action,module_name,setup_path,varcontents,projid,tfbucket)
     
     # Utilizing Terraform Wrapper for init / apply / destroy
     env(action, orgid, billing_acc, folderid, env_path, randomid, tfbucket, projid)
@@ -118,16 +117,19 @@ def radlabauth(currentusr):
             return currentusr
 
 def set_proj(projid):
-    projid = os.popen("gcloud config list --format 'value(core.project)' 2>/dev/null").read().strip()
-    if(projid != ""):
-        select_proj = input("\nWhich Project would you like to use for RAD Lab management (Example - Creating/Utilizing GCS bucket where Terraform states will be stored) ? :" + "\n[1] Currently set project - " + Fore.GREEN + projid + Style.RESET_ALL + "\n[2] Enter a different Project ID" +Fore.YELLOW + Style.BRIGHT + "\nChoose a number for the RAD Lab management Project" + Style.RESET_ALL + ': ').strip()
-        if(select_proj == '2'):
-            projid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Project ID" + Style.RESET_ALL + ': ').strip()
+    if projid is None:
+        projid = os.popen("gcloud config list --format 'value(core.project)' 2>/dev/null").read().strip()
+        if(projid != ""):
+            select_proj = input("\nWhich Project would you like to use for RAD Lab management (Example - Creating/Utilizing GCS bucket where Terraform states will be stored) ? :" + "\n[1] Currently set project - " + Fore.GREEN + projid + Style.RESET_ALL + "\n[2] Enter a different Project ID" +Fore.YELLOW + Style.BRIGHT + "\nChoose a number for the RAD Lab management Project" + Style.RESET_ALL + ': ').strip()
+            if(select_proj == '2'):
+                projid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Project ID" + Style.RESET_ALL + ': ').strip()
+                os.system("gcloud config set project " + projid)
+            elif(select_proj != '1' and select_proj != '2'):
+                sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
+        else:
+            projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the Project ID for RAD Lab management" + Style.RESET_ALL + ': ').strip()
             os.system("gcloud config set project " + projid)
-        elif(select_proj != '1' and select_proj != '2'):
-            sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
     else:
-        projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the Project ID for RAD Lab management" + Style.RESET_ALL + ': ').strip()
         os.system("gcloud config set project " + projid)
     print("\nProject ID (Selected) : " + Fore.GREEN + Style.BRIGHT + projid + Style.RESET_ALL)
     return projid
@@ -815,10 +817,11 @@ def list_modules():
     else:
         sys.exit(Fore.RED + "\nInvalid module")
 
-def module_deploy_common_settings(action,module_name,setup_path,varcontents,projid):
+def module_deploy_common_settings(action,module_name,setup_path,varcontents,projid,tfbucket):
 
     # Get Terraform Bucket Details
-    tfbucket = getbucket(action,projid)
+    if tfbucket is None:
+        tfbucket = getbucket(action,projid)
     print("\nGCS bucket for Terraform config & state (Selected) : " + Fore.GREEN + Style.BRIGHT + tfbucket + Style.RESET_ALL )
 
     # Setting Org ID, Billing Account, Folder ID
@@ -976,7 +979,9 @@ if __name__ == "__main__":
         parser.add_argument('-f','--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents", required=False)
         parser.add_argument('-m','--module', dest="module_name", choices=sorted([s.replace(os.path.dirname(os.getcwd()) + '/modules/', "") for s in glob.glob(os.path.dirname(os.getcwd()) + '/modules/*')]), help="RADLab Module name under ../../modules folder", required=False)
         parser.add_argument('-a','--action', dest="action", choices=['create', 'update', 'delete','list'], help="Type of action you want to perform for the selected RADLab module", required=False)
-        
+        parser.add_argument('-p','--rad-project', dest="projid", help="RAD Lab management GCP Project.", required=False)
+        parser.add_argument('-b','--rad-bucket', dest="tfbucket", help="RAD Lab management GCS Bucket where Terraform states for the modules will be stored.", required=False)
+       
         args = parser.parse_args()
 
         # File Argument
@@ -999,7 +1004,7 @@ if __name__ == "__main__":
         else:
             action = None
 
-        main(variables, args.module_name, action)
+        main(variables, args.module_name, action, args.projid, args.tfbucket)
 
     except Exception as e: 
         print(e)
