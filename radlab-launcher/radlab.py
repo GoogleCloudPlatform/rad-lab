@@ -978,12 +978,12 @@ if __name__ == "__main__":
         print('\n'+text2art("RADLAB",font="larry3d"))
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('-f','--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents", required=False)
-        parser.add_argument('-m','--module', dest="module_name", choices=sorted([s.replace(os.path.dirname(os.getcwd()) + '/modules/', "") for s in glob.glob(os.path.dirname(os.getcwd()) + '/modules/*')]), help="RADLab Module name under ../../modules folder", required=False)
-        parser.add_argument('-a','--action', dest="action", choices=['create', 'update', 'delete','list'], help="Type of action you want to perform for the selected RADLab module", required=False)
         parser.add_argument('-p','--rad-project', dest="projid", help="RAD Lab management GCP Project.", required=False)
         parser.add_argument('-b','--rad-bucket', dest="tfbucket", help="RAD Lab management GCS Bucket where Terraform states for the modules will be stored.", required=False)
-       
+        parser.add_argument('-m','--module', dest="module_name", choices=sorted([s.replace(os.path.dirname(os.getcwd()) + '/modules/', "") for s in glob.glob(os.path.dirname(os.getcwd()) + '/modules/*')]), help="RADLab Module name under ../../modules folder", required=False)
+        parser.add_argument('-a','--action', dest="action", choices=['create', 'update', 'delete','list'], help="Type of action you want to perform for the selected RADLab module.", required=False)
+        parser.add_argument('-f','--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents.", required=False)
+
         args = parser.parse_args()
 
         # File Argument

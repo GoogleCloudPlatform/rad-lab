@@ -79,24 +79,38 @@ You can use the Google Cloud Console to [view](https://cloud.google.com/iam/docs
     python3 radlab.py
     ``` 
 
-3. To set any module specific variables, use `--varfile` argument while running **radlab.py** and pass a file with variables content:
+NOTE: Save the **deployment_id** from the output for future reference. It is required to supply the deployment id for updating or deleting the RAD Lab module deployment.
+
+### Using Command Line Arguments
+
+RAD Lab launcher accepts following command line arguments: 
+
+* `--rad-project` or `-p`   : To set GCP Project ID for RAD Lab management.
+* `--rad-bucket` or `-b`    : To set GCS Bucket ID under RAD Lab management GCP Project where Terraform states & configs for the modules will be stored.
+* `--module` or `-m`        : To select the RAD Lab Module you would like to deploy.
+* `--action` or `-a`        : To select the action you would like to perform on the selected RAD Lab module.
+* `--varfile` or `-f`       : To pass a file with the key-value pairs of module variables and their default overriden values.
+
+_Usage:_
 
 ```
-% python3 radlab.py -h
-usage: radlab.py [-h] [--varfile FILE]
-
-optional arguments:
-  -h, --help      show this help message and exit
-  --varfile FILE  Input file (with complete path) for terraform.tfvars contents
-% 
+python3 radlab.py --module <module_name> --action <action_type> --rad-project <projectid> --rad-bucket <bucketid> --varfile <overriding_variables_file>
 ```
-NOTE: When the above parameter is not passed then the modules are deployed with module's default variable values.
+OR
+```
+python3 radlab.py -m <module_name> -a <action_type> -p <projectid> -b <bucketid> -f <overriding_variables_file>
+```
 
-Example :
+### Overriding default variables of a RAD Lab Module
+
+To set any module specific variables, use `--varfile` argument while running **radlab.py** and pass a file with variables content. Variables like **organization_id**, **folder_id**, **billing_account_id**, **random_id** (a.k.a. **deployment id**), which are requested as part of guided setup, can be set via --varfile argument by passing them in a file. There is a `terraform.tfvars.example` file under each [module](../modules/) as an example on how can you set/override the default variables.
+
+_Usage :_
 ```
 python3 radlab.py --varfile /<path_to_file>/<file_with_terraform.tfvars_contents>
 ```
-NOTE: Save the **deployment_id** from the output for future reference. It is used to make updates or delete the RAD Lab module deployment.
+
+NOTE: When the above argument is not passed then the modules are deployed with module's default variable values in `variables.tf` file.
 
 ## Example Launch of Data Science Module
 
