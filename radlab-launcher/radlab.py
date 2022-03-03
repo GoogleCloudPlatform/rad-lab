@@ -159,12 +159,12 @@ def launcherperm(projid,currentusr):
                 rolefound = True
                 if('user:'+currentusr not in response0['bindings'][y]['members']):
                     projiam = False
-                    sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )
+                    sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/tree/main/radlab-launcher#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )
                 else:
                     pass
         
         if rolefound == False:
-            sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n((Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )
+            sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/tree/main/radlab-launcher#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )
     
     if projiam == True:
         print(Fore.GREEN + '\nRADLAB LAUNCHER - Project Permission check passed' + Style.RESET_ALL)
@@ -191,12 +191,12 @@ def launcherperm(projid,currentusr):
                     rolefound = True
                     if('user:'+currentusr not in response2['bindings'][x]['members']):
                         orgiam = False
-                        sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                        sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/tree/main/radlab-launcher#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
                     else:
                         pass  
             
             if rolefound == False:
-                sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/radlab-launcher/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/tree/main/radlab-launcher#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
                     
         if orgiam == True:
                 print(Fore.GREEN + '\nRADLAB LAUNCHER - Organization Permission check passed' + Style.RESET_ALL)
@@ -370,12 +370,12 @@ def moduleperm(projid,module_name,currentusr):
                     rolefound = True
                     if('user:'+currentusr not in response1['bindings'][y]['members']):
                         projiam = False
-                        sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                        sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/tree/main/modules/"+module_name+"#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
                     else:
                         pass
             
             if rolefound == False:
-                sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/tree/main/modules/"+module_name+"#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
      
 
         if projiam == True:
@@ -407,12 +407,12 @@ def moduleperm(projid,module_name,currentusr):
                         rolefound = True
                         if('user:'+currentusr not in response2['bindings'][x]['members']):
                             orgiam = False
-                            sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE ("+ module_name + ") PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                            sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE ("+ module_name + ") PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/tree/main/modules/"+module_name+"#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
                         else:
                             pass   
 
                 if rolefound == False:
-                    sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE ("+ module_name + ") PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/modules/"+module_name+"/README.md#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
+                    sys.exit(Fore.RED + "\nError Occured - RADLAB MODULE ("+ module_name + ") PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/tree/main/modules/"+module_name+"#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )  
                      
             if orgiam == True:
                     print(Fore.GREEN + '\nRADLAB MODULE ('+ module_name + ') - Organization Permission check passed' + Style.RESET_ALL)
