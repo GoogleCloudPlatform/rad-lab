@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-output "project_id" {
-  value = module.slurm_project.project_id
+data "google_compute_image" "schedmd_slurm_img" {
+  project = "schedmd-slurm-public"
+  family  = "schedmd-slurm-21-08-4-hpc-centos-7"
 }
 
-output "project_number" {
-  value = module.slurm_project.project_number
-}
+module "slurm_cluster_controller" {
+  source = "git::https://github.com/SchedMD/slurm-gcp.git//tf/modules/controller?ref=v4.1.5"
 
-output "random_id" {
-  value = module.slurm_project.random_id
-}
-
-output "network_selflink" {
-  value = module.slurm_network.network_selflink
+  project      = module.slurm_project.project_id
+  image        = data.google_compute_image.schedmd_slurm_img.self_link
+  cluster_name = var.slurm_controller_cluster_name
+  region       = var.region
+  partitions   = var.slurm_controller_partitions
 }
