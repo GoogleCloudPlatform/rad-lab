@@ -58,7 +58,7 @@ variable "container_image_repository" {
 variable "container_image_tag" {
   description = "Container Image Tag, only set if creating container image notebook instance by setting `create_container_image` variable to true"
   type        = string
-  default     = ""
+  default     = "latest"
 }
 
 variable "enable_gpu_driver" {
