@@ -15,38 +15,36 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.hex
-
-  labels = length(var.labels) == 0 ? {
-    origin = "rad-lab"
-  } : merge(var.labels, { origin = "rad-lab" })
+  random_id = var.random_id == null ? random_id.random_id.0.hex : var.random_id
 }
 
-resource "random_id" "default" {
+resource "random_id" "random_id" {
+  count       = var.random_id == null ? 1 : 0
   byte_length = 2
 }
 
 module "slurm_project" {
   source = "../../helpers/tf_modules/project"
 
-  create_project     = var.create_project
-  parent             = var.parent
-  project_name       = var.project_name
-  project_id         = format("%s-%s", var.project_name, local.random_id)
   billing_account_id = var.billing_account_id
-  labels             = local.labels
-
-  project_services = [
-    "compute.googleapis.com"
-  ]
+  parent             = var.parent
+  project_id         = var.project_id
+  project_name       = var.project_name
+  random_id          = local.random_id
+  labels             = var.labels
 }
 
-module "network" {
-  source = "../../helpers/tf_modules/net-vpc"
+module "slurm_network" {
+  source = "../../helpers/tf_modules/vpc-net"
 
-  create_vpc   = var.create_network
-  network_name = var.network_name
   project_id   = module.slurm_project.project_id
-  subnets      = var.subnets
-
+  network_name = "slurm-nw"
+  subnets = [
+    {
+      name               = "euw1-slurm-snw"
+      cidr_range         = "10.0.0.0/16"
+      region             = "europe-west1"
+      secondary_ip_range = null
+    }
+  ]
 }

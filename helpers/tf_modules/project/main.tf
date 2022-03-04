@@ -15,8 +15,12 @@
  */
 
 locals {
-  parent_type = var.parent == null ? null : split("/", var.parent)[0]
-  parent_id   = var.parent == null ? null : split("/", var.parent)[1]
+  parent_type  = var.parent == null ? null : split("/", var.parent)[0]
+  parent_id    = var.parent == null ? null : split("/", var.parent)[1]
+  project_name = var.project_name == null ? local.project_id : var.project_name
+  random_id    = var.random_id == null ? var.random_id : var.random_id
+  project_id   = var.project_id == null ? format("%s-%s", var.project_name, local.random_id) : var.project_id
+  labels       = merge({ solution = "radlab", source = "terraform" }, var.labels)
 
   project = (
     var.create_project ?
@@ -40,8 +44,8 @@ data "google_project" "default" {
 
 resource "google_project" "default" {
   count               = var.create_project ? 1 : 0
-  name                = var.project_name
-  project_id          = var.project_id
+  name                = local.project_name
+  project_id          = local.project_id
   org_id              = local.parent_type == "organization" ? local.parent_id : null
   folder_id           = local.parent_type == "folders" ? local.parent_id : null
   billing_account     = var.billing_account_id

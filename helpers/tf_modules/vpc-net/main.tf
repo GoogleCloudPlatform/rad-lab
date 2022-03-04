@@ -31,11 +31,14 @@ data "google_compute_network" "default" {
 }
 
 resource "google_compute_network" "default" {
-  count                   = var.create_vpc ? 1 : 0
-  project                 = var.project_id
-  name                    = var.network_name
-  description             = "Network created by RAD Lab."
-  auto_create_subnetworks = false
+  count                           = var.create_vpc ? 1 : 0
+  project                         = var.project_id
+  name                            = var.network_name
+  description                     = "Network created by RAD Lab."
+  auto_create_subnetworks         = var.auto_create_subnetworks
+  delete_default_routes_on_create = var.delete_default_routes_on_create
+  mtu                             = var.mtu
+  routing_mode                    = var.routing_mode
 }
 
 resource "google_compute_subnetwork" "default" {
@@ -47,10 +50,4 @@ resource "google_compute_subnetwork" "default" {
   private_ip_google_access = true
   project                  = var.project_id
   region                   = each.value.region
-
-  log_config {
-    aggregation_interval = "INTERVAL_10_MIN"
-    flow_sampling        = 0.5
-    metadata             = "INCLUDE_ALL_METADATA"
-  }
 }

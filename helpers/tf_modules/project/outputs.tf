@@ -17,7 +17,7 @@
 output "project_id" {
   description = "Project ID of the newly created project (or existing one)."
   value       = local.project.project_id
-  depends_on = [
+  depends_on  = [
     google_project.default,
     data.google_project.default,
     google_project_service.default,
@@ -25,10 +25,14 @@ output "project_id" {
 }
 
 output "project_number" {
-  value = local.project.project_number
+  value      = local.project.project_number
   depends_on = [
     google_project.default,
     data.google_project.default,
     google_project_service.default,
   ]
+}
+
+output "random_id" {
+  value = local.random_id
 }

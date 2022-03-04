@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
+variable "auto_create_subnetworks" {
+  description = "Create default subnets in each region."
+  type        = bool
+  default     = false
+}
+
 variable "create_vpc" {
   description = "Indicate whether an existing VPC should be used or a new one should be created."
   type        = bool
   default     = true
 }
 
-variable "enable_internet_access" {
-  description = "Enable routing and NAT towards the public internet."
+variable "delete_default_routes_on_create" {
+  description = "Delete default routes on create."
   type        = bool
-  default     = true
+  default     = false
+}
+
+variable "mtu" {
+  description = "Maximum Transmission Unit in bytes.  Minimum value is 1460 and maximum value is 1500 bytes."
+  type        = string
+  default     = null
 }
 
 variable "network_name" {
@@ -36,6 +48,16 @@ variable "project_id" {
   type        = string
 }
 
+variable "routing_mode" {
+  description = "Routing mode for the network."
+  type        = string
+  default     = "GLOBAL"
+  validation {
+    condition     = var.routing_mode == "GLOBAL" || var.routing_mode == "REGIONAL"
+    error_message = "Routing mode must be GLOBAL or REGIONAL."
+  }
+}
+
 variable "subnets" {
   description = "List of subnets to create on the network."
   type = list(object({
@@ -46,4 +68,3 @@ variable "subnets" {
   }))
   default = []
 }
-

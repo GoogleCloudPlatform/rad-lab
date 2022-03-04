@@ -49,6 +49,12 @@ variable "parent" {
   default     = null
 }
 
+variable "project_id" {
+  description = "Project ID to be assigned to the project.  If a value is provided, it should correspond to an existing Project ID, as RAD Lab will try to deploy the resources in that project."
+  type        = string
+  default     = null
+}
+
 variable "project_name" {
   description = "Name to be used for the project."
   type        = string

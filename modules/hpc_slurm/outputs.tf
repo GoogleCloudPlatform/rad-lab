@@ -23,5 +23,5 @@ output "project_number" {
 }
 
 output "random_id" {
-  value = random_id.default.hex
+  value = module.slurm_project.random_id
 }
