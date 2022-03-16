@@ -26,7 +26,7 @@ output "project-radlab-ds-analytics-id" {
 
 output "notebooks-instance-names" {
   description = "Notebook Instance Names"
-  value       = join(", ", google_notebooks_instance.ai_notebook_vm[*].name, google_notebooks_instance.ai_notebook_container[*].name)
+  value       = join(", ", google_notebooks_instance.ai_notebook[*].name)
 }
 
 output "user-scripts-bucket-uri" {
