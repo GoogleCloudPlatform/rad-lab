@@ -90,6 +90,7 @@ RAD Lab launcher accepts following command line arguments:
 * `--module` or `-m`        : To select the RAD Lab Module you would like to deploy.
 * `--action` or `-a`        : To select the action you would like to perform on the selected RAD Lab module.
 * `--varfile` or `-f`       : To pass a file with the key-value pairs of module variables and their default overriden values.
+* `--disable-perm-check` or `-dc`       : To disable RAD Lab permissions pre-check . NOTE: This doesn't means one will not need the required permissions. This will just disable the permission pre-checks which RAD Lab Launcher do for the module deployments. Thus deployment may still fail eventually if required permissions are not set for the identity spinning up the modules.
 
 _Usage:_
 
