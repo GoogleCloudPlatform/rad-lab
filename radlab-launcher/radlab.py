@@ -42,7 +42,7 @@ ACTION_UPDATE_DEPLOYMENT = "2"
 ACTION_DELETE_DEPLOYMENT = "3"
 ACTION_LIST_DEPLOYMENT = "4"
 
-def main(varcontents={}, module_name=None , action=None, projid=None, tfbucket=None):
+def main(varcontents={}, module_name=None , action=None, projid=None, tfbucket=None, check=None):
 
     orgid           = ""
     folderid        = ""
@@ -58,14 +58,16 @@ def main(varcontents={}, module_name=None , action=None, projid=None, tfbucket=N
     projid = set_proj(projid)
 
     # Checking for User Permissions
-    launcherperm(projid,currentusr)
+    if check == True:
+        launcherperm(projid,currentusr)
 
     # Listing / Selecting from available RAD Lab modules
     if module_name is None:
         module_name = list_modules()
 
     # Checking Module specific permissions
-    moduleperm(projid,module_name,currentusr)
+    if check == True:
+        moduleperm(projid,module_name,currentusr)
 
     # Validating user input Terraform variables against selected module
     validate_tfvars(varcontents, module_name)
@@ -150,12 +152,21 @@ def launcherperm(projid,currentusr):
     projiam = True
     for role in launcherprojroles:
         rolefound = False
+        ownerrole = False
         for y in range(len(response0['bindings'])):
             # print("ROLE --->")
             # print(response0['bindings'][y]['role'])
             # print("MEMBERS --->")
             # print(response0['bindings'][y]['members'])
-            if(role == response0['bindings'][y]['role']):
+
+            # Check for Owner role on RAD Lab Management Project
+            if(response0['bindings'][y]['role'] == 'roles/owner' and 'user:'+currentusr in response0['bindings'][y]['members']):
+                rolefound = True
+                ownerrole = True
+                print("\n" + currentusr + " has roles/owner role for RAD Lab Management Project: " + projid)
+                break
+            # Check for Required roles on RAD Lab Management Project
+            elif(response0['bindings'][y]['role'] == role):
                 rolefound = True
                 if('user:'+currentusr not in response0['bindings'][y]['members']):
                     projiam = False
@@ -165,7 +176,10 @@ def launcherperm(projid,currentusr):
         
         if rolefound == False:
             sys.exit(Fore.RED + "\nError Occured - RADLAB LAUNCHER PERMISSION ISSUE | " + role + " permission missing...\n(Review https://github.com/GoogleCloudPlatform/rad-lab/tree/main/radlab-launcher#iam-permissions-prerequisites for more details)\n" +Style.RESET_ALL )
-    
+
+        if(ownerrole == True):
+            break
+            
     if projiam == True:
         print(Fore.GREEN + '\nRADLAB LAUNCHER - Project Permission check passed' + Style.RESET_ALL)
 
@@ -983,6 +997,7 @@ if __name__ == "__main__":
         parser.add_argument('-m','--module', dest="module_name", choices=sorted([s.replace(os.path.dirname(os.getcwd()) + '/modules/', "") for s in glob.glob(os.path.dirname(os.getcwd()) + '/modules/*')]), help="RADLab Module name under ../../modules folder", required=False)
         parser.add_argument('-a','--action', dest="action", choices=['create', 'update', 'delete','list'], help="Type of action you want to perform for the selected RADLab module.", required=False)
         parser.add_argument('-f','--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents.", required=False)
+        parser.add_argument('-dc','--disable-perm-check', dest="disable_perm_check", action='store_false', help="Flag to Disable permissions checking.", required=False)
 
         args = parser.parse_args()
 
@@ -1006,7 +1021,7 @@ if __name__ == "__main__":
         else:
             action = None
 
-        main(variables, args.module_name, action, args.projid, args.tfbucket)
+        main(variables, args.module_name, action, args.projid, args.tfbucket, args.disable_perm_check)
 
     except Exception as e: 
         print(e)
