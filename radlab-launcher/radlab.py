@@ -997,7 +997,7 @@ if __name__ == "__main__":
         parser.add_argument('-m','--module', dest="module_name", choices=sorted([s.replace(os.path.dirname(os.getcwd()) + '/modules/', "") for s in glob.glob(os.path.dirname(os.getcwd()) + '/modules/*')]), help="RADLab Module name under ../../modules folder", required=False)
         parser.add_argument('-a','--action', dest="action", choices=['create', 'update', 'delete','list'], help="Type of action you want to perform for the selected RADLab module.", required=False)
         parser.add_argument('-f','--varfile', dest="file", type=argparse.FileType('r', encoding='UTF-8'), help="Input file (with complete path) for terraform.tfvars contents.", required=False)
-        parser.add_argument('-dc','--disable-perm-check', dest="disable_perm_check", action='store_false', help="Flag to Disable permissions checking.", required=False)
+        parser.add_argument('-dc','--disable-perm-check', dest="disable_perm_check", action='store_false', help="Flag to disable RAD Lab permissions pre-check.", required=False)
 
         args = parser.parse_args()
 
