@@ -15,21 +15,10 @@
  */
 
 
- resource "google_storage_bucket_object" "notebook1" {
-  name   = "notebooks/BigQuery_tutorial.ipynb"
-  source = "${path.module}/scripts/build/BigQuery_tutorial.ipynb"
-  bucket = google_storage_bucket.user_scripts_bucket.name
-}
-
-resource "google_storage_bucket_object" "notebook2" {
-  name   = "notebooks/Exploring_gnomad_on_BigQuery.ipynb"
-  source = "${path.module}/scripts/build/Exploring_gnomad_on_BigQuery.ipynb"
-  bucket = google_storage_bucket.user_scripts_bucket.name
-}
-
-resource "google_storage_bucket_object" "notebook3" {
-  name   = "notebooks/Quantum_Simulation_qsimcirq.ipynb"
-  source = "${path.module}/scripts/build/Quantum_Simulation_qsimcirq.ipynb"
+resource "google_storage_bucket_object" "notebooks" {
+  for_each = fileset("${path.module}/scripts/build/", "notebooks/*.ipynb")
+  name     = each.value
+  source = join("/", ["${path.module}/scripts/build", each.value])
   bucket = google_storage_bucket.user_scripts_bucket.name
 }
 

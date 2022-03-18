@@ -230,7 +230,10 @@ resource "google_notebooks_instance" "ai_notebook" {
     terraform  = "true"
     proxy-mode = "mail"
   }
-  depends_on = [time_sleep.wait_120_seconds]
+  depends_on = [
+    time_sleep.wait_120_seconds,
+    google_storage_bucket_object.notebooks
+    ]
 }
 
 resource "google_storage_bucket" "user_scripts_bucket" {

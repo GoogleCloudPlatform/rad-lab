@@ -7,7 +7,7 @@
 * Not all warning messages are bad! Often you will run a cell that will return warnings in the output (sometimes these warnings will even be alarmingly color-coded in red or pink). This does not mean that the cell was not successful, and these warnings can often be ignored.
 
 
-**What's in sample/bigquery-public-data**.
+**What's in sample/notebooks**.
 
 Example AI notebooks (jupyter notebook) in a GCS location that gets added to your AI notebooks when you install Radlab Datascience module, you can update this script to pull or use your own examples from a GCS location based on what is needed for the end users.
  
@@ -49,8 +49,3 @@ This code is shared as is for quickly deploying development environments with re
 For all GCP support queries reach out to Google Cloud support.
 
 For Radlab specific queries reach out to your Google account team who provisioned Radlab access.
-
-### License
-
-### Workspace Change Log
-

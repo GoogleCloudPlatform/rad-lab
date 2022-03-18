@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2021 Google LLC
+# Copyright 2022 Google LLC
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 # Create dir for sample notebooks
 echo "Creating directory to store samples."
-mkdir -p sample/bigquery-public-data
+mkdir -p /home/jupyter/sample/notebooks
 
 # Setting environment variabled for Project ID
 echo "Setting Project ID variable."
@@ -24,9 +24,7 @@ export PROJECT_ID=$(gcloud config get-value project)
 
 # Copy samples to the notebook
 echo "Copying sample notebooks to the instance."
-gsutil cp gs://user-scripts-${PROJECT_ID}/notebooks/BigQuery_tutorial.ipynb /home/jupyter/sample/bigquery-public-data/BigQuery_tutorial.ipynb
-gsutil cp gs://user-scripts-${PROJECT_ID}/notebooks/Exploring_gnomad_on_BigQuery.ipynb /home/jupyter/sample/bigquery-public-data/Exploring_gnomad_on_BigQuery.ipynb
-gsutil cp gs://user-scripts-${PROJECT_ID}/notebooks/Quantum_Simulation_qsimcirq.ipynb /home/jupyter/sample/bigquery-public-data/Quantum_Simulation_qsimcirq.ipynb
+gsutil -m cp -r gs://user-scripts-${PROJECT_ID}/notebooks/*.ipynb /home/jupyter/sample/notebooks
 
 echo "Startup script finished."
 
