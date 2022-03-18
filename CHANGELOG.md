@@ -15,6 +15,22 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [5.1.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v5.0.0) (2022-03-18)
+
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v5.0.0...v5.1.1)
+
+### Added
+- _RAD Lab Module:_ Option to create container image Vertex AI notebooks in Data Science Module. [(#48)](https://github.com/GoogleCloudPlatform/rad-lab/pull/48)
+- _RAD Lab Module:_ Capability for users to upload their own Jupyter notebooks to Vertex AI notebooks on Data Science Module deployment. [(#48)](https://github.com/GoogleCloudPlatform/rad-lab/pull/48)
+- _RAD Lab Launcher:_ Enhancements to accept Command Line arguments. [(#41)](https://github.com/GoogleCloudPlatform/rad-lab/issues/41)[(#44)](https://github.com/GoogleCloudPlatform/rad-lab/pull/44)
+
+### Changed
+- _RAD Lab Launcher:_ Added a CLI argument / flag to disable RADLab Permission pre-checks. [(#46)](https://github.com/GoogleCloudPlatform/rad-lab/pull/46)
+
+### Fixed
+- _RAD Lab Launcher:_ Fixing links in the Error Messages. [(1e64c2d)](https://github.com/GoogleCloudPlatform/rad-lab/commit/1e64c2d2074c5688a589651ebaf2e1845370897a)
+- _RAD Lab Launcher:_ Fixing a bug to also check for Owner role (i.e. roles/owner) which already contains all required permission for pre-checks for RAD Lab management project. [(#46)](https://github.com/GoogleCloudPlatform/rad-lab/pull/46)
+
 ## [5.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v5.0.0) (2022-02-23)
 
  [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v4.2.1...v5.0.0)
