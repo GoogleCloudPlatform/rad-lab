@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,8 @@ locals {
     "roles/compute.instanceAdmin",
     "roles/notebooks.admin",
     "roles/bigquery.user",
-    "roles/storage.objectViewer"
+    "roles/storage.objectViewer",
+    "roles/iam.serviceAccountUser"
   ]
 
   project_services = var.enable_services ? [
@@ -182,14 +183,34 @@ resource "google_notebooks_instance" "ai_notebook" {
   location     = var.zone
   machine_type = var.machine_type
 
-  vm_image {
-    project      = var.image_project
-    image_family = var.image_family
+  dynamic "vm_image" {
+    for_each = var.create_container_image ? [] : [1]
+    content {
+      project      = var.image_project
+      image_family = var.image_family
+    }
+  }
+
+  dynamic "container_image" {
+    for_each = var.create_container_image ? [1] : []
+    content {
+      repository = var.container_image_repository
+      tag = var.container_image_tag
+    }
+  }
+
+  install_gpu_driver = var.enable_gpu_driver
+
+  dynamic "accelerator_config"{
+    for_each = var.enable_gpu_driver ? [1] : []
+    content {
+      type         = var.gpu_accelerator_type
+      core_count   = var.gpu_accelerator_core_count
+    }
   }
 
   service_account = google_service_account.sa_p_notebook.email
 
-  install_gpu_driver = false
   boot_disk_type     = var.boot_disk_type
   boot_disk_size_gb  = var.boot_disk_size_gb
 
@@ -209,7 +230,10 @@ resource "google_notebooks_instance" "ai_notebook" {
     terraform  = "true"
     proxy-mode = "mail"
   }
-  depends_on = [time_sleep.wait_120_seconds]
+  depends_on = [
+    time_sleep.wait_120_seconds,
+    google_storage_bucket_object.notebooks
+    ]
 }
 
 resource "google_storage_bucket" "user_scripts_bucket" {
