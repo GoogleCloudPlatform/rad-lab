@@ -15,17 +15,21 @@
  */
 
 output "project_id" {
-  value = module.slurm_project.project_id
-}
-
-output "project_number" {
-  value = module.slurm_project.project_number
+  value = local.project.project_id
 }
 
 output "random_id" {
-  value = module.slurm_project.random_id
+  value = local.random_id
 }
 
 output "network_selflink" {
-  value = module.slurm_network.network_selflink
+  value = local.network.self_link
+}
+
+output "network_id" {
+  value = local.network.id
+}
+
+output "subnet_selflink" {
+  value = local.subnet.self_link
 }

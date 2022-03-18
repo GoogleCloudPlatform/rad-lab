@@ -31,6 +31,24 @@ variable "create_project" {
   default     = true
 }
 
+variable "enable_services" {
+  description = "Enable services on the project.  Set to false if using an existing project and the services have already been enabled."
+  type        = bool
+  default     = true
+}
+
+variable "folder_id" {
+  description = "Folder ID where the project should be created."
+  type        = string
+  default     = null
+}
+
+variable "ip_cidr_range" {
+  description = "CIDR range for the subnet that hosts the HPC Slurm cluster."
+  type        = string
+  default     = "10.0.0.0/24"
+}
+
 variable "labels" {
   description = "Labels to be assigned to the resources."
   type        = map(string)
@@ -41,6 +59,12 @@ variable "network_name" {
   description = "Name for the network where HPC resources will be deployed."
   type        = string
   default     = "rad-hpc-slurm-nw"
+}
+
+variable "organization_id" {
+  description = "Organization ID where the project should be created.  This will act as the parent for the project."
+  type        = string
+  default     = null
 }
 
 variable "parent" {
@@ -74,80 +98,9 @@ variable "region" {
   default     = "us-central1"
 }
 
-variable "slurm_controller_cluster_name" {
-  description = "Name to be used for the cluster."
+variable "subnet_name" {
+  description = "Name for the subnet.  Should match an existing subnet if deploying in an existing network."
   type        = string
-  default     = "rad-hpc-slurm-controller"
-}
-
-variable "slurm_controller_partitions" {
-  description = "A list of partitions for the Controller cluster."
-  type = list(object({
-    name                 = string,
-    machine_type         = string,
-    max_node_count       = number,
-    zone                 = string,
-    image                = string,
-    image_hyperthreads   = bool,
-    compute_disk_type    = string,
-    compute_disk_size_gb = number,
-    compute_labels       = any,
-    cpu_platform         = string,
-    gpu_type             = string,
-    gpu_count            = number,
-    network_storage = list(object({
-      server_ip    = string,
-      remote_mount = string,
-      local_mount  = string,
-      fs_type      = string,
-    mount_options = string })),
-    preemptible_bursting = string,
-    vpc_subnet           = string,
-    exclusive            = bool,
-    enable_placement     = bool,
-    regional_capacity    = bool,
-    regional_policy      = any,
-    instance_template    = string,
-    static_node_count    = number
-  }))
-  default = [{
-    name                 = "radlab-controller-partition"
-    image                = "projects/schedmd-slurm-public/global/images/family/schedmd-slurm-21-08-4-hpc-centos-7"
-    machine_type         = "c2-standard-4"
-    static_node_count    = 0
-    max_node_count       = 10
-    zone                 = "us-central1-a"
-    image_hyperthreads   = true
-    compute_disk_type    = "pd-standard"
-    compute_disk_size_gb = 20
-    compute_labels       = {}
-    cpu_platform         = null
-    gpu_count            = 0
-    gpu_type             = null
-    network_storage      = []
-    preemptible_bursting = false
-    vpc_subnet           = null
-    exclusive            = false
-    enable_placement     = false
-    regional_capacity    = false
-    regional_policy      = {}
-    instance_template    = null
-  }]
-}
-
-variable "subnets" {
-  description = "List of subnets to create on the network."
-  type = list(object({
-    name               = string
-    cidr_range         = string
-    region             = string
-    secondary_ip_range = map(string)
-  }))
-  default = [{
-    name               = "rad-hpc-slurm-snw-use1"
-    cidr_range         = "10.0.0.0/16"
-    region             = "us-east1"
-    secondary_ip_range = null
-  }]
+  default     = "rad-hpc-slurm-snw"
 }
 

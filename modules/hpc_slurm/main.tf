@@ -16,6 +16,27 @@
 
 locals {
   random_id = var.random_id == null ? random_id.random_id.0.hex : var.random_id
+
+  project_services = var.enable_services ? [
+    "compute.googleapis.com"
+  ] : []
+
+  project = (var.create_project
+    ? try(module.hpc_slurm_project.0, null)
+    : try(data.google_project.existing_project.0, null)
+  )
+
+  network = (
+    var.create_network
+    ? try(module.hpc_slurm_network.0.network.network, null)
+    : try(data.google_compute_network.default.0, null)
+  )
+
+  subnet = (
+    var.create_network
+    ? try(module.hpc_slurm_network.0.subnets["${var.region}/${var.subnet_name}"], null)
+    : try(data.google_compute_subnetwork.default.0, null)
+  )
 }
 
 resource "random_id" "random_id" {
@@ -23,28 +44,33 @@ resource "random_id" "random_id" {
   byte_length = 2
 }
 
-module "slurm_project" {
-  source = "../../helpers/tf_modules/project"
-
-  billing_account_id = var.billing_account_id
-  parent             = var.parent
-  project_id         = var.project_id
-  project_name       = var.project_name
-  random_id          = local.random_id
-  labels             = var.labels
+data "google_project" "existing_project" {
+  count      = var.create_project ? 0 : 1
+  project_id = var.project_id
 }
 
-module "slurm_network" {
-  source = "../../helpers/tf_modules/vpc-net"
+module "hpc_slurm_project" {
+  count   = var.create_project ? 1 : 0
+  source  = "terraform-google-modules/project-factory/google"
+  version = "~> 11.0"
 
-  project_id   = module.slurm_project.project_id
-  network_name = "slurm-nw"
-  subnets = [
-    {
-      name               = "euw1-slurm-snw"
-      cidr_range         = "10.0.0.0/16"
-      region             = "europe-west1"
-      secondary_ip_range = null
-    }
+  name              = format("%s-%s", var.project_name, local.random_id)
+  random_project_id = false
+  org_id            = var.organization_id
+  folder_id         = var.folder_id
+  billing_account   = var.billing_account_id
+
+  activate_apis = []
+}
+
+resource "google_project_service" "enabled_services" {
+  for_each                   = toset(local.project_services)
+  project                    = local.project.project_id
+  service                    = each.value
+  disable_dependent_services = true
+  disable_on_destroy         = true
+
+  depends_on = [
+    module.hpc_slurm_project
   ]
 }
