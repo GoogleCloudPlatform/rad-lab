@@ -49,6 +49,30 @@ variable "ip_cidr_range" {
   default     = "10.0.0.0/24"
 }
 
+variable "hpc_login_boot_disk_size" {
+  description = "Size of the boot disk of the login node."
+  type        = number
+  default     = 20
+}
+
+variable "hpc_login_boot_disk_type" {
+  description = "Disk type for the login nodes boot disk."
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "hpc_login_machine_type" {
+  description = "Machine type for the login node."
+  type        = string
+  default     = "n1-standard-2"
+}
+
+variable "hpc_node_prefix" {
+  description = "Prefix for login node and controllers.  Will be suffixed with either '-login' or '-contr'."
+  type        = string
+  default     = "hpc-node"
+}
+
 variable "labels" {
   description = "Labels to be assigned to the resources."
   type        = map(string)
