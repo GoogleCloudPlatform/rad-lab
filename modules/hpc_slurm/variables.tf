@@ -49,6 +49,30 @@ variable "ip_cidr_range" {
   default     = "10.0.0.0/24"
 }
 
+variable "hpc_controller_users" {
+  description = "Users who should have access to the controller nodes."
+  type        = set(string)
+  default     = null
+}
+
+variable "hpc_controller_boot_disk_type" {
+  description = "Disk type for the boot disk, attached to the controller."
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "hpc_controller_boot_disk_size" {
+  description = "Size of the boot disk of the controller node."
+  type        = number
+  default     = 50
+}
+
+variable "hpc_controller_machine_type" {
+  description = "Machine type to be used for the Slurm controller."
+  type        = string
+  default     = "n1-standard-2"
+}
+
 variable "hpc_login_boot_disk_size" {
   description = "Size of the boot disk of the login node."
   type        = number
@@ -68,7 +92,7 @@ variable "hpc_login_machine_type" {
 }
 
 variable "hpc_login_users" {
-  description = "Users who should have access to the login node.  Should be specified as 'user:USERNAME'."
+  description = "Users who should have access to the login node."
   type        = set(string)
   default     = null
 }
@@ -77,6 +101,12 @@ variable "hpc_node_prefix" {
   description = "Prefix for login node and controllers.  Will be suffixed with either '-login' or '-contr'."
   type        = string
   default     = "hpc-node"
+}
+
+variable "hpc_users" {
+  description = "Users who should have access to all instances, as opposed to the individual instances."
+  type        = set(string)
+  default     = null
 }
 
 variable "labels" {

@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+locals {
+  login_node_access_users = concat(var.hpc_users, var.hpc_login_users)
+}
+
 data "google_compute_zones" "zones" {
   project = local.project.project_id
   region  = var.region
@@ -26,7 +30,7 @@ resource "google_service_account" "hpc_login_identity" {
 }
 
 resource "google_service_account_iam_member" "hpc_login_user_access" {
-  for_each           = var.hpc_login_users
+  for_each           = local.login_node_access_users
   member             = each.value
   role               = "roles/iam.serviceAccountUser"
   service_account_id = google_service_account.hpc_login_identity.id
