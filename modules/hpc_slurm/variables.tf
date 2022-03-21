@@ -67,6 +67,12 @@ variable "hpc_login_machine_type" {
   default     = "n1-standard-2"
 }
 
+variable "hpc_login_users" {
+  description = "Users who should have access to the login node.  Should be specified as 'user:USERNAME'."
+  type        = set(string)
+  default     = null
+}
+
 variable "hpc_node_prefix" {
   description = "Prefix for login node and controllers.  Will be suffixed with either '-login' or '-contr'."
   type        = string

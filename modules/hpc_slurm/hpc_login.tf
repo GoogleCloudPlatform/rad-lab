@@ -25,6 +25,13 @@ resource "google_service_account" "hpc_login_identity" {
   description = "Identity of the HPC Slurm Login node"
 }
 
+resource "google_service_account_iam_member" "hpc_login_user_access" {
+  for_each           = var.hpc_login_users
+  member             = each.value
+  role               = "roles/iam.serviceAccountUser"
+  service_account_id = google_service_account.hpc_login_identity.id
+}
+
 resource "google_compute_instance" "login_node" {
   project      = local.project.project_id
   name         = format("%s-%s", var.hpc_node_prefix, "login")
