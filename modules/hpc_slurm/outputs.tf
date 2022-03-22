@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-output "project_id" {
-  value = local.project.project_id
+output "hpc_controller_ssh_command" {
+  value = "gcloud compute ssh ${google_compute_instance.slurm_controller.name} --zone ${google_compute_instance.slurm_controller.zone} --project ${local.project.project_id}"
 }
 
-output "random_id" {
-  value = local.random_id
+output "hpc_login_ssh_command" {
+  value = "gcloud compute ssh ${google_compute_instance.login_node.name} --zone ${google_compute_instance.login_node.zone} --project ${local.project.project_id}"
+}
+
+output "network_id" {
+  value = local.network.id
 }
 
 output "network_selflink" {
   value = local.network.self_link
 }
 
-output "network_id" {
-  value = local.network.id
+output "project_id" {
+  value = local.project.project_id
+}
+
+output "random_id" {
+  value = local.random_id
 }
 
 output "subnet_selflink" {
