@@ -1,6 +1,18 @@
 # HPC - Slurm Cluster
 
-The purpose of this module is to create an HPC cluster with Slurm as the orchestrator. It uses the open source repository maintained by SchedMD to create the HPC cluster. 
+## GCP Products/Services
+
+* Compute instances (Slurm login node, Slurm controller)
+* Virtual Private Cloud (VPC)
+
+## Reference Architecture Diagram
+
+
+## IAM Permissions Prerequisites
+Ensure that the identity executing this module has the following IAM permissions, **when project is created as well**.  (`create_project = true`):
+- Parent: `roles/resourcemanager.projectCreator`
+- Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only required if setting any Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of the RAD Lab module)
+- Billing Account: `roles/billing.user`
 
 ## Using Terraform module
 Here are a couple of examples to use the module directly in your Terraform code, as opposed to using the RAD Lab Launcher.
