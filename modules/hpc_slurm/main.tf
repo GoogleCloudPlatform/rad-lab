@@ -18,7 +18,8 @@ locals {
   random_id = var.random_id == null ? random_id.random_id.0.hex : var.random_id
 
   project_services = var.enable_services ? [
-    "compute.googleapis.com"
+    "compute.googleapis.com",
+    "iap.googleapis.com"
   ] : []
 
   project = (var.create_project

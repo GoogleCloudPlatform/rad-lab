@@ -15,7 +15,7 @@
  */
 
 locals {
-  login_node_access_users = concat(var.hpc_users, var.hpc_login_users)
+  login_node_access_users = setunion(var.hpc_users, var.hpc_login_users)
 }
 
 data "google_compute_zones" "zones" {
@@ -31,7 +31,7 @@ resource "google_service_account" "hpc_login_identity" {
 
 resource "google_service_account_iam_member" "hpc_login_user_access" {
   for_each           = local.login_node_access_users
-  member             = each.value
+  member             = "user:${each.value}"
   role               = "roles/iam.serviceAccountUser"
   service_account_id = google_service_account.hpc_login_identity.id
 }
@@ -58,6 +58,8 @@ resource "google_compute_instance" "login_node" {
     email  = google_service_account.hpc_login_identity.email
     scopes = ["cloud-platform"]
   }
+
+  tags = ["iap"]
 
   metadata = {
     enable-oslogin = "TRUE"

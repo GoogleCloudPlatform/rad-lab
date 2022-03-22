@@ -15,7 +15,7 @@
  */
 
 locals {
-  user_node_access = toset(concat(var.hpc_users, var.hpc_login_users, var.hpc_controller_users))
+  user_node_access = setunion(var.hpc_users, var.hpc_login_users, var.hpc_controller_users)
 }
 
 data "google_compute_image" "schedmd_slurm_img" {
@@ -26,22 +26,42 @@ data "google_compute_image" "schedmd_slurm_img" {
 resource "google_project_iam_member" "hpc_node_access" {
   for_each = local.user_node_access
   member   = "user:${each.value}"
-  project  = module.hpc_slurm_project.project_id
+  project  = local.project.project_id
   role     = "roles/compute.viewer"
 }
 
 resource "google_compute_instance_iam_member" "hpc_login_access" {
   for_each      = local.login_node_access_users
-  project       = module.hpc_slurm_project.project_id
+  project       = local.project.project_id
   instance_name = google_compute_instance.login_node.name
+  zone          = google_compute_instance.login_node.zone
   member        = "user:${each.value}"
   role          = "roles/compute.osLogin"
 }
 
 resource "google_compute_instance_iam_member" "hpc_controller_access" {
   for_each      = local.controller_node_access_users
-  project       = module.hpc_slurm_project.project_id
+  project       = local.project.project_id
   instance_name = google_compute_instance.slurm_controller.name
+  zone          = google_compute_instance.slurm_controller.zone
   member        = "user:${each.value}"
   role          = "roles/compute.osLogin"
+}
+
+resource "google_iap_tunnel_instance_iam_member" "login_node_iap_access" {
+  for_each = local.login_node_access_users
+  project  = local.project.project_id
+  role     = "roles/iap.tunnelResourceAccessor"
+  instance = google_compute_instance.login_node.name
+  zone     = google_compute_instance.login_node.zone
+  member   = "user:${each.value}"
+}
+
+resource "google_iap_tunnel_instance_iam_member" "controller_node_iap_access" {
+  for_each = local.controller_node_access_users
+  project  = local.project.project_id
+  role     = "roles/iap.tunnelResourceAccessor"
+  instance = google_compute_instance.slurm_controller.name
+  zone     = google_compute_instance.slurm_controller.zone
+  member   = "user:${each.value}"
 }

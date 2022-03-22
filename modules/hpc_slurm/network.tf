@@ -45,6 +45,19 @@ module "hpc_slurm_network" {
     subnet_private_access = true
   }]
 
+  firewall_rules = [{
+    name        = "allow-iap-access"
+    description = "Firewall rule to allow IAP access to login and controller nodes."
+    ranges      = ["35.235.240.0/20"]
+    direction   = "INGRESS"
+    targets     = ["iap"]
+
+    allow = [{
+      protocol = "tcp"
+      ports    = ["22"]
+    }]
+  }]
+
   depends_on = [
     google_project_service.enabled_services
   ]

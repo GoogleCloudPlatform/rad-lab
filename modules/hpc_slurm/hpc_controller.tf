@@ -15,16 +15,11 @@
  */
 
 locals {
-  controller_node_access_users = concat(var.hpc_controller_users, var.hpc_users)
-}
-
-data "google_compute_image" "slurm_controller_image" {
-  project = ""
-  family = "schedmd-slurm-hpc-intel-controller"
+  controller_node_access_users = setunion(var.hpc_controller_users, var.hpc_users)
 }
 
 resource "google_service_account" "hpc_slurm_controller_identity" {
-  project     = module.hpc_slurm_project.project_id
+  project     = local.project.project_id
   account_id  = "hpc-controller-id"
   description = "HPC Controller Identity"
 }
@@ -37,7 +32,7 @@ resource "google_service_account_iam_member" "hpc_slurm_controller_access" {
 }
 
 resource "google_compute_instance" "slurm_controller" {
-  project      = module.hpc_slurm_project.project_id
+  project      = local.project.project_id
   name         = format("%s-%s", var.hpc_node_prefix, "controller")
   zone         = data.google_compute_zones.zones.names[0]
   machine_type = var.hpc_controller_machine_type
@@ -58,6 +53,8 @@ resource "google_compute_instance" "slurm_controller" {
     email  = google_service_account.hpc_slurm_controller_identity.email
     scopes = ["cloud-platform"]
   }
+
+  tags = ["iap"]
 
   metadata = {
     enable-oslogin = "TRUE"

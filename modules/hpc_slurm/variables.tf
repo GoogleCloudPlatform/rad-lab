@@ -52,7 +52,7 @@ variable "ip_cidr_range" {
 variable "hpc_controller_users" {
   description = "Users who should have access to the controller nodes."
   type        = set(string)
-  default     = null
+  default     = []
 }
 
 variable "hpc_controller_boot_disk_type" {
@@ -94,7 +94,7 @@ variable "hpc_login_machine_type" {
 variable "hpc_login_users" {
   description = "Users who should have access to the login node."
   type        = set(string)
-  default     = null
+  default     = []
 }
 
 variable "hpc_node_prefix" {
@@ -106,7 +106,7 @@ variable "hpc_node_prefix" {
 variable "hpc_users" {
   description = "Users who should have access to all instances, as opposed to the individual instances."
   type        = set(string)
-  default     = null
+  default     = []
 }
 
 variable "labels" {
@@ -156,6 +156,18 @@ variable "region" {
   description = "Default region to use for all resources, apart from subnets."
   type        = string
   default     = "us-central1"
+}
+
+variable "set_shielded_vm_policy" {
+  description = "Enable shielded VM organization policy."
+  type        = bool
+  default     = false
+}
+
+variable "set_vpc_peering_policy" {
+  description = "Set organization policy to enable VPC peering with certain projecst."
+  type        = bool
+  default     = false
 }
 
 variable "subnet_name" {
