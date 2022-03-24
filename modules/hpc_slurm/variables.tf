@@ -49,6 +49,12 @@ variable "ip_cidr_range" {
   default     = "10.0.0.0/24"
 }
 
+variable "hpc_cluster_name" {
+  description = "Name of the HPC cluster."
+  type        = string
+  default     = "hpc-slurm-cluster"
+}
+
 variable "hpc_controller_users" {
   description = "Users who should have access to the controller nodes."
   type        = set(string)

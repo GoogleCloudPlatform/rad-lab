@@ -56,6 +56,22 @@ module "hpc_slurm_network" {
       protocol = "tcp"
       ports    = ["22"]
     }]
+    }, {
+    name        = "allow-internal-traffic"
+    description = "Allow internal traffic between the different nodes."
+    ranges      = [var.ip_cidr_range]
+    direction   = "INGRESS"
+
+    allow = [{
+      protocol = "icmp"
+      ports = []
+      }, {
+      protocol = "tcp"
+      ports    = ["0-65535"]
+      }, {
+      protocol = "udp"
+      ports    = ["0-65535"]
+    }]
   }]
 
   depends_on = [

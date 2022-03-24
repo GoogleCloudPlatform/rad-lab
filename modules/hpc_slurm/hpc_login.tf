@@ -42,6 +42,8 @@ resource "google_compute_instance" "login_node" {
   machine_type = var.hpc_login_machine_type
   zone         = data.google_compute_zones.zones.names[0]
 
+  #  metadata_startup_script = "${path.module}/scripts/usage/startup.sh"
+
   boot_disk {
     initialize_params {
       image = data.google_compute_image.schedmd_slurm_img.self_link
@@ -63,6 +65,11 @@ resource "google_compute_instance" "login_node" {
 
   metadata = {
     enable-oslogin = "TRUE"
+    VmDnsSetting   = "GlobalOnly"
+    config = jsonencode({
+      cluster_name  = var.hpc_cluster_name
+      instance_type = "login"
+    })
   }
 
 }
