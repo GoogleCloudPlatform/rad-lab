@@ -16,6 +16,7 @@
 
 locals {
   controller_node_access_users = setunion(var.hpc_controller_users, var.hpc_users)
+  controller_host_name         = format("%s-%s", var.hpc_node_prefix, "controller")
 }
 
 resource "google_service_account" "hpc_slurm_controller_identity" {
@@ -33,9 +34,15 @@ resource "google_service_account_iam_member" "hpc_slurm_controller_access" {
 
 resource "google_compute_instance" "slurm_controller" {
   project      = local.project.project_id
-  name         = format("%s-%s", var.hpc_node_prefix, "controller")
+  name         = local.controller_host_name
   zone         = data.google_compute_zones.zones.names[0]
   machine_type = var.hpc_controller_machine_type
+
+  metadata_startup_script = templatefile("${path.module}/templates/controller_startup_script.sh.tpl", {
+    SLURM_STATE_DIR      = var.hpc_vars_state_save
+    SLURM_CONFIG_FILE    = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.slurm_configuration.name}"
+    SLURM_DB_CONFIG_FILE = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.slurm_db_configuration.name}"
+  })
 
   boot_disk {
     initialize_params {

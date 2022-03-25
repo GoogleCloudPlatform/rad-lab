@@ -55,6 +55,11 @@ variable "hpc_cluster_name" {
   default     = "hpc-slurm-cluster"
 }
 
+variable "hpc_config_bucket_name" {
+  description = "Name of the bucket where HPC configuration is stored."
+  type        = string
+  default     = "hpc-config-files"
+}
 variable "hpc_controller_users" {
   description = "Users who should have access to the controller nodes."
   type        = set(string)
@@ -77,6 +82,18 @@ variable "hpc_controller_machine_type" {
   description = "Machine type to be used for the Slurm controller."
   type        = string
   default     = "n1-standard-2"
+}
+
+variable "hpc_db_version" {
+  description = "MySQL version of the database."
+  type        = string
+  default     = "MYSQL_8_0"
+}
+
+variable "hpc_db_name" {
+  description = "Name of the Cloud SQL instance to host the Slurm database."
+  type        = string
+  default     = "slurm-db-inst"
 }
 
 variable "hpc_login_boot_disk_size" {
@@ -115,6 +132,84 @@ variable "hpc_users" {
   default     = []
 }
 
+variable "hpc_vars_complete_wait_time" {
+  description = "Wait time for time for the cluster."
+  type        = number
+  default     = 0
+}
+
+variable "hpc_vars_config_file" {
+  description = "Override the config file template that comes with the module.  Should point to a valid `slurm.conf` file."
+  type        = string
+  default     = null
+}
+
+variable "hpc_vars_db_host" {
+  description = "Host where the database is run."
+  type        = string
+  default     = "localhost"
+}
+
+variable "hpc_vars_db_name" {
+  description = "Location on disk where the DB files are stored."
+  type        = string
+  default     = "slurm_acct_db"
+}
+
+variable "hpc_vars_db_password" {
+  description = "Password to authenticate with the local Slurm DB."
+  type        = string
+  default     = ""
+}
+
+variable "hpc_vars_db_port" {
+  description = "Port on which the local DB is exposed."
+  type        = number
+  default     = 3306
+}
+
+variable "hpc_vars_db_user" {
+  description = "User to authenticate with the database."
+  type        = string
+  default     = "slurm"
+}
+
+variable "hpc_vars_log_directory" {
+  description = "Directory where the logs should be stored on each machine."
+  type        = string
+  default     = "/var/log/slurm"
+}
+
+variable "hpc_vars_mpi_default" {
+  description = "MPI default value for the Slurm cluster."
+  type        = string
+  default     = "none"
+}
+
+variable "hpc_vars_resume_timeout" {
+  description = "Resume timeout for the Slurm workloads."
+  type        = number
+  default     = 300
+}
+
+variable "hpc_vars_script_directory" {
+  description = "Directory where HPC configuration scripts are stored."
+  type        = string
+  default     = "/slurm/scripts"
+}
+
+variable "hpc_vars_state_save" {
+  description = "Directory where the state of the cluster should be saved."
+  type        = string
+  default     = "/var/spool/slurm"
+}
+
+variable "hpc_vars_suspend_timeout" {
+  description = "Timeout for suspending nodes."
+  type        = number
+  default     = 300
+}
+
 variable "labels" {
   description = "Labels to be assigned to the resources."
   type        = map(string)
@@ -138,7 +233,6 @@ variable "parent" {
   type        = string
   default     = null
 }
-
 
 variable "project_id" {
   description = "Project ID to be assigned to the project.  If a value is provided, it should correspond to an existing Project ID, as RAD Lab will try to deploy the resources in that project."

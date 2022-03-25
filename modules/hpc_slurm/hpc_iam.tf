@@ -65,3 +65,9 @@ resource "google_iap_tunnel_instance_iam_member" "controller_node_iap_access" {
   zone     = google_compute_instance.slurm_controller.zone
   member   = "user:${each.value}"
 }
+
+resource "google_storage_bucket_iam_member" "slurm_identity_storage_access" {
+  bucket = google_storage_bucket.config_files.name
+  member = "serviceAccount:${google_service_account.hpc_slurm_controller_identity.email}"
+  role   = "roles/storage.objectViewer"
+}
