@@ -20,7 +20,9 @@ locals {
   project_services = var.enable_services ? [
     "compute.googleapis.com",
     "iap.googleapis.com",
-    "logging.googleapis.com"
+    "logging.googleapis.com",
+    "servicenetworking.googleapis.com",
+    "sqladmin.googleapis.com"
   ] : []
 
   project = (var.create_project
