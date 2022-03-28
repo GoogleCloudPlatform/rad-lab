@@ -16,6 +16,10 @@
 
 locals {
   user_node_access = setunion(var.hpc_users, var.hpc_login_users, var.hpc_controller_users)
+
+  controller_identity_permissions = [
+    "roles/cloudsql.admin"
+  ]
 }
 
 data "google_compute_image" "schedmd_slurm_img" {
@@ -70,4 +74,11 @@ resource "google_storage_bucket_iam_member" "slurm_identity_storage_access" {
   bucket = google_storage_bucket.config_files.name
   member = "serviceAccount:${google_service_account.hpc_slurm_controller_identity.email}"
   role   = "roles/storage.objectViewer"
+}
+
+resource "google_project_iam_member" "controller_project_permissions" {
+  for_each = toset(local.controller_identity_permissions)
+  project  = local.project.project_id
+  member   = "serviceAccount:${google_service_account.hpc_slurm_controller_identity.email}"
+  role     = each.value
 }

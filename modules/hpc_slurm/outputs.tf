@@ -34,6 +34,10 @@ output "project_id" {
   value = local.project.project_id
 }
 
+output "project_number" {
+  value = local.project.project_number
+}
+
 output "random_id" {
   value = local.random_id
 }

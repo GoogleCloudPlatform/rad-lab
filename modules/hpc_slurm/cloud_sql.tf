@@ -14,43 +14,53 @@
  * limitations under the License.
  */
 
-resource "google_compute_global_address" "private_ip_address" {
-  project       = local.project.project_id
-  name          = "cloud-sql-ip"
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 24
-  network       = local.network.id
+resource "random_password" "db_password" {
+  length      = 8
+  min_lower   = 2
+  min_upper   = 2
+  min_numeric = 2
+  min_special = 2
 }
 
-resource "google_service_networking_connection" "private_vpc_connection" {
-  provider = google-beta
+module "private_service_access" {
+  source  = "GoogleCloudPlatform/sql-db/google//modules/private_service_access"
+  version = "10.0.0"
 
-  network                 = local.network.id
-  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
-  service                 = "servicenetworking.googleapis.com"
-
-  depends_on = [
-    google_project_service.enabled_services
-  ]
+  project_id  = local.project.project_id
+  vpc_network = local.network.name
 }
 
-resource "google_sql_database_instance" "slurm_db_instance" {
-  project             = local.project.project_id
+module "private_sql_db_instance" {
+  source  = "GoogleCloudPlatform/sql-db/google//modules/mysql"
+  version = "10.0.0"
+
+  project_id           = local.project.project_id
+  name                 = var.hpc_db_name
+  random_instance_name = true
+
   database_version    = "MYSQL_8_0"
-  name                = var.hpc_db_name
-  region              = var.region
   deletion_protection = false
+  region              = var.region
+  zone                = data.google_compute_zones.zones.names[0]
+  tier                = "db-n1-standard-1"
 
-  settings {
-    tier = "db-f1-micro"
-    ip_configuration {
-      ipv4_enabled    = false
-      private_network = local.network.id
-    }
+  ip_configuration = {
+    ipv4_enabled        = false
+    authorized_networks = []
+    require_ssl         = false
+    private_network     = local.network.self_link
+    allocated_ip_range  = module.private_service_access.google_compute_global_address_name
   }
 
-  depends_on = [
-    google_service_networking_connection.private_vpc_connection
-  ]
+  additional_databases = [{
+    name      = "slurm_acct_db"
+    charset   = "utf8"
+    collation = "utf8_general_ci"
+  }]
+
+  user_host     = "%"
+  user_name     = var.hpc_vars_db_user
+  user_password = random_password.db_password.result
+
+  module_depends_on = [module.private_service_access.peering_completed]
 }

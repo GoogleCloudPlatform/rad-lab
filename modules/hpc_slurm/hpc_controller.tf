@@ -42,6 +42,7 @@ resource "google_compute_instance" "slurm_controller" {
     SLURM_STATE_DIR      = var.hpc_vars_state_save
     SLURM_CONFIG_FILE    = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.slurm_configuration.name}"
     SLURM_DB_CONFIG_FILE = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.slurm_db_configuration.name}"
+    CGROUP_CONFIG_FILE   = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.cgroup_configuration.name}"
   })
 
   boot_disk {

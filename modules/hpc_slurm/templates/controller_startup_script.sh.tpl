@@ -28,7 +28,7 @@ if ! (gsutil cp ${SLURM_CONFIG_FILE} $${SLURM_CONFIG_PATH}/slurm.conf); then
   exit 1
 fi
 
-chown slurm:slurm $${SLURM_CONFIG_TARGET}/slurm.conf
+chown slurm:slurm $${SLURM_CONFIG_PATH}/slurm.conf
 
 mkdir -p ${SLURM_STATE_DIR}
 
@@ -39,11 +39,23 @@ dd if=/dev/urandom bs=32 count=1 > ${SLURM_STATE_DIR}/jwt_hs256.key
 chown slurm:slurm ${SLURM_STATE_DIR}/jwt_hs256.key
 
 echo "Creating DB files ..."
-if ! (gsutil cp ${SLURM_DB_CONFIG_FILE} $${SLURM_CONFIG_TARGET}/slurmdb.conf); then
+if ! (gsutil cp ${SLURM_DB_CONFIG_FILE} $${SLURM_CONFIG_PATH}/slurmdbd.conf); then
   echo "Failed to download Slurm DB configuration ..."
   exit 1
 fi
-chown slurm:slurm $${SLURM_CONFIG_TARGET}/slurmdb.conf
+chown slurm:slurm $${SLURM_CONFIG_PATH}/slurmdbd.conf
+chmod 0600 $${SLURM_CONFIG_PATH}/slurmdbd.conf
+
+echo "Copying cgroup.conf configuration ..."
+if ! (gsutil cp ${CGROUP_CONFIG_FILE} $${SLURM_CONFIG_TARGET}/cgroup.conf); then
+  echo "Failed to download cgroup.conf ..."
+  exit 1
+fi
+chown slurm:slurm $${SLURM_CONFIG_PATH}/cgroup.conf
+
+echo "Enabling slurmdbd service ..."
+systemctl enable slurmdbd
+systemctl start slurmdbd
 
 echo "Enabling Slurmctld service ..."
 systemctl enable slurmctld

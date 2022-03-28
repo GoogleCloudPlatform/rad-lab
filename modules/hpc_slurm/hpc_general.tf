@@ -41,16 +41,22 @@ resource "google_storage_bucket_object" "slurm_configuration" {
 
 resource "google_storage_bucket_object" "slurm_db_configuration" {
   bucket = google_storage_bucket.config_files.name
-  name   = "slurmdb.conf"
+  name   = "slurmdbd.conf"
 
-  content = templatefile("${path.module}/templates/slurmdb.conf.tpl", {
+  content = templatefile("${path.module}/templates/slurmdbd.conf.tpl", {
     STATE_SAVE_LOCATION  = var.hpc_vars_state_save
     CONTROLLER_HOST_NAME = local.controller_host_name
     SLURM_DB_NAME        = var.hpc_vars_db_name
-    SLURM_DB_HOST        = var.hpc_vars_db_host
+    SLURM_DB_HOST        = module.private_sql_db_instance.private_ip_address
     SLURM_DB_PORT        = var.hpc_vars_db_port
     SLURM_DB_USER        = var.hpc_vars_db_user
-    SLURM_DB_PASSWORD    = var.hpc_vars_db_password
+    SLURM_DB_PASSWORD    = random_password.db_password.result
     LOG_DIRECTORY        = var.hpc_vars_log_directory
   })
+}
+
+resource "google_storage_bucket_object" "cgroup_configuration" {
+  bucket  = google_storage_bucket.config_files.name
+  name    = "cgroup.conf"
+  content = templatefile("${path.module}/templates/cgroup.conf.tpl", {})
 }
