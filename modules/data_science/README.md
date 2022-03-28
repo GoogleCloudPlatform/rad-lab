@@ -29,7 +29,7 @@ When deploying in an existing project, ensure the identity has the following per
 - `roles/storage.admin`
 - `roles/notebooks.admin`
 
-NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](./radlab-launcher)
+NOTE: Additional [permissions](../../radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](../../radlab-launcher)
 
 ## Using Terraform module
 Here are a couple of examples to use the module directly in your Terraform code, as opposed to using the RAD Lab Launcher.
