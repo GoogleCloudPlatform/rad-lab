@@ -19,7 +19,7 @@ resource "random_password" "db_password" {
   min_lower   = 2
   min_upper   = 2
   min_numeric = 2
-  min_special = 2
+  min_special = 0
 }
 
 module "private_service_access" {
@@ -53,7 +53,7 @@ module "private_sql_db_instance" {
   }
 
   additional_databases = [{
-    name      = "slurm_acct_db"
+    name      = var.hpc_vars_db_name
     charset   = "utf8"
     collation = "utf8_general_ci"
   }]

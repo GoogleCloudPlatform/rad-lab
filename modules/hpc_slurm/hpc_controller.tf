@@ -67,4 +67,10 @@ resource "google_compute_instance" "slurm_controller" {
   metadata = {
     enable-oslogin = "TRUE"
   }
+
+  depends_on = [
+    google_storage_bucket_object.slurm_configuration,
+    google_storage_bucket_object.slurm_db_configuration,
+    google_storage_bucket_object.cgroup_configuration
+  ]
 }
