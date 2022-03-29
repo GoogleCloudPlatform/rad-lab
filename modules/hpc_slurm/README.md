@@ -1,5 +1,7 @@
 # HPC - Slurm Cluster
 
+This module uses the Slurm GCP installation, open sourced by SchedMD, as an inspiration. Some of the scripts are directly copied from their source repository on GitHub, which can be found [here](https://github.com/SchedMD/slurm-gcp).
+
 ## GCP Products/Services
 
 * Compute instances (Slurm login node, Slurm controller)

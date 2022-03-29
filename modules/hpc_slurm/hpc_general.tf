@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+locals {
+  runtime_scripts = {
+    "resume.py"  = "${path.module}/scripts/usage/resume.py"
+    "suspend.py" = "${path.module}/scripts/usage/suspend.py"
+  }
+}
+
 resource "google_storage_bucket" "config_files" {
   project                     = local.project.project_id
   location                    = var.region
@@ -59,4 +66,11 @@ resource "google_storage_bucket_object" "cgroup_configuration" {
   bucket  = google_storage_bucket.config_files.name
   name    = "cgroup.conf"
   content = templatefile("${path.module}/templates/cgroup.conf.tpl", {})
+}
+
+resource "google_storage_bucket_object" "runtime_scripts" {
+  for_each = local.runtime_scripts
+  bucket   = google_storage_bucket.config_files.name
+  name     = each.key
+  content  = file(each.value)
 }

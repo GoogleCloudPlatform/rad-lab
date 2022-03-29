@@ -22,7 +22,8 @@ locals {
     "iap.googleapis.com",
     "logging.googleapis.com",
     "servicenetworking.googleapis.com",
-    "sqladmin.googleapis.com"
+    "sqladmin.googleapis.com",
+    "monitoring.googleapis.com"
   ] : []
 
   project = (var.create_project
