@@ -16,6 +16,15 @@
 
 echo "Startup script started."
 
+mkdir alpha-fold
+cd alpha-fold
+
+git init
+git remote add -f origin https://github.com/GoogleCloudPlatform/vertex-ai-samples
+git config core.sparseCheckout true
+echo "community-content/alphafold_on_workbench/" >> .git/info/sparse-checkout
+git pull origin main
+
 echo "Startup script finished."
 
 #auto-shutdown script - enable if needed
