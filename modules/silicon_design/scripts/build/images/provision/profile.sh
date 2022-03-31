@@ -1,0 +1,2 @@
+export OPENLANE_ROOT=/OpenLane
+export PATH=$OPENLANE_ROOT:$OPENLANE_ROOT/scripts:$PATH
