@@ -1,0 +1,9 @@
+set ::env(PDK_ROOT) "$::env(CONDA_PREFIX)/share/pdk"
+set ::env(TCLLIBPATH) "$::env(CONDA_PREFIX)/opt/conda/lib/tcllib1.20"
+set ::env(OL_INSTALL_DIR) "$::env(OPENLANE_ROOT)/install"
+set ::env(OPENLANE_LOCAL_INSTALL) 1
+set ::env(MISMATCHES_OK) 1
+set ::env(RUN_CVC) 0
+set ::env(RUN_KLAYOUT_XOR) 0
+set ::env(RUN_KLAYOUT_DRC) 0
+set ::env(RUN_KLAYOUT) 0

@@ -137,3 +137,9 @@ variable "zone" {
   type        = string
   default     = "us-east4-c"
 }
+
+variable "image_name" {
+  description = "Basename for for the compute and container image."
+  type        = string
+  default     = "silicon-design-ubuntu-2004"
+}
