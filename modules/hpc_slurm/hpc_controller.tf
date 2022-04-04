@@ -43,6 +43,10 @@ resource "google_compute_instance" "slurm_controller" {
     SLURM_CONFIG_FILE    = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.slurm_configuration.name}"
     SLURM_DB_CONFIG_FILE = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.slurm_db_configuration.name}"
     CGROUP_CONFIG_FILE   = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.cgroup_configuration.name}"
+    SUSPEND_SCRIPT       = "gs://${google_storage_bucket.config_files.name}/suspend.py"
+    RESUME_SCRIPT        = "gs://${google_storage_bucket.config_files.name}/resume.py"
+    SCRIPT_DIRECTORY     = var.hpc_vars_script_directory
+    CLUSTER_NAME         = var.hpc_cluster_name
   })
 
   boot_disk {
@@ -71,6 +75,7 @@ resource "google_compute_instance" "slurm_controller" {
   depends_on = [
     google_storage_bucket_object.slurm_configuration,
     google_storage_bucket_object.slurm_db_configuration,
-    google_storage_bucket_object.cgroup_configuration
+    google_storage_bucket_object.cgroup_configuration,
+    module.private_sql_db_instance
   ]
 }

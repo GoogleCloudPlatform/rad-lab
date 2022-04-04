@@ -20,7 +20,11 @@ if [ -f $FLAGFILE ]; then
   exit 0
 fi
 
-SLURM_CONFIG_PATH="/usr/local/etc/slurm/"
+SLURM_CONFIG_PATH="/usr/local/etc/slurm"
+
+mkdir -p ${SCRIPT_DIRECTORY}
+chown slurm:slurm ${SCRIPT_DIRECTORY}
+chown slurm:slurm $${SLURM_CONFIG_PATH}
 
 echo "Downloading Slurm configuration ..."
 if ! (gsutil cp ${SLURM_CONFIG_FILE} $${SLURM_CONFIG_PATH}/slurm.conf); then
@@ -51,15 +55,42 @@ if ! (gsutil cp ${CGROUP_CONFIG_FILE} $${SLURM_CONFIG_TARGET}/cgroup.conf); then
   echo "Failed to download cgroup.conf ..."
   exit 1
 fi
-chown slurm:slurm $${SLURM_CONFIG_PATH}/cgroup.conf
+chown slurm:slurm $${SLURM_CONFIG_TARGET}/cgroup.conf
+
+echo "Copying resume and suspend scripts ..."
+if ! (gsutil cp ${SUSPEND_SCRIPT} ${SCRIPT_DIRECTORY}/suspend.py); then
+  echo "Failed to download suspend.py ..."
+  exit 1
+fi
+
+if ! (gsutil cp ${RESUME_SCRIPT} ${SCRIPT_DIRECTORY}/resume.py); then
+  echo "Failed to download resume.py ..."
+  exit 1
+fi
+
+chown slurm:slurm ${SCRIPT_DIRECTORY}/suspend.py
+chown slurm:slurm ${SCRIPT_DIRECTORY}/resume.py
 
 echo "Enabling slurmdbd service ..."
 systemctl enable slurmdbd
 systemctl start slurmdbd
 
+sleep 5
+
+echo "Adding cluster ..."
+sacctmgr -i add cluster ${CLUSTER_NAME}
+
 echo "Enabling Slurmctld service ..."
 systemctl enable slurmctld
 systemctl start slurmctld
+
+echo "Enabling slurm rest service ..."
+systemctl enable slurmrestd
+systemctl start slurmrestd
+
+echo "Enable NFS server ..."
+systemctl enable nfs-server
+systemctl start nfs-server
 
 echo "Startup completed, create flag file to stop re-running the startup script ..."
 touch $${FLAGFILE}

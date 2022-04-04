@@ -18,6 +18,10 @@ locals {
   login_node_access_users = setunion(var.hpc_users, var.hpc_login_users)
 }
 
+provider "google" {
+  project = module.hpc_slurm_project.project_id
+}
+
 data "google_compute_zones" "zones" {
   project = local.project.project_id
   region  = var.region
@@ -41,8 +45,6 @@ resource "google_compute_instance" "login_node" {
   name         = format("%s-%s", var.hpc_node_prefix, "login")
   machine_type = var.hpc_login_machine_type
   zone         = data.google_compute_zones.zones.names[0]
-
-  #  metadata_startup_script = "${path.module}/scripts/usage/startup.sh"
 
   boot_disk {
     initialize_params {

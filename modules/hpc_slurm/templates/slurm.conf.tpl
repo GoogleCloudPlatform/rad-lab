@@ -70,9 +70,9 @@ PrologSlurmctld=${SCRIPT_DIRECTORY}/resume.py
 EpilogSlurmctld=${SCRIPT_DIRECTORY}/suspend.py
 
 # POWER SAVE SUPPORT FOR IDLE NODES (optional)
-#SuspendProgram=${SCRIPT_DIRECTORY}/suspend.py
-#ResumeProgram=${SCRIPT_DIRECTORY}/resume.py
-#ResumeFailProgram=${SCRIPT_DIRECTORY}/suspend.py
+SuspendProgram=${SCRIPT_DIRECTORY}/suspend.py
+ResumeProgram=${SCRIPT_DIRECTORY}/resume.py
+ResumeFailProgram=${SCRIPT_DIRECTORY}/suspend.py
 SuspendTimeout=${SUSPEND_TIMEOUT}
 ResumeTimeout=${RESUME_TIMEOUT}
 ResumeRate=0
@@ -82,3 +82,5 @@ SchedulerParameters=salloc_wait_nodes
 SlurmctldParameters=cloud_dns,idle_on_node_suspend
 CommunicationParameters=NoAddrCache
 GresTypes=gpu
+
+# Nodes
