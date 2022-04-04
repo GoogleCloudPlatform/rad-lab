@@ -18,10 +18,6 @@ locals {
   login_node_access_users = setunion(var.hpc_users, var.hpc_login_users)
 }
 
-provider "google" {
-  project = module.hpc_slurm_project.project_id
-}
-
 data "google_compute_zones" "zones" {
   project = local.project.project_id
   region  = var.region

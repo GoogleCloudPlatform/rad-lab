@@ -19,6 +19,8 @@ locals {
     "resume.py"  = "${path.module}/scripts/usage/resume.py"
     "suspend.py" = "${path.module}/scripts/usage/suspend.py"
   }
+
+  hpc_controller_node_name = format("%s-[%d-%d]", var.hpc_cluster_name, var.hpc_controller_node_default.static_node_count, var.hpc_controller_node_default.max_node_count - 1)
 }
 
 resource "google_storage_bucket" "config_files" {
@@ -43,6 +45,14 @@ resource "google_storage_bucket_object" "slurm_configuration" {
     SCRIPT_DIRECTORY     = var.hpc_vars_script_directory
     SUSPEND_TIMEOUT      = var.hpc_vars_suspend_timeout
     RESUME_TIMEOUT       = var.hpc_vars_resume_timeout
+
+    # Default Compute Node
+    HPC_NODE_DEFAULT_SOCKETS          = var.hpc_controller_node_default.sockets
+    HPC_NODE_DEFAULT_CORES_PER_SOCKET = var.hpc_controller_node_default.cores_per_socket
+    HPC_NODE_DEFAULT_THREADS_PER_CORE = var.hpc_controller_node_default.threads_per_core
+    HPC_NODE_DEFAULT_REAL_MEMORY      = var.hpc_controller_node_default.real_memory
+    HPC_NODE_DEFAULT_STATE            = var.hpc_controller_node_default.state
+    HPC_NODE_CONTROLLER_NODENAME      = local.hpc_controller_node_name
   })
 }
 

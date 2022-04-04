@@ -84,3 +84,8 @@ CommunicationParameters=NoAddrCache
 GresTypes=gpu
 
 # Nodes
+NodeName=DEFAULT Sockets=${HPC_NODE_DEFAULT_SOCKETS} CoresPerSocket=${HPC_NODE_DEFAULT_CORES_PER_SOCKET} ThreadsPerCore=${HPC_NODE_DEFAULT_THREADS_PER_CORE} RealMemory=${HPC_NODE_DEFAULT_REAL_MEMORY} State=${HPC_NODE_DEFAULT_STATE}
+NodeName=${HPC_NODE_CONTROLLER_NODENAME} State=CLOUD
+
+#PartitionName=s4 Nodes=mycluster-compute-0-[0-4] MaxTime=INFINITE State=UP DefMemPerCPU=3876 LLN=no Default=YES
+

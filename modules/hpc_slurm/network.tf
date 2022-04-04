@@ -64,7 +64,7 @@ module "hpc_slurm_network" {
 
     allow = [{
       protocol = "icmp"
-      ports = []
+      ports    = []
       }, {
       protocol = "tcp"
       ports    = ["0-65535"]

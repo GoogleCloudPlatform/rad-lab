@@ -84,6 +84,28 @@ variable "hpc_controller_machine_type" {
   default     = "n1-standard-2"
 }
 
+variable "hpc_controller_node_default" {
+  description = "Default values for Compute nodes in the HPC cluster."
+  type = object({
+    sockets           = number
+    cores_per_socket  = number
+    threads_per_core  = number
+    real_memory       = number
+    state             = string
+    static_node_count = number
+    max_node_count    = number
+  })
+  default = {
+    sockets           = 1
+    cores_per_socket  = 4
+    threads_per_core  = 1
+    real_memory       = 15504
+    state             = "UNKNOWN"
+    static_node_count = 0
+    max_node_count    = 5
+  }
+}
+
 variable "hpc_db_version" {
   description = "MySQL version of the database."
   type        = string
@@ -125,6 +147,25 @@ variable "hpc_node_prefix" {
   type        = string
   default     = "hpc-node"
 }
+
+variable "hpc_partition" {
+  description = "Partition configuration for the HPC cluster."
+  type = list(object({
+    name                 = string
+    machine_type         = string
+    max_node_count       = number
+    static_node_count    = number
+    zone                 = string
+    image                = string
+    compute_disk_type    = string
+    compute_disk_size_gb = number
+  }))
+  default = [{
+    name = "local-partition"
+
+  }]
+}
+
 
 variable "hpc_users" {
   description = "Users who should have access to all instances, as opposed to the individual instances."
