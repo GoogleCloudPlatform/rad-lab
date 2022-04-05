@@ -153,17 +153,26 @@ variable "hpc_partition" {
   type = list(object({
     name                 = string
     machine_type         = string
-    max_node_count       = number
-    static_node_count    = number
-    zone                 = string
     image                = string
+    zone                 = string
     compute_disk_type    = string
+    max_node_count       = number
     compute_disk_size_gb = number
+    static_node_count    = number
+    is_default           = bool
   }))
   default = [{
-    name = "local-partition"
-
+    name                 = "hpc-slurm-partition"
+    machine_type         = "c2-standard-4"
+    compute_disk_type    = "pd-standard"
+    compute_disk_size_gb = 20
+    static_node_count    = 0
+    max_node_count       = 5
+    zone                 = "us-central1-a"
+    image                = null
+    is_default           = true
   }]
+
 }
 
 

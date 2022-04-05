@@ -15,6 +15,7 @@
 # limitations under the License.
 
 FLAGFILE=/slurm/slurm_configured_do_not_remove
+
 if [ -f $FLAGFILE ]; then
   echo "Startup script - Slurm was already configured, exit startup script."
   exit 0
@@ -23,8 +24,10 @@ fi
 SLURM_CONFIG_PATH="/usr/local/etc/slurm"
 
 mkdir -p ${SCRIPT_DIRECTORY}
-chown slurm:slurm ${SCRIPT_DIRECTORY}
-chown slurm:slurm $${SLURM_CONFIG_PATH}
+
+echo "Setting permissions of the parent directories ..."
+TMP=${SCRIPT_DIRECTORY}
+while [[ $TMP != / ]]; do chown slurm:slurm "$TMP"; TMP=$(dirname "$TMP"); done;
 
 echo "Downloading Slurm configuration ..."
 if ! (gsutil cp ${SLURM_CONFIG_FILE} $${SLURM_CONFIG_PATH}/slurm.conf); then
@@ -94,3 +97,4 @@ systemctl start nfs-server
 
 echo "Startup completed, create flag file to stop re-running the startup script ..."
 touch $${FLAGFILE}
+chown slurm:slurm $${FLAGFILE}
