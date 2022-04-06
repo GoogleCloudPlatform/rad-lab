@@ -96,6 +96,7 @@ variable "project_name" {
   type        = string
   default     = "radlab-silicon-design"
 }
+
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
   type        = string

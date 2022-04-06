@@ -67,12 +67,8 @@ resource "random_id" "default" {
 ############################
 
 data "google_project" "existing_project" {
-  count      = var.create_project ? 0 : 1
-  project_id = var.project_name
-}
-
-data "google_project" "project" {
-  project_id = var.project_name
+  count       = var.create_project ? 0 : 1
+  project_id  = var.project_name
 }
 
 module "project_radlab_silicon_design" {
@@ -170,7 +166,7 @@ resource "google_project_iam_member" "sa_p_notebook_permissions" {
 resource "google_project_iam_member" "sa_p_cloudbuild_permissions" {
   for_each = toset(local.cloudbuild_sa_project_roles)
   project  = local.project.project_id
-  member   = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
+  member   =  var.create_project ? "serviceAccount:${local.project.project_number}@cloudbuild.gserviceaccount.com" : "serviceAccount:${local.project.number}@cloudbuild.gserviceaccount.com"
   role     = each.value
 }
 
