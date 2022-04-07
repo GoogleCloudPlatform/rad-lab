@@ -16,8 +16,8 @@
 
 echo "Startup script started."
 
-mkdir radlab-alpha-fold
-cd radlab-alpha-fold
+mkdir -p /home/jupyter/radlab-alpha-fold
+cd /home/jupyter/radlab-alpha-fold
 
 git init
 git remote add -f origin https://github.com/GoogleCloudPlatform/vertex-ai-samples
