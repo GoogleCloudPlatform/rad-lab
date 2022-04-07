@@ -22,7 +22,7 @@ variable "billing_account_id" {
 variable "boot_disk_size_gb" {
   description = "The size of the boot disk in GB attached to this instance"
   type        = number
-  default     = 30
+  default     = 100
 }
 
 variable "boot_disk_type" {
