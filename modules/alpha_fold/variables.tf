@@ -22,7 +22,7 @@ variable "billing_account_id" {
 variable "boot_disk_size_gb" {
   description = "The size of the boot disk in GB attached to this instance"
   type        = number
-  default     = 100
+  default     = 30
 }
 
 variable "boot_disk_type" {
@@ -112,7 +112,7 @@ variable "ip_cidr_range" {
 variable "machine_type" {
   description = "Type of VM you would like to spin up"
   type        = string
-  default     = "n1-standard-1"
+  default     = "n1-standard-8"
 }
 
 variable "network_name" {
