@@ -14,7 +14,6 @@ This RAD Lab module utilizes [Data Science Module](../data_science) and deploy t
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
 
-
 ## IAM Permissions Prerequisites
 
 Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
@@ -52,7 +51,7 @@ NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prere
 | *image_family* | Image of the Vertex AI Workbench. | <code title="">string</code> |  | <code title="">tf-latest-cpu</code> |
 | *image_project* | Google Cloud project where the image is hosted. | <code title="">string</code> |  | <code title=""></code> |
 | *ip_cidr_range* | Unique IP CIDR Range for Vertex AI Workbench subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
-| *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-1</code> |
+| *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-8</code> |
 | *network_name* | Name of the network to be created. | <code title="">string</code> |  | <code title="">vertex-ai-workbench</code> |
 | *notebook_count* | Number of Vertex AI Workbench requested | <code title="">string</code> |  | <code title="">1</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
