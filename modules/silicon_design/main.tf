@@ -19,7 +19,11 @@ locals {
   project = (var.create_project
     ? try(module.project_radlab_silicon_design.0, null)
     : try(data.google_project.existing_project.0, null)
-  )
+    )
+  project_number = (var.create_project
+    ? try(module.project_radlab_silicon_design.0.project_number, null)
+    : try(data.google_project.existing_project.0.number, null)
+    )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   network = (
@@ -166,7 +170,7 @@ resource "google_project_iam_member" "sa_p_notebook_permissions" {
 resource "google_project_iam_member" "sa_p_cloudbuild_permissions" {
   for_each = toset(local.cloudbuild_sa_project_roles)
   project  = local.project.project_id
-  member   =  var.create_project ? "serviceAccount:${local.project.project_number}@cloudbuild.gserviceaccount.com" : "serviceAccount:${local.project.number}@cloudbuild.gserviceaccount.com"
+  member   =  "serviceAccount:${local.project_number}@cloudbuild.gserviceaccount.com"
   role     = each.value
 }
 
