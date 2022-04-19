@@ -1,20 +1,21 @@
-# RAD Lab
+# RAD Lab alpha fold module
 
-RAD Lab enables users to deploy infrastructure on Google Cloud Platform (GCP) to support specific use cases. Infrastructure is created and managed through [Terraform](https://www.terraform.io/) in conjunction with support scripts written in Python. The templates, code, and documentation for each use case are bundled into [modules](./modules).
+RAD Lab enables users to deploy infrastructure on Google Cloud Platform (GCP) to support specific use cases. Infrastructure is created and managed through [Terraform](https://www.terraform.io/) in conjunction with support scripts written in Python. 
 
-Each module comes with an initial sample configuration that can be deployed via the [RAD Lab Launcher](./radlab-launcher). Teams with experience in Terraform can use the Terraform modules in the [/modules-directory](./modules) directly, to integrate the codebase with their existing CI/CD infrastructure.
+Alphafold module deployment with radlab craetes a gcp project for researchers, enables Vertex AI APIs and deploys the alphafold container as a notebook in Vertex AI platform workbench.
 
-For any issues, please create an issue in the Issue tracker of the repository, following the provided templates.
 
-## Disclaimer
+## GCP Products/Services
 
-This is not an officially supported Google product
+Vertex AI Workbench Notebooks with alphafold container to run alphafold demo
 
-## Quick Start
+## Reference Architecture Diagram
 
-To create a module in an existing GCP environment, please click on the “Open In Cloud Shell” button.  This will clone the entire repository to Cloud Shell and automatically select the `main`-branch.
+Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/rad-lab&cloudshell_git_branch=main)
+![](../../docs/images/V1_DataScience.png)
+
+We provide sample Jupyter Notebooks as part of data science module deployment. If you would like to include your own Jupyter Notebooks add them into [scripts/build/notebooks](./scripts/build/notebooks) folder and then run the deployment. You will be able to access your Jupyter notebooks from the Vertex AI Workbench Notebook created as part of the deployment.
 
     
 ### Prerequisites
