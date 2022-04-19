@@ -2,7 +2,10 @@
 
 RAD Lab enables users to deploy infrastructure on Google Cloud Platform (GCP) to support specific use cases. Infrastructure is created and managed through [Terraform](https://www.terraform.io/) in conjunction with support scripts written in Python. 
 Bio-pharma organizations can now leverage the groundbreaking protein folding system, AlphaFold, with Vertex AI
-Alphafold module deployment with radlab craetes a gcp project for researchers, enables Vertex AI APIs and deploys the alphafold container as a notebook in Vertex AI platform workbench.
+Alphafold module deployment with radlab:
+1. Craetes a gcp project for researchers.
+2. Enables Vertex AI APIs 
+3. Deploys the alphafold container as a notebook in Vertex AI platform workbench.
 We provide a customized Docker image in Artifact Registry, with preinstalled packages for launching a notebook instance in Vertex AI Workbench and prerequisites for running AlphaFold.
 
 
