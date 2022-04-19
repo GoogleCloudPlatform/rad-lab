@@ -1,31 +1,20 @@
-# RAD Lab alpha fold module
+# RAD Lab
 
-RAD Lab enables users to deploy infrastructure on Google Cloud Platform (GCP) to support specific use cases. Infrastructure is created and managed through [Terraform](https://www.terraform.io/) in conjunction with support scripts written in Python. 
-Bio-pharma organizations can now leverage the groundbreaking protein folding system, AlphaFold, with Vertex AI
-Alphafold module deployment with radlab:
-1. Craetes a gcp project for researchers.
-2. Enables Vertex AI APIs 
-3. Deploys the alphafold container as a notebook in Vertex AI platform workbench.
-We provide a customized Docker image in Artifact Registry, with preinstalled packages for launching a notebook instance in Vertex AI Workbench and prerequisites for running AlphaFold.
+RAD Lab enables users to deploy infrastructure on Google Cloud Platform (GCP) to support specific use cases. Infrastructure is created and managed through [Terraform](https://www.terraform.io/) in conjunction with support scripts written in Python. The templates, code, and documentation for each use case are bundled into [modules](./modules).
 
+Each module comes with an initial sample configuration that can be deployed via the [RAD Lab Launcher](./radlab-launcher). Teams with experience in Terraform can use the Terraform modules in the [/modules-directory](./modules) directly, to integrate the codebase with their existing CI/CD infrastructure.
 
-## GCP Products/Services
+For any issues, please create an issue in the Issue tracker of the repository, following the provided templates.
 
-Vertex AI Workbench Notebooks with alphafold container to run alphafold demo
+## Disclaimer
 
-## Reference Architecture Diagram
+This is not an officially supported Google product
 
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
+## Quick Start
 
-![](../../docs/images/V1-Alphafold.png)
-Vertex AI lets you develop the entire data science/machine learning workflow in a single development environment, helping you deploy models faster, with fewer lines of code and fewer distractions.
+To create a module in an existing GCP environment, please click on the “Open In Cloud Shell” button.  This will clone the entire repository to Cloud Shell and automatically select the `main`-branch.
 
-For running AlphaFold, we choose Vertex AI Workbench user-managed notebooks, which uses Jupyter notebooks and offers both various preinstalled suites of deep learning packages and full control over the environment. We also use Google Cloud Storage and Google Cloud Artifact Registry, as shown in the architecture diagram above.We provide a customized Docker image in Artifact Registry, with preinstalled packages for launching a notebook instance in Vertex AI Workbench and prerequisites for running AlphaFold.
-
-
-We provide sample alphafold.ipynb upyter Notebooks as part of radlab deployment. This notebook is maintained by Vertex AI samples.
-
-Click on this blog to learn more about using this notebook https://cloud.google.com/blog/products/ai-machine-learning/running-alphafold-on-vertexai
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/rad-lab&cloudshell_git_branch=main)
     
 ### Prerequisites
 * [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/gcp-get-started) version 1.0 or higher.
