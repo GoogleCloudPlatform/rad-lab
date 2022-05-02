@@ -168,10 +168,16 @@ resource "google_project_iam_member" "sa_p_notebook_permissions" {
   role     = each.value
 }
 
+resource "google_project_service_identity" "sa_cloudbuild_identity" {
+  provider = google-beta
+  project  = local.project.project_id  
+  service = "cloudbuild.googleapis.com"
+}
+
 resource "google_project_iam_member" "sa_p_cloudbuild_permissions" {
   for_each = toset(local.cloudbuild_sa_project_roles)
   project  = local.project.project_id
-  member   =  "serviceAccount:${local.project_number}@cloudbuild.gserviceaccount.com"
+  member   =  "serviceAccount:${google_project_service_identity.sa_cloudbuild_identity.email}"
   role     = each.value
 }
 
