@@ -39,7 +39,7 @@ module "vpc_nextflow" {
 
   subnets = [
     {
-      subnet_name           = var.network_name
+      subnet_name           = var.subnet_name
       subnet_ip             = var.ip_cidr_range
       subnet_region         = local.region
       description           = "Subnetwork inside nextflow VPC network, created via Terraform"
@@ -88,6 +88,6 @@ module "cloud-nat" {
   project_id    = local.project.project_id
   region        = local.region
   network       = module.vpc_nextflow.0.network_name
-  router        = "${var.network_name}-nat-router"
   create_router = true
+  router        = "${var.network_name}-nat-router"
 }

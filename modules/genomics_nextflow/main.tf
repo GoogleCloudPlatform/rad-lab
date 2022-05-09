@@ -109,15 +109,14 @@ resource "google_storage_bucket" "nextflow_workflow_bucket" {
 resource "google_storage_bucket_object" "config" {
   name   = "provisioning/nextflow.config"
   bucket = google_storage_bucket.nextflow_workflow_bucket.name
-  content = templatefile("scripts/build/nextflow.conf", {
-    nextflow_PROJECT         = local.project.project_id,
-    nextflow_ROOT_BUCKET     = google_storage_bucket.nextflow_workflow_bucket.url,
-    nextflow_VPC             = var.network_name
-    nextflow_SERVICE_ACCOUNT = module.nextflow_service_account.email,
-    nextflow_PAPI_LOCATION   = var.nextflow_PAPI_location,
-    nextflow_PAPI_ENDPOINT   = var.nextflow_PAPI_endpoint,
-    REQUESTER_PAY_PROJECT    = local.project.project_id,
-    nextflow_ZONES           = "[${join(", ", var.nextflow_zones)}]"
+  content = templatefile("scripts/build/nextflow.config", {
+    NEXTFLOW_PROJECT         = local.project.project_id,
+    NEXTFLOW_WORK_DIR        = "${google_storage_bucket.nextflow_workflow_bucket.url}/workdir",
+    NEXTFLOW_NETWORK         = var.network_name
+    NEXTFLOW_SUBNET          = var.subnet_name
+    NEXTFLOW_SERVICE_ACCOUNT = module.nextflow_service_account.email,
+    NEXTFLOW_LOCATION        = var.nextflow_PAPI_location,
+    NEXTFLOW_ZONES           = "[${join(", ", var.nextflow_zones)}]"
   })
 }
 
@@ -125,6 +124,6 @@ resource "google_storage_bucket_object" "bootstrap" {
   name   = "provisioning/bootstrap.sh"
   bucket = google_storage_bucket.nextflow_workflow_bucket.name
   content = templatefile("scripts/build/bootstrap.sh", {
-        BUCKET_URL       = google_storage_bucket.nextflow_workflow_bucket.url
+    BUCKET_URL = google_storage_bucket.nextflow_workflow_bucket.url
   })
 }

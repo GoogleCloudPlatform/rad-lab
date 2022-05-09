@@ -30,21 +30,13 @@ variable "create_project" {
   default     = true
 }
 
-variable "nextflow_PAPI_endpoint" {
-  description = "Endpoint for Life Sciences APIs. For locations other than us-central1, the endpoint needs to be updated to match the location For example for \"europe-west4\" location the endpoint-url should be \"https://europe-west4-lifesciences.googleapi/\""
-  type        = string
-  default     = "https://lifesciences.googleapis.com"
-}
+
 variable "nextflow_PAPI_location" {
   description = "Google Cloud region or multi-region where the Life Sciences API endpoint will be used. This does not affect where worker instances or data will be stored."
   type        = string
   default     = "us-central1"
 }
-variable "nextflow_port" {
-  description = "Port nextflow server will use for the REST API and web user interface."
-  type        = string
-  default     = "8000"
-}
+
 variable "nextflow_sa_roles" {
   description = "List of roles granted to the nextflow service account. This server account will be used to run both the nextflow server and workers as well."
   type        = list(any)
@@ -67,32 +59,20 @@ variable "nextflow_server_instance_type" {
   type        = string
   default     = "e2-standard-4"
 }
-variable "nextflow_version" {
-  description = "nextflow version that will be downloaded, for the latest release version, please check https://github.com/broadinstitute/nextflow/releases for the latest releases."
-  type        = string
-  default     = "72"
-
-}
-
 
 variable "nextflow_zones" {
   description = "GCP Zones that will be set as the default runtime in nextflow config file."
   type        = list(any)
   default     = ["us-central1-a", "us-central1-b"]
 }
-variable "db_service_network_cidr_range" {
-  description = "CIDR range used for the private service range for CloudSQL"
-  type        = string
-  default     = "10.128.50.0/24"
-}
 
 variable "default_region" {
-  description = "The default region where the CloudSQL, Compute Instance and VPCs will be deployed"
+  description = "The default region where the Compute Instance and VPCs will be deployed"
   type        = string
   default     = "us-central1"
 }
 variable "default_zone" {
-  description = "The default zone where the CloudSQL, Compute Instance be deployed"
+  description = "The default zone where the Compute Instance be deployed"
   type        = string
   default     = "us-central1-a"
 }
@@ -114,7 +94,13 @@ variable "ip_cidr_range" {
 }
 
 variable "network_name" {
-  description = "This name will be used for VPC and subnets created"
+  description = "This name will be used for VPC created"
+  type        = string
+  default     = "nextflow-vpc"
+}
+
+variable "subnet_name" {
+  description = "This name will be used for subnet created"
   type        = string
   default     = "nextflow-vpc"
 }

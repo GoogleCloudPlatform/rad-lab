@@ -19,12 +19,12 @@ data "google_compute_image" "debian" {
 }
 //Create nextflow service account and assign required roles
 module "nextflow_service_account" {
-  source        = "terraform-google-modules/service-accounts/google"
-  version       = "4.0.3"
-  project_id    = local.project.project_id
-  names         = ["nextflow-sa"]
-  display_name  = "nextflow Service account"
-  description   = "Service Account used to run nextflow server and worker VMs"
+  source       = "terraform-google-modules/service-accounts/google"
+  version      = "4.0.3"
+  project_id   = local.project.project_id
+  names        = ["nextflow-sa"]
+  display_name = "nextflow Service account"
+  description  = "Service Account used to run nextflow server and worker VMs"
 }
 
 
@@ -72,8 +72,7 @@ resource "google_compute_instance" "nextflow_server" {
   }
   depends_on = [
     google_storage_bucket_object.bootstrap,
-    google_storage_bucket_object.config,
-    google_storage_bucket_object.service
+    google_storage_bucket_object.config
   ]
 }
 
