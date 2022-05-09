@@ -15,6 +15,22 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [6.1.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v6.1.1) (2022-04-26)
+
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v6.0.0...v6.1.1)
+
+### Added
+ - _RAD Lab Launcher:_ Listing Existing Deployments when Updating/Deleting any deployment.[(#55)](https://github.com/GoogleCloudPlatform/rad-lab/pull/55)
+### Fixed
+- _RAD Lab Launcher:_ Fix for empty line in the file of "--varfile" used to cause error of "index out of range" and fail the execution of "python3 radlab.py --module.... --varfile ./xxxxx". [(#55)](https://github.com/GoogleCloudPlatform/rad-lab/pull/55)
+
+## [6.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v6.0.0) (2022-04-19)
+
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v5.1.1...v6.0.0)
+### Added
+ 
+- _RAD Lab Module:_ RAD-Lab alpha fold Module [(#54)](https://github.com/GoogleCloudPlatform/rad-lab/pull/54)
+
 ## [5.1.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v5.0.0) (2022-03-18)
 
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v5.0.0...v5.1.1)

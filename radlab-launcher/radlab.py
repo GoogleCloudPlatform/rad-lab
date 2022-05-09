@@ -790,7 +790,7 @@ def list_radlab_deployments(tfbucket, module_name, projid):
     bucket = storage_client.get_bucket(tfbucket)
     iterator = bucket.list_blobs(prefix='radlab/',delimiter='/')
     response = iterator._get_next_page_response()
-    print("\nPlease find the list of "+ module_name + " module below:\n")
+    print("\nPlease find the list of existing "+ module_name + " module deployments below:\n")
 
     for prefix in response['prefixes']:
         if module_name in prefix:
@@ -871,8 +871,11 @@ def module_deploy_common_settings(action,module_name,setup_path,varcontents,proj
 
     elif(action == ACTION_UPDATE_DEPLOYMENT or action == ACTION_DELETE_DEPLOYMENT):
         
+        # List Existing Deployments
+        list_radlab_deployments(tfbucket, module_name, projid)
+
         # Get Deployment ID
-        randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RAD Lab Module Deployment ID (example 'l8b3' is the id for project with id - radlab-ds-analytics-l8b3)" + Style.RESET_ALL + ': ')
+        randomid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter RAD Lab Module Deployment ID (example 'l8b3' is the id for module deployment with name - data_science_l8b3)" + Style.RESET_ALL + ': ')
         randomid = randomid.strip()
 
         # Validating Deployment ID
@@ -976,7 +979,7 @@ def fetchvariables(filecontents):
         # Skipping for commented lines
         if x.startswith('#') or x.startswith('//'):
             continue
-        else:
+        elif (len(x.split("=")) == 2):
             x = x.strip()
             # print(x)
             variables[x.split("=")[0].strip()] = x.split("=")[1].strip()
