@@ -19,6 +19,7 @@ substitutions:
   _COMPUTE_IMAGE: 'silicon-design-ubuntu-2004'
   _CONTAINER_IMAGE: 'silicon-design-ubuntu-2004'
   _NOTEBOOKS_BUCKET: 'silicon-design-notebooks'
+  _COMPUTE_NETWORK: 'global/networks/default'  
 options:
   logging: CLOUD_LOGGING_ONLY
 steps:
@@ -42,7 +43,7 @@ steps:
     cd scripts/build/images/
     gsutil cp gs://compute-image-tools/release/linux/daisy .
     chmod +x daisy
-    ./daisy -project $PROJECT_ID -zone $_ZONE -variables image_name=$_COMPUTE_IMAGE,image_tag=$BUILD_ID compute_image.wf.json
+    ./daisy -project $PROJECT_ID -zone $_ZONE -variables image_name=$_COMPUTE_IMAGE,image_tag=$BUILD_ID,network=$_COMPUTE_NETWORK compute_image.wf.json
   waitFor: ['-']    
 - id: 'container-image-build'
   name: 'gcr.io/cloud-builders/docker'

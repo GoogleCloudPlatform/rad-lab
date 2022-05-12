@@ -21,6 +21,7 @@ ZONE=$2
 COMPUTE_IMAGE=$3
 CONTAINER_IMAGE=$4
 NOTEBOOKS_BUCKET=$5
+COMPUTE_NETWORK=$6
 
 gcloud config set project ${PROJECT_ID}
-gcloud builds submit . --config ./scripts/build/cloudbuild.yaml --substitutions "_ZONE=${ZONE},_COMPUTE_IMAGE=${COMPUTE_IMAGE},_CONTAINER_IMAGE=${CONTAINER_IMAGE},_NOTEBOOKS_BUCKET=${NOTEBOOKS_BUCKET}"
+gcloud builds submit . --config ./scripts/build/cloudbuild.yaml --substitutions "_ZONE=${ZONE},_COMPUTE_IMAGE=${COMPUTE_IMAGE},_CONTAINER_IMAGE=${CONTAINER_IMAGE},_NOTEBOOKS_BUCKET=${NOTEBOOKS_BUCKET},_COMPUTE_NETWORK=${COMPUTE_NETWORK}"
