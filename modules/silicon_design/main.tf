@@ -280,7 +280,7 @@ resource "null_resource" "build_and_push_image" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "scripts/build/build.sh ${local.project.project_id} ${var.zone} ${var.image_name} ${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/${var.image_name} ${google_storage_bucket.notebooks_bucket.name}"
+    command     = "scripts/build/build.sh ${local.project.project_id} ${var.zone} ${var.image_name} ${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/${var.image_name} ${google_storage_bucket.notebooks_bucket.name} ${local.network.self_link}"
   }
 
   depends_on = [
