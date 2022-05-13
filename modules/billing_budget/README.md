@@ -30,7 +30,11 @@ The User, Group, or Service Account who will be deploying the module should have
 
 Note: This is not a Project IAM Binding; this is a **Service Account** IAM Binding.
 
-NOTE: Additional [permissions](../../radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](../../radlab-launcher)
+NOTE: Additional [permissions](../../radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](../../radlab-launcher). Use `--disable-perm-check` or `-dc` arguments when using RAD lab Launcher for the module deployment.
+
+_Usage:_
+
+```python3 radlab.py --disable-perm-check```
 
 
 <!-- BEGIN TFDOC -->
