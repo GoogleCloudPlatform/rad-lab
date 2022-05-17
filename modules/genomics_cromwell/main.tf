@@ -109,7 +109,7 @@ resource "google_storage_bucket" "cromwell_workflow_bucket" {
 resource "google_storage_bucket_object" "config" {
   name   = "provisioning/cromwell.conf"
   bucket = google_storage_bucket.cromwell_workflow_bucket.name
-  content = templatefile("scripts/build/cromwell.conf", {
+  content = templatefile("${path.module}/scripts/build/cromwell.conf", {
     CROMWELL_PROJECT         = local.project.project_id,
     CROMWELL_ROOT_BUCKET     = google_storage_bucket.cromwell_workflow_bucket.url,
     CROMWELL_VPC             = var.network_name
@@ -127,13 +127,13 @@ resource "google_storage_bucket_object" "config" {
 resource "google_storage_bucket_object" "bootstrap" {
   name   = "provisioning/bootstrap.sh"
   bucket = google_storage_bucket.cromwell_workflow_bucket.name
-  content = templatefile("scripts/build/bootstrap.sh", {
+  content = templatefile("${path.module}/scripts/build/bootstrap.sh", {
     CROMWELL_VERSION = var.cromwell_version,
     BUCKET_URL       = google_storage_bucket.cromwell_workflow_bucket.url
   })
 }
 resource "google_storage_bucket_object" "service" {
   name   = "provisioning/cromwell.service"
-  source = "scripts/build/cromwell.service"
+  source = "${path.module}/scripts/build/cromwell.service"
   bucket = google_storage_bucket.cromwell_workflow_bucket.name
 }
