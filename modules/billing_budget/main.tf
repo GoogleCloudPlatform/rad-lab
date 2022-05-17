@@ -26,7 +26,7 @@ provider "google" {
 data "google_service_account_access_token" "default" {
   provider               = google.impersonated
   scopes                 = ["userinfo-email", "cloud-platform"]
-  target_service_account = var.sa
+  target_service_account = var.resource_creator_identity
   lifetime               = "1800s"
 }
 

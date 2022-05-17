@@ -56,7 +56,7 @@ _Usage:_
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
 | *project_name* | Project name or ID, if it's an existing project. | <code title="">string</code> |  | <code title="">radlab-billing-budget</code> |
 | *random_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
-| *sa* | Terraform Service Account which will be creating the GCP resources | <code title="">string</code> |  | <code title=""></code> |
+| *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources | <code title="">string</code> |  | <code title=""></code> |
 | *trusted_users* | The list of trusted users who will be assigned Editor role on the project | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 
 ## Outputs

@@ -101,7 +101,7 @@ variable "random_id" {
   default     = null
 }
 
-variable "sa" {
+variable "resource_creator_identity" {
   description = "Terraform Service Account which will be creating the GCP resources"
   type        = string
   default     = ""
