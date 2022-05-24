@@ -116,8 +116,7 @@ def radlabauth(currentusr):
             r = requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+token)
             currentusr = r.json()["email"]
 
-            print("\nUser to deploy RAD Lab Modules (Selected) : " + Fore.GREEN + Style.BRIGHT + currentusr + Style.RESET_ALL )
-            os.system("gcloud config set account " + currentusr)        
+            print("\nUser to deploy RAD Lab Modules (Selected) : " + Fore.GREEN + Style.BRIGHT + currentusr + Style.RESET_ALL )        
             return currentusr
 
 def set_proj(projid):
