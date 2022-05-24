@@ -49,8 +49,7 @@ locals {
   cloudbuild_sa_project_roles = [
     "roles/compute.instanceAdmin",
     "roles/compute.storageAdmin",
-    "roles/iam.serviceAccountUser",
-    "roles/serviceusage.serviceUsageAdmin",
+    "roles/iam.serviceAccountUser"
   ]
 
   project_services = var.enable_services ? [
