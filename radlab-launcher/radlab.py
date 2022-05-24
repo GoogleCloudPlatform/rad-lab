@@ -115,7 +115,7 @@ def radlabauth(currentusr):
             token = subprocess.Popen(["gcloud auth application-default print-access-token"],shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.read().strip().decode('utf-8')
             r = requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+token)
             currentusr = r.json()["email"]
-
+            os.system("gcloud config set account " + currentusr)
             print("\nUser to deploy RAD Lab Modules (Selected) : " + Fore.GREEN + Style.BRIGHT + currentusr + Style.RESET_ALL )        
             return currentusr
 
