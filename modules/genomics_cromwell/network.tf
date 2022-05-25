@@ -84,6 +84,7 @@ module "vpc_cromwell" {
 
 module "cloud-nat" {
   source        = "terraform-google-modules/cloud-nat/google"
+  version       = "~> 1.2"
   name          = "${var.network_name}-nat"
   project_id    = local.project.project_id
   region        = local.region

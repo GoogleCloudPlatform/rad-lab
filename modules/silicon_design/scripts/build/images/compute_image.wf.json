@@ -18,6 +18,10 @@
     "network": {
       "Description": "compute network",
       "Value": "global/networks/default"
+    },
+    "subnet": {
+      "Description": "compute subnet",
+      "Value": ""
     }    
   },
   "Sources": {
@@ -45,7 +49,8 @@
           "MachineType": "n1-standard-4",
           "StartupScript": "provision.sh",
           "NetworkInterfaces": [{
-            "network": "${network}"
+            "Network": "${network}",
+	    "Subnetwork": "${subnet}"
           }]
         }
       ]

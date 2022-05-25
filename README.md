@@ -15,7 +15,6 @@ This is not an officially supported Google product
 To create a module in an existing GCP environment, please click on the “Open In Cloud Shell” button.  This will clone the entire repository to Cloud Shell and automatically select the `main`-branch.
 
 [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/rad-lab&cloudshell_git_branch=main)
-
     
 ### Prerequisites
 * [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/gcp-get-started) version 1.0 or higher.
