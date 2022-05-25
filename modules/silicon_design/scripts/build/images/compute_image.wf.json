@@ -67,7 +67,7 @@
           }
         }
       ],
-      "Timeout": "30m"
+      "Timeout": "45m"
     },
     "stop-instance": {
       "StopInstances": {

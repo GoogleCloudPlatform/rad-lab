@@ -43,10 +43,7 @@ for tool in yosys netgen
 do
   /opt/conda/bin/conda list -c ${tool} > /OpenLane/install/build/versions/${tool}
 done
-# https://github.com/The-OpenROAD-Project/OpenLane/pull/978
-# https://github.com/RTimothyEdwards/open_pdks/commit/098c3b0e934e8d1b8d8b71074df8837c58c00405
-sed -i -z 's/}\n\ \ \ \ "/},\n    "/' /opt/conda/share/pdk/sky130A/.config/nodeinfo.json
-# https://github.com/The-OpenROAD-Project/OpenLane/pull/978
+# https://github.com/The-OpenROAD-Project/OpenLane/pull/1027
 curl --silent  https://patch-diff.githubusercontent.com/raw/The-OpenROAD-Project/OpenLane/pull/1027.patch | patch -d /OpenLane -p1
 
 echo "DaisyStatus: adding profile hook"
