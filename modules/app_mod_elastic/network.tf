@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#
+
 #locals {
 #  network = (
 #    var.create_network
@@ -41,42 +41,6 @@
 #  region  = var.region
 #}
 #
-#module "elastic_search_network" {
-#  count   = var.create_network ? 1 : 0
-#  source  = "terraform-google-modules/network/google"
-#  version = "~> 3.0"
-#
-#  project_id   = local.project.project_id
-#  network_name = var.network_name
-#  routing_mode = "GLOBAL"
-#  description  = "VPC Network created via Terraform"
-#
-#  subnets = [
-#    {
-#      subnet_name           = var.subnet_name
-#      subnet_ip             = var.network_cidr_block
-#      subnet_region         = var.region
-#      description           = "Subnetwork inside ${var.network_name} VPC network, created via Terraform"
-#      subnet_private_access = true
-#
-#    }
-#  ]
-#
-#  secondary_ranges = {
-#    "${var.subnet_name}" = [{ # Do not remove quotes, Terraform doesn't like variable references as map-keys without them
-#      range_name    = var.pod_ip_range_name
-#      ip_cidr_range = var.pod_cidr_block
-#      }, {
-#      range_name    = var.service_ip_range_name
-#      ip_cidr_range = var.service_cidr_block
-#    }]
-#  }
-#
-#  depends_on = [
-#    module.elastic_search_project,
-#    google_project_service.enabled_services
-#  ]
-#}
 #
 #// External access
 #resource "google_compute_router" "router" {
@@ -120,3 +84,59 @@
 #  next_hop_gateway = "default-internet-gateway"
 #}
 #
+#module "elastic_search_network" {
+#  count   = var.create_network ? 1 : 0
+#  source  = "terraform-google-modules/network/google"
+#  version = "~> 3.0"
+#
+#  project_id   = local.project.project_id
+#  network_name = var.network_name
+#  routing_mode = "GLOBAL"
+#  description  = "VPC Network created via Terraform"
+#
+#  subnets = [
+#    {
+#      subnet_name           = var.subnet_name
+#      subnet_ip             = var.network_cidr_block
+#      subnet_region         = var.region
+#      description           = "Subnetwork inside ${var.network_name} VPC network, created via Terraform"
+#      subnet_private_access = true
+#
+#    }
+#  ]
+#
+#  secondary_ranges = {
+#    "${var.subnet_name}" = [{ # Do not remove quotes, Terraform doesn't like variable references as map-keys without them
+#      range_name    = var.pod_ip_range_name
+#      ip_cidr_range = var.pod_cidr_block
+#      }, {
+#      range_name    = var.service_ip_range_name
+#      ip_cidr_range = var.service_cidr_block
+#    }]
+#  }
+#
+#  depends_on = [
+#    module.elastic_search_project,
+#    google_project_service.enabled_services
+#  ]
+#}
+
+module "network" {
+  source = "../../helpers/tf-modules/net-vpc"
+
+  project_id     = module.elastic_search_project.project_id
+  create_network = var.create_network
+  network_name   = var.network_name
+  description    = "Network created by Terraform."
+
+  subnets = [{
+    name          = var.subnet_name
+    ip_cidr_range = var.network_cidr_block
+    region        = var.region
+    description   = "Subnetwork inside ${var.network_name} VPC network, created via Terraform."
+    secondary_ip_range = {
+      "${var.pod_ip_range_name}"     = var.pod_cidr_block
+      "${var.service_ip_range_name}" = var.service_cidr_block
+    }
+  }]
+}
