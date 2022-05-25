@@ -15,79 +15,79 @@
  */
 
 locals {
-  k8s_credentials_cmd          = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.region} --project ${local.project.project_id}"
-  elastic_search_identity_name = "es-demo-identity"
-  k8s_namespace                = "elastic-search-demo"
+#  k8s_credentials_cmd          = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.region} --project ${local.project.project_id}"
+#  elastic_search_identity_name = "es-demo-identity"
+#  k8s_namespace                = "elastic-search-demo"
 }
 
-module "deploy_eck_crds" {
-  source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
-
-  project_id              = local.project.project_id
-  cluster_name            = module.gke_cluster.name
-  cluster_location        = var.region
-  kubectl_create_command  = "kubectl create -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
-  kubectl_destroy_command = "kubectl delete -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
-  skip_download           = true
-  upgrade                 = false
-
-  module_depends_on = [
-    module.gke_cluster.endpoint,
-  ]
-}
-
-module "deploy_eck_operator" {
-  source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
-
-  project_id              = local.project.project_id
-  cluster_name            = module.gke_cluster.name
-  cluster_location        = var.region
-  kubectl_create_command  = "kubectl apply -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
-  kubectl_destroy_command = "${path.module}/scripts/build/remove_eck_operator.sh"
-  skip_download           = true
-  upgrade                 = false
-
-  module_depends_on = [
-    module.gke_cluster.endpoint, # Force dependency between modules
-    module.deploy_eck_crds.wait,
-  ]
-}
-
-data "template_file" "elastic_search_yaml" {
-  count    = var.deploy_elastic_search ? 1 : 0
-  template = file("${path.module}/templates/elastic_search_deployment.yaml.tpl")
-  vars = {
-    NAMESPACE           = local.k8s_namespace
-    COUNT               = var.elastic_search_instance_count
-    VERSION             = var.elk_version
-    GCP_SERVICE_ACCOUNT = google_service_account.elastic_search_gcp_identity.email
-    IDENTITY_NAME       = local.elastic_search_identity_name
-  }
-}
-
-resource "local_file" "elastic_search_yaml_output" {
-  count    = var.deploy_elastic_search ? 1 : 0
-  filename = "${path.module}/elk/elastic_search_deployment.yaml"
-  content  = data.template_file.elastic_search_yaml.0.rendered
-}
-
-module "deploy_elastic_search" {
-  count  = var.deploy_elastic_search ? 1 : 0
-  source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
-
-  project_id              = local.project.project_id
-  cluster_name            = module.gke_cluster.name
-  cluster_location        = var.region
-  kubectl_create_command  = "kubectl apply -f ${path.module}/elk"
-  kubectl_destroy_command = "kubectl delete -f ${path.module}/elk"
-  skip_download           = true
-  upgrade                 = false
-  use_existing_context    = false
-
-  module_depends_on = [
-    module.gke_cluster.endpoint,
-    module.deploy_eck_crds.wait,
-    module.deploy_eck_operator.wait,
-    local_file.elastic_search_yaml_output.0.filename,
-  ]
-}
+#module "deploy_eck_crds" {
+#  source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
+#
+#  project_id              = local.project.project_id
+#  cluster_name            = module.gke_cluster.name
+#  cluster_location        = var.region
+#  kubectl_create_command  = "kubectl create -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
+#  kubectl_destroy_command = "kubectl delete -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
+#  skip_download           = true
+#  upgrade                 = false
+#
+#  module_depends_on = [
+#    module.gke_cluster.endpoint,
+#  ]
+#}
+#
+#module "deploy_eck_operator" {
+#  source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
+#
+#  project_id              = local.project.project_id
+#  cluster_name            = module.gke_cluster.name
+#  cluster_location        = var.region
+#  kubectl_create_command  = "kubectl apply -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
+#  kubectl_destroy_command = "${path.module}/scripts/build/remove_eck_operator.sh"
+#  skip_download           = true
+#  upgrade                 = false
+#
+#  module_depends_on = [
+#    module.gke_cluster.endpoint, # Force dependency between modules
+#    module.deploy_eck_crds.wait,
+#  ]
+#}
+#
+#data "template_file" "elastic_search_yaml" {
+#  count    = var.deploy_elastic_search ? 1 : 0
+#  template = file("${path.module}/templates/elastic_search_deployment.yaml.tpl")
+#  vars = {
+#    NAMESPACE           = local.k8s_namespace
+#    COUNT               = var.elastic_search_instance_count
+#    VERSION             = var.elk_version
+#    GCP_SERVICE_ACCOUNT = google_service_account.elastic_search_gcp_identity.email
+#    IDENTITY_NAME       = local.elastic_search_identity_name
+#  }
+#}
+#
+#resource "local_file" "elastic_search_yaml_output" {
+#  count    = var.deploy_elastic_search ? 1 : 0
+#  filename = "${path.module}/elk/elastic_search_deployment.yaml"
+#  content  = data.template_file.elastic_search_yaml.0.rendered
+#}
+#
+#module "deploy_elastic_search" {
+#  count  = var.deploy_elastic_search ? 1 : 0
+#  source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
+#
+#  project_id              = local.project.project_id
+#  cluster_name            = module.gke_cluster.name
+#  cluster_location        = var.region
+#  kubectl_create_command  = "kubectl apply -f ${path.module}/elk"
+#  kubectl_destroy_command = "kubectl delete -f ${path.module}/elk"
+#  skip_download           = true
+#  upgrade                 = false
+#  use_existing_context    = false
+#
+#  module_depends_on = [
+#    module.gke_cluster.endpoint,
+#    module.deploy_eck_crds.wait,
+#    module.deploy_eck_operator.wait,
+#    local_file.elastic_search_yaml_output.0.filename,
+#  ]
+#}

@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-output "deployment_id" {
-  description = "RADLab Module Deployment ID"
-  value       = module.elastic_search_project.deployment_id
+terraform {
+  required_version = ">= 1.1.0"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.21.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = ">= 4.21.0"
+    }
+  }
 }
-
-#output "cluster_credentials_cmd" {
-#  value = local.k8s_credentials_cmd
-#}
-#
-#output "project_id" {
-#  value = local.project.project_id
-#}
-
-

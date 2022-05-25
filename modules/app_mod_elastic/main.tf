@@ -15,75 +15,52 @@
  */
 
 locals {
-  # Allow users to either create their own random_id or use a generated one
-  random_id = var.random_id != null ? var.random_id : random_id.random_id.hex
-  project = (
-    var.create_project
-    ? try(module.elastic_search_project.0, null)
-    : try(data.google_project.existing_project.0, null)
-  )
-
-  project_services = [
+  project_services = var.enable_apis ? [
     "compute.googleapis.com",
     "container.googleapis.com",
     "monitoring.googleapis.com",
     "logging.googleapis.com"
-  ]
-}
+  ] : []
 
-resource "random_id" "random_id" {
-  byte_length = 2
-}
-
-data "google_project" "existing_project" {
-  count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  organization_bool_policies = var.set_shielded_vm_policy ? { "constraints/compute.requireShieldedVm" : true } : {}
+  organization_list_policies = var.set_vpc_peering_policy ? { "constraints/compute.restrictVpcPeering" : {
+    inherit_from_parent = false
+    suggested_value     = null
+    status              = true
+    values              = null
+  } } : {}
 }
 
 module "elastic_search_project" {
-  count   = var.create_project ? 1 : 0
-  source  = "terraform-google-modules/project-factory/google"
-  version = "~> 11.0"
+  source = "../../helpers/tf-modules/project"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
-  random_project_id = false
-  org_id            = var.organization_id
-  folder_id         = var.folder_id
-  billing_account   = var.billing_account_id
-  create_project_sa = false
-
-  activate_apis = []
+  project_name       = var.project_name
+  create_project     = var.create_project
+  parent             = var.folder_id != null ? "folders/${var.folder_id}" : "organizations/${var.organization_id}"
+  random_id          = var.random_id
+  billing_account_id = var.billing_account_id
+  project_apis       = local.project_services
+  org_policy_bool    = local.organization_bool_policies
+  org_policy_list    = local.organization_list_policies
 }
 
-resource "google_project_service" "enabled_services" {
-  for_each                   = toset(local.project_services)
-  project                    = local.project.project_id
-  service                    = each.value
-  disable_dependent_services = true
-  disable_on_destroy         = true
-
-  depends_on = [
-    module.elastic_search_project
-  ]
-}
-
-resource "google_service_account" "elastic_search_gcp_identity" {
-  project      = local.project.project_id
-  account_id   = "elastic-search-id"
-  description  = "Elastic Search pod identity."
-  display_name = "Elastic Search Identity"
-
-  depends_on = [
-    module.elastic_search_project
-  ]
-}
-
-resource "google_service_account_iam_member" "elastic_search_k8s_identity" {
-  member             = "serviceAccount:${local.project.project_id}.svc.id.goog[${local.k8s_namespace}/${local.elastic_search_identity_name}]"
-  role               = "roles/iam.workloadIdentityUser"
-  service_account_id = google_service_account.elastic_search_gcp_identity.id
-
-  depends_on = [
-    module.gke_cluster
-  ]
-}
+#resource "google_service_account" "elastic_search_gcp_identity" {
+#  project      = local.project.project_id
+#  account_id   = "elastic-search-id"
+#  description  = "Elastic Search pod identity."
+#  display_name = "Elastic Search Identity"
+#
+#  depends_on = [
+#    module.elastic_search_project
+#  ]
+#}
+#
+#resource "google_service_account_iam_member" "elastic_search_k8s_identity" {
+#  member             = "serviceAccount:${local.project.project_id}.svc.id.goog[${local.k8s_namespace}/${local.elastic_search_identity_name}]"
+#  role               = "roles/iam.workloadIdentityUser"
+#  service_account_id = google_service_account.elastic_search_gcp_identity.id
+#
+#  depends_on = [
+#    module.gke_cluster
+#  ]
+#}

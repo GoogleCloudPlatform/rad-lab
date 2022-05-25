@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-output "deployment_id" {
-  description = "RADLab Module Deployment ID"
-  value       = module.elastic_search_project.deployment_id
+locals {
+  iam_members = flatten([
+    for member, roles in var.iam_members : [
+      for role in roles : {
+        role   = role
+        member = member
+      }
+    ]
+  ])
 }
 
-#output "cluster_credentials_cmd" {
-#  value = local.k8s_credentials_cmd
-#}
-#
-#output "project_id" {
-#  value = local.project.project_id
-#}
+resource "google_project_iam_member" "additive_iam_permissions" {
+  for_each = {
+    for permission in local.iam_members: "${permission.role}${permission.member}" => permission
+  }
 
-
+  member  = each.value.member
+  project = local.project.project_id
+  role    = each.value.role
+}

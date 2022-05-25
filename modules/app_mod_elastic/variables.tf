@@ -61,6 +61,12 @@ variable "elk_version" {
   default     = "7.15.1"
 }
 
+variable "enable_apis" {
+  description = "Enable APIs on the project.  When deploying in an existing project, these might already have been enabled, in which case this should be set to false."
+  type        = bool
+  default     = true
+}
+
 variable "enable_internet_egress_traffic" {
   description = "Enable egress traffic to the internet.  Necessary to download the Elastic Search pods."
   type        = bool
@@ -70,7 +76,7 @@ variable "enable_internet_egress_traffic" {
 variable "folder_id" {
   description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. "
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "gke_cluster_name" {
@@ -90,7 +96,6 @@ variable "kibana_instance_count" {
   type        = string
   default     = "1"
 }
-
 
 variable "master_ipv4_cidr_block" {
   description = "IPv4 CIDR block to assign to the Master cluster."
@@ -137,7 +142,7 @@ variable "node_pool_name" {
 variable "organization_id" {
   description = "Organization ID where the project will be created. It can be skipped if already setting folder_id"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "pod_cidr_block" {
