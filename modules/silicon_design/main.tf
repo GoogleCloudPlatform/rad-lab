@@ -49,6 +49,7 @@ locals {
   cloudbuild_sa_project_roles = [
     "roles/compute.instanceAdmin",
     "roles/compute.storageAdmin",
+    "roles/storage.admin",
     "roles/iam.serviceAccountUser"
   ]
 
