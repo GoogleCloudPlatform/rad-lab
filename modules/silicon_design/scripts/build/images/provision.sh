@@ -15,6 +15,7 @@
 # limitations under the License.
 
 set -ex
+trap "echo DaisyFailure: trapped error" ERR
 
 env
 OPENLANE_VERSION=master
