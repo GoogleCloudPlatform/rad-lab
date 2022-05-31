@@ -38,12 +38,6 @@ variable "description" {
   default     = "Managed by Terraform."
 }
 
-variable "enable_external_egress" {
-  description = "Enable access to the public internet.  Setting this to true will create a Cloud Router and Cloud NAT to allow services that are deployed in the network can reach out to the public internet."
-  type        = bool
-  default     = false
-}
-
 variable "network_name" {
   description = "Name of the network."
   type        = string
