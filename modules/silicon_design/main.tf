@@ -19,11 +19,11 @@ locals {
   project = (var.create_project
     ? try(module.project_radlab_silicon_design.0, null)
     : try(data.google_project.existing_project.0, null)
-    )
+  )
   project_number = (var.create_project
     ? try(module.project_radlab_silicon_design.0.project_number, null)
     : try(data.google_project.existing_project.0.number, null)
-    )
+  )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   network = (
@@ -60,7 +60,7 @@ locals {
     "artifactregistry.googleapis.com",
   ] : []
 
-  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-design-notebook-${i}"]
+  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count) : "silicon-design-notebook-${i}"]
 }
 
 resource "random_id" "default" {
@@ -72,8 +72,8 @@ resource "random_id" "default" {
 ############################
 
 data "google_project" "existing_project" {
-  count       = var.create_project ? 0 : 1
-  project_id  = var.project_name
+  count      = var.create_project ? 0 : 1
+  project_id = var.project_name
 }
 
 module "project_radlab_silicon_design" {
@@ -170,14 +170,14 @@ resource "google_project_iam_member" "sa_p_notebook_permissions" {
 
 resource "google_project_service_identity" "sa_cloudbuild_identity" {
   provider = google-beta
-  project  = local.project.project_id  
-  service = "cloudbuild.googleapis.com"
+  project  = local.project.project_id
+  service  = "cloudbuild.googleapis.com"
 }
 
 resource "google_project_iam_member" "sa_p_cloudbuild_permissions" {
   for_each = toset(local.cloudbuild_sa_project_roles)
   project  = local.project.project_id
-  member   =  "serviceAccount:${google_project_service_identity.sa_cloudbuild_identity.email}"
+  member   = "serviceAccount:${google_project_service_identity.sa_cloudbuild_identity.email}"
   role     = each.value
 }
 
@@ -197,7 +197,7 @@ resource "google_project_iam_member" "ai_notebook_user_role1" {
 
 resource "google_project_iam_member" "ai_notebook_user_role2" {
   for_each = var.trusted_users
-  project  = local.project.project_id  
+  project  = local.project.project_id
   member   = each.value
   role     = "roles/viewer"
 }
@@ -264,28 +264,40 @@ resource "google_storage_bucket" "notebooks_bucket" {
   uniform_bucket_level_access = true
 }
 
+resource "google_service_account" "compute_image_identity" {
+  project    = local.project.project_id
+  account_id = "compute-img-identity"
+}
+
+resource "google_project_iam_member" "compute_image_identity_permissions" {
+  for_each = toset(["roles/storage.admin"])
+  member   = "serviceAccount:${google_service_account.compute_image_identity.email}"
+  project  = local.project.project_id
+  role     = each.value
+}
 
 # Locally build container for notebook container and push to container registry #
 resource "null_resource" "build_and_push_image" {
   triggers = {
     cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/cloudbuild.yaml")
     build_script_sha    = filesha1("${path.module}/scripts/build/build.sh")
-    workflow_sha      = filesha1("${path.module}/scripts/build/images/compute_image.wf.json")    
+    workflow_sha        = filesha1("${path.module}/scripts/build/images/compute_image.wf.json")
     dockerfile_sha      = filesha1("${path.module}/scripts/build/images/Dockerfile")
-    environment_sha        = filesha1("${path.module}/scripts/build/images/provision/environment.yml")    
-    env_sha        = filesha1("${path.module}/scripts/build/images/provision/env.tcl")    
-    profile_sha        = filesha1("${path.module}/scripts/build/images/provision/profile.sh")    
+    environment_sha     = filesha1("${path.module}/scripts/build/images/provision/environment.yml")
+    env_sha             = filesha1("${path.module}/scripts/build/images/provision/env.tcl")
+    profile_sha         = filesha1("${path.module}/scripts/build/images/provision/profile.sh")
     notebook_sha        = filesha1("${path.module}/scripts/build/notebooks/inverter.md")
   }
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "scripts/build/build.sh ${local.project.project_id} ${var.zone} ${var.image_name} ${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/${var.image_name} ${google_storage_bucket.notebooks_bucket.name} ${local.network.id} ${local.subnet.id} ${google_project_service_identity.sa_cloudbuild_identity.email}"
+    command     = "scripts/build/build.sh ${local.project.project_id} ${var.zone} ${var.image_name} ${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/${var.image_name} ${google_storage_bucket.notebooks_bucket.name} ${local.network.id} ${local.subnet.id} ${google_service_account.compute_image_identity.email}"
   }
 
   depends_on = [
     google_artifact_registry_repository.containers_repo,
     google_storage_bucket.notebooks_bucket,
     google_project_iam_member.sa_p_cloudbuild_permissions,
+    google_project_iam_member.compute_image_identity_permissions
   ]
 }
