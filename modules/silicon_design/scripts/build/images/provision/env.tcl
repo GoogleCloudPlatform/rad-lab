@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Copyright 2022 Google LLC
 #
@@ -14,16 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
-
-PROJECT_ID=$1
-ZONE=$2
-COMPUTE_IMAGE=$3
-CONTAINER_IMAGE=$4
-NOTEBOOKS_BUCKET=$5
-COMPUTE_NETWORK=$6
-COMPUTE_SUBNET=$7
-CLOUD_BUILD_SA=$8
-
-gcloud config set project ${PROJECT_ID}
-gcloud builds submit . --config ./scripts/build/cloudbuild.yaml --substitutions "_ZONE=${ZONE},_COMPUTE_IMAGE=${COMPUTE_IMAGE},_CONTAINER_IMAGE=${CONTAINER_IMAGE},_NOTEBOOKS_BUCKET=${NOTEBOOKS_BUCKET},_COMPUTE_NETWORK=${COMPUTE_NETWORK},_COMPUTE_SUBNET=${COMPUTE_SUBNET},_CLOUD_BUILD_SA=${CLOUD_BUILD_SA}"
+set ::env(PDK_ROOT) "$::env(CONDA_PREFIX)/share/pdk"
+set ::env(TCLLIBPATH) "$::env(CONDA_PREFIX)/opt/conda/lib/tcllib1.20"
+set ::env(OL_INSTALL_DIR) "$::env(OPENLANE_ROOT)/install"
+set ::env(OPENLANE_LOCAL_INSTALL) 1
+set ::env(MISMATCHES_OK) 1
+set ::env(RUN_CVC) 0
+set ::env(RUN_KLAYOUT_XOR) 0
+set ::env(RUN_KLAYOUT_DRC) 0
+set ::env(RUN_KLAYOUT) 0

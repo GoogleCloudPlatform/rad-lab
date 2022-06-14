@@ -96,6 +96,7 @@ variable "project_name" {
   type        = string
   default     = "radlab-silicon-design"
 }
+
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
   type        = string
@@ -136,4 +137,10 @@ variable "zone" {
   description = "Cloud Zone associated to the AI Notebooks"
   type        = string
   default     = "us-east4-c"
+}
+
+variable "image_name" {
+  description = "Basename for for the compute and container image."
+  type        = string
+  default     = "silicon-design-ubuntu-2004"
 }
