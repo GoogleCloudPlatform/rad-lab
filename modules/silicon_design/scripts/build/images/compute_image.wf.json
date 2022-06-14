@@ -22,6 +22,10 @@
     "subnet": {
       "Description": "compute subnet",
       "Value": ""
+    },
+    "service_account": {
+      "Description": "compute sevice account",
+      "Value": ""
     }    
   },
   "Sources": {
@@ -51,7 +55,11 @@
           "NetworkInterfaces": [{
             "Network": "${network}",
 	    "Subnetwork": "${subnet}"
-          }]
+          }],
+	  "ServiceAccounts": [{
+	    "email": "${service_account}",
+	    "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"]
+	  }]
         }
       ]
     },
