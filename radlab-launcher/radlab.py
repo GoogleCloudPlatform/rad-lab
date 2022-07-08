@@ -95,6 +95,10 @@ def radlabauth(currentusr):
         # Setting Credentials for non Cloud Shell CLI
         if(platform.system() != 'Linux' and platform.processor() !='' and not platform.system().startswith('cs-')):
             # countdown(5)
+
+            # Adding Execution handling if GOOGLE_APPLICATION_CREDENTIALS is set to Empty.
+            del os.environ['GOOGLE_APPLICATION_CREDENTIALS']
+
             x = input("\nWould you like to proceed the RAD Lab deployment with user - " + Fore.YELLOW + currentusr + Style.RESET_ALL + ' ?\n[1] Yes\n[2] No\n'+ Fore.YELLOW + Style.BRIGHT + 'Choose a number : ' + Style.RESET_ALL ).strip()
             if(x == '1'):
                 pass
@@ -105,6 +109,10 @@ def radlabauth(currentusr):
                 currentusr = '0'
 
     except:
+        # Adding Execution handling if GOOGLE_APPLICATION_CREDENTIALS is set to Empty.
+        if(platform.system() != 'Linux' and platform.processor() !='' and not platform.system().startswith('cs-')):
+            del os.environ['GOOGLE_APPLICATION_CREDENTIALS']
+
         print("\nLogin with User account with which you would like to deploy RAD Lab Modules...\n")
         os.system("gcloud auth application-default login")
     
