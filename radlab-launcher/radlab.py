@@ -97,7 +97,10 @@ def radlabauth(currentusr):
             # countdown(5)
 
             # Adding Execution handling if GOOGLE_APPLICATION_CREDENTIALS is set to Empty.
-            del os.environ['GOOGLE_APPLICATION_CREDENTIALS']
+            try:
+                del os.environ['GOOGLE_APPLICATION_CREDENTIALS']
+            except:
+                pass   
 
             x = input("\nWould you like to proceed the RAD Lab deployment with user - " + Fore.YELLOW + currentusr + Style.RESET_ALL + ' ?\n[1] Yes\n[2] No\n'+ Fore.YELLOW + Style.BRIGHT + 'Choose a number : ' + Style.RESET_ALL ).strip()
             if(x == '1'):
@@ -111,8 +114,10 @@ def radlabauth(currentusr):
     except:
         # Adding Execution handling if GOOGLE_APPLICATION_CREDENTIALS is set to Empty.
         if(platform.system() != 'Linux' and platform.processor() !='' and not platform.system().startswith('cs-')):
-            del os.environ['GOOGLE_APPLICATION_CREDENTIALS']
-
+            try:
+                del os.environ['GOOGLE_APPLICATION_CREDENTIALS']
+            except:
+                pass
         print("\nLogin with User account with which you would like to deploy RAD Lab Modules...\n")
         os.system("gcloud auth application-default login")
     
@@ -875,6 +880,8 @@ def module_deploy_common_settings(action,module_name,setup_path,varcontents,proj
         # Create file with billing/org/folder details
         create_env(env_path, orgid, billing_acc, folderid)
 
+        print("\nCREATING DEPLOYMENT...")
+
         return env_path,tfbucket,orgid,billing_acc,folderid,randomid
 
     elif(action == ACTION_UPDATE_DEPLOYMENT or action == ACTION_DELETE_DEPLOYMENT):
@@ -905,14 +912,16 @@ def module_deploy_common_settings(action,module_name,setup_path,varcontents,proj
         # Set Terraform states remote backend as GCS
         settfstategcs(env_path,prefix,tfbucket,projid)
 
-        # Create file with billing/org/folder details
+        # Create file with billing/org/folder details and user input variables
+        if os.path.exists(env_path + '/terraform.tfvars'):
+            os.remove(env_path + '/terraform.tfvars')
+        create_tfvars(env_path,varcontents)
+
         if(action == ACTION_UPDATE_DEPLOYMENT):
-            if os.path.exists(env_path + '/terraform.tfvars'):
-                os.remove(env_path + '/terraform.tfvars')
-            create_tfvars(env_path,varcontents)
+            print("\nUPDATING DEPLOYMENT...")
 
         if(action == ACTION_DELETE_DEPLOYMENT):
-            print("DELETING DEPLOYMENT...")
+            print("\nDELETING DEPLOYMENT...")
 
         return env_path,tfbucket,orgid,billing_acc,folderid,randomid
 
