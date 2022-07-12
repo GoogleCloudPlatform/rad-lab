@@ -20,7 +20,7 @@ data "google_compute_image" "debian" {
 //Create Cromwell service account and assign required roles
 module "cromwell_service_account" {
   source        = "terraform-google-modules/service-accounts/google"
-  version       = "4.0.3"
+  version       = "~> 4.0"
   project_id    = local.project.project_id
   names         = ["cromwell-sa"]
   display_name  = "Cromwell Service account"

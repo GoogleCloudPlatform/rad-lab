@@ -68,7 +68,7 @@ data "google_project" "existing_project" {
 module "project_radlab_silicon_design" {
   count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 11.0"
+  version = "~> 13.0"
 
   name              = format("%s-%s", var.project_name, local.random_id)
   random_project_id = false
@@ -107,7 +107,7 @@ data "google_compute_subnetwork" "default" {
 module "vpc_ai_notebook" {
   count   = var.create_network ? 1 : 0
   source  = "terraform-google-modules/network/google"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   project_id   = local.project.project_id
   network_name = var.network_name

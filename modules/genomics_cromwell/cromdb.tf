@@ -20,7 +20,7 @@ resource "random_password" "cromwell_db_pass" {
 }
 module "cromwell_mysql_db" {
   source  = "GoogleCloudPlatform/sql-db/google//modules/mysql"
-  version = "8.0.0"
+  version = "~> 11.0"
 
 
   name       = var.cromwell_db_name

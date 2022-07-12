@@ -30,7 +30,7 @@ data "google_compute_subnetwork" "default" {
 module "vpc_cromwell" {
   count   = var.create_network ? 1 : 0
   source  = "terraform-google-modules/network/google"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   project_id   = local.project.project_id
   network_name = var.network_name
@@ -84,7 +84,7 @@ module "vpc_cromwell" {
 
 module "cloud-nat" {
   source        = "terraform-google-modules/cloud-nat/google"
-  version       = "~> 1.2"
+  version       = "~> 2.0"
   name          = "${var.network_name}-nat"
   project_id    = local.project.project_id
   region        = local.region
@@ -95,7 +95,7 @@ module "cloud-nat" {
 
 module "private-service-access" {
   source        = "GoogleCloudPlatform/sql-db/google//modules/private_service_access"
-  version       = "8.0.0"
+  version       = "~> 11.0"
   project_id    = local.project.project_id
   vpc_network   = module.vpc_cromwell.0.network_name
   address       = split("/", var.db_service_network_cidr_range)[0]
