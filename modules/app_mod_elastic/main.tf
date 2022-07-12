@@ -43,7 +43,7 @@ data "google_project" "existing_project" {
 module "elastic_search_project" {
   count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 11.0"
+  version = "~> 13.0"
 
   name              = format("%s-%s", var.project_name, local.random_id)
   random_project_id = false
