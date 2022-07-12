@@ -1,0 +1,81 @@
+/**
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+locals {
+  controller_node_access_users = setunion(var.hpc_controller_users, var.hpc_users)
+  controller_host_name         = format("%s-%s", var.hpc_node_prefix, "controller")
+}
+
+resource "google_service_account" "hpc_slurm_controller_identity" {
+  project     = local.project.project_id
+  account_id  = "hpc-controller-id"
+  description = "HPC Controller Identity"
+}
+
+resource "google_service_account_iam_member" "hpc_slurm_controller_access" {
+  for_each           = local.controller_node_access_users
+  member             = "user:${each.value}"
+  role               = "roles/iam.serviceAccountUser"
+  service_account_id = google_service_account.hpc_slurm_controller_identity.id
+}
+
+resource "google_compute_instance" "slurm_controller" {
+  project      = local.project.project_id
+  name         = local.controller_host_name
+  zone         = data.google_compute_zones.zones.names[0]
+  machine_type = var.hpc_controller_machine_type
+
+  metadata_startup_script = templatefile("${path.module}/templates/controller_startup_script.sh.tpl", {
+    SLURM_STATE_DIR      = var.hpc_vars_state_save
+    SLURM_CONFIG_FILE    = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.slurm_configuration.name}"
+    SLURM_DB_CONFIG_FILE = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.slurm_db_configuration.name}"
+    CGROUP_CONFIG_FILE   = "gs://${google_storage_bucket.config_files.name}/${google_storage_bucket_object.cgroup_configuration.name}"
+    SUSPEND_SCRIPT       = "gs://${google_storage_bucket.config_files.name}/suspend.py"
+    RESUME_SCRIPT        = "gs://${google_storage_bucket.config_files.name}/resume.py"
+    SCRIPT_DIRECTORY     = var.hpc_vars_script_directory
+    CLUSTER_NAME         = var.hpc_cluster_name
+  })
+
+  boot_disk {
+    initialize_params {
+      image = data.google_compute_image.schedmd_slurm_img.self_link
+      type  = var.hpc_controller_boot_disk_type
+      size  = var.hpc_controller_boot_disk_size
+    }
+  }
+
+  network_interface {
+    subnetwork = local.subnet.self_link
+  }
+
+  service_account {
+    email  = google_service_account.hpc_slurm_controller_identity.email
+    scopes = ["cloud-platform"]
+  }
+
+  tags = ["iap"]
+
+  metadata = {
+    enable-oslogin = "TRUE"
+  }
+
+  depends_on = [
+    google_storage_bucket_object.slurm_configuration,
+    google_storage_bucket_object.slurm_db_configuration,
+    google_storage_bucket_object.cgroup_configuration,
+    module.private_sql_db_instance
+  ]
+}
