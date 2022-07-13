@@ -40,7 +40,7 @@ resource "random_id" "random_id" {
 
 module "project_radlab_genomics" {
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 11.0"
+  version = "~> 13.0"
 
   name              = local.radlab_genomics_project_id
   random_project_id = false
@@ -57,7 +57,7 @@ module "project_radlab_genomics" {
 
 module "vpc_ngs" {
   source  = "terraform-google-modules/network/google"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   project_id   = module.project_radlab_genomics.project_id
   network_name = var.network

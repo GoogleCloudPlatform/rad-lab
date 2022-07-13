@@ -53,22 +53,17 @@ module "deploy_eck_operator" {
   ]
 }
 
-data "template_file" "elastic_search_yaml" {
+resource "local_file" "elastic_search_yaml_output" {
   count    = var.deploy_elastic_search ? 1 : 0
-  template = file("${path.module}/templates/elastic_search_deployment.yaml.tpl")
-  vars = {
+  filename = "${path.module}/elk/elastic_search_deployment.yaml"
+
+  content = templatefile("${path.module}/templates/elastic_search_deployment.yaml.tpl", {
     NAMESPACE           = local.k8s_namespace
     COUNT               = var.elastic_search_instance_count
     VERSION             = var.elk_version
     GCP_SERVICE_ACCOUNT = google_service_account.elastic_search_gcp_identity.email
     IDENTITY_NAME       = local.elastic_search_identity_name
-  }
-}
-
-resource "local_file" "elastic_search_yaml_output" {
-  count    = var.deploy_elastic_search ? 1 : 0
-  filename = "${path.module}/elk/elastic_search_deployment.yaml"
-  content  = data.template_file.elastic_search_yaml.0.rendered
+  })
 }
 
 module "deploy_elastic_search" {

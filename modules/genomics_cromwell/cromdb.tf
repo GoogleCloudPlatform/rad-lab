@@ -20,7 +20,7 @@ resource "random_password" "cromwell_db_pass" {
 }
 module "cromwell_mysql_db" {
   source  = "GoogleCloudPlatform/sql-db/google//modules/mysql"
-  version = "8.0.0"
+  version = "~> 11.0"
 
 
   name       = var.cromwell_db_name
@@ -44,10 +44,11 @@ module "cromwell_mysql_db" {
   ]
 
   ip_configuration = {
+    authorized_networks = [],
     ipv4_enabled        = false,
     private_network     = module.vpc_cromwell.0.network_self_link,
-    authorized_networks = [],
     require_ssl         = false
+    allocated_ip_range  = null
   }
 
   // Optional: used to enforce ordering in the creation of resources.

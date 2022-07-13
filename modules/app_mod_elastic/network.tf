@@ -44,7 +44,7 @@ data "google_compute_subnetwork" "existing_subnet" {
 module "elastic_search_network" {
   count   = var.create_network ? 1 : 0
   source  = "terraform-google-modules/network/google"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   project_id   = local.project.project_id
   network_name = var.network_name
