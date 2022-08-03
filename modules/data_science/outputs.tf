@@ -34,6 +34,11 @@ output "notebooks-googlemanaged-names" {
   value       = join(", ", google_notebooks_runtime.ai_notebook_googlemanaged[*].name)
 }
 
+output "notebooks-instance-locations" {
+  description = "Notebook Instance Locations"
+  value       = join(", ", google_notebooks_instance.ai_notebook[*].location)
+}
+
 output "user-scripts-bucket-uri" {
   description = "User Script Bucket URI"
   value       = google_storage_bucket.user_scripts_bucket.self_link
