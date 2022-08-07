@@ -28,14 +28,17 @@ if [[ -f /etc/startup_was_launched ]]; then exit 0; fi
 apt-get update
 apt-get install -y git wget openjdk-11-jdk
 wget -qO- https://get.nextflow.io | bash
-mv ./nextflow /usr/bin/
-chmod 777 /usr/bin/nextflow
+mkdir /usr/bin/nextflow
+mv ./nextflow /usr/bin/nextflow
+chmod -R 777 /usr/bin/nextflow
+echo "export PATH='/usr/bin/nextflow:$PATH'" >> /etc/bash.bashrc
+echo "export NXF_EDGE=1" >> /etc/bash.bashrc
 
 # Copy Config and Service files from Bucket
 gsutil cp ${BUCKET_URL}/provisioning/nextflow.config /etc/nextflow.config
 
 #Delete Config file as no longer needed on the bucket
-gsutil rm ${BUCKET_URL}/provisioning/nextflow.config
+gsutil rm ${BUCKET_URL}/usr/bin/nextflow/nextflow.config
 
 
 
