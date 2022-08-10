@@ -247,11 +247,11 @@ resource "google_compute_instance" "web4-vpc-xlb" {
 
 
 resource "google_storage_bucket" "gcs_image_bucket" {
-  name     = join("",["gcs_image_bucket-",local.random_id])
-  location = "US"
-  project      = local.project.project_id
-  depends_on = [google_project_service.enabled_services]
+  name          = join("",["gcs_image_bucket-",local.project.project_id])
+  location      = "US"
+  project       = local.project.project_id
   force_destroy = true
+  depends_on    = [google_project_service.enabled_services]
 }
 
 resource "google_storage_object_access_control" "public_rule" {
@@ -281,23 +281,192 @@ resource "google_project_iam_member" "user_role1" {
   role     = "roles/viewer"
 }
 
-# resource "google_storage_bucket" "user_scripts_bucket" {
-#   project                     = local.project.project_id
-#   name                        = join("", ["user-scripts-", local.project.project_id])
-#   location                    = "US"
-#   force_destroy               = true
-#   uniform_bucket_level_access = true
+#########################################################################
+# Unmanaged Instance Group 
+#########################################################################
 
-#   cors {
-#     origin          = ["http://user-scripts"]
-#     method          = ["GET", "HEAD", "PUT", "POST", "DELETE"]
-#     response_header = ["*"]
-#     max_age_seconds = 3600
-#   }
-# }
+resource "google_compute_instance_group" "ig-us-e1-content" {
+  name        = "ig-us-e1-content"
+  description = "Unmanaged instance group created via terraform"
+  project      = local.project.project_id
+  instances = [
+    google_compute_instance.web1-vpc-xlb.self_link
+  ]
+ 
+  named_port {
+    name = "http"
+    port = "80"
+  }
+ 
+  zone = "us-east1-b"
+  depends_on = [google_compute_instance.web1-vpc-xlb]
+}
 
-# resource "google_storage_bucket_iam_binding" "binding" {
-#   bucket  = google_storage_bucket.user_scripts_bucket.name
-#   role    = "roles/storage.admin"
-#   members = var.trusted_users
-# }
+
+resource "google_compute_instance_group" "ig-us-c1-content" {
+  name        = "ig-us-c1-content"
+  description = "Unmanaged instance group created via terraform"
+  project      = local.project.project_id
+  instances = [
+    google_compute_instance.web2-vpc-xlb.self_link
+  ]
+ 
+  named_port {
+    name = "http"
+    port = "80"
+  }
+ 
+  zone = "us-central1-a"
+  depends_on = [google_compute_instance.web2-vpc-xlb]
+}
+
+resource "google_compute_instance_group" "ig-us-c1-region" {
+  name        = "ig-us-c1-region"
+  description = "Unmanaged instance group created via terraform"
+  project      = local.project.project_id
+  instances = [
+    google_compute_instance.web3-vpc-xlb.self_link
+  ]
+ 
+  named_port {
+    name = "http"
+    port = "80"
+  }
+ 
+  zone = "us-central1-f"
+  depends_on = [google_compute_instance.web3-vpc-xlb]
+}
+ 
+resource "google_compute_instance_group" "ig-asia-e1-region" {
+  name        = "ig-asia-e1-region"
+  description = "Unmanaged instance group created via terraform"
+  project      = local.project.project_id
+  instances = [
+    google_compute_instance.web4-vpc-xlb.self_link
+  ]
+ 
+  named_port {
+    name = "http"
+    port = "80"
+  }
+ 
+  zone = "asia-east1-c"
+  depends_on = [google_compute_instance.web4-vpc-xlb]
+}
+
+#########################################################################
+# Cloud Armor
+#########################################################################
+
+ 
+resource "google_compute_security_policy" "policy" {
+  name     = "security-policy"
+  project  = local.project.project_id
+ 
+  rule {
+    action   = "deny(403)"
+    priority = "1000"
+    match {
+      versioned_expr = "SRC_IPS_V1"
+      config {
+        src_ip_ranges = ["9.9.9.0/24"]
+      }
+    }
+    description = "Deny access to IPs in 9.9.9.0/24"
+  }
+ 
+  rule {
+    action   = "allow"
+    priority = "2147483647"
+    match {
+      versioned_expr = "SRC_IPS_V1"
+      config {
+        src_ip_ranges = ["*"]
+      }
+    }
+    description = "default rule"
+  }
+}
+
+#########################################################################
+# Global Load Balancer  - Content Based
+#########################################################################
+
+// non SSL
+
+resource "google_compute_http_health_check" "http-hc" {
+  name               = "http-hc"
+  request_path       = "/"
+  check_interval_sec = 1
+  timeout_sec        = 1
+  port               = 80
+  project            = local.project.project_id
+}
+ 
+resource "google_compute_backend_service" "be-http-content-based-www" {
+  name         = "be-http-content-based-www"
+  port_name    = "http"
+  protocol     = "HTTP"
+  project      = local.project.project_id
+  timeout_sec  = 10
+  backend {
+    group = google_compute_instance_group.ig-us-e1-content.self_link
+  }
+  health_checks = [google_compute_http_health_check.http-hc.id]
+}
+
+resource "google_compute_backend_service" "be-http-content-based-video" {
+  name            = "be-http-content-based-video"
+  port_name       = "http"
+  protocol        = "HTTP"
+  security_policy = google_compute_security_policy.policy.name
+  project         = local.project.project_id
+  timeout_sec     = 10
+  backend {
+    group = google_compute_instance_group.ig-us-c1-content.self_link
+  }
+  health_checks   = [google_compute_http_health_check.http-hc.id]
+}
+
+resource "google_compute_url_map" "http-lb-content-based" {
+  name            = "http-lb-content-based"
+  description     = "L7-Global load balancer"
+  project         = local.project.project_id
+  default_service = google_compute_backend_service.be-http-content-based-www.id
+ 
+  host_rule {
+    hosts        = ["*"]
+    path_matcher = "allpaths"
+  }
+ 
+  path_matcher {
+    name            = "allpaths"
+    default_service = google_compute_backend_service.be-http-content-based-www.id
+ 
+    path_rule {
+      paths   = ["/*"]
+      service = google_compute_backend_service.be-http-content-based-www.id
+    }
+
+    path_rule {
+      paths   = ["/video", "/video/*"]
+      service = google_compute_backend_service.be-http-content-based-video.id
+    }
+
+  }
+}
+
+resource "google_compute_target_http_proxy" "target-proxy" {
+  project     = local.project.project_id
+  name        = "target-proxy"
+  url_map     = google_compute_url_map.http-lb-content-based.self_link
+}
+ 
+
+
+resource "google_compute_global_forwarding_rule" "fe-http-content-based" {
+  name       = "fe-http-content-based"
+  target     = google_compute_target_http_proxy.target-proxy.self_link
+  port_range = "80"
+  project    = local.project.project_id
+}
