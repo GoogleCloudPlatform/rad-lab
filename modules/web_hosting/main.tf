@@ -36,6 +36,8 @@ locals {
 
   project_services = var.enable_services ? [
     "compute.googleapis.com",
+    "iap.googleapis.com",
+    "networkmanagement.googleapis.com"
   ] : []
 }
 
@@ -174,18 +176,28 @@ resource "google_compute_firewall" "fw-vpc-xlb-allow-internal" {
 }
 
 # FW rule to allow SSH
-resource "google_compute_firewall" "fw-vpc-xlb-allow-ssh" {
+# resource "google_compute_firewall" "fw-vpc-xlb-allow-ssh" {
+#   project       = local.project.project_id
+#   name          = "fw-vpc-xlb-allow-ssh"
+#   network       = google_compute_network.vpc-xlb.name
+#   priority      = 65534
+#   allow {
+#     protocol    = "tcp"
+#     ports       = ["22"]
+#   }
+#   source_ranges = ["0.0.0.0/0"]
+# }
+
+resource "google_compute_firewall" "fw-vpc-xlb-allow-iap-ssh" {
+  name          = "fw-vpc-xlb-allow-iap-ssh"
+  network       = resource.google_compute_network.vpc-xlb.name
   project       = local.project.project_id
-  name          = "fw-vpc-xlb-allow-ssh"
-  network       = google_compute_network.vpc-xlb.name
-  priority      = 65534
   allow {
     protocol    = "tcp"
     ports       = ["22"]
   }
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = ["35.235.240.0/20"]
 }
-
 
 #########################################################################
 # Startup script for VMs in vpc-xlb
@@ -338,15 +350,7 @@ resource "google_storage_bucket_object" "picture" {
 resource "google_storage_bucket_iam_binding" "binding" {
   bucket  = google_storage_bucket.gcs_image_bucket.name
   role    = "roles/storage.admin"
-  members = var.trusted_users
-}
-
-
-resource "google_project_iam_member" "user_role1" {
-  for_each = var.trusted_users
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/viewer"
+  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
 }
 
 #########################################################################
@@ -475,8 +479,8 @@ resource "google_compute_backend_bucket" "be-http-cdn-gcs" {
 resource "google_compute_http_health_check" "http-hc" {
   name               = "http-hc"
   request_path       = "/"
-  check_interval_sec = 1
-  timeout_sec        = 1
+  check_interval_sec = 5
+  timeout_sec        = 5
   port               = 80
   project            = local.project.project_id
 }
@@ -610,4 +614,29 @@ resource "google_compute_global_forwarding_rule" "fe-http-cross-region-cdn" {
   target     = google_compute_target_http_proxy.target-proxy-cross-region.self_link
   port_range = "80"
   project    = local.project.project_id
+}
+
+#########################################################################
+# IAM - Trusted User
+#########################################################################
+
+resource "google_project_iam_member" "trusted_user_group_role1" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/iap.tunnelResourceAccessor"
+}
+
+resource "google_project_iam_member" "trusted_user_group_role2" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/compute.instanceAdmin.v1"
+}
+
+resource "google_project_iam_member" "trusted_user_group_role3" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/viewer"
 }

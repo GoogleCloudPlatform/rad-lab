@@ -109,11 +109,18 @@ variable "set_shielded_vm_policy" {
 #   default     = "subnet-vertex-ai-workbench"
 # }
 
-variable "trusted_users" {
-  description = "The list of trusted users."
+variable "trusted_groups" {
+  description = "The list of trusted groups (e.g. `myteam@abc.com`)."
   type        = set(string)
   default     = []
 }
+
+variable "trusted_users" {
+  description = "The list of trusted users (e.g. `username@abc.com`)."
+  type        = set(string)
+  default     = []
+}
+
 
 # variable "zone" {
 #   description = "Cloud Zone associated to the Vertex AI Workbench"
