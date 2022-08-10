@@ -43,9 +43,9 @@ resource "random_id" "default" {
   byte_length = 2
 }
 
-#######################
-# WEB HOSTING PROJECT #
-#######################
+#########################################################################
+# WEB HOSTING PROJECT
+#########################################################################
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
@@ -74,6 +74,10 @@ resource "google_project_service" "enabled_services" {
     module.project_radlab_web_hosting
   ]
 }
+
+#########################################################################
+# Network & Subnests
+#########################################################################
 
 resource "google_compute_network" "vpc-xlb" {
   name                    = "vpc-xlb"
@@ -118,6 +122,70 @@ resource "google_compute_subnetwork" "subnetwork-vpc-xlb-asia-e1" {
   private_ip_google_access = true
   depends_on               = [google_compute_network.vpc-xlb]
 }
+
+#########################################################################
+# Firewall Rules in vpc-xlb
+#########################################################################
+
+# FW rule for L7LB healthcheck
+resource "google_compute_firewall" "fw-vpc-xlb-lb-hc" {
+  project       = local.project.project_id
+  name          = "fw-vpc-xlb-lb-hc"
+  network       = google_compute_network.vpc-xlb.name
+ 
+  allow {
+    protocol    = "tcp"
+    ports       = ["80"]
+  }
+ 
+  source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
+}
+
+
+# FW rule for ICMP
+resource "google_compute_firewall" "fw-vpc-xlb-allow-icmp" {
+  project       = local.project.project_id
+  name          = "fw-vpc-xlb-allow-icmp"
+  network       = google_compute_network.vpc-xlb.name
+  priority      = 65534
+  allow {
+    protocol    = "icmp"
+  }
+ 
+  source_ranges = ["0.0.0.0/0"]
+}
+
+# FW rule to allow internal
+resource "google_compute_firewall" "fw-vpc-xlb-allow-internal" {
+  project       = local.project.project_id
+  name          = "fw-vpc-xlb-allow-internal"
+  network       = google_compute_network.vpc-xlb.name
+  priority      = 65534
+  allow {
+    protocol    = "tcp"
+    ports       = ["0-65535"]
+  }
+  allow {
+    protocol    = "udp"
+    ports       = ["0-65535"]
+  }
+ 
+  source_ranges = ["10.128.0.0/9"]
+}
+
+# FW rule to allow SSH
+resource "google_compute_firewall" "fw-vpc-xlb-allow-ssh" {
+  project       = local.project.project_id
+  name          = "fw-vpc-xlb-allow-ssh"
+  network       = google_compute_network.vpc-xlb.name
+  priority      = 65534
+  allow {
+    protocol    = "tcp"
+    ports       = ["22"]
+  }
+  source_ranges = ["0.0.0.0/0"]
+}
+
 
 #########################################################################
 # Startup script for VMs in vpc-xlb
@@ -242,7 +310,7 @@ resource "google_compute_instance" "web4-vpc-xlb" {
 }
 
 #########################################################################
-# Cloud CDN with GCS bucket
+# GCS bucket / Bucket Objects / Bucket Bindings
 #########################################################################
 
 
@@ -389,10 +457,20 @@ resource "google_compute_security_policy" "policy" {
 }
 
 #########################################################################
-# Global Load Balancer  - Content Based
+# Cloud CDN with GCS bucket
 #########################################################################
 
-// non SSL
+resource "google_compute_backend_bucket" "be-http-cdn-gcs" {
+  name        =  "be-http-cdn-gcs"
+  description = "Contains test images"
+  project     = local.project.project_id
+  bucket_name = google_storage_bucket.gcs_image_bucket.name
+  enable_cdn  = true
+}
+
+#########################################################################
+# Global Load Balancer  - Health Check
+#########################################################################
 
 resource "google_compute_http_health_check" "http-hc" {
   name               = "http-hc"
@@ -402,6 +480,12 @@ resource "google_compute_http_health_check" "http-hc" {
   port               = 80
   project            = local.project.project_id
 }
+
+#########################################################################
+# Global Load Balancer  - Content Based
+#########################################################################
+
+// non SSL
  
 resource "google_compute_backend_service" "be-http-content-based-www" {
   name         = "be-http-content-based-www"
@@ -430,7 +514,7 @@ resource "google_compute_backend_service" "be-http-content-based-video" {
 
 resource "google_compute_url_map" "http-lb-content-based" {
   name            = "http-lb-content-based"
-  description     = "L7-Global load balancer"
+  description     = "L7 Global load balancer Content based"
   project         = local.project.project_id
   default_service = google_compute_backend_service.be-http-content-based-www.id
  
@@ -456,17 +540,74 @@ resource "google_compute_url_map" "http-lb-content-based" {
   }
 }
 
-resource "google_compute_target_http_proxy" "target-proxy" {
+resource "google_compute_target_http_proxy" "target-proxy-content-based" {
   project     = local.project.project_id
-  name        = "target-proxy"
+  name        = "target-proxy-content-based"
   url_map     = google_compute_url_map.http-lb-content-based.self_link
 }
  
-
-
 resource "google_compute_global_forwarding_rule" "fe-http-content-based" {
   name       = "fe-http-content-based"
-  target     = google_compute_target_http_proxy.target-proxy.self_link
+  target     = google_compute_target_http_proxy.target-proxy-content-based.self_link
+  port_range = "80"
+  project    = local.project.project_id
+}
+
+#########################################################################
+# Global Load Balancer  - Cross Region
+#########################################################################
+
+resource "google_compute_backend_service" "be-http-cross-region" {
+  name         = "be-http-cross-region"
+  port_name    = "http"
+  protocol     = "HTTP"
+  project      = local.project.project_id
+  timeout_sec  = 10
+  backend {
+    group = google_compute_instance_group.ig-us-c1-region.self_link
+  }
+  backend {
+    group = google_compute_instance_group.ig-asia-e1-region.self_link
+  }
+
+  health_checks = [google_compute_http_health_check.http-hc.id]
+}
+
+resource "google_compute_url_map" "http-lb-cross-region" {
+  name        = "http-lb-cross-region"
+  description = "L7 Global load balancer Cross Region"
+  project      = local.project.project_id
+  default_service = google_compute_backend_service.be-http-cross-region.id
+ 
+  host_rule {
+    hosts        = ["*"]
+    path_matcher = "allpaths"
+  }
+ 
+  path_matcher {
+    name            = "allpaths"
+    default_service = google_compute_backend_service.be-http-cross-region.id
+ 
+    path_rule {
+      paths   = ["/*"]
+      service = google_compute_backend_service.be-http-cross-region.id
+    }
+    path_rule {
+      paths = ["/images/*"]
+      service = google_compute_backend_bucket.be-http-cdn-gcs.id
+    }
+  }
+}
+
+resource "google_compute_target_http_proxy" "target-proxy-cross-region" {
+  project     = local.project.project_id
+  name        = "target-proxy-cross-region"
+  url_map     = google_compute_url_map.http-lb-cross-region.self_link
+}
+
+resource "google_compute_global_forwarding_rule" "fe-http-cross-region-cdn" {
+  name       = "fe-http-cross-region-cdn"
+  target     = google_compute_target_http_proxy.target-proxy-cross-region.self_link
   port_range = "80"
   project    = local.project.project_id
 }
