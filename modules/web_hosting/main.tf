@@ -98,7 +98,11 @@ resource "google_compute_subnetwork" "subnetwork-vpc-xlb-us-e1" {
   network                  = google_compute_network.vpc-xlb.name
   project                  = local.project.project_id
   private_ip_google_access = true
-  depends_on               = [google_compute_network.vpc-xlb]
+  log_config {
+    aggregation_interval = "INTERVAL_30_SEC"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 # Creating Sunbet for vpc-xlb VPC network
@@ -110,19 +114,27 @@ resource "google_compute_subnetwork" "subnetwork-vpc-xlb-us-c1" {
   network                  = google_compute_network.vpc-xlb.name
   project                  = local.project.project_id
   private_ip_google_access = true
-  depends_on               = [google_compute_network.vpc-xlb]
+  log_config {
+    aggregation_interval = "INTERVAL_30_SEC"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 # Creating Sunbet for vpc-xlb VPC network
 
-resource "google_compute_subnetwork" "subnetwork-vpc-xlb-asia-e1" {
-  name                     = "vpc-xlb-asia-e1"
-  ip_cidr_range            = "10.200.240.0/20"
-  region                   = "asia-east1"
+resource "google_compute_subnetwork" "subnetwork-vpc-xlb-asia-s1" {
+  name                     = "vpc-xlb-asia-s1"
+  ip_cidr_range            = "10.200.240.0/24"
+  region                   = "asia-south1"
   network                  = google_compute_network.vpc-xlb.name
   project                  = local.project.project_id
   private_ip_google_access = true
-  depends_on               = [google_compute_network.vpc-xlb]
+  log_config {
+    aggregation_interval = "INTERVAL_30_SEC"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 #########################################################################
@@ -158,35 +170,35 @@ resource "google_compute_firewall" "fw-vpc-xlb-allow-icmp" {
 }
 
 # FW rule to allow internal
-resource "google_compute_firewall" "fw-vpc-xlb-allow-internal" {
-  project       = local.project.project_id
-  name          = "fw-vpc-xlb-allow-internal"
-  network       = google_compute_network.vpc-xlb.name
-  priority      = 65534
-  allow {
-    protocol    = "tcp"
-    ports       = ["0-65535"]
-  }
-  allow {
-    protocol    = "udp"
-    ports       = ["0-65535"]
-  }
- 
-  source_ranges = ["10.128.0.0/9"]
-}
-
-# FW rule to allow SSH
-# resource "google_compute_firewall" "fw-vpc-xlb-allow-ssh" {
+# resource "google_compute_firewall" "fw-vpc-xlb-allow-internal" {
 #   project       = local.project.project_id
-#   name          = "fw-vpc-xlb-allow-ssh"
+#   name          = "fw-vpc-xlb-allow-internal"
 #   network       = google_compute_network.vpc-xlb.name
 #   priority      = 65534
 #   allow {
 #     protocol    = "tcp"
-#     ports       = ["22"]
+#     ports       = ["0-65535"]
 #   }
-#   source_ranges = ["0.0.0.0/0"]
+#   allow {
+#     protocol    = "udp"
+#     ports       = ["0-65535"]
+#   }
+ 
+#   source_ranges = ["10.128.0.0/9"]
 # }
+
+# FW rule to allow SSH
+resource "google_compute_firewall" "fw-vpc-xlb-allow-ssh" {
+  project       = local.project.project_id
+  name          = "fw-vpc-xlb-allow-ssh"
+  network       = google_compute_network.vpc-xlb.name
+  priority      = 65534
+  allow {
+    protocol    = "tcp"
+    ports       = ["22"]
+  }
+  source_ranges = ["0.0.0.0/0"]
+}
 
 resource "google_compute_firewall" "fw-vpc-xlb-allow-iap-ssh" {
   name          = "fw-vpc-xlb-allow-iap-ssh"
@@ -213,7 +225,7 @@ data "template_file" "metadata_startup_script_video" {
 
 
 #########################################################################
-# Creating 4 GCE VMs in vpc-xlb
+# Creating GCE VMs in vpc-xlb
 #########################################################################
 
 
@@ -233,9 +245,9 @@ resource "google_compute_instance" "web1-vpc-xlb" {
     subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-us-e1.name
     subnetwork_project = local.project.project_id
     network_ip         = "10.200.10.2"
-    # access_config {
-    #   // Ephemeral IP
-    # }
+    access_config {
+      // Ephemeral IP
+    }
   }
  
   depends_on = [
@@ -297,7 +309,7 @@ resource "google_compute_instance" "web3-vpc-xlb" {
  
 resource "google_compute_instance" "web4-vpc-xlb" {
   project      = local.project.project_id
-  zone         = "asia-east1-c"
+  zone         = "asia-south1-c"
   name         = "web4-vpc-xlb"
   machine_type = "f1-micro"
   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
@@ -308,7 +320,7 @@ resource "google_compute_instance" "web4-vpc-xlb" {
   }
  
   network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-asia-e1.name
+    subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-asia-s1.name
     subnetwork_project = local.project.project_id
     network_ip         = "10.200.240.2"
     # access_config {
@@ -409,8 +421,8 @@ resource "google_compute_instance_group" "ig-us-c1-region" {
   depends_on = [google_compute_instance.web3-vpc-xlb]
 }
  
-resource "google_compute_instance_group" "ig-asia-e1-region" {
-  name        = "ig-asia-e1-region"
+resource "google_compute_instance_group" "ig-asia-s1-region" {
+  name        = "ig-asia-s1-region"
   description = "Unmanaged instance group created via terraform"
   project      = local.project.project_id
   instances = [
@@ -422,7 +434,7 @@ resource "google_compute_instance_group" "ig-asia-e1-region" {
     port = "80"
   }
  
-  zone = "asia-east1-c"
+  zone = "asia-south1-c"
   depends_on = [google_compute_instance.web4-vpc-xlb]
 }
 
@@ -476,20 +488,29 @@ resource "google_compute_backend_bucket" "be-http-cdn-gcs" {
 # Global Load Balancer  - Health Check
 #########################################################################
 
-resource "google_compute_http_health_check" "http-hc" {
+# resource "google_compute_http_health_check" "http-hc" {
+#   name               = "http-hc"
+#   request_path       = "/"
+#   check_interval_sec = 5
+#   timeout_sec        = 5
+#   port               = 80
+#   project            = local.project.project_id
+# }
+
+resource "google_compute_health_check" "http-hc" {
   name               = "http-hc"
-  request_path       = "/"
-  check_interval_sec = 5
-  timeout_sec        = 5
-  port               = 80
+  timeout_sec        = 1
+  check_interval_sec = 1
+  http_health_check {
+    port             = 80
+    request_path     = "/"
+  }
   project            = local.project.project_id
 }
 
 #########################################################################
-# Global Load Balancer  - Content Based
+# Global HTTP Load Balancer  - Content Based
 #########################################################################
-
-// non SSL
  
 resource "google_compute_backend_service" "be-http-content-based-www" {
   name         = "be-http-content-based-www"
@@ -499,8 +520,10 @@ resource "google_compute_backend_service" "be-http-content-based-www" {
   timeout_sec  = 10
   backend {
     group = google_compute_instance_group.ig-us-e1-content.self_link
+    balancing_mode  = "UTILIZATION"
+    max_utilization = 0.8
   }
-  health_checks = [google_compute_http_health_check.http-hc.id]
+  health_checks = [google_compute_health_check.http-hc.id]
 }
 
 resource "google_compute_backend_service" "be-http-content-based-video" {
@@ -512,8 +535,10 @@ resource "google_compute_backend_service" "be-http-content-based-video" {
   timeout_sec     = 10
   backend {
     group = google_compute_instance_group.ig-us-c1-content.self_link
+    balancing_mode  = "UTILIZATION"
+    max_utilization = 0.8
   }
-  health_checks   = [google_compute_http_health_check.http-hc.id]
+  health_checks   = [google_compute_health_check.http-hc.id]
 }
 
 resource "google_compute_url_map" "http-lb-content-based" {
@@ -558,7 +583,7 @@ resource "google_compute_global_forwarding_rule" "fe-http-content-based" {
 }
 
 #########################################################################
-# Global Load Balancer  - Cross Region
+# Global HTTP Load Balancer  - Cross Region
 #########################################################################
 
 resource "google_compute_backend_service" "be-http-cross-region" {
@@ -569,12 +594,14 @@ resource "google_compute_backend_service" "be-http-cross-region" {
   timeout_sec  = 10
   backend {
     group = google_compute_instance_group.ig-us-c1-region.self_link
+    balancing_mode  = "UTILIZATION"
+    max_utilization = 0.8
   }
   backend {
-    group = google_compute_instance_group.ig-asia-e1-region.self_link
+    group = google_compute_instance_group.ig-asia-s1-region.self_link
   }
 
-  health_checks = [google_compute_http_health_check.http-hc.id]
+  health_checks = [google_compute_health_check.http-hc.id]
 }
 
 resource "google_compute_url_map" "http-lb-cross-region" {
@@ -617,7 +644,7 @@ resource "google_compute_global_forwarding_rule" "fe-http-cross-region-cdn" {
 }
 
 #########################################################################
-# IAM - Trusted User
+# IAM - Trusted User/Group
 #########################################################################
 
 resource "google_project_iam_member" "trusted_user_group_role1" {
