@@ -26,7 +26,7 @@
 #     }
 #   }
 #   depends_on = [
-#     module.project_radlab_alpha_fold
+#     module.project_radlab_web_hosting
 #   ]
 # }
 

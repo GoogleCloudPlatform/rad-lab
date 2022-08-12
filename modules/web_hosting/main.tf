@@ -91,22 +91,6 @@ resource "google_compute_network" "vpc-xlb" {
 
 # Creating Sunbet for vpc-xlb VPC network
 
-resource "google_compute_subnetwork" "subnetwork-vpc-xlb-us-e1" {
-  name                     = "vpc-xlb-us-e1"
-  ip_cidr_range            = "10.200.10.0/24"
-  region                   = "us-east1"
-  network                  = google_compute_network.vpc-xlb.name
-  project                  = local.project.project_id
-  private_ip_google_access = true
-  log_config {
-    aggregation_interval = "INTERVAL_30_SEC"
-    flow_sampling        = 0.5
-    metadata             = "INCLUDE_ALL_METADATA"
-  }
-}
-
-# Creating Sunbet for vpc-xlb VPC network
-
 resource "google_compute_subnetwork" "subnetwork-vpc-xlb-us-c1" {
   name                     = "vpc-xlb-us-c1"
   ip_cidr_range            = "10.200.20.0/24"
@@ -114,11 +98,11 @@ resource "google_compute_subnetwork" "subnetwork-vpc-xlb-us-c1" {
   network                  = google_compute_network.vpc-xlb.name
   project                  = local.project.project_id
   private_ip_google_access = true
-  log_config {
-    aggregation_interval = "INTERVAL_30_SEC"
-    flow_sampling        = 0.5
-    metadata             = "INCLUDE_ALL_METADATA"
-  }
+  # log_config {
+  #   aggregation_interval = "INTERVAL_30_SEC"
+  #   flow_sampling        = 0.5
+  #   metadata             = "INCLUDE_ALL_METADATA"
+  # }
 }
 
 # Creating Sunbet for vpc-xlb VPC network
@@ -130,11 +114,11 @@ resource "google_compute_subnetwork" "subnetwork-vpc-xlb-asia-s1" {
   network                  = google_compute_network.vpc-xlb.name
   project                  = local.project.project_id
   private_ip_google_access = true
-  log_config {
-    aggregation_interval = "INTERVAL_30_SEC"
-    flow_sampling        = 0.5
-    metadata             = "INCLUDE_ALL_METADATA"
-  }
+  # log_config {
+  #   aggregation_interval = "INTERVAL_30_SEC"
+  #   flow_sampling        = 0.5
+  #   metadata             = "INCLUDE_ALL_METADATA"
+  # }
 }
 
 #########################################################################
@@ -169,37 +153,6 @@ resource "google_compute_firewall" "fw-vpc-xlb-allow-icmp" {
   source_ranges = ["0.0.0.0/0"]
 }
 
-# FW rule to allow internal
-# resource "google_compute_firewall" "fw-vpc-xlb-allow-internal" {
-#   project       = local.project.project_id
-#   name          = "fw-vpc-xlb-allow-internal"
-#   network       = google_compute_network.vpc-xlb.name
-#   priority      = 65534
-#   allow {
-#     protocol    = "tcp"
-#     ports       = ["0-65535"]
-#   }
-#   allow {
-#     protocol    = "udp"
-#     ports       = ["0-65535"]
-#   }
- 
-#   source_ranges = ["10.128.0.0/9"]
-# }
-
-# FW rule to allow SSH
-resource "google_compute_firewall" "fw-vpc-xlb-allow-ssh" {
-  project       = local.project.project_id
-  name          = "fw-vpc-xlb-allow-ssh"
-  network       = google_compute_network.vpc-xlb.name
-  priority      = 65534
-  allow {
-    protocol    = "tcp"
-    ports       = ["22"]
-  }
-  source_ranges = ["0.0.0.0/0"]
-}
-
 resource "google_compute_firewall" "fw-vpc-xlb-allow-iap-ssh" {
   name          = "fw-vpc-xlb-allow-iap-ssh"
   network       = resource.google_compute_network.vpc-xlb.name
@@ -223,6 +176,60 @@ data "template_file" "metadata_startup_script_video" {
     template = "${file("./scripts/build/video_webapp.sh")}"
 }
 
+#########################################################################
+# Creating Cloud NATs for Egress traffic from GCE VMs in vpc-xlb
+#########################################################################
+
+resource "google_compute_router" "cr-nat-us-c1" {
+  name    = "cr-nat-us-c1"
+  project = local.project.project_id
+  region  = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.region
+  network = google_compute_network.vpc-xlb.id
+
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat-gw-us-c1" {
+  name                               = "nat-gw-us-c1"
+  project                            = local.project.project_id
+  router                             = google_compute_router.cr-nat-us-c1.name
+  region                             = google_compute_router.cr-nat-us-c1.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
+resource "google_compute_router" "cr-nat-asia-s1" {
+  name    = "cr-nat-asia-s1"
+  project = local.project.project_id
+  region  = google_compute_subnetwork.subnetwork-vpc-xlb-asia-s1.region
+  network = google_compute_network.vpc-xlb.id
+
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat-gw-asia-s1" {
+  name                               = "nat-gw-asia-s1"
+  project                            = local.project.project_id
+  router                             = google_compute_router.cr-nat-asia-s1.name
+  region                             = google_compute_router.cr-nat-asia-s1.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
 
 #########################################################################
 # Creating GCE VMs in vpc-xlb
@@ -231,39 +238,16 @@ data "template_file" "metadata_startup_script_video" {
 
 resource "google_compute_instance" "web1-vpc-xlb" {
   project      = local.project.project_id
-  zone         = "us-east1-b"
+  zone         = "us-central1-a"
   name         = "web1-vpc-xlb"
   machine_type = "f1-micro"
   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
+  metadata = {
+    enable-oslogin = true
+  }
   boot_disk {
     initialize_params {
-      image = "ubuntu-1604-xenial-v20170328"
-    }
-  }
- 
-  network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-us-e1.name
-    subnetwork_project = local.project.project_id
-    network_ip         = "10.200.10.2"
-    access_config {
-      // Ephemeral IP
-    }
-  }
- 
-  depends_on = [
-    time_sleep.wait_120_seconds
-    ]
-}
-
-resource "google_compute_instance" "web2-vpc-xlb" {
-  project      = local.project.project_id
-  zone         = "us-central1-a"
-  name         = "web2-vpc-xlb"
-  machine_type = "f1-micro"
-  metadata_startup_script   = data.template_file.metadata_startup_script_video.rendered
-  boot_disk {
-    initialize_params {
-      image = "ubuntu-1604-xenial-v20170328"
+      image = "debian-11-bullseye-v20220719"
     }
   }
  
@@ -277,19 +261,23 @@ resource "google_compute_instance" "web2-vpc-xlb" {
   }
  
   depends_on = [
-    time_sleep.wait_120_seconds
+    time_sleep.wait_120_seconds,
+    google_compute_router_nat.nat-gw-us-c1
     ]
 }
- 
-resource "google_compute_instance" "web3-vpc-xlb" {
+
+resource "google_compute_instance" "web2-vpc-xlb" {
   project      = local.project.project_id
-  zone         = "us-central1-f"
-  name         = "web3-vpc-xlb"
+  zone         = "us-central1-b"
+  name         = "web2-vpc-xlb"
   machine_type = "f1-micro"
-  metadata_startup_script   = data.template_file.metadata_startup_script.rendered
+  metadata_startup_script   = data.template_file.metadata_startup_script_video.rendered
+  metadata = {
+    enable-oslogin = true
+  }
   boot_disk {
     initialize_params {
-      image = "ubuntu-1604-xenial-v20170328"
+      image = "debian-11-bullseye-v20220719"
     }
   }
  
@@ -303,7 +291,38 @@ resource "google_compute_instance" "web3-vpc-xlb" {
   }
  
   depends_on = [
-    time_sleep.wait_120_seconds
+    time_sleep.wait_120_seconds,
+    google_compute_router_nat.nat-gw-us-c1
+    ]
+}
+ 
+resource "google_compute_instance" "web3-vpc-xlb" {
+  project      = local.project.project_id
+  zone         = "us-central1-f"
+  name         = "web3-vpc-xlb"
+  machine_type = "f1-micro"
+  metadata_startup_script   = data.template_file.metadata_startup_script.rendered
+  metadata = {
+    enable-oslogin = true
+  }
+  boot_disk {
+    initialize_params {
+      image = "debian-11-bullseye-v20220719"
+    }
+  }
+ 
+  network_interface {
+    subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name
+    subnetwork_project = local.project.project_id
+    network_ip         = "10.200.20.4"
+    # access_config {
+    #   // Ephemeral IP
+    # }
+  }
+ 
+  depends_on = [
+    time_sleep.wait_120_seconds,
+    google_compute_router_nat.nat-gw-us-c1
     ]
 }
  
@@ -313,9 +332,12 @@ resource "google_compute_instance" "web4-vpc-xlb" {
   name         = "web4-vpc-xlb"
   machine_type = "f1-micro"
   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
+  metadata = {
+    enable-oslogin = true
+  }
   boot_disk {
     initialize_params {
-      image = "ubuntu-1604-xenial-v20170328"
+      image = "debian-11-bullseye-v20220719"
     }
   }
  
@@ -329,7 +351,8 @@ resource "google_compute_instance" "web4-vpc-xlb" {
   }
  
   depends_on = [
-    time_sleep.wait_120_seconds
+    time_sleep.wait_120_seconds,
+    google_compute_router_nat.nat-gw-asia-s1
     ]
 }
 
@@ -369,8 +392,8 @@ resource "google_storage_bucket_iam_binding" "binding" {
 # Unmanaged Instance Group 
 #########################################################################
 
-resource "google_compute_instance_group" "ig-us-e1-content" {
-  name        = "ig-us-e1-content"
+resource "google_compute_instance_group" "ig-us-c1-content-www" {
+  name        = "ig-us-c1-content-www"
   description = "Unmanaged instance group created via terraform"
   project      = local.project.project_id
   instances = [
@@ -382,13 +405,12 @@ resource "google_compute_instance_group" "ig-us-e1-content" {
     port = "80"
   }
  
-  zone = "us-east1-b"
+  zone = "us-central1-a"
   depends_on = [google_compute_instance.web1-vpc-xlb]
 }
 
-
-resource "google_compute_instance_group" "ig-us-c1-content" {
-  name        = "ig-us-c1-content"
+resource "google_compute_instance_group" "ig-us-c1-content-video" {
+  name        = "ig-us-c1-content-video"
   description = "Unmanaged instance group created via terraform"
   project      = local.project.project_id
   instances = [
@@ -400,7 +422,7 @@ resource "google_compute_instance_group" "ig-us-c1-content" {
     port = "80"
   }
  
-  zone = "us-central1-a"
+  zone = "us-central1-b"
   depends_on = [google_compute_instance.web2-vpc-xlb]
 }
 
@@ -488,15 +510,6 @@ resource "google_compute_backend_bucket" "be-http-cdn-gcs" {
 # Global Load Balancer  - Health Check
 #########################################################################
 
-# resource "google_compute_http_health_check" "http-hc" {
-#   name               = "http-hc"
-#   request_path       = "/"
-#   check_interval_sec = 5
-#   timeout_sec        = 5
-#   port               = 80
-#   project            = local.project.project_id
-# }
-
 resource "google_compute_health_check" "http-hc" {
   name               = "http-hc"
   timeout_sec        = 1
@@ -519,7 +532,7 @@ resource "google_compute_backend_service" "be-http-content-based-www" {
   project      = local.project.project_id
   timeout_sec  = 10
   backend {
-    group = google_compute_instance_group.ig-us-e1-content.self_link
+    group = google_compute_instance_group.ig-us-c1-content-www.self_link
     balancing_mode  = "UTILIZATION"
     max_utilization = 0.8
   }
@@ -534,7 +547,7 @@ resource "google_compute_backend_service" "be-http-content-based-video" {
   project         = local.project.project_id
   timeout_sec     = 10
   backend {
-    group = google_compute_instance_group.ig-us-c1-content.self_link
+    group = google_compute_instance_group.ig-us-c1-content-video.self_link
     balancing_mode  = "UTILIZATION"
     max_utilization = 0.8
   }

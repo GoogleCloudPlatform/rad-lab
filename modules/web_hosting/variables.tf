@@ -79,17 +79,17 @@ variable "random_id" {
   default     = null
 }
 
-# variable "set_external_ip_policy" {
-#   description = "Enable org policy to allow External (Public) IP addresses on virtual machines."
-#   type        = bool
-#   default     = true
-# }
-
 variable "set_bucket_level_access_policy" {
   description = "Apply org policy to disable Uniform Bucket Level Access on GCS."
   type        = bool
   default     = true
 }
+
+# variable "set_external_ip_policy" {
+#   description = "Enable org policy to allow External (Public) IP addresses on virtual machines."
+#   type        = bool
+#   default     = true
+# }
 
 variable "set_shielded_vm_policy" {
   description = "Apply org policy to disable shielded VMs."

@@ -19,7 +19,7 @@ output "deployment_id" {
   value       = local.random_id
 }
 
-output "project_radlab_web_hosting-id" {
+output "project_radlab_web_hosting_id" {
   description = "Web Hosting Project ID"
   value       = local.project.project_id
 }
