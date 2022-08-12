@@ -63,7 +63,7 @@ variable "nextflow_server_instance_type" {
 
 variable "nextflow_zone" {
   description = "GCP Zone that will be set as the default runtime in nextflow config file."
-  type        = list(any)
+  type        = string
   default     = "us-central1-a"
 }
 
