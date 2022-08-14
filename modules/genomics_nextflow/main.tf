@@ -69,6 +69,7 @@ module "project_radlab_gen_nextflow" {
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
   org_id            = var.organization_id
+  default_service_account = "keep"
   labels = {
     vpc-network = var.network_name
   }
