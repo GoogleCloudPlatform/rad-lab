@@ -78,90 +78,86 @@ resource "google_project_service" "enabled_services" {
 }
 
 #########################################################################
-# Network & Subnests
+# Creating Cloud NATs for Egress traffic from GCE VMs in vpc-xlb
 #########################################################################
 
-resource "google_compute_network" "vpc-xlb" {
-  name                    = "vpc-xlb"
-  project                 = local.project.project_id
-  auto_create_subnetworks = "false"
-  routing_mode            = "GLOBAL"
-  depends_on              = [google_project_service.enabled_services]
+resource "google_compute_router" "cr-vpc-xlb-us-c1" {
+  name    = "cr-vpc-xlb-us-c1"
+  project = local.project.project_id
+  region  = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.region
+  network = google_compute_network.vpc-xlb.id
+
+  bgp {
+    asn = 64514
+  }
 }
 
-# Creating Sunbet for vpc-xlb VPC network
+resource "google_compute_router_nat" "nat-gw-vpc-xlb-us-c1" {
+  name                               = "nat-gw-vpc-xlb-us-c1"
+  project                            = local.project.project_id
+  router                             = google_compute_router.cr-vpc-xlb-us-c1.name
+  region                             = google_compute_router.cr-vpc-xlb-us-c1.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 
-resource "google_compute_subnetwork" "subnetwork-vpc-xlb-us-c1" {
-  name                     = "vpc-xlb-us-c1"
-  ip_cidr_range            = "10.200.20.0/24"
-  region                   = "us-central1"
-  network                  = google_compute_network.vpc-xlb.name
-  project                  = local.project.project_id
-  private_ip_google_access = true
-  # log_config {
-  #   aggregation_interval = "INTERVAL_30_SEC"
-  #   flow_sampling        = 0.5
-  #   metadata             = "INCLUDE_ALL_METADATA"
-  # }
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
 }
 
-# Creating Sunbet for vpc-xlb VPC network
+resource "google_compute_router" "cr-vpc-xlb-asia-s1" {
+  name    = "cr-vpc-xlb-asia-s1"
+  project = local.project.project_id
+  region  = google_compute_subnetwork.subnetwork-vpc-xlb-asia-s1.region
+  network = google_compute_network.vpc-xlb.id
 
-resource "google_compute_subnetwork" "subnetwork-vpc-xlb-asia-s1" {
-  name                     = "vpc-xlb-asia-s1"
-  ip_cidr_range            = "10.200.240.0/24"
-  region                   = "asia-south1"
-  network                  = google_compute_network.vpc-xlb.name
-  project                  = local.project.project_id
-  private_ip_google_access = true
-  # log_config {
-  #   aggregation_interval = "INTERVAL_30_SEC"
-  #   flow_sampling        = 0.5
-  #   metadata             = "INCLUDE_ALL_METADATA"
-  # }
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat-gw-vpc-xlb-asia-s1" {
+  name                               = "nat-gw-vpc-xlb-asia-s1"
+  project                            = local.project.project_id
+  router                             = google_compute_router.cr-vpc-xlb-asia-s1.name
+  region                             = google_compute_router.cr-vpc-xlb-asia-s1.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
 }
 
 #########################################################################
-# Firewall Rules in vpc-xlb
+# Creating Cloud NATs for Egress traffic from GCE VMs in vpc-ilb
 #########################################################################
 
-# FW rule for L7LB healthcheck
-resource "google_compute_firewall" "fw-vpc-xlb-lb-hc" {
-  project       = local.project.project_id
-  name          = "fw-vpc-xlb-lb-hc"
-  network       = google_compute_network.vpc-xlb.name
- 
-  allow {
-    protocol    = "tcp"
-    ports       = ["80"]
+resource "google_compute_router" "cr-vpc-ilb-us-c1" {
+  name    = "cr-vpc-ilb-us-c1"
+  project = local.project.project_id
+  region  = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.region
+  network = google_compute_network.vpc-ilb.id
+
+  bgp {
+    asn = 64514
   }
- 
-  source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
 }
 
+resource "google_compute_router_nat" "nat-gw-vpc-ilb-us-c1" {
+  name                               = "nat-gw-vpc-ilb-us-c1"
+  project                            = local.project.project_id
+  router                             = google_compute_router.cr-vpc-ilb-us-c1.name
+  region                             = google_compute_router.cr-vpc-ilb-us-c1.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 
-# FW rule for ICMP
-resource "google_compute_firewall" "fw-vpc-xlb-allow-icmp" {
-  project       = local.project.project_id
-  name          = "fw-vpc-xlb-allow-icmp"
-  network       = google_compute_network.vpc-xlb.name
-  priority      = 65534
-  allow {
-    protocol    = "icmp"
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
   }
- 
-  source_ranges = ["0.0.0.0/0"]
-}
-
-resource "google_compute_firewall" "fw-vpc-xlb-allow-iap-ssh" {
-  name          = "fw-vpc-xlb-allow-iap-ssh"
-  network       = resource.google_compute_network.vpc-xlb.name
-  project       = local.project.project_id
-  allow {
-    protocol    = "tcp"
-    ports       = ["22"]
-  }
-  source_ranges = ["35.235.240.0/20"]
 }
 
 #########################################################################
@@ -175,61 +171,6 @@ data "template_file" "metadata_startup_script" {
 data "template_file" "metadata_startup_script_video" {
     template = "${file("./scripts/build/video_webapp.sh")}"
 }
-
-#########################################################################
-# Creating Cloud NATs for Egress traffic from GCE VMs in vpc-xlb
-#########################################################################
-
-resource "google_compute_router" "cr-nat-us-c1" {
-  name    = "cr-nat-us-c1"
-  project = local.project.project_id
-  region  = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.region
-  network = google_compute_network.vpc-xlb.id
-
-  bgp {
-    asn = 64514
-  }
-}
-
-resource "google_compute_router_nat" "nat-gw-us-c1" {
-  name                               = "nat-gw-us-c1"
-  project                            = local.project.project_id
-  router                             = google_compute_router.cr-nat-us-c1.name
-  region                             = google_compute_router.cr-nat-us-c1.region
-  nat_ip_allocate_option             = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-
-  log_config {
-    enable = true
-    filter = "ERRORS_ONLY"
-  }
-}
-
-resource "google_compute_router" "cr-nat-asia-s1" {
-  name    = "cr-nat-asia-s1"
-  project = local.project.project_id
-  region  = google_compute_subnetwork.subnetwork-vpc-xlb-asia-s1.region
-  network = google_compute_network.vpc-xlb.id
-
-  bgp {
-    asn = 64514
-  }
-}
-
-resource "google_compute_router_nat" "nat-gw-asia-s1" {
-  name                               = "nat-gw-asia-s1"
-  project                            = local.project.project_id
-  router                             = google_compute_router.cr-nat-asia-s1.name
-  region                             = google_compute_router.cr-nat-asia-s1.region
-  nat_ip_allocate_option             = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-
-  log_config {
-    enable = true
-    filter = "ERRORS_ONLY"
-  }
-}
-
 
 #########################################################################
 # Creating GCE VMs in vpc-xlb
@@ -262,7 +203,7 @@ resource "google_compute_instance" "web1-vpc-xlb" {
  
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat-gw-us-c1
+    google_compute_router_nat.nat-gw-vpc-xlb-us-c1
     ]
 }
 
@@ -292,7 +233,7 @@ resource "google_compute_instance" "web2-vpc-xlb" {
  
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat-gw-us-c1
+    google_compute_router_nat.nat-gw-vpc-xlb-us-c1
     ]
 }
  
@@ -322,7 +263,7 @@ resource "google_compute_instance" "web3-vpc-xlb" {
  
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat-gw-us-c1
+    google_compute_router_nat.nat-gw-vpc-xlb-us-c1
     ]
 }
  
@@ -352,7 +293,72 @@ resource "google_compute_instance" "web4-vpc-xlb" {
  
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat-gw-asia-s1
+    google_compute_router_nat.nat-gw-vpc-xlb-asia-s1
+    ]
+}
+
+#########################################################################
+# Creating GCE VMs in vpc-ilb
+#########################################################################
+
+
+resource "google_compute_instance" "app1-vpc-ilb" {
+  project      = local.project.project_id
+  zone         = "us-central1-c"
+  name         = "app1-vpc-ilb"
+  machine_type = "f1-micro"
+  metadata_startup_script   = data.template_file.metadata_startup_script.rendered
+  metadata = {
+    enable-oslogin = true
+  }
+  boot_disk {
+    initialize_params {
+      image = "debian-11-bullseye-v20220719"
+    }
+  }
+ 
+  network_interface {
+    subnetwork         = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.name
+    subnetwork_project = local.project.project_id
+    network_ip         = "10.100.20.2"
+    # access_config {
+    #   // Ephemeral IP
+    # }
+  }
+ 
+  depends_on = [
+    time_sleep.wait_120_seconds,
+    google_compute_router_nat.nat-gw-vpc-ilb-us-c1
+    ]
+}
+
+resource "google_compute_instance" "app2-vpc-ilb" {
+  project      = local.project.project_id
+  zone         = "us-central1-f"
+  name         = "app2-vpc-ilb"
+  machine_type = "f1-micro"
+  metadata_startup_script   = data.template_file.metadata_startup_script.rendered
+  metadata = {
+    enable-oslogin = true
+  }
+  boot_disk {
+    initialize_params {
+      image = "debian-11-bullseye-v20220719"
+    }
+  }
+ 
+  network_interface {
+    subnetwork         = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.name
+    subnetwork_project = local.project.project_id
+    network_ip         = "10.100.20.3"
+    # access_config {
+    #   // Ephemeral IP
+    # }
+  }
+ 
+  depends_on = [
+    time_sleep.wait_120_seconds,
+    google_compute_router_nat.nat-gw-vpc-ilb-us-c1
     ]
 }
 
@@ -389,7 +395,7 @@ resource "google_storage_bucket_iam_binding" "binding" {
 }
 
 #########################################################################
-# Unmanaged Instance Group 
+# Unmanaged Instance Group - vpc-xlb
 #########################################################################
 
 resource "google_compute_instance_group" "ig-us-c1-content-www" {
@@ -461,6 +467,38 @@ resource "google_compute_instance_group" "ig-asia-s1-region" {
 }
 
 #########################################################################
+# Unmanaged Instance Group - vpc-ilb
+#########################################################################
+
+resource "google_compute_instance_group" "ig-ilb-us-c1-c" {
+  name        = "ig-ilb-us-c1-c"
+  description = "Unmanaged instance group created via terraform"
+  project     = local.project.project_id
+  instances = [
+    google_compute_instance.app1-vpc-ilb.self_link,
+  ]
+  named_port {
+    name = "http"
+    port = "80"
+  }
+  zone = "us-central1-c"
+}
+
+resource "google_compute_instance_group" "ig-ilb-us-c1-f" {
+  name        = "ig-ilb-us-c1-f"
+  description = "Unmanaged instance group created via terraform"
+  project     = local.project.project_id
+  instances = [
+    google_compute_instance.app2-vpc-ilb.self_link,
+  ]
+  named_port {
+    name = "http"
+    port = "80"
+  }
+  zone = "us-central1-f"
+}
+
+#########################################################################
 # Cloud Armor
 #########################################################################
 
@@ -507,7 +545,7 @@ resource "google_compute_backend_bucket" "be-http-cdn-gcs" {
 }
 
 #########################################################################
-# Global Load Balancer  - Health Check
+# L7 HTTP Load Balancer  - Health Check
 #########################################################################
 
 resource "google_compute_health_check" "http-hc" {
@@ -654,6 +692,49 @@ resource "google_compute_global_forwarding_rule" "fe-http-cross-region-cdn" {
   target     = google_compute_target_http_proxy.target-proxy-cross-region.self_link
   port_range = "80"
   project    = local.project.project_id
+}
+
+#########################################################################
+# L7 HTTP Load Balancer  - Health Check
+#########################################################################
+
+resource "google_compute_health_check" "ilb-hc" {
+  name               = "ilb-hc"
+  timeout_sec        = 1
+  check_interval_sec = 1
+  tcp_health_check {
+    port             = 80
+  }
+  project            = local.project.project_id
+}
+
+#########################################################################
+# Internal Load Balancer
+#########################################################################
+
+resource "google_compute_region_backend_service" "be-ilb" {
+  name                  = "be-ilb"
+  project               = local.project.project_id
+  region                = "us-central1"
+  backend {
+    group = google_compute_instance_group.ig-ilb-us-c1-c.self_link
+  }
+  backend {
+    group = google_compute_instance_group.ig-ilb-us-c1-f.self_link
+  }
+  health_checks         = [google_compute_health_check.ilb-hc.id]
+}
+
+resource "google_compute_forwarding_rule" "ilb" {
+  name                  = "ilb"
+  project               = local.project.project_id
+  region                = "us-central1"
+  load_balancing_scheme = "INTERNAL"
+  backend_service       = google_compute_region_backend_service.be-ilb.id
+  all_ports             = true
+  allow_global_access   = true
+  network               = google_compute_network.vpc-ilb.name
+  subnetwork            = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.name
 }
 
 #########################################################################
