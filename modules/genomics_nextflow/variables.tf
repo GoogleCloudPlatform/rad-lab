@@ -47,7 +47,8 @@ variable "nextflow_sa_roles" {
     "roles/batch.jobsAdmin",
     "roles/batch.agentReporter",
     "roles/iam.serviceAccountUser",
-    "roles/browser"
+    "roles/browser",
+    "roles/logging.viewer"
   ]
 }
 

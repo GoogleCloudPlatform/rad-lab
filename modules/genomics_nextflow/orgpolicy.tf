@@ -30,23 +30,6 @@ resource "google_project_organization_policy" "external_ip_policy" {
   ]
 }
 
-resource "google_project_organization_policy" "restrict_vpc_peering_policy" {
-  count      = var.set_restrict_vpc_peering_policy ? 1 : 0
-  constraint = "compute.restrictVpcPeering"
-  project    = local.project.project_id
-
-  list_policy {
-    allow {
-      values = [
-        "under:organizations/433637338589" // Google organization ID, where the Cloud SQL instance is created.
-      ]
-    }
-  }
-  depends_on = [
-    module.project_radlab_gen_nextflow
-  ]
-}
-
 resource "google_project_organization_policy" "shielded_vm_policy" {
   count      = var.set_shielded_vm_policy ? 1 : 0
   constraint = "compute.requireShieldedVm"
@@ -81,7 +64,6 @@ resource "time_sleep" "wait_120_seconds" {
 
   depends_on = [
     google_project_organization_policy.external_ip_policy,
-    google_project_organization_policy.restrict_vpc_peering_policy,
     google_project_organization_policy.shielded_vm_policy,
     google_project_organization_policy.trustedimage_project_policy
 

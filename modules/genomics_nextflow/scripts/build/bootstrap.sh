@@ -36,11 +36,11 @@ echo "export PATH=/usr/local/bin/nextflow:$PATH" >> /etc/profile
 echo "export NXF_EDGE=1" >> /etc/profile
 
 # Copy Config and Service files from Bucket
-gsutil cp ${BUCKET_URL}/provisioning/nextflow.config /usr/local/bin/nextflow/nextflow.config
+gsutil cp ${BUCKET_URL}/provisioning/nextflow.config /etc/nextflow.config
 
 #Delete Config file as no longer needed on the bucket
-gsutil rm ${BUCKET_URL}/provisioning/nextflow.config
 chmod -R 777 /usr/local/bin/nextflow
+chmod 777 /etc/nextflow.config
 
 
 #Run only once

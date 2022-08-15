@@ -64,11 +64,11 @@ module "project_radlab_gen_nextflow" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
-  random_project_id = false
-  folder_id         = var.folder_id
-  billing_account   = var.billing_account_id
-  org_id            = var.organization_id
+  name                    = format("%s-%s", var.project_name, local.random_id)
+  random_project_id       = false
+  folder_id               = var.folder_id
+  billing_account         = var.billing_account_id
+  org_id                  = var.organization_id
   default_service_account = "keep"
   labels = {
     vpc-network = var.network_name
@@ -89,6 +89,23 @@ resource "google_project_service" "enabled_services" {
   depends_on = [
     module.project_radlab_gen_nextflow
   ]
+}
+
+data "google_compute_default_service_account" "default" {
+  project = local.project.project_id
+  depends_on = [
+    google_project_service.enabled_services
+  ]
+}
+
+resource "google_project_iam_member" "compute_service_account_roles" {
+  for_each = toset([
+    "roles/storage.objectAdmin",
+    "roles/batch.agentReporter"
+  ])
+  project = local.project.project_id
+  role    = each.value
+  member  = "serviceAccount:${data.google_compute_default_service_account.default.email}"
 }
 
 resource "google_storage_bucket" "nextflow_workflow_bucket" {
