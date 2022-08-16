@@ -42,7 +42,8 @@ locals {
     "servicenetworking.googleapis.com",
     "iam.googleapis.com",
     "batch.googleapis.com",
-    "logging.googleapis.com"
+    "logging.googleapis.com",
+    "lifesciences.googleapis.com"
   ] : []
 }
 
