@@ -37,7 +37,9 @@ locals {
   project_services = var.enable_services ? [
     "compute.googleapis.com",
     "iap.googleapis.com",
-    "networkmanagement.googleapis.com"
+    "networkmanagement.googleapis.com",
+    "servicenetworking.googleapis.com",
+    "sqladmin.googleapis.com"
   ] : []
 }
 
@@ -76,88 +78,14 @@ resource "google_project_service" "enabled_services" {
     module.project_radlab_web_hosting
   ]
 }
-
 #########################################################################
-# Creating Cloud NATs for Egress traffic from GCE VMs in vpc-xlb
-#########################################################################
-
-resource "google_compute_router" "cr-vpc-xlb-us-c1" {
-  name    = "cr-vpc-xlb-us-c1"
-  project = local.project.project_id
-  region  = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.region
-  network = google_compute_network.vpc-xlb.id
-
-  bgp {
-    asn = 64514
-  }
-}
-
-resource "google_compute_router_nat" "nat-gw-vpc-xlb-us-c1" {
-  name                               = "nat-gw-vpc-xlb-us-c1"
-  project                            = local.project.project_id
-  router                             = google_compute_router.cr-vpc-xlb-us-c1.name
-  region                             = google_compute_router.cr-vpc-xlb-us-c1.region
-  nat_ip_allocate_option             = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-
-  log_config {
-    enable = true
-    filter = "ERRORS_ONLY"
-  }
-}
-
-resource "google_compute_router" "cr-vpc-xlb-asia-s1" {
-  name    = "cr-vpc-xlb-asia-s1"
-  project = local.project.project_id
-  region  = google_compute_subnetwork.subnetwork-vpc-xlb-asia-s1.region
-  network = google_compute_network.vpc-xlb.id
-
-  bgp {
-    asn = 64514
-  }
-}
-
-resource "google_compute_router_nat" "nat-gw-vpc-xlb-asia-s1" {
-  name                               = "nat-gw-vpc-xlb-asia-s1"
-  project                            = local.project.project_id
-  router                             = google_compute_router.cr-vpc-xlb-asia-s1.name
-  region                             = google_compute_router.cr-vpc-xlb-asia-s1.region
-  nat_ip_allocate_option             = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-
-  log_config {
-    enable = true
-    filter = "ERRORS_ONLY"
-  }
-}
-
-#########################################################################
-# Creating Cloud NATs for Egress traffic from GCE VMs in vpc-ilb
+# Service Account to connect to Cloud SQL
 #########################################################################
 
-resource "google_compute_router" "cr-vpc-ilb-us-c1" {
-  name    = "cr-vpc-ilb-us-c1"
-  project = local.project.project_id
-  region  = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.region
-  network = google_compute_network.vpc-ilb.id
-
-  bgp {
-    asn = 64514
-  }
-}
-
-resource "google_compute_router_nat" "nat-gw-vpc-ilb-us-c1" {
-  name                               = "nat-gw-vpc-ilb-us-c1"
-  project                            = local.project.project_id
-  router                             = google_compute_router.cr-vpc-ilb-us-c1.name
-  region                             = google_compute_router.cr-vpc-ilb-us-c1.region
-  nat_ip_allocate_option             = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-
-  log_config {
-    enable = true
-    filter = "ERRORS_ONLY"
-  }
+resource "google_service_account" "sa_p_cloud_sql" {
+  project  = local.project.project_id
+  account_id   = "gce-sql-sa"
+  display_name = "Service Account to connect Cloud SQL"
 }
 
 #########################################################################
@@ -182,6 +110,7 @@ resource "google_compute_instance" "web1-vpc-xlb" {
   zone         = "us-central1-a"
   name         = "web1-vpc-xlb"
   machine_type = "f1-micro"
+  allow_stopping_for_update = true
   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
   metadata = {
     enable-oslogin = true
@@ -200,6 +129,11 @@ resource "google_compute_instance" "web1-vpc-xlb" {
     #   // Ephemeral IP
     # }
   }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.sa_p_cloud_sql.email
+    scopes = ["cloud-platform"]
+  }
  
   depends_on = [
     time_sleep.wait_120_seconds,
@@ -212,6 +146,7 @@ resource "google_compute_instance" "web2-vpc-xlb" {
   zone         = "us-central1-b"
   name         = "web2-vpc-xlb"
   machine_type = "f1-micro"
+  allow_stopping_for_update = true
   metadata_startup_script   = data.template_file.metadata_startup_script_video.rendered
   metadata = {
     enable-oslogin = true
@@ -230,7 +165,12 @@ resource "google_compute_instance" "web2-vpc-xlb" {
     #   // Ephemeral IP
     # }
   }
- 
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.sa_p_cloud_sql.email
+    scopes = ["cloud-platform"]
+  }
+
   depends_on = [
     time_sleep.wait_120_seconds,
     google_compute_router_nat.nat-gw-vpc-xlb-us-c1
@@ -242,6 +182,7 @@ resource "google_compute_instance" "web3-vpc-xlb" {
   zone         = "us-central1-f"
   name         = "web3-vpc-xlb"
   machine_type = "f1-micro"
+  allow_stopping_for_update = true
   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
   metadata = {
     enable-oslogin = true
@@ -260,7 +201,12 @@ resource "google_compute_instance" "web3-vpc-xlb" {
     #   // Ephemeral IP
     # }
   }
- 
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.sa_p_cloud_sql.email
+    scopes = ["cloud-platform"]
+  }
+  
   depends_on = [
     time_sleep.wait_120_seconds,
     google_compute_router_nat.nat-gw-vpc-xlb-us-c1
@@ -272,6 +218,7 @@ resource "google_compute_instance" "web4-vpc-xlb" {
   zone         = "asia-south1-c"
   name         = "web4-vpc-xlb"
   machine_type = "f1-micro"
+  allow_stopping_for_update = true
   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
   metadata = {
     enable-oslogin = true
@@ -290,7 +237,12 @@ resource "google_compute_instance" "web4-vpc-xlb" {
     #   // Ephemeral IP
     # }
   }
- 
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.sa_p_cloud_sql.email
+    scopes = ["cloud-platform"]
+  }
+
   depends_on = [
     time_sleep.wait_120_seconds,
     google_compute_router_nat.nat-gw-vpc-xlb-asia-s1
@@ -307,6 +259,7 @@ resource "google_compute_instance" "app1-vpc-ilb" {
   zone         = "us-central1-c"
   name         = "app1-vpc-ilb"
   machine_type = "f1-micro"
+  allow_stopping_for_update = true
   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
   metadata = {
     enable-oslogin = true
@@ -325,7 +278,12 @@ resource "google_compute_instance" "app1-vpc-ilb" {
     #   // Ephemeral IP
     # }
   }
- 
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.sa_p_cloud_sql.email
+    scopes = ["cloud-platform"]
+  }
+
   depends_on = [
     time_sleep.wait_120_seconds,
     google_compute_router_nat.nat-gw-vpc-ilb-us-c1
@@ -337,6 +295,7 @@ resource "google_compute_instance" "app2-vpc-ilb" {
   zone         = "us-central1-f"
   name         = "app2-vpc-ilb"
   machine_type = "f1-micro"
+  allow_stopping_for_update = true
   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
   metadata = {
     enable-oslogin = true
@@ -355,7 +314,12 @@ resource "google_compute_instance" "app2-vpc-ilb" {
     #   // Ephemeral IP
     # }
   }
- 
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.sa_p_cloud_sql.email
+    scopes = ["cloud-platform"]
+  }
+
   depends_on = [
     time_sleep.wait_120_seconds,
     google_compute_router_nat.nat-gw-vpc-ilb-us-c1
@@ -760,4 +724,10 @@ resource "google_project_iam_member" "trusted_user_group_role3" {
   project  = local.project.project_id
   member   = each.value
   role     = "roles/viewer"
+}
+
+resource "google_project_iam_member" "sa_p_cloud_sql_permissions" {
+  project  = local.project.project_id
+  role     = "roles/cloudsql.client"
+  member   = format("serviceAccount:%s@%s.iam.gserviceaccount.com", google_service_account.sa_p_cloud_sql.account_id,local.project.project_id)
 }

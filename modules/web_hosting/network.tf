@@ -175,3 +175,111 @@ resource "google_compute_firewall" "fw-vpc-ilb-allow-iap-ssh" {
   }
   source_ranges = ["35.235.240.0/20"]
 }
+
+
+#########################################################################
+# Creating Cloud NATs for Egress traffic from GCE VMs in vpc-xlb
+#########################################################################
+
+resource "google_compute_router" "cr-vpc-xlb-us-c1" {
+  name    = "cr-vpc-xlb-us-c1"
+  project = local.project.project_id
+  region  = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.region
+  network = google_compute_network.vpc-xlb.id
+
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat-gw-vpc-xlb-us-c1" {
+  name                               = "nat-gw-vpc-xlb-us-c1"
+  project                            = local.project.project_id
+  router                             = google_compute_router.cr-vpc-xlb-us-c1.name
+  region                             = google_compute_router.cr-vpc-xlb-us-c1.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
+resource "google_compute_router" "cr-vpc-xlb-asia-s1" {
+  name    = "cr-vpc-xlb-asia-s1"
+  project = local.project.project_id
+  region  = google_compute_subnetwork.subnetwork-vpc-xlb-asia-s1.region
+  network = google_compute_network.vpc-xlb.id
+
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat-gw-vpc-xlb-asia-s1" {
+  name                               = "nat-gw-vpc-xlb-asia-s1"
+  project                            = local.project.project_id
+  router                             = google_compute_router.cr-vpc-xlb-asia-s1.name
+  region                             = google_compute_router.cr-vpc-xlb-asia-s1.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
+#########################################################################
+# Creating Cloud NATs for Egress traffic from GCE VMs in vpc-ilb
+#########################################################################
+
+resource "google_compute_router" "cr-vpc-ilb-us-c1" {
+  name    = "cr-vpc-ilb-us-c1"
+  project = local.project.project_id
+  region  = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.region
+  network = google_compute_network.vpc-ilb.id
+
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat-gw-vpc-ilb-us-c1" {
+  name                               = "nat-gw-vpc-ilb-us-c1"
+  project                            = local.project.project_id
+  router                             = google_compute_router.cr-vpc-ilb-us-c1.name
+  region                             = google_compute_router.cr-vpc-ilb-us-c1.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
+#########################################################################
+# Enable Private Service Connect in vpc-xlb
+#########################################################################
+
+resource "google_compute_global_address" "psconnect_private_ip_alloc" {
+  name          = "psconnect-ip-range"
+  address_type  = "INTERNAL"
+  purpose       = "VPC_PEERING"
+  prefix_length = 24
+  network       = google_compute_network.vpc-xlb.id
+  project       = local.project.project_id
+
+  depends_on = [
+    google_project_service.enabled_services
+  ]
+}
+
+
+resource "google_service_networking_connection" "psconnect" {
+  network                 = google_compute_network.vpc-xlb.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.psconnect_private_ip_alloc.name]
+}
