@@ -231,7 +231,8 @@ resource "google_notebooks_instance" "workbench" {
     proxy-mode = "mail"
   }
   depends_on = [
-    time_sleep.wait_120_seconds
+    time_sleep.wait_120_seconds,
+    google_project_service.enabled_services
     ]
 }
 
