@@ -93,11 +93,11 @@ resource "google_service_account" "sa_p_cloud_sql" {
 #########################################################################
 
 data "template_file" "metadata_startup_script" {
-    template = "${file("./scripts/build/webapp.sh")}"
+    template = "${file("./scripts/build/startup_scripts/web_server/webapp.sh")}"
 }
 
 data "template_file" "metadata_startup_script_video" {
-    template = "${file("./scripts/build/video_webapp.sh")}"
+    template = "${file("./scripts/build/startup_scripts/web_server/video_webapp.sh")}"
 }
 
 #########################################################################
@@ -699,35 +699,4 @@ resource "google_compute_forwarding_rule" "ilb" {
   allow_global_access   = true
   network               = google_compute_network.vpc-ilb.name
   subnetwork            = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.name
-}
-
-#########################################################################
-# IAM - Trusted User/Group
-#########################################################################
-
-resource "google_project_iam_member" "trusted_user_group_role1" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/iap.tunnelResourceAccessor"
-}
-
-resource "google_project_iam_member" "trusted_user_group_role2" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/compute.instanceAdmin.v1"
-}
-
-resource "google_project_iam_member" "trusted_user_group_role3" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/viewer"
-}
-
-resource "google_project_iam_member" "sa_p_cloud_sql_permissions" {
-  project  = local.project.project_id
-  role     = "roles/cloudsql.client"
-  member   = format("serviceAccount:%s@%s.iam.gserviceaccount.com", google_service_account.sa_p_cloud_sql.account_id,local.project.project_id)
 }
