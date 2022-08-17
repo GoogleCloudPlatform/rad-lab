@@ -238,7 +238,7 @@ resource "google_notebooks_instance" "workbench" {
 resource "google_storage_bucket" "user_scripts_bucket" {
   project                     = local.project.project_id
   name                        = join("", ["user-scripts-", local.project.project_id])
-  location                    = "US"
+  location                    = local.region
   force_destroy               = true
   uniform_bucket_level_access = true
 

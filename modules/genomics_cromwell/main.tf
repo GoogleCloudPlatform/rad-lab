@@ -91,7 +91,7 @@ resource "google_project_service" "enabled_services" {
 
 resource "google_storage_bucket" "cromwell_workflow_bucket" {
   name                        = "${local.project.project_id}-cromwell-wf-exec"
-  location                    = var.default_region
+  location                    = local.region
   force_destroy               = true
   uniform_bucket_level_access = true
   project                     = local.project.project_id

@@ -112,7 +112,7 @@ resource "google_project_iam_binding" "genomics_ngs_user_role2" {
 resource "google_storage_bucket" "input_bucket" {
   project                     = module.project_radlab_genomics.project_id
   name                        = join("", ["ngs-input-bucket-", local.random_id])
-  location                    = "EU"
+  location                    = local.region
   uniform_bucket_level_access = true
   force_destroy               = true
 }
@@ -126,7 +126,7 @@ resource "google_storage_bucket_iam_binding" "binding1" {
 resource "google_storage_bucket" "output_bucket" {
   project                     = module.project_radlab_genomics.project_id
   name                        = join("", ["ngs-output-bucket-", local.random_id])
-  location                    = "EU"
+  location                    = local.region
   uniform_bucket_level_access = true
   force_destroy               = true
 }
@@ -141,7 +141,7 @@ resource "google_storage_bucket_iam_binding" "binding2" {
 resource "google_storage_bucket" "source_code_bucket" {
   project                     = module.project_radlab_genomics.project_id
   name                        = join("", ["radlab-source-code-bucket-", local.random_id])
-  location                    = "EU"
+  location                    = local.region
   uniform_bucket_level_access = true
 }
 
@@ -164,7 +164,7 @@ resource "google_cloudfunctions_function" "function" {
   description           = "Cloud function that uses dsub to execute pipeline jobs using lifesciences api in GCP."
   project               = module.project_radlab_genomics.project_id
   runtime               = "python38"
-  region                = var.region
+  region                = local.region
   ingress_settings      = "ALLOW_INTERNAL_AND_GCLB"
   available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.source_code_bucket.name
@@ -187,7 +187,7 @@ resource "google_cloudfunctions_function" "function" {
     GCS_OUTPUT_BUCKET = join("", ["gs://", google_storage_bucket.output_bucket.name])
     GCS_LOG_LOCATION  = join("", ["gs://", google_storage_bucket.output_bucket.name, "/logs"])
     CONTAINER_IMAGE   = join("", ["gcr.io/", module.project_radlab_genomics.project_id, "/fastqc:latest"])
-    REGION            = var.region
+    REGION            = local.region
     NETWORK           = module.vpc_ngs.network_name
     SUBNETWORK        = module.vpc_ngs.subnets_names.0
     ZONES             = var.zone
