@@ -140,8 +140,14 @@ variable "project_name" {
   default     = "radlab-genomics-cromwell"
 }
 
+variable "use_random_id" {
+  description = "Set it to true to add a suffix of 4 random characters to the `project_id`."
+  type        = bool
+  default     = true
+}
+
 variable "random_id" {
-  description = "Adds a suffix of 4 random characters to the `project_id`"
+  description = "Suffix of 4 random characters to the `project_id`"
   type        = string
   default     = null
 }
@@ -169,4 +175,3 @@ variable "set_trustedimage_project_policy" {
   type        = bool
   default     = true
 }
-

@@ -16,7 +16,7 @@
 
 locals {
   random_id                  = var.random_id != null ? var.random_id : random_id.random_id.hex
-  radlab_genomics_project_id = format("%s-%s", var.project_name, local.random_id)
+  radlab_genomics_project_id = var.use_random_id ? format("%s-%s", var.project_name, local.random_id) : var.project_name
   region                     = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   ngs_sa_project_roles = [

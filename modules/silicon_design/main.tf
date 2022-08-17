@@ -70,7 +70,7 @@ module "project_radlab_silicon_design" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
+  name              = var.use_random_id ? format("%s-%s", var.project_name, local.random_id) : var.project_name
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
