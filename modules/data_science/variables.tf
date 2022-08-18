@@ -49,6 +49,12 @@ variable "create_project" {
   default     = true
 }
 
+variable "create_usermanaged_notebook" {
+  description = "Set to true if you want to create user managed workbench notebooks. If you want to create google managed workbench notebook, set this variable to false."
+  type        = bool
+  default     = true
+}
+
 variable "container_image_repository" {
   description = "Container Image Repo, only set if creating container image notebook instance by setting `create_container_image` variable to true"
   type        = string
@@ -122,9 +128,9 @@ variable "network_name" {
 }
 
 variable "notebook_count" {
-  description = "Number of AI Notebooks requested"
-  type        = string
-  default     = "1"
+  description = "Number of AI Notebooks requested."
+  type        = number
+  default     = 1
 }
 
 variable "organization_id" {
@@ -178,5 +184,5 @@ variable "trusted_users" {
 variable "zone" {
   description = "Cloud Zone associated to the AI Notebooks"
   type        = string
-  default     = "us-east4-c"
+  default     = "us-central1-c"
 }

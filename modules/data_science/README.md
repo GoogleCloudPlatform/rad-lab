@@ -105,6 +105,7 @@ module "existing_project_and_network" {
 | *create_container_image* | If the notebook needs to have image type as Container set this variable to true, set it to false when using dafault image type i.e. VM. | <code title="">bool</code> |  | <code title="">false</code> |
 | *create_network* | If the module has to be deployed in an existing network, set this variable to false. | <code title="">bool</code> |  | <code title="">true</code> |
 | *create_project* | Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false. | <code title="">bool</code> |  | <code title="">true</code> |
+| *create_usermanaged_notebook* | Set to true if you want to create user managed workbench notebooks. If you want to create google managed workbench notebook, set this variable to false. | <code title="">bool</code> |  | <code title="">true</code> |
 | *enable_gpu_driver* | Install GPU driver on the instance | <code title="">bool</code> |  | <code title="">false</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false. | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node.  | <code title="">string</code> |  | <code title=""></code> |
@@ -115,7 +116,7 @@ module "existing_project_and_network" {
 | *ip_cidr_range* | Unique IP CIDR Range for AI Notebooks subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
 | *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-1</code> |
 | *network_name* | Name of the network to be created. | <code title="">string</code> |  | <code title="">ai-notebook</code> |
-| *notebook_count* | Number of AI Notebooks requested | <code title="">string</code> |  | <code title="">1</code> |
+| *notebook_count* | Number of AI Notebooks requested. | <code title="">number</code> |  | <code title="">1</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
 | *project_name* | Project name or ID, if it's an existing project. | <code title="">string</code> |  | <code title="">radlab-data-science</code> |
 | *random_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
@@ -124,15 +125,16 @@ module "existing_project_and_network" {
 | *set_trustedimage_project_policy* | Apply org policy to set the trusted image projects. | <code title="">bool</code> |  | <code title="">true</code> |
 | *subnet_name* | Name of the subnet where to deploy the Notebooks. | <code title="">string</code> |  | <code title="">subnet-ai-notebook</code> |
 | *trusted_users* | The list of trusted users. | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
-| *zone* | Cloud Zone associated to the AI Notebooks | <code title="">string</code> |  | <code title="">us-east4-c</code> |
+| *zone* | Cloud Zone associated to the AI Notebooks | <code title="">string</code> |  | <code title="">us-central1-c</code> |
 
 ## Outputs
 
 | name | description | sensitive |
 |---|---|:---:|
 | deployment_id | RADLab Module Deployment ID |  |
-| notebooks-instance-names | Notebook Instance Names |  |
-| project-radlab-ds-analytics-id | Analytics Project ID |  |
+| notebooks-googlemanaged-names | Google Managed Notebook Instance Names |  |
+| notebooks-usermanaged-names | User Managed Notebook Instance Names |  |
+| project_id | Analytics Project ID |  |
 | user-scripts-bucket-uri | User Script Bucket URI |  |
 <!-- END TFDOC -->
 
