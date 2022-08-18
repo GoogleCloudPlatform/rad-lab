@@ -15,7 +15,7 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  random_id = var.random_id != null ? var.random_id : random_id.default.0.hex
   project = (var.create_project
     ? try(module.project_radlab_ds_analytics.0, null)
     : try(data.google_project.existing_project.0, null)
@@ -51,6 +51,7 @@ locals {
 }
 
 resource "random_id" "default" {
+  count       = var.random_id == null ? 1 : 0
   byte_length = 2
 }
 
@@ -103,7 +104,7 @@ data "google_compute_subnetwork" "default" {
 }
 
 module "vpc_ai_notebook" {
-  count   = var.create_network ? 1 : 0
+  count   = var.create_network && var.create_usermanaged_notebook ? 1 : 0
   source  = "terraform-google-modules/network/google"
   version = "~> 5.0"
 
@@ -155,31 +156,31 @@ resource "google_project_iam_member" "sa_p_notebook_permissions" {
   role     = each.value
 }
 
-resource "google_service_account_iam_member" "sa_ai_notebook_user_iam" {
+resource "google_service_account_iam_member" "sa_ai_notebook_iam" {
   for_each           = var.trusted_users
   member             = each.value
   role               = "roles/iam.serviceAccountUser"
   service_account_id = google_service_account.sa_p_notebook.id
 }
 
-resource "google_project_iam_member" "ai_notebook_user_role1" {
+resource "google_project_iam_member" "module_role1" {
   for_each = var.trusted_users
   project  = local.project.project_id
   member   = each.value
   role     = "roles/notebooks.admin"
 }
 
-resource "google_project_iam_member" "ai_notebook_user_role2" {
+resource "google_project_iam_member" "module_role2" {
   for_each = var.trusted_users
   project  = local.project.project_id
   member   = each.value
   role     = "roles/viewer"
 }
 
-resource "google_notebooks_instance" "ai_notebook" {
-  count        = var.notebook_count
+resource "google_notebooks_instance" "ai_notebook_usermanaged" {
+  count        = (var.notebook_count > 0 ? true : false) && var.create_usermanaged_notebook ? var.notebook_count : 0
   project      = local.project.project_id
-  name         = "notebooks-instance-${count.index}"
+  name         = "usermanaged-notebooks-${count.index + 1}"
   location     = var.zone
   machine_type = var.machine_type
 
@@ -195,24 +196,24 @@ resource "google_notebooks_instance" "ai_notebook" {
     for_each = var.create_container_image ? [1] : []
     content {
       repository = var.container_image_repository
-      tag = var.container_image_tag
+      tag        = var.container_image_tag
     }
   }
 
   install_gpu_driver = var.enable_gpu_driver
 
-  dynamic "accelerator_config"{
+  dynamic "accelerator_config" {
     for_each = var.enable_gpu_driver ? [1] : []
     content {
-      type         = var.gpu_accelerator_type
-      core_count   = var.gpu_accelerator_core_count
+      type       = var.gpu_accelerator_type
+      core_count = var.gpu_accelerator_core_count
     }
   }
 
   service_account = google_service_account.sa_p_notebook.email
 
-  boot_disk_type     = var.boot_disk_type
-  boot_disk_size_gb  = var.boot_disk_size_gb
+  boot_disk_type    = var.boot_disk_type
+  boot_disk_size_gb = var.boot_disk_size_gb
 
   no_public_ip    = false
   no_proxy_access = false
@@ -220,7 +221,7 @@ resource "google_notebooks_instance" "ai_notebook" {
   network = local.network.self_link
   subnet  = local.subnet.self_link
 
-  post_startup_script = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name,google_storage_bucket_object.notebook_post_startup_script.name)
+  post_startup_script = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name, google_storage_bucket_object.notebook_post_startup_script.name)
 
   labels = {
     module = "data-science"
@@ -233,7 +234,51 @@ resource "google_notebooks_instance" "ai_notebook" {
   depends_on = [
     time_sleep.wait_120_seconds,
     google_storage_bucket_object.notebooks
-    ]
+  ]
+}
+
+resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
+  count        = (var.notebook_count > 0 ? true : false) && !var.create_usermanaged_notebook ? var.notebook_count : 0
+  name         = "googlemanaged-notebooks-${count.index + 1}"
+  project      = local.project.project_id
+  location     = local.region
+  access_config {
+    access_type = "SERVICE_ACCOUNT"
+    runtime_owner = google_service_account.sa_p_notebook.email
+  }
+  software_config {
+    post_startup_script = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name, google_storage_bucket_object.notebook_post_startup_script.name)
+    post_startup_script_behavior = "RUN_EVERY_START"
+  }
+  virtual_machine {
+    virtual_machine_config {
+      machine_type = var.machine_type
+      dynamic "container_images" {
+        for_each = var.create_container_image ? [1] : []
+        content {
+          repository = var.container_image_repository
+          tag        = var.container_image_tag
+        }
+      }
+      data_disk {
+        initialize_params {
+          disk_size_gb = var.boot_disk_size_gb
+          disk_type = var.boot_disk_type
+        }
+      }
+      dynamic "accelerator_config" {
+        for_each = var.enable_gpu_driver ? [1] : []
+        content {
+          type       = var.gpu_accelerator_type
+          core_count = var.gpu_accelerator_core_count
+        }
+      }
+    }
+  }
+  depends_on = [
+    time_sleep.wait_120_seconds,
+    google_storage_bucket_object.notebooks
+  ]
 }
 
 resource "google_storage_bucket" "user_scripts_bucket" {

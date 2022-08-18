@@ -19,14 +19,19 @@ output "deployment_id" {
   value       = local.random_id
 }
 
-output "project-radlab-ds-analytics-id" {
+output "project_id" {
   description = "Analytics Project ID"
   value       = local.project.project_id
 }
 
-output "notebooks-instance-names" {
-  description = "Notebook Instance Names"
-  value       = join(", ", google_notebooks_instance.ai_notebook[*].name)
+output "notebooks-usermanaged-names" {
+  description = "User Managed Notebook Instance Names"
+  value       = join(", ", google_notebooks_instance.ai_notebook_usermanaged[*].name)
+}
+
+output "notebooks-googlemanaged-names" {
+  description = "Google Managed Notebook Instance Names"
+  value       = join(", ", google_notebooks_runtime.ai_notebook_googlemanaged[*].name)
 }
 
 output "user-scripts-bucket-uri" {
