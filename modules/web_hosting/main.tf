@@ -39,7 +39,8 @@ locals {
     "iap.googleapis.com",
     "networkmanagement.googleapis.com",
     "servicenetworking.googleapis.com",
-    "sqladmin.googleapis.com"
+    "sqladmin.googleapis.com",
+    "dns.googleapis.com"
   ] : []
 }
 
@@ -699,4 +700,33 @@ resource "google_compute_forwarding_rule" "ilb" {
   allow_global_access   = true
   network               = google_compute_network.vpc-ilb.name
   subnetwork            = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.name
+}
+
+#########################################################################
+# Cloud DNS to the External LB IP
+#########################################################################
+
+resource "google_dns_managed_zone" "radlab-zone" {
+  name     = "radlab-zone"
+  dns_name = format("radlab%s.mydomain.com.", local.random_id)
+  project  = local.project.project_id
+}
+
+resource "google_dns_record_set" "a-record" {
+  name = "${google_dns_managed_zone.radlab-zone.dns_name}"
+  type = "A"
+  ttl  = 300
+
+  managed_zone = google_dns_managed_zone.radlab-zone.name
+  project  = local.project.project_id
+  rrdatas = [google_compute_global_forwarding_rule.fe-http-content-based.ip_address]
+}
+
+resource "google_dns_record_set" "cname" {
+  name         = "www.${google_dns_managed_zone.radlab-zone.dns_name}"
+  managed_zone = google_dns_managed_zone.radlab-zone.name
+  type         = "CNAME"
+  ttl          = 300
+  project      = local.project.project_id
+  rrdatas      = toset([format("radlab%s.mydomain.com.", local.random_id)])
 }
