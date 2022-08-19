@@ -29,6 +29,11 @@ output "workbench-instance-names" {
   value       = join(", ", google_notebooks_instance.workbench[*].name)
 }
 
+output "workbench-instance-locations" {
+  description = "Vertex AI Workbench Names"
+  value       = join(", ", google_notebooks_instance.workbench[*].location)
+}
+
 output "user-scripts-bucket-uri" {
   description = "User Script Bucket URI"
   value       = google_storage_bucket.user_scripts_bucket.self_link

@@ -29,14 +29,19 @@ output "notebooks-usermanaged-names" {
   value       = join(", ", google_notebooks_instance.ai_notebook_usermanaged[*].name)
 }
 
+output "notebooks-usermanaged-locations" {
+  description = "User Managed Notebook Instance Names"
+  value       = join(", ", google_notebooks_instance.ai_notebook_usermanaged[*].location)
+}
+
 output "notebooks-googlemanaged-names" {
   description = "Google Managed Notebook Instance Names"
   value       = join(", ", google_notebooks_runtime.ai_notebook_googlemanaged[*].name)
 }
 
-output "notebooks-instance-locations" {
-  description = "Notebook Instance Locations"
-  value       = join(", ", google_notebooks_instance.ai_notebook[*].location)
+output "notebooks-googlemanaged-locations" {
+  description = "Google Managed Notebook Instance Names"
+  value       = join(", ", google_notebooks_runtime.ai_notebook_googlemanaged[*].location)
 }
 
 output "user-scripts-bucket-uri" {

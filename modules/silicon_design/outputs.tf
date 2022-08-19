@@ -29,6 +29,11 @@ output "notebooks_instance_names" {
   value       = join(", ", google_notebooks_instance.ai_notebook[*].name)
 }
 
+output "notebooks_instance_locations" {
+  description = "Notebook Instance Names"
+  value       = join(", ", google_notebooks_instance.ai_notebook[*].location)
+}
+
 output "notebooks_bucket_name" {
   description = "Notebooks GCS Bucket Name"
   value       = google_storage_bucket.notebooks_bucket.name
