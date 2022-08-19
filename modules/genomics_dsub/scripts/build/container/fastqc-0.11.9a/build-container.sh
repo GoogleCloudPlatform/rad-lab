@@ -17,5 +17,5 @@
 PROJECT_ID=$1
 REGION=$2
 
-gcloud config set project ${PROJECT_ID}
-gcloud builds submit . --config ./scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml --substitutions=_REGION="$REGION"
+gcloud config set project "${PROJECT_ID}"
+gcloud builds submit . --config ./scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml --region="$REGION" --substitutions=_REGION="$REGION"

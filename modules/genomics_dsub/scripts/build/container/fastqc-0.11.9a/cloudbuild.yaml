@@ -15,5 +15,5 @@
 # [START cloudbuild_quickstart_build]
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/fastqc', '-f', './scripts/build/container/fastqc-0.11.9a/Dockerfile', '.']
-images: ['${_REGION}-docker.pkg.dev/${PROJECT_ID}/fastqc:latest']
+  args: ['build', '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/fastqc/fastqc', '-f', './scripts/build/container/fastqc-0.11.9a/Dockerfile', '.']
+images: ['${_REGION}-docker.pkg.dev/${PROJECT_ID}/fastqc/fastqc:latest']

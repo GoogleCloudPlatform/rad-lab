@@ -25,7 +25,8 @@ locals {
     "roles/storage.admin",
     "roles/lifesciences.serviceAgent",
     "roles/lifesciences.workflowsRunner",
-    "roles/iam.serviceAccountUser"
+    "roles/iam.serviceAccountUser",
+    "roles/artifactregistry.reader"
   ]
 
 }
@@ -52,6 +53,9 @@ module "project_radlab_genomics" {
     "lifesciences.googleapis.com",
     "cloudfunctions.googleapis.com",
     "cloudbuild.googleapis.com",
+    "eventarc.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "run.googleapis.com"
   ]
 }
 
@@ -158,45 +162,94 @@ resource "google_storage_bucket_object" "archive" {
 }
 
 # Create cloud functions from source code (Zip) stored in Bucket #
+data "google_storage_project_service_account" "gcs_sa" {
+  project = module.project_radlab_genomics.project_id
 
-resource "google_cloudfunctions_function" "function" {
-  name                  = "ngs-qc-fastqc-fn"
-  description           = "Cloud function that uses dsub to execute pipeline jobs using lifesciences api in GCP."
-  project               = module.project_radlab_genomics.project_id
-  runtime               = "python38"
-  region                = local.region
-  ingress_settings      = "ALLOW_INTERNAL_AND_GCLB"
-  available_memory_mb   = 256
-  source_archive_bucket = google_storage_bucket.source_code_bucket.name
-  source_archive_object = google_storage_bucket_object.archive.name
-  timeout               = 60
-  entry_point           = "ngs_qc_trigger"
-  service_account_email = google_service_account.sa_p_ngs.email
+  depends_on = [
+    # See https://github.com/hashicorp/terraform/issues/29555
+    module.project_radlab_genomics.project_id
+  ]
+}
 
-  labels = {
-    my-label = "my-label-value"
+resource "google_project_iam_member" "gcs_sa_pubsub_publisher" {
+  project = module.project_radlab_genomics.project_id
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:${data.google_storage_project_service_account.gcs_sa.email_address}"
+}
+
+resource "time_sleep" "wait_30_seconds" {
+  depends_on = [google_project_iam_member.sa_p_ngs_permissions]
+
+  create_duration = "30s"
+}
+
+resource "google_cloudfunctions2_function" "function" {
+  provider    = google-beta
+  name        = "ngs-qc-fastqc-fn"
+  description = "Cloud function that uses dsub to execute pipeline jobs using lifesciences api in GCP."
+  project     = module.project_radlab_genomics.project_id
+  location    = local.region
+
+  build_config {
+    runtime     = "python38"
+    entry_point = "ngs_qc_trigger"
+    source {
+      storage_source {
+        bucket = google_storage_bucket.source_code_bucket.name
+        object = google_storage_bucket_object.archive.name
+      }
+    }
+  }
+
+  service_config {
+    available_memory      = "256M"
+    timeout_seconds       = 60
+    service_account_email = google_service_account.sa_p_ngs.email
+    ingress_settings      = "ALLOW_INTERNAL_AND_GCLB"
+    environment_variables = {
+      GCP_PROJECT       = module.project_radlab_genomics.project_id
+      GCS_OUTPUT_BUCKET = join("", ["gs://", google_storage_bucket.output_bucket.name])
+      GCS_LOG_LOCATION  = join("", ["gs://", google_storage_bucket.output_bucket.name, "/logs"])
+      CONTAINER_IMAGE   = join("", ["${local.region}-docker.pkg.dev/", module.project_radlab_genomics.project_id, "/fastqc/fastqc:latest"])
+      REGION            = local.region
+      NETWORK           = module.vpc_ngs.network_name
+      SUBNETWORK        = module.vpc_ngs.subnets_names.0
+      ZONES             = var.zone
+      DISK_SIZE         = var.boot_disk_size_gb
+      SERVICE_ACCOUNT   = google_service_account.sa_p_ngs.email
+    }
   }
 
   event_trigger {
-    event_type = "google.storage.object.finalize"
-    resource   = google_storage_bucket.input_bucket.name
+    event_type = "google.cloud.storage.object.v1.finalized"
+    event_filters {
+      attribute = "bucket"
+      value     = google_storage_bucket.input_bucket.name
+    }
   }
 
-  environment_variables = {
-    GCP_PROJECT       = module.project_radlab_genomics.project_id
-    GCS_OUTPUT_BUCKET = join("", ["gs://", google_storage_bucket.output_bucket.name])
-    GCS_LOG_LOCATION  = join("", ["gs://", google_storage_bucket.output_bucket.name, "/logs"])
-    CONTAINER_IMAGE   = join("", ["${local.region}-docker.pkg.dev/", module.project_radlab_genomics.project_id, "/fastqc:latest"])
-    REGION            = local.region
-    NETWORK           = module.vpc_ngs.network_name
-    SUBNETWORK        = module.vpc_ngs.subnets_names.0
-    ZONES             = var.zone
-    DISK_SIZE         = var.boot_disk_size_gb
-    SERVICE_ACCOUNT   = google_service_account.sa_p_ngs.email
+  depends_on = [
+    google_project_iam_member.sa_p_ngs_permissions,
+    time_sleep.wait_30_seconds,
+    google_project_iam_member.gcs_sa_pubsub_publisher
+  ]
+}
+
+# Locally build container for bioinformatics tool and push to artifact registry #
+resource "google_artifact_registry_repository" "fastqc" {
+  project       = module.project_radlab_genomics.project_id
+  location      = var.region
+  repository_id = "fastqc"
+  format        = "DOCKER"
+}
+
+resource "null_resource" "create_cloudbuild_bucket" {
+  provisioner "local-exec" {
+    working_dir = "${path.module}/scripts"
+    command     = "./create-cloud-build-bucket.sh ${module.project_radlab_genomics.project_id} ${local.region}"
   }
 }
 
-# Locally build container for bioinformatics tool and push to container registry #
 resource "null_resource" "build_and_push_image" {
   triggers = {
     cloudbuild_yaml_sha = sha1(file("${path.module}/scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml"))
@@ -208,4 +261,9 @@ resource "null_resource" "build_and_push_image" {
     working_dir = path.module
     command     = "${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh ${module.project_radlab_genomics.project_id} ${local.region}"
   }
+
+  depends_on = [
+    google_artifact_registry_repository.fastqc,
+    null_resource.create_cloudbuild_bucket
+  ]
 }
