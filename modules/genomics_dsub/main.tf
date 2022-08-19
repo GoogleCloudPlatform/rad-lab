@@ -186,7 +186,7 @@ resource "google_cloudfunctions_function" "function" {
     GCP_PROJECT       = module.project_radlab_genomics.project_id
     GCS_OUTPUT_BUCKET = join("", ["gs://", google_storage_bucket.output_bucket.name])
     GCS_LOG_LOCATION  = join("", ["gs://", google_storage_bucket.output_bucket.name, "/logs"])
-    CONTAINER_IMAGE   = join("", ["gcr.io/", module.project_radlab_genomics.project_id, "/fastqc:latest"])
+    CONTAINER_IMAGE   = join("", ["${local.region}-docker.pkg.dev/", module.project_radlab_genomics.project_id, "/fastqc:latest"])
     REGION            = local.region
     NETWORK           = module.vpc_ngs.network_name
     SUBNETWORK        = module.vpc_ngs.subnets_names.0
@@ -206,6 +206,6 @@ resource "null_resource" "build_and_push_image" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh ${module.project_radlab_genomics.project_id}"
+    command     = "${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh ${module.project_radlab_genomics.project_id} ${local.region}"
   }
 }
