@@ -49,7 +49,7 @@ locals {
     "artifactregistry.googleapis.com",
   ] : []
 
-  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-design-notebook-${i}"]
+  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count) : "silicon-design-notebook-${i}"]
 }
 
 resource "random_id" "default" {
@@ -173,7 +173,7 @@ resource "google_project_iam_member" "ai_notebook_user_role1" {
 
 resource "google_project_iam_member" "ai_notebook_user_role2" {
   for_each = var.trusted_users
-  project  = local.project.project_id  
+  project  = local.project.project_id
   member   = each.value
   role     = "roles/viewer"
 }
@@ -242,6 +242,13 @@ resource "google_storage_bucket" "notebooks_bucket" {
 
 
 # Locally build container for notebook container and push to container registry #
+resource "null_resource" "create_cloudbuild_bucket" {
+  provisioner "local-exec" {
+    working_dir = path.module
+    command     = "scripts/build/create-cloud-build-bucket.sh ${local.project.project_id} ${local.region}"
+  }
+}
+
 resource "null_resource" "build_and_push_image" {
   triggers = {
     cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/cloudbuild.yaml")
@@ -258,5 +265,6 @@ resource "null_resource" "build_and_push_image" {
   depends_on = [
     google_artifact_registry_repository.containers_repo,
     google_storage_bucket.notebooks_bucket,
+    null_resource.create_cloudbuild_bucket
   ]
 }
