@@ -233,7 +233,8 @@ resource "google_notebooks_instance" "ai_notebook_usermanaged" {
   }
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_storage_bucket_object.notebooks
+    google_storage_bucket_object.notebooks,
+    google_project_service.enabled_services
   ]
 }
 
@@ -277,7 +278,8 @@ resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
   }
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_storage_bucket_object.notebooks
+    google_storage_bucket_object.notebooks,
+    google_project_service.enabled_services
   ]
 }
 
