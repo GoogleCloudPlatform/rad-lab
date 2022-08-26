@@ -90,24 +90,23 @@ resource "google_project_service" "enabled_services" {
   ]
 }
 
-resource "google_project_service" "notebooks" {
-  project                    = local.project.project_id
-  service                    = "notebooks.googleapis.com"
-  disable_dependent_services = true
-  disable_on_destroy         = true
-
-  depends_on = [
-    google_project_service.enabled_services
-  ]
-}
-
 resource "time_sleep" "wait_enabled_services" {
   depends_on = [
     google_project_service.enabled_services,
-    google_project_service.notebooks
   ]
 
   create_duration = "120s"
+}
+
+resource "google_project_service" "notebooks" {
+  project                    = local.project.project_id
+  service                    = "notebooks.googleapis.com"
+  disable_dependent_services = false
+  disable_on_destroy         = false
+
+  depends_on = [
+    time_sleep.wait_enabled_services
+  ]
 }
 
 data "google_compute_network" "default" {
@@ -253,7 +252,7 @@ resource "google_notebooks_instance" "ai_notebook_usermanaged" {
   }
   depends_on = [
     time_sleep.wait_120_seconds,
-    time_sleep.wait_enabled_services,
+    google_project_service.notebooks,
     google_storage_bucket_object.notebooks,
   ]
 }
@@ -298,7 +297,7 @@ resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
   }
   depends_on = [
     time_sleep.wait_120_seconds,
-    time_sleep.wait_enabled_services,
+    google_project_service.notebooks,
     google_storage_bucket_object.notebooks,
   ]
 }
