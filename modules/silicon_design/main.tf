@@ -91,6 +91,14 @@ resource "google_project_service" "enabled_services" {
   ]
 }
 
+resource "time_sleep" "wait_enabled_services" {
+  depends_on = [
+    google_project_service.enabled_services,
+  ]
+
+  create_duration = "120s"
+}
+
 data "google_compute_network" "default" {
   count   = var.create_network ? 0 : 1
   project = local.project.project_id
@@ -140,7 +148,7 @@ module "vpc_ai_notebook" {
   ]
 
   depends_on = [
-    google_project_service.enabled_services
+    time_sleep.wait_enabled_services
   ]
 }
 
@@ -214,6 +222,7 @@ resource "google_notebooks_instance" "ai_notebook" {
   }
   depends_on = [
     time_sleep.wait_120_seconds,
+    time_sleep.wait_enabled_services,
     null_resource.build_and_push_image,
   ]
 }
@@ -228,7 +237,7 @@ resource "google_artifact_registry_repository" "containers_repo" {
   format        = "DOCKER"
 
   depends_on = [
-    google_project_service.enabled_services
+    time_sleep.wait_enabled_services
   ]
 }
 

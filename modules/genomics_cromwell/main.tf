@@ -89,6 +89,14 @@ resource "google_project_service" "enabled_services" {
   ]
 }
 
+resource "time_sleep" "wait_enabled_services" {
+  depends_on = [
+    google_project_service.enabled_services,
+  ]
+
+  create_duration = "120s"
+}
+
 resource "google_storage_bucket" "cromwell_workflow_bucket" {
   name                        = "${local.project.project_id}-cromwell-wf-exec"
   location                    = local.region
@@ -102,6 +110,10 @@ resource "google_storage_bucket" "cromwell_workflow_bucket" {
     response_header = ["*"]
     max_age_seconds = 3600
   }
+
+  depends_on = [
+    time_sleep.wait_enabled_services
+  ]
 }
 
 resource "google_storage_bucket_object" "config" {
@@ -130,6 +142,7 @@ resource "google_storage_bucket_object" "bootstrap" {
     BUCKET_URL       = google_storage_bucket.cromwell_workflow_bucket.url
   })
 }
+
 resource "google_storage_bucket_object" "service" {
   name   = "provisioning/cromwell.service"
   source = "scripts/build/cromwell.service"

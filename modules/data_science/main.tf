@@ -90,6 +90,14 @@ resource "google_project_service" "enabled_services" {
   ]
 }
 
+resource "time_sleep" "wait_enabled_services" {
+  depends_on = [
+    google_project_service.enabled_services,
+  ]
+
+  create_duration = "120s"
+}
+
 data "google_compute_network" "default" {
   count   = var.create_network ? 0 : 1
   project = local.project.project_id
@@ -244,23 +252,22 @@ resource "google_notebooks_instance" "ai_notebook_usermanaged" {
   }
   depends_on = [
     time_sleep.wait_120_seconds,
+    time_sleep.wait_enabled_services,
     google_storage_bucket_object.notebooks,
-    google_project_service.enabled_services,
-    google_project_service.notebooks
   ]
 }
 
 resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
-  count        = (var.notebook_count > 0 ? true : false) && !var.create_usermanaged_notebook ? var.notebook_count : 0
-  name         = "googlemanaged-notebooks-${count.index + 1}"
-  project      = local.project.project_id
-  location     = local.region
+  count    = (var.notebook_count > 0 ? true : false) && !var.create_usermanaged_notebook ? var.notebook_count : 0
+  name     = "googlemanaged-notebooks-${count.index + 1}"
+  project  = local.project.project_id
+  location = local.region
   access_config {
-    access_type = "SERVICE_ACCOUNT"
+    access_type   = "SERVICE_ACCOUNT"
     runtime_owner = google_service_account.sa_p_notebook.email
   }
   software_config {
-    post_startup_script = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name, google_storage_bucket_object.notebook_post_startup_script.name)
+    post_startup_script          = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name, google_storage_bucket_object.notebook_post_startup_script.name)
     post_startup_script_behavior = "RUN_EVERY_START"
   }
   virtual_machine {
@@ -276,7 +283,7 @@ resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
       data_disk {
         initialize_params {
           disk_size_gb = var.boot_disk_size_gb
-          disk_type = var.boot_disk_type
+          disk_type    = var.boot_disk_type
         }
       }
       dynamic "accelerator_config" {
@@ -290,8 +297,8 @@ resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
   }
   depends_on = [
     time_sleep.wait_120_seconds,
+    time_sleep.wait_enabled_services,
     google_storage_bucket_object.notebooks,
-    google_project_service.enabled_services
   ]
 }
 

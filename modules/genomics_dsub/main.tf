@@ -177,10 +177,10 @@ resource "google_project_iam_member" "gcs_sa_pubsub_publisher" {
   member  = "serviceAccount:${data.google_storage_project_service_account.gcs_sa.email_address}"
 }
 
-resource "time_sleep" "wait_30_seconds" {
+resource "time_sleep" "wait_permissions" {
   depends_on = [google_project_iam_member.sa_p_ngs_permissions]
 
-  create_duration = "30s"
+  create_duration = "120s"
 }
 
 resource "google_cloudfunctions2_function" "function" {
@@ -229,8 +229,7 @@ resource "google_cloudfunctions2_function" "function" {
   }
 
   depends_on = [
-    google_project_iam_member.sa_p_ngs_permissions,
-    time_sleep.wait_30_seconds,
+    time_sleep.wait_permissions,
     google_project_iam_member.gcs_sa_pubsub_publisher
   ]
 }

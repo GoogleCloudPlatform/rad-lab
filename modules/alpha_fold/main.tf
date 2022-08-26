@@ -89,6 +89,14 @@ resource "google_project_service" "enabled_services" {
   ]
 }
 
+resource "time_sleep" "wait_enabled_services" {
+  depends_on = [
+    google_project_service.enabled_services,
+  ]
+
+  create_duration = "120s"
+}
+
 data "google_compute_network" "default" {
   count   = var.create_network ? 0 : 1
   project = local.project.project_id
@@ -195,24 +203,24 @@ resource "google_notebooks_instance" "workbench" {
     for_each = var.create_container_image ? [1] : []
     content {
       repository = var.container_image_repository
-      tag = var.container_image_tag
+      tag        = var.container_image_tag
     }
   }
 
   install_gpu_driver = var.enable_gpu_driver
 
-  dynamic "accelerator_config"{
+  dynamic "accelerator_config" {
     for_each = var.enable_gpu_driver ? [1] : []
     content {
-      type         = var.gpu_accelerator_type
-      core_count   = var.gpu_accelerator_core_count
+      type       = var.gpu_accelerator_type
+      core_count = var.gpu_accelerator_core_count
     }
   }
 
   service_account = google_service_account.sa_p_workbench.email
 
-  boot_disk_type     = var.boot_disk_type
-  boot_disk_size_gb  = var.boot_disk_size_gb
+  boot_disk_type    = var.boot_disk_type
+  boot_disk_size_gb = var.boot_disk_size_gb
 
   no_public_ip    = false
   no_proxy_access = false
@@ -220,7 +228,7 @@ resource "google_notebooks_instance" "workbench" {
   network = local.network.self_link
   subnet  = local.subnet.self_link
 
-  post_startup_script = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name,google_storage_bucket_object.workbench_post_startup_script.name)
+  post_startup_script = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name, google_storage_bucket_object.workbench_post_startup_script.name)
 
   labels = {
     module = "alpha-fold"
@@ -232,8 +240,8 @@ resource "google_notebooks_instance" "workbench" {
   }
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_project_service.enabled_services
-    ]
+    time_sleep.wait_enabled_services
+  ]
 }
 
 resource "google_storage_bucket" "user_scripts_bucket" {
