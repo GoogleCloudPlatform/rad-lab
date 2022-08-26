@@ -177,6 +177,17 @@ resource "google_project_iam_member" "module_role2" {
   role     = "roles/viewer"
 }
 
+resource "google_project_service" "notebooks" {
+  project                    = local.project.project_id
+  service                    = "notebooks.googleapis.com"
+  disable_dependent_services = true
+  disable_on_destroy         = true
+
+  depends_on = [
+    google_project_service.enabled_services
+  ]
+}
+
 resource "google_notebooks_instance" "ai_notebook_usermanaged" {
   count        = (var.notebook_count > 0 ? true : false) && var.create_usermanaged_notebook ? var.notebook_count : 0
   project      = local.project.project_id
@@ -234,7 +245,8 @@ resource "google_notebooks_instance" "ai_notebook_usermanaged" {
   depends_on = [
     time_sleep.wait_120_seconds,
     google_storage_bucket_object.notebooks,
-    google_project_service.enabled_services
+    google_project_service.enabled_services,
+    google_project_service.notebooks
   ]
 }
 
