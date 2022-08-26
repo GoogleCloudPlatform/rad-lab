@@ -90,9 +90,21 @@ resource "google_project_service" "enabled_services" {
   ]
 }
 
+resource "google_project_service" "notebooks" {
+  project                    = local.project.project_id
+  service                    = "notebooks.googleapis.com"
+  disable_dependent_services = true
+  disable_on_destroy         = true
+
+  depends_on = [
+    google_project_service.enabled_services
+  ]
+}
+
 resource "time_sleep" "wait_enabled_services" {
   depends_on = [
     google_project_service.enabled_services,
+    google_project_service.notebooks
   ]
 
   create_duration = "120s"
@@ -183,17 +195,6 @@ resource "google_project_iam_member" "module_role2" {
   project  = local.project.project_id
   member   = each.value
   role     = "roles/viewer"
-}
-
-resource "google_project_service" "notebooks" {
-  project                    = local.project.project_id
-  service                    = "notebooks.googleapis.com"
-  disable_dependent_services = true
-  disable_on_destroy         = true
-
-  depends_on = [
-    google_project_service.enabled_services
-  ]
 }
 
 resource "google_notebooks_instance" "ai_notebook_usermanaged" {
