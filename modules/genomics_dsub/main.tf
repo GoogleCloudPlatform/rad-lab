@@ -124,7 +124,7 @@ resource "google_storage_bucket" "input_bucket" {
 resource "google_storage_bucket_iam_binding" "binding1" {
   bucket  = google_storage_bucket.input_bucket.name
   role    = "roles/storage.admin"
-  members = var.trusted_users
+  members = setunion(["serviceAccount:${google_service_account.sa_p_ngs.email}"], var.trusted_users)
 }
 
 resource "google_storage_bucket" "output_bucket" {
@@ -138,7 +138,7 @@ resource "google_storage_bucket" "output_bucket" {
 resource "google_storage_bucket_iam_binding" "binding2" {
   bucket  = google_storage_bucket.output_bucket.name
   role    = "roles/storage.admin"
-  members = var.trusted_users
+  members = setunion(["serviceAccount:${google_service_account.sa_p_ngs.email}"], var.trusted_users)
 }
 
 # Bucket to store Cloud functions #
@@ -230,7 +230,9 @@ resource "google_cloudfunctions2_function" "function" {
 
   depends_on = [
     time_sleep.wait_permissions,
-    google_project_iam_member.gcs_sa_pubsub_publisher
+    google_project_iam_member.gcs_sa_pubsub_publisher,
+    google_storage_bucket_iam_binding.binding1,
+    google_storage_bucket_iam_binding.binding2
   ]
 }
 
