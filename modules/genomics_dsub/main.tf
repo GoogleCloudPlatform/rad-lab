@@ -26,7 +26,9 @@ locals {
     "roles/lifesciences.serviceAgent",
     "roles/lifesciences.workflowsRunner",
     "roles/iam.serviceAccountUser",
-    "roles/artifactregistry.reader"
+    "roles/artifactregistry.reader",
+    "roles/run.invoker",
+    "roles/eventarc.eventReceiver"
   ]
 
 }
@@ -124,7 +126,7 @@ resource "google_storage_bucket" "input_bucket" {
 resource "google_storage_bucket_iam_binding" "binding1" {
   bucket  = google_storage_bucket.input_bucket.name
   role    = "roles/storage.admin"
-  members = setunion(["serviceAccount:${google_service_account.sa_p_ngs.email}"], var.trusted_users)
+  members = var.trusted_users
 }
 
 resource "google_storage_bucket" "output_bucket" {
@@ -138,7 +140,7 @@ resource "google_storage_bucket" "output_bucket" {
 resource "google_storage_bucket_iam_binding" "binding2" {
   bucket  = google_storage_bucket.output_bucket.name
   role    = "roles/storage.admin"
-  members = setunion(["serviceAccount:${google_service_account.sa_p_ngs.email}"], var.trusted_users)
+  members = var.trusted_users
 }
 
 # Bucket to store Cloud functions #
@@ -177,8 +179,25 @@ resource "google_project_iam_member" "gcs_sa_pubsub_publisher" {
   member  = "serviceAccount:${data.google_storage_project_service_account.gcs_sa.email_address}"
 }
 
+resource "google_storage_bucket_iam_member" "sa_p_ngs_input_bucket" {
+  bucket = google_storage_bucket.input_bucket.name
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${google_service_account.sa_p_ngs.email}"
+}
+
+resource "google_storage_bucket_iam_member" "sa_p_ngs_output_bucket" {
+  bucket = google_storage_bucket.output_bucket.name
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${google_service_account.sa_p_ngs.email}"
+}
+
 resource "time_sleep" "wait_permissions" {
-  depends_on = [google_project_iam_member.sa_p_ngs_permissions]
+  depends_on = [
+    google_project_iam_member.gcs_sa_pubsub_publisher,
+    google_project_iam_member.sa_p_ngs_permissions,
+    google_storage_bucket_iam_member.sa_p_ngs_input_bucket,
+    google_storage_bucket_iam_member.sa_p_ngs_output_bucket
+  ]
 
   create_duration = "120s"
 }
@@ -230,9 +249,6 @@ resource "google_cloudfunctions2_function" "function" {
 
   depends_on = [
     time_sleep.wait_permissions,
-    google_project_iam_member.gcs_sa_pubsub_publisher,
-    google_storage_bucket_iam_binding.binding1,
-    google_storage_bucket_iam_binding.binding2
   ]
 }
 
