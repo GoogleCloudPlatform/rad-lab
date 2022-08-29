@@ -137,3 +137,22 @@ variable "zone" {
   type        = string
   default     = "europe-west2-*"
 }
+
+variable "currency_code" {
+  description = "Currency code"
+  type = string
+}
+
+variable "amount" {
+  description = "Budget amount"
+}
+
+variable "owner" {
+  description = "Scientist, who owns the project"
+  type = string
+}
+
+variable "manager" {
+  description = "Manager, who approved project creation"
+  type = string
+}

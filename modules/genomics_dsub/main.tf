@@ -276,3 +276,57 @@ resource "null_resource" "build_and_push_image" {
     null_resource.create_cloudbuild_bucket
   ]
 }
+
+resource "google_billing_budget" "budget" {
+  billing_account = var.billing_account_id
+  display_name    = "Billing Budget"
+
+  budget_filter {
+    projects = ["projects/${var.project_name}"]
+  }
+
+  amount {
+    specified_amount {
+      currency_code = var.currency_code
+      units         = var.amount
+    }
+  }
+
+  threshold_rules {
+    threshold_percent = 1.0
+  }
+  threshold_rules {
+    threshold_percent = 0.9
+  }
+  threshold_rules {
+    treshhold_percent = 0.5
+  }
+  threshold_rules {
+    treshhold_percent = 0.25
+  }
+
+  all_updates_rule {
+    monitoring_notification_channels = [
+      google_monitoring_notification_channel.notification_channel.id,
+    ]
+    disable_default_iam_recipients = true
+  }
+}
+
+resource "google_monitoring_notification_channel" "scientist_notification_channel" {
+  display_name = "Budget Notification Channel for scientist"
+  type         = "email"
+
+  labels = {
+    email_address = var.owner
+  }
+}
+
+resource "google_monitoring_notification_channel" "manager_notification_channel" {
+  display_name = "Budget Notification Channel for manager"
+  type         = "email"
+
+  labels = {
+    email_address = var.manager
+  }
+}
