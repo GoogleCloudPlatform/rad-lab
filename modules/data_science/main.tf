@@ -95,7 +95,7 @@ resource "time_sleep" "wait_enabled_services" {
     google_project_service.enabled_services,
   ]
 
-  create_duration = "1440s"
+  create_duration = "1200s"
 }
 
 data "google_compute_network" "default" {
