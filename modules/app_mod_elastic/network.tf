@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,8 @@ module "elastic_search_network" {
 
   depends_on = [
     module.elastic_search_project,
-    google_project_service.enabled_services
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds
   ]
 }
 
