@@ -31,7 +31,7 @@ Add below 2 tags in the Argolis Common Problems TF solution specific README.md f
 
 Example:
 
-```python3 tfdoc.py ./../common-problems-solutions/tf_solution_1```
+```python3 tfdoc.py ./../modules/data_science```
 
 ## 2. License Boilderplate
 
