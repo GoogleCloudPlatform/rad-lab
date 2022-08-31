@@ -20,6 +20,15 @@ PROJECT_ID=$1
 REPOSITORY_LOCATION=$2
 REPOSITORY_ID=$3
 NOTEBOOKS_BUCKET=$4
+SERVICE_ACCOUNT=$5
 
-gcloud config set project ${PROJECT_ID}
-gcloud builds submit . --config ./scripts/build/cloudbuild.yaml --substitutions "_REPOSITORY_LOCATION=${REPOSITORY_LOCATION},_REPOSITORY_ID=${REPOSITORY_ID},_NOTEBOOKS_BUCKET=${NOTEBOOKS_BUCKET}"
+if [ -n "${SERVICE_ACCOUNT}" ] 
+then
+    echo "SERVICE_ACCOUNT is set to a non-empty string"
+    gcloud config set project ${PROJECT_ID}
+    gcloud builds submit . --config ./scripts/build/cloudbuild.yaml --impersonate-service-account=${SERVICE_ACCOUNT} --substitutions "_REPOSITORY_LOCATION=${REPOSITORY_LOCATION},_REPOSITORY_ID=${REPOSITORY_ID},_NOTEBOOKS_BUCKET=${NOTEBOOKS_BUCKET}"
+else
+    echo "SERVICE_ACCOUNT is set to an empty string"
+    gcloud config set project ${PROJECT_ID}
+    gcloud builds submit . --config ./scripts/build/cloudbuild.yaml --substitutions "_REPOSITORY_LOCATION=${REPOSITORY_LOCATION},_REPOSITORY_ID=${REPOSITORY_ID},_NOTEBOOKS_BUCKET=${NOTEBOOKS_BUCKET}"
+fi
