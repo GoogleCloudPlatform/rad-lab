@@ -50,7 +50,7 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
 
    * [Organization ID](https://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id)
 
-   NOTE: If you like to spin up a RAD Lab module in a GCP project without any **Organization**, make sure to disable _orgpolicy.tf_ under `modules/[MODULE-NAME]/` either by deleting it or by manually setting the default value of Orgpolicy variables (example: _set_shielded_vm_policy_ & _set_vpc_peering_policy_ in [app_mod_elastic module](../modules/app_mod_elastic) in _variables.tf_ under `modules/[MODULE-NAME]/` to **false**
+   NOTE: If you like to spin up a RAD Lab module in a GCP project without any **Organization**, make sure to disable _orgpolicy.tf_ under `modules/[MODULE-NAME]/` either by manually setting the default value of Orgpolicy variables (example: _set_shielded_vm_policy_ & _set_vpc_peering_policy_ in [app_mod_elastic module](../modules/app_mod_elastic) in _variables.tf_ under `modules/[MODULE-NAME]/` to **false**
 
    * [Billing Account](https://cloud.google.com/billing/docs/how-to/manage-billing-account) for RAD Lab deployments (projects/resources).
    * [OPTIONAL] [Folder ID](https://cloud.google.com/resource-manager/docs/creating-managing-folders#view) to deploy the module in an existing folder.
