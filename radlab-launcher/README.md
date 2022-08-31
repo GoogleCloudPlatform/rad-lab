@@ -58,7 +58,7 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
 
 ### IAM Permissions Prerequisites
 
-In addition to the [module](../../modules) specific minimum [IAM](https://cloud.google.com/iam/docs/overview) permissions (listed in Each [module](../../modules)'s `README.md`), entity deploying RAD Lab modules via **RAD Lab Launcher** will also need to have below permission:
+In addition to the [module](../modules) specific minimum [IAM](https://cloud.google.com/iam/docs/overview) permissions (listed in Each [module](../modules)'s `README.md`), entity deploying RAD Lab modules via **RAD Lab Launcher** will also need to have below permission:
 - Parent: `roles/iam.organizationRoleViewer` [OPTIONAL: This permission is not required if *no parent (organization/folder)* exists]
 - RAD Lab Management Project: `roles/storage.admin`
 - RAD Lab Management Project: `roles/serviceusage.serviceUsageConsumer`
@@ -66,7 +66,7 @@ In addition to the [module](../../modules) specific minimum [IAM](https://cloud.
 You can use the Google Cloud Console to [view](https://cloud.google.com/iam/docs/manage-access-other-resources) or [change](https://cloud.google.com/iam/docs/manage-access-other-resources#single-role) IAM permissions.
 
 ## Deploy a RAD Lab Module
-**If you encounter errors during deployment, please see [Troubleshooting Common Problems](../../docs/TROUBLESHOOTING.md) section for a list of common problems and fixes.**  If you don't see a solution listed, please create an [Issue](https://github.com/GoogleCloudPlatform/rad-lab/issues). 
+**If you encounter errors during deployment, please see [Troubleshooting Common Problems](../docs/TROUBLESHOOTING.md) section for a list of common problems and fixes.**  If you don't see a solution listed, please create an [Issue](https://github.com/GoogleCloudPlatform/rad-lab/issues). 
 
 
 1. Navigate to the RAD Lab Launcher folder from the main directory:
