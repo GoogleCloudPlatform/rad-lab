@@ -42,6 +42,11 @@ output "workbench_instance_names" {
 
 output "workbench_instance_urls" {
   description = "Vertex AI Workbench Notebook URLS"
-  value       = join(", ", google_notebooks_instance.workbench[*].proxy_uri)
+  value       = formatlist("https://%s", google_notebooks_instance.workbench[*].proxy_uri)
+  
+  depends_on = [
+    null_resource.workbench_provisioning_state
+  ]
+
 }
 

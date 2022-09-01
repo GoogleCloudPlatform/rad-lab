@@ -220,6 +220,15 @@ resource "google_notebooks_instance" "ai_notebook" {
   ]
 }
 
+resource "null_resource" "ai_notebook_provisioning_state" {
+  for_each = toset(google_notebooks_instance.ai_notebook[*].name)
+  provisioner "local-exec" {
+    command = "while [ \"$(gcloud notebooks instances list --location ${var.zone} --project ${local.project.project_id} --filter 'NAME:${each.value} AND STATE:ACTIVE' --format 'value(STATE)' | wc -l | xargs)\" != 1 ]; do echo \"${each.value} not active yet.\"; done"
+  }
+
+  depends_on = [google_notebooks_instance.ai_notebook]
+}
+
 resource "google_artifact_registry_repository" "containers_repo" {
   provider = google-beta
 

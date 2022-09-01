@@ -47,7 +47,11 @@ output "notebook_instance_names" {
 
 output "notebook_urls" {
   description = "URLs for the notebook that was created in this module."
-  value       = join(", ", google_notebooks_instance.ai_notebook[*].proxy_uri)
+  value       = formatlist("https://%s", google_notebooks_instance.ai_notebook[*].proxy_uri)
+  
+  depends_on = [
+    null_resource.ai_notebook_provisioning_state
+  ]
 }
 
 output "artifact_registry_repository_id" {
