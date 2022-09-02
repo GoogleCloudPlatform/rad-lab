@@ -18,11 +18,11 @@ create_project = false
 
 # Prefix for the project ID, if creating new GCP project in RAD Lab deployment using above variable. 
 # GCP Project ID of existing project, if using existing GCP project in RAD Lab deployment using above variable. 
-project_name = "radlab-project"
+project_id_prefix = "radlab-project"
 
 # Random ID a.k.a. Deployment ID for the RAD Lab Deployment. 
 # Only set it when either Updating or Deleting the existing deployment.
-# This will be added as suffix of 4 random characters to the `project_name` when creating the deployment.
+# This will be added as suffix of 4 random characters to the `project_id_prefix` when creating the deployment.
 random_id = "abc1"
 
 # When you have already se the below Orgpolicies set it below variables to false.

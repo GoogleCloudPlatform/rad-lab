@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ module "cromwell_mysql_db" {
 
   database_version = "MYSQL_8_0"
   region           = local.region
-  zone             = var.default_zone
+  zone             = var.zone
   tier             = var.cromwell_db_tier
 
   additional_databases = [{ name = "cromwell", collation = "", charset = "" }]
@@ -52,5 +52,5 @@ module "cromwell_mysql_db" {
   }
 
   // Optional: used to enforce ordering in the creation of resources.
-  module_depends_on = [module.private-service-access.peering_completed]
+  module_depends_on = [google_service_networking_connection.private_service_access]
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,26 @@
  */
 
 locals {
-  random_id                  = var.random_id != null ? var.random_id : random_id.random_id.hex
-  radlab_genomics_project_id = format("%s-%s", var.project_name, local.random_id)
+  random_id                  = var.deployment_id != null ? var.deployment_id : random_id.random_id.hex
   region                     = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
+  
+  project = (var.create_project
+    ? try(module.project_radlab_genomics.0, null)
+    : try(data.google_project.existing_project.0, null)
+  )
 
+  network = (
+    var.create_network
+    ? try(module.vpc_ngs.0.network.network, null)
+    : try(data.google_compute_network.default.0, null)
+  )
+
+  subnet = (
+    var.create_network
+    ? try(module.vpc_ngs.0.subnets["${local.region}/${var.subnet}"], null)
+    : try(data.google_compute_subnetwork.default.0, null)
+  )
+  
   ngs_sa_project_roles = [
     "roles/compute.instanceAdmin",
     "roles/storage.objectViewer",
@@ -27,6 +43,13 @@ locals {
     "roles/lifesciences.workflowsRunner",
     "roles/iam.serviceAccountUser"
   ]
+
+  project_services = var.enable_services ? [
+    "compute.googleapis.com",
+    "lifesciences.googleapis.com",
+    "cloudfunctions.googleapis.com",
+    "cloudbuild.googleapis.com"
+  ] : []
 
 }
 
@@ -38,28 +61,55 @@ resource "random_id" "random_id" {
 # GENOMICS PROJECT #
 #####################
 
+data "google_project" "existing_project" {
+  count      = var.create_project ? 0 : 1
+  project_id = var.project_id_prefix
+}
+
 module "project_radlab_genomics" {
+  count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = local.radlab_genomics_project_id
+  name              = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
   org_id            = var.organization_id
-  activate_apis = [
-    "compute.googleapis.com",
-    "lifesciences.googleapis.com",
-    "cloudfunctions.googleapis.com",
-    "cloudbuild.googleapis.com",
+  activate_apis = []
+}
+
+resource "google_project_service" "enabled_services" {
+  for_each                   = toset(local.project_services)
+  project                    = local.project.project_id
+  service                    = each.value
+  disable_dependent_services = true
+  disable_on_destroy         = true
+
+  depends_on = [
+    module.project_radlab_genomics
   ]
 }
 
+data "google_compute_network" "default" {
+  count   = var.create_network ? 0 : 1
+  project = local.project.project_id
+  name    = var.network
+}
+
+data "google_compute_subnetwork" "default" {
+  count   = var.create_network ? 0 : 1
+  project = local.project.project_id
+  name    = var.subnet
+  region  = local.region
+}
+
 module "vpc_ngs" {
+  count   = var.create_network ? 1 : 0
   source  = "terraform-google-modules/network/google"
   version = "~> 5.0"
 
-  project_id   = module.project_radlab_genomics.project_id
+  project_id   = local.project.project_id
   network_name = var.network
   routing_mode = "GLOBAL"
   description  = "VPC Network created via Terraform"
@@ -73,46 +123,52 @@ module "vpc_ngs" {
       subnet_private_access = true
     }
   ]
+  
+  depends_on = [
+    module.project_radlab_genomics,
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds
+  ]
 
 }
 
 resource "google_service_account" "sa_p_ngs" {
-  project      = module.project_radlab_genomics.project_id
+  project      = local.project.project_id
   account_id   = format("sa-p-ngs-%s", local.random_id)
   display_name = "NGS in trusted environment"
 }
 
 resource "google_project_iam_member" "sa_p_ngs_permissions" {
   for_each = toset(local.ngs_sa_project_roles)
-  project  = module.project_radlab_genomics.project_id
+  project  = local.project.project_id
   member   = "serviceAccount:${google_service_account.sa_p_ngs.email}"
   role     = each.value
 }
 
-resource "google_service_account_iam_member" "sa_ngs_user_iam" {
-  for_each           = var.trusted_users
+resource "google_service_account_iam_member" "sa_ngs_iam" {
+  for_each           = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   member             = each.value
   role               = "roles/iam.serviceAccountUser"
   service_account_id = google_service_account.sa_p_ngs.id
 }
 
-resource "google_project_iam_binding" "genomics_ngs_user_role1" {
-  project = module.project_radlab_genomics.project_id
-  members = var.trusted_users
+resource "google_project_iam_binding" "module_role1" {
+  project = local.project.project_id
+  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   role    = "roles/storage.admin"
 }
 
-resource "google_project_iam_binding" "genomics_ngs_user_role2" {
-  project = module.project_radlab_genomics.project_id
-  members = var.trusted_users
+resource "google_project_iam_binding" "module_role2" {
+  project = local.project.project_id
+  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   role    = "roles/viewer"
 }
 
 # Bucket to store sequence inputs and processed outputs #
 resource "google_storage_bucket" "input_bucket" {
-  project                     = module.project_radlab_genomics.project_id
+  project                     = local.project.project_id
   name                        = join("", ["ngs-input-bucket-", local.random_id])
-  location                    = "EU"
+  location                    = local.region
   uniform_bucket_level_access = true
   force_destroy               = true
 }
@@ -120,13 +176,13 @@ resource "google_storage_bucket" "input_bucket" {
 resource "google_storage_bucket_iam_binding" "binding1" {
   bucket  = google_storage_bucket.input_bucket.name
   role    = "roles/storage.admin"
-  members = var.trusted_users
+  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
 }
 
 resource "google_storage_bucket" "output_bucket" {
-  project                     = module.project_radlab_genomics.project_id
+  project                     = local.project.project_id
   name                        = join("", ["ngs-output-bucket-", local.random_id])
-  location                    = "EU"
+  location                    = local.region
   uniform_bucket_level_access = true
   force_destroy               = true
 }
@@ -134,14 +190,14 @@ resource "google_storage_bucket" "output_bucket" {
 resource "google_storage_bucket_iam_binding" "binding2" {
   bucket  = google_storage_bucket.output_bucket.name
   role    = "roles/storage.admin"
-  members = var.trusted_users
+  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
 }
 
 # Bucket to store Cloud functions #
 resource "google_storage_bucket" "source_code_bucket" {
-  project                     = module.project_radlab_genomics.project_id
+  project                     = local.project.project_id
   name                        = join("", ["radlab-source-code-bucket-", local.random_id])
-  location                    = "EU"
+  location                    = local.region
   uniform_bucket_level_access = true
 }
 
@@ -162,9 +218,9 @@ resource "google_storage_bucket_object" "archive" {
 resource "google_cloudfunctions_function" "function" {
   name                  = "ngs-qc-fastqc-fn"
   description           = "Cloud function that uses dsub to execute pipeline jobs using lifesciences api in GCP."
-  project               = module.project_radlab_genomics.project_id
+  project               = local.project.project_id
   runtime               = "python38"
-  region                = var.region
+  region                = local.region
   ingress_settings      = "ALLOW_INTERNAL_AND_GCLB"
   available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.source_code_bucket.name
@@ -183,13 +239,13 @@ resource "google_cloudfunctions_function" "function" {
   }
 
   environment_variables = {
-    GCP_PROJECT       = module.project_radlab_genomics.project_id
+    GCP_PROJECT       = local.project.project_id
     GCS_OUTPUT_BUCKET = join("", ["gs://", google_storage_bucket.output_bucket.name])
     GCS_LOG_LOCATION  = join("", ["gs://", google_storage_bucket.output_bucket.name, "/logs"])
-    CONTAINER_IMAGE   = join("", ["gcr.io/", module.project_radlab_genomics.project_id, "/fastqc:latest"])
-    REGION            = var.region
-    NETWORK           = module.vpc_ngs.network_name
-    SUBNETWORK        = module.vpc_ngs.subnets_names.0
+    CONTAINER_IMAGE   = join("", ["gcr.io/", local.project.project_id, "/fastqc:latest"])
+    REGION            = local.region
+    NETWORK           = local.network.self_link
+    SUBNETWORK        = local.subnet.self_link
     ZONES             = var.zone
     DISK_SIZE         = var.boot_disk_size_gb
     SERVICE_ACCOUNT   = google_service_account.sa_p_ngs.email
@@ -206,6 +262,7 @@ resource "null_resource" "build_and_push_image" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh ${module.project_radlab_genomics.project_id}"
+    command     = "bash ${path.module}/scripts/build/container/fastqc-0.11.9a/build-container.sh ${local.project.project_id} ${var.resource_creator_identity}"
+
   }
 }

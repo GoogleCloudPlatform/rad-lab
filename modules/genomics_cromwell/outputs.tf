@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-output "project_id" {
-  description = "Project ID where resources where created"
-  value       = local.project.project_id
+output "billing_budget_budget_id" {
+  sensitive   = true
+  description = "Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}`"
+  value       = var.create_budget ? google_billing_budget.budget[0].name : ""
 }
+
 output "cromwell_server_instance_id" {
   description = "VM instance name running the Cromwell server"
   value       = google_compute_instance.cromwell_server.name
 }
+
 output "cromwell_server_zone" {
   description = "Google Cloud zone in which the server was provisioned"
-  value       = var.default_zone
+  value       = var.zone
 }
-output "cromell_server_internal_IP" {
+
+output "cromwell_server_internal_ip" {
   description = "Cromwell server private IP address"
   value       = google_compute_instance.cromwell_server.network_interface[0].network_ip
 }
@@ -36,13 +40,18 @@ output "cromwell_service_account_email" {
   value       = module.cromwell_service_account.email
 }
 
-output "GCS_Bucket_URL" {
+output "gcs_bucket_url" {
   description = "Google Cloud Storage Bucket configured for workflow execution"
   value       = google_storage_bucket.cromwell_workflow_bucket.url
 }
 
 output "gcloud_iap_command" {
   description = "To connect to the Cromwell server using Identity Aware Proxy, run the following command"
-  value       = "gcloud compute start-iap-tunnel ${google_compute_instance.cromwell_server.name} 8000 --local-host-port=localhost:8080 --zone=${var.default_zone} --project ${local.project.project_id}"
+  value       = "gcloud compute start-iap-tunnel ${google_compute_instance.cromwell_server.name} 8000 --local-host-port=localhost:8080 --zone=${var.zone} --project ${local.project.project_id}"
+}
+
+output "project_id" {
+  description = "Project ID where resources where created"
+  value       = local.project.project_id
 }
 

@@ -15,23 +15,23 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.0.hex
-  project = (var.create_project
-    ? try(module.project_radlab_ds_analytics.0, null)
-    : try(data.google_project.existing_project.0, null)
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
+  project   = (var.create_project
+  ? try(module.project_radlab_ds_analytics.0, null)
+  : try(data.google_project.existing_project.0, null)
   )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   network = (
-    var.create_network
-    ? try(module.vpc_ai_notebook.0.network.network, null)
-    : try(data.google_compute_network.default.0, null)
+  var.create_network
+  ? try(module.vpc_ai_notebook.0.network.network, null)
+  : try(data.google_compute_network.default.0, null)
   )
 
   subnet = (
-    var.create_network
-    ? try(module.vpc_ai_notebook.0.subnets["${local.region}/${var.subnet_name}"], null)
-    : try(data.google_compute_subnetwork.default.0, null)
+  var.create_network
+  ? try(module.vpc_ai_notebook.0.subnets["${local.region}/${var.subnet_name}"], null)
+  : try(data.google_compute_subnetwork.default.0, null)
   )
 
   notebook_sa_project_roles = [
@@ -51,7 +51,7 @@ locals {
 }
 
 resource "random_id" "default" {
-  count       = var.random_id == null ? 1 : 0
+  count       = var.deployment_id == null ? 1 : 0
   byte_length = 2
 }
 
@@ -61,7 +61,7 @@ resource "random_id" "default" {
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  project_id = var.project_id_prefix
 }
 
 module "project_radlab_ds_analytics" {
@@ -69,7 +69,7 @@ module "project_radlab_ds_analytics" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
+  name              = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
@@ -131,15 +131,19 @@ module "vpc_ai_notebook" {
       ranges      = ["10.0.0.0/8"]
       direction   = "INGRESS"
 
-      allow = [{
-        protocol = "tcp"
-        ports    = ["0-65535"]
-      }]
+      allow = [
+        {
+          protocol = "tcp"
+          ports    = ["0-65535"]
+        }
+      ]
     }
   ]
 
   depends_on = [
-    google_project_service.enabled_services
+    module.project_radlab_ds_analytics,
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds
   ]
 }
 
@@ -157,28 +161,37 @@ resource "google_project_iam_member" "sa_p_notebook_permissions" {
 }
 
 resource "google_service_account_iam_member" "sa_ai_notebook_iam" {
-  for_each           = var.trusted_users
+  for_each           = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   member             = each.value
   role               = "roles/iam.serviceAccountUser"
   service_account_id = google_service_account.sa_p_notebook.id
 }
 
 resource "google_project_iam_member" "module_role1" {
-  for_each = var.trusted_users
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id
   member   = each.value
   role     = "roles/notebooks.admin"
 }
 
 resource "google_project_iam_member" "module_role2" {
-  for_each = var.trusted_users
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id
   member   = each.value
   role     = "roles/viewer"
 }
 
+resource "null_resource" "ai_notebook_usermanaged_provisioning_state" {
+  for_each = toset(google_notebooks_instance.ai_notebook_usermanaged[*].name)
+  provisioner "local-exec" {
+    command = "while [ \"$(gcloud notebooks instances list --location ${var.zone} --project ${local.project.project_id} --filter 'NAME:${each.value} AND STATE:ACTIVE' --format 'value(STATE)' | wc -l | xargs)\" != 1 ]; do echo \"${each.value} not active yet.\"; done"
+  }
+
+  depends_on = [google_notebooks_instance.ai_notebook_usermanaged]
+}
+
 resource "google_notebooks_instance" "ai_notebook_usermanaged" {
-  count        = (var.notebook_count > 0 ? true : false) && var.create_usermanaged_notebook ? var.notebook_count : 0
+  count        = var.notebook_count > 0 && var.create_usermanaged_notebook ? var.notebook_count : 0
   project      = local.project.project_id
   name         = "usermanaged-notebooks-${count.index + 1}"
   location     = var.zone
@@ -238,16 +251,16 @@ resource "google_notebooks_instance" "ai_notebook_usermanaged" {
 }
 
 resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
-  count        = (var.notebook_count > 0 ? true : false) && !var.create_usermanaged_notebook ? var.notebook_count : 0
-  name         = "googlemanaged-notebooks-${count.index + 1}"
-  project      = local.project.project_id
-  location     = local.region
+  count    = var.notebook_count > 0 && !var.create_usermanaged_notebook ? var.notebook_count : 0
+  name     = "googlemanaged-notebooks-${count.index + 1}"
+  project  = local.project.project_id
+  location = local.region
   access_config {
-    access_type = "SERVICE_ACCOUNT"
+    access_type   = "SERVICE_ACCOUNT"
     runtime_owner = google_service_account.sa_p_notebook.email
   }
   software_config {
-    post_startup_script = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name, google_storage_bucket_object.notebook_post_startup_script.name)
+    post_startup_script          = format("gs://%s/%s", google_storage_bucket.user_scripts_bucket.name, google_storage_bucket_object.notebook_post_startup_script.name)
     post_startup_script_behavior = "RUN_EVERY_START"
   }
   virtual_machine {
@@ -263,7 +276,7 @@ resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
       data_disk {
         initialize_params {
           disk_size_gb = var.boot_disk_size_gb
-          disk_type = var.boot_disk_type
+          disk_type    = var.boot_disk_type
         }
       }
       dynamic "accelerator_config" {
@@ -284,7 +297,7 @@ resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
 resource "google_storage_bucket" "user_scripts_bucket" {
   project                     = local.project.project_id
   name                        = join("", ["user-scripts-", local.project.project_id])
-  location                    = "US"
+  location                    = local.region
   force_destroy               = true
   uniform_bucket_level_access = true
 
@@ -299,5 +312,5 @@ resource "google_storage_bucket" "user_scripts_bucket" {
 resource "google_storage_bucket_iam_binding" "binding" {
   bucket  = google_storage_bucket.user_scripts_bucket.name
   role    = "roles/storage.admin"
-  members = var.trusted_users
+  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
 }

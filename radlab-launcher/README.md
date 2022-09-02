@@ -50,7 +50,7 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
 
    * [Organization ID](https://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id)
 
-   NOTE: If you like to spin up a RAD Lab module in a GCP project without any **Organization**, make sure to disable _orgpolicy.tf_ under `modules/[MODULE-NAME]/` either by deleting it or by manually setting the default value of Orgpolicy variables (example: _set_shielded_vm_policy_ & _set_vpc_peering_policy_ in [app_mod_elastic module](../modules/app_mod_elastic) in _variables.tf_ under `modules/[MODULE-NAME]/` to **false**
+   NOTE: If you like to spin up a RAD Lab module in a GCP project without any **Organization**, make sure to disable _orgpolicy.tf_ under `modules/[MODULE-NAME]/` either by manually setting the default value of Orgpolicy variables (example: _set_shielded_vm_policy_ & _set_vpc_peering_policy_ in [app_mod_elastic module](../modules/app_mod_elastic) in _variables.tf_ under `modules/[MODULE-NAME]/` to **false**
 
    * [Billing Account](https://cloud.google.com/billing/docs/how-to/manage-billing-account) for RAD Lab deployments (projects/resources).
    * [OPTIONAL] [Folder ID](https://cloud.google.com/resource-manager/docs/creating-managing-folders#view) to deploy the module in an existing folder.
@@ -58,7 +58,7 @@ NOTE: If you are using Windows OS make sure to deploy from `Command Prompt and R
 
 ### IAM Permissions Prerequisites
 
-In addition to the [module](../../modules) specific minimum [IAM](https://cloud.google.com/iam/docs/overview) permissions (listed in Each [module](../../modules)'s `README.md`), entity deploying RAD Lab modules via **RAD Lab Launcher** will also need to have below permission:
+In addition to the [module](../modules) specific minimum [IAM](https://cloud.google.com/iam/docs/overview) permissions (listed in Each [module](../modules)'s `README.md`), entity deploying RAD Lab modules via **RAD Lab Launcher** will also need to have below permission:
 - Parent: `roles/iam.organizationRoleViewer` [OPTIONAL: This permission is not required if *no parent (organization/folder)* exists]
 - RAD Lab Management Project: `roles/storage.admin`
 - RAD Lab Management Project: `roles/serviceusage.serviceUsageConsumer`
@@ -66,7 +66,7 @@ In addition to the [module](../../modules) specific minimum [IAM](https://cloud.
 You can use the Google Cloud Console to [view](https://cloud.google.com/iam/docs/manage-access-other-resources) or [change](https://cloud.google.com/iam/docs/manage-access-other-resources#single-role) IAM permissions.
 
 ## Deploy a RAD Lab Module
-**If you encounter errors during deployment, please see [Troubleshooting Common Problems](../../docs/TROUBLESHOOTING.md) section for a list of common problems and fixes.**  If you don't see a solution listed, please create an [Issue](https://github.com/GoogleCloudPlatform/rad-lab/issues). 
+**If you encounter errors during deployment, please see [Troubleshooting Common Problems](../docs/TROUBLESHOOTING.md) section for a list of common problems and fixes.**  If you don't see a solution listed, please create an [Issue](https://github.com/GoogleCloudPlatform/rad-lab/issues). 
 
 
 1. Navigate to the RAD Lab Launcher folder from the main directory:
