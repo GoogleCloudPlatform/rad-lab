@@ -164,7 +164,7 @@ variable "gpu_accelerator_type" {
 variable "gpu_accelerator_core_count" {
   description = "Number of of GPU core count. {{UIMeta group=3 order=11 }}"
   type        = number
-  default     = null
+  default     = 0
 }
 
 variable "image_family" {
