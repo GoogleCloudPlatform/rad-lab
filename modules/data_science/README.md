@@ -147,7 +147,7 @@ module "existing_project_and_network" {
 | *enable_gpu_driver* | Install GPU driver on the instance | <code title="">bool</code> |  | <code title="">false</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node | <code title="">string</code> |  | <code title=""></code> |
-| *gpu_accelerator_core_count* | Number of of GPU core count | <code title="">number</code> |  | <code title="">null</code> |
+| *gpu_accelerator_core_count* | Number of of GPU core count | <code title="">number</code> |  | <code title="">0</code> |
 | *gpu_accelerator_type* | Type of GPU you would like to spin up | <code title="">string</code> |  | <code title=""></code> |
 | *image_family* | Image of the AI notebook | <code title="">string</code> |  | <code title="">tf-latest-cpu</code> |
 | *image_project* | Google Cloud project where the image is hosted | <code title="">string</code> |  | <code title="">deeplearning-platform-release</code> |
