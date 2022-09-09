@@ -142,13 +142,16 @@ def set_proj(projid):
             if (select_proj == '2'):
                 projid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Project ID" + Style.RESET_ALL + ': ').strip()
                 os.system("gcloud config set project " + projid)
+                os.system("gcloud auth application-default set-quota-project "  + projid )
             elif (select_proj != '1' and select_proj != '2'):
                 sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
         else:
             projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the Project ID for RAD Lab management" + Style.RESET_ALL + ': ').strip()
             os.system("gcloud config set project " + projid)
+            os.system("gcloud auth application-default set-quota-project "  + projid )
     else:
         os.system("gcloud config set project " + projid)
+        os.system("gcloud auth application-default set-quota-project "  + projid )
     print("\nProject ID (Selected) : " + Fore.GREEN + Style.BRIGHT + projid + Style.RESET_ALL)
     return projid
 
@@ -457,6 +460,8 @@ def env(action, orgid, billing_acc, folderid, env_path, deployment_id, tfbucket,
 
     if (action == ACTION_CREATE_DEPLOYMENT or action == ACTION_UPDATE_DEPLOYMENT):
         return_code, stdout, stderr = tr.apply_cmd(capture_output=False, auto_approve=True, var={'organization_id': orgid, 'billing_account_id': billing_acc, 'deployment_id': deployment_id})
+        return_code, stdout, stderr = tr.apply_cmd(refresh=True, capture_output=False, auto_approve=True, var={'organization_id': orgid, 'billing_account_id': billing_acc, 'deployment_id': deployment_id})
+
     elif (action == ACTION_DELETE_DEPLOYMENT):
         return_code, stdout, stderr = tr.destroy_cmd(capture_output=False, auto_approve=True, var={'organization_id': orgid, 'billing_account_id': billing_acc, 'deployment_id': deployment_id})
 
