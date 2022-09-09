@@ -141,18 +141,17 @@ def set_proj(projid):
             select_proj = input("\nWhich Project would you like to use for RAD Lab management (Example - Creating/Utilizing GCS bucket where Terraform states will be stored) ? :" + "\n[1] Currently set project - " + Fore.GREEN + projid + Style.RESET_ALL + "\n[2] Enter a different Project ID" + Fore.YELLOW + Style.BRIGHT + "\nChoose a number for the RAD Lab management Project" + Style.RESET_ALL + ': ').strip()
             if (select_proj == '2'):
                 projid = input(Fore.YELLOW + Style.BRIGHT + "Enter the Project ID" + Style.RESET_ALL + ': ').strip()
-                os.system("gcloud config set project " + projid)
-                os.system("gcloud auth application-default set-quota-project "  + projid )
             elif (select_proj != '1' and select_proj != '2'):
                 sys.exit(Fore.RED + "\nError Occured - INVALID choice.\n")
         else:
             projid = input(Fore.YELLOW + Style.BRIGHT + "\nEnter the Project ID for RAD Lab management" + Style.RESET_ALL + ': ').strip()
-            os.system("gcloud config set project " + projid)
-            os.system("gcloud auth application-default set-quota-project "  + projid )
     else:
-        os.system("gcloud config set project " + projid)
-        os.system("gcloud auth application-default set-quota-project "  + projid )
+        pass
+
+    os.system("gcloud config set project " + projid)
+    os.system("gcloud auth application-default set-quota-project "  + projid )
     print("\nProject ID (Selected) : " + Fore.GREEN + Style.BRIGHT + projid + Style.RESET_ALL)
+
     return projid
 
 
