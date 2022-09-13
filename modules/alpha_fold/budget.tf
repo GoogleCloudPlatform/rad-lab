@@ -20,7 +20,7 @@ locals {
 
 resource "google_monitoring_notification_channel" "email_notif" {
   count        = length(var.billing_budget_notification_email_addresses)
-  display_name = "RAD Lab Billing Budget Notification Channel - ${element(var.billing_budget_notification_email_addresses, count.index)}"
+  display_name = "Billing Budget Notification Channel - ${element(var.billing_budget_notification_email_addresses, count.index)}"
   project      = local.project.project_id
   type         = "email"
   labels       = {
@@ -42,7 +42,7 @@ resource "google_billing_budget" "budget" {
   count = var.create_budget ? 1 : 0
 
   billing_account = var.billing_account_id
-  display_name    = format("RAD Lab Billing Budget - %s", local.project.project_id)
+  display_name    = format("Billing Budget - %s", local.project.project_id)
 
   budget_filter {
     projects               = toset(["projects/${local.project.project_id}"])
