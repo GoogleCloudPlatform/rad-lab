@@ -24,8 +24,8 @@ data "google_compute_zones" "zones" {
 }
 
 module "gke_cluster" {
-  source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
-  version                    = "~> 21.0"
+  source                     = "terraform-google-modules/kubernetes-engine/google//modules/private-cluster"
+  version                    = "~> 23.0"
   project_id                 = local.project.project_id
   name                       = var.gke_cluster_name
   region                     = var.region
