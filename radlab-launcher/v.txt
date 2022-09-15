@@ -1,0 +1,3 @@
+set_domain_restricted_sharing_policy=true
+set_vpc_peering_policy=true
+set_shielded_vm_policy=true

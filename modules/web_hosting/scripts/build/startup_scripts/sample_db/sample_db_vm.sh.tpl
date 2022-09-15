@@ -23,19 +23,16 @@ PGPASSWORD=${DB_PASS} psql "host=${DB_IP} port=5432 sslmode=disable dbname=${DB_
 DROP TABLE IF EXISTS accounts;
 \x
 CREATE TABLE IF NOT EXISTS accounts ( 
-      username VARCHAR ( 50 ) UNIQUE NOT NULL, 
-      email VARCHAR ( 255 ) UNIQUE NOT NULL, 
-      fn VARCHAR ( 50 ) NOT NULL, 
-      ln VARCHAR ( 50 ) NOT NULL,
-      user_role VARCHAR ( 50 ) NOT NULL );
+      name VARCHAR ( 50 ) NOT NULL, 
+      email VARCHAR ( 255 ) UNIQUE NOT NULL); 
 \x
-INSERT INTO accounts (username, email, fn, ln, user_role)
+INSERT INTO accounts (name, email)
 VALUES
-    ('kris','kris@myfoo.gov','Kris','Marrier','Adjudicator'),
-    ('fsaylors','fsaylors@myfoo.gov','Fatima','Saylors','Adjudicator'),
-    ('jbutt','jbutt@gmail.com','James','Butt','Applicant'),
-    ('jose','jose@yahoo.com','Jose','Stockham','Applicant'),
-    ('twenner','twenner@aol.com','Tonette','Wenner','Applicant');
+    ('Kris Marrier','kris@myfoo.gov'),
+    ('Fatima Saylors','fsaylors@myfoo.gov'),
+    ('James Butt','jbutt@gmail.com'),
+    ('Jose Stockham','jose@yahoo.com'),
+    ('Tonette Wenner','twenner@aol.com');
 \x
 SELECT * FROM accounts;
 EOF
