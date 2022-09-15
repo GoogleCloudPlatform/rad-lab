@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, url_for, flash, redirect, jso
 import sqlalchemy
 
 db_user = os.environ.get('CLOUD_SQL_USERNAME')
-db_password = os.environ.get('CLOUD_SQL_PASSWORD')
+db_pass = os.environ.get('CLOUD_SQL_PASSWORD')
 db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
 db_host = os.environ.get('INSTANCE_HOST')
 db_port = "5432"
