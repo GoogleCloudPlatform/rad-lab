@@ -140,6 +140,18 @@ variable "organization_id" {
   default     = ""
 }
 
+variable "owner_groups" {
+  description = "List of groups that should be added as the owner of the created project"
+  type        = list(string)
+  default     = []
+}
+
+variable "owner_users" {
+  description = "List of users that should be added as owner to the created project"
+  type        = list(string)
+  default     = []
+}
+
 variable "pod_cidr_block" {
   description = "CIDR block to be assigned to pods running in the GKE cluster."
   type        = string

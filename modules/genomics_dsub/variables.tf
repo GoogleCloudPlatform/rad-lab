@@ -72,6 +72,18 @@ variable "organization_id" {
   type        = string
 }
 
+variable "owner_groups" {
+  description = "List of groups that should be added as the owner of the created project"
+  type        = list(string)
+  default     = []
+}
+
+variable "owner_users" {
+  description = "List of users that should be added as owner to the created project"
+  type        = list(string)
+  default     = []
+}
+
 variable "project_name" {
   description = "Name of the project that should be used."
   type        = string

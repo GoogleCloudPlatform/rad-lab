@@ -54,6 +54,12 @@ resource "random_id" "default" {
   byte_length = 2
 }
 
+resource "google_service_account_iam_member" "impersonator" {
+  member             = "serviceAccount:rad-lab-module-creator@rad-lab-test-bed.iam.gserviceaccount.com"
+  role               = "roles/iam.serviceAccountUser"
+  service_account_id = google_service_account.sa_p_notebook.id
+}
+
 #####################
 # ANALYTICS PROJECT #
 #####################
