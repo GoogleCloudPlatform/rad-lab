@@ -15,7 +15,7 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.hex
   project = (var.create_project
     ? try(module.project_radlab_silicon_design.0, null)
     : try(data.google_project.existing_project.0, null)
@@ -62,7 +62,7 @@ resource "random_id" "default" {
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  project_id = var.project_id_prefix
 }
 
 module "project_radlab_silicon_design" {
@@ -70,7 +70,7 @@ module "project_radlab_silicon_design" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
+  name              = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
@@ -140,7 +140,9 @@ module "vpc_ai_notebook" {
   ]
 
   depends_on = [
-    google_project_service.enabled_services
+    module.project_radlab_silicon_design,
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds
   ]
 }
 
@@ -157,22 +159,22 @@ resource "google_project_iam_member" "sa_p_notebook_permissions" {
   role     = each.value
 }
 
-resource "google_service_account_iam_member" "sa_ai_notebook_user_iam" {
-  for_each           = var.trusted_users
+resource "google_service_account_iam_member" "sa_ai_notebook_iam" {
+  for_each           = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   member             = each.value
   role               = "roles/iam.serviceAccountUser"
   service_account_id = google_service_account.sa_p_notebook.id
 }
 
-resource "google_project_iam_member" "ai_notebook_user_role1" {
-  for_each = var.trusted_users
+resource "google_project_iam_member" "module_role1" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id
   member   = each.value
   role     = "roles/notebooks.admin"
 }
 
-resource "google_project_iam_member" "ai_notebook_user_role2" {
-  for_each = var.trusted_users
+resource "google_project_iam_member" "module_role2" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id  
   member   = each.value
   role     = "roles/viewer"
@@ -218,6 +220,15 @@ resource "google_notebooks_instance" "ai_notebook" {
   ]
 }
 
+resource "null_resource" "ai_notebook_provisioning_state" {
+  for_each = toset(google_notebooks_instance.ai_notebook[*].name)
+  provisioner "local-exec" {
+    command = "while [ \"$(gcloud notebooks instances list --location ${var.zone} --project ${local.project.project_id} --filter 'NAME:${each.value} AND STATE:ACTIVE' --format 'value(STATE)' | wc -l | xargs)\" != 1 ]; do echo \"${each.value} not active yet.\"; done"
+  }
+
+  depends_on = [google_notebooks_instance.ai_notebook]
+}
+
 resource "google_artifact_registry_repository" "containers_repo" {
   provider = google-beta
 
@@ -240,7 +251,6 @@ resource "google_storage_bucket" "notebooks_bucket" {
   uniform_bucket_level_access = true
 }
 
-
 # Locally build container for notebook container and push to container registry #
 resource "null_resource" "build_and_push_image" {
   triggers = {
@@ -252,7 +262,7 @@ resource "null_resource" "build_and_push_image" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "scripts/build/build.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.location} ${google_artifact_registry_repository.containers_repo.repository_id} ${google_storage_bucket.notebooks_bucket.name}"
+    command     = "bash ${path.module}/scripts/build/build.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.location} ${google_artifact_registry_repository.containers_repo.repository_id} ${google_storage_bucket.notebooks_bucket.name} ${var.resource_creator_identity}"
   }
 
   depends_on = [

@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ resource "google_compute_instance" "cromwell_server" {
   project                   = local.project.project_id
   name                      = var.cromwell_server_instance_name
   machine_type              = var.cromwell_server_instance_type
-  zone                      = var.default_zone
+  zone                      = var.zone
   allow_stopping_for_update = true
 
   boot_disk {

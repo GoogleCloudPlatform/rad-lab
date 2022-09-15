@@ -15,32 +15,8 @@
  */
 
 
-provider "google" {
-  alias        = "impersonated"
-  scopes = [
-    "https://www.googleapis.com/auth/cloud-platform",
-    "https://www.googleapis.com/auth/userinfo.email"
-  ]
-}
-
-data "google_service_account_access_token" "default" {
-  provider               = google.impersonated
-  scopes                 = ["userinfo-email", "cloud-platform"]
-  target_service_account = var.resource_creator_identity
-  lifetime               = "1800s"
-}
-
-provider "google" {
-  access_token = data.google_service_account_access_token.default.access_token
-}
-
-provider "google-beta" {
-  access_token = data.google_service_account_access_token.default.access_token
-}
-
-
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.hex
   project = (var.create_project
     ? try(module.project_radlab_billing_budget.0, null)
     : try(data.google_project.existing_project.0, null)
@@ -59,7 +35,7 @@ resource "random_id" "default" {
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  project_id = var.project_id_prefix
 }
 
 module "project_radlab_billing_budget" {
@@ -67,7 +43,7 @@ module "project_radlab_billing_budget" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
+  name              = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
@@ -85,35 +61,8 @@ resource "google_project_service" "enabled_services" {
   disable_on_destroy         = true
 }
 
-resource "time_sleep" "wait_120_seconds" {
-  count = var.enable_services ? 1 : 0
-  create_duration = "120s"
-
-  depends_on = [
-    google_project_service.enabled_services
-  ]
-}
-
-module "billing_budget" {
-  source                  = "terraform-google-modules/project-factory/google//modules/budget"
-  display_name            = format("RADLab Billing Budget - %s", local.project.project_id)
-  billing_account         = var.billing_account_id
-  projects                = ["${local.project.project_id}"]
-  amount                  = var.billing_budget_amount
-  alert_spend_basis       = var.billing_budget_alert_spend_basis
-  alert_spent_percents    = var.billing_budget_alert_spent_percents
-  credit_types_treatment  = var.billing_budget_credit_types_treatment
-  labels                  = var.billing_budget_labels
-  services                = var.billing_budget_services
-
-  depends_on = [
-    time_sleep.wait_120_seconds
-  ]
-
-}
-
-resource "google_project_iam_member" "user_role_assignment" {
-  for_each = var.trusted_users
+resource "google_project_iam_member" "module_role1" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id
   member   = each.value
   role     = "roles/editor"

@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,13 +61,31 @@ resource "google_project_organization_policy" "trustedimage_project_policy" {
   ]
 }
 
+resource "google_project_organization_policy" "domain_restricted_sharing_policy" {
+  count      = var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic ? 1 : 0
+  constraint = "iam.allowedPolicyMemberDomains"
+  project    = local.project.project_id
+
+  list_policy {
+    allow {
+      all = true
+    }
+  }
+
+  depends_on = [
+    module.project_radlab_silicon_design
+  ]
+}
+
 resource "time_sleep" "wait_120_seconds" {
-  count = var.set_trustedimage_project_policy || var.set_shielded_vm_policy || var.set_external_ip_policy ? 1 : 0
+  count = var.set_trustedimage_project_policy || var.set_shielded_vm_policy || var.set_external_ip_policy || var.enable_services ? 1 : 0
 
   depends_on = [
     google_project_organization_policy.external_ip_policy,
     google_project_organization_policy.shielded_vm_policy,
-    google_project_organization_policy.trustedimage_project_policy
+    google_project_organization_policy.trustedimage_project_policy,
+    google_project_organization_policy.domain_restricted_sharing_policy,
+    google_project_service.enabled_services
   ]
 
   create_duration = "120s"

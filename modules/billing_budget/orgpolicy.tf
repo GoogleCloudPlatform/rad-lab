@@ -14,34 +14,6 @@
  * limitations under the License.
  */
  
- resource "google_project_organization_policy" "vpc_peering_policy" {
-  count      = var.set_vpc_peering_policy ? 1 : 0
-  constraint = "compute.restrictVpcPeering"
-  project    = local.project.project_id
-
-  list_policy {
-    allow {
-      all = true
-    }
-  }
-  depends_on = [
-    module.elastic_search_project
-  ]
-}
-
-resource "google_project_organization_policy" "shielded_vm_policy" {
-  count      = var.set_shielded_vm_policy ? 1 : 0
-  constraint = "compute.requireShieldedVm"
-  project    = local.project.project_id
-
-  boolean_policy {
-    enforced = false
-  }
-  depends_on = [
-    module.elastic_search_project
-  ]
-}
-
 resource "google_project_organization_policy" "domain_restricted_sharing_policy" {
   count      = var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic ? 1 : 0
   constraint = "iam.allowedPolicyMemberDomains"
@@ -54,17 +26,15 @@ resource "google_project_organization_policy" "domain_restricted_sharing_policy"
   }
 
   depends_on = [
-    module.elastic_search_project
+    module.project_radlab_billing_budget
   ]
 }
 
 resource "time_sleep" "wait_120_seconds" {
   
-  count = var.set_vpc_peering_policy || var.set_shielded_vm_policy || (var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic) || var.enable_services ? 1 : 0
+  count = (var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic) || var.enable_services ? 1 : 0
 
   depends_on = [
-      google_project_organization_policy.vpc_peering_policy,
-      google_project_organization_policy.shielded_vm_policy,
       google_project_organization_policy.domain_restricted_sharing_policy,
       google_project_service.enabled_services
       ]

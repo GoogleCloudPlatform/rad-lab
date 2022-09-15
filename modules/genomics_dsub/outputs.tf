@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
+output "billing_budget_budget_id" {
+  sensitive   = true
+  description = "Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}`"
+  value       = var.create_budget ? google_billing_budget.budget[0].name : ""
+}
+
 output "deployment_id" {
   description = "RADLab Module Deployment ID"
-  value       = var.random_id
+  value       = var.deployment_id
 }
 
-output "project-radlab-genomics-id" {
+output "project_id" {
   description = "Genomics Project ID"
-  value       = module.project_radlab_genomics.project_id
+  value       = local.project.project_id
 }
-

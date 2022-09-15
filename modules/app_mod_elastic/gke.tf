@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ data "google_compute_zones" "zones" {
 }
 
 module "gke_cluster" {
-  source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
-  version                    = "~> 21.0"
+  source                     = "terraform-google-modules/kubernetes-engine/google//modules/private-cluster"
+  version                    = "~> 23.0"
   project_id                 = local.project.project_id
   name                       = var.gke_cluster_name
   region                     = var.region
