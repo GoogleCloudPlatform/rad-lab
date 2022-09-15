@@ -18,8 +18,8 @@
 resource "google_storage_bucket_object" "notebooks" {
   for_each = fileset("${path.module}/scripts/build/", "notebooks/*.ipynb")
   name     = each.value
-  source = join("/", ["${path.module}/scripts/build", each.value])
-  bucket = google_storage_bucket.user_scripts_bucket.name
+  source   = join("/", ["${path.module}/scripts/build", each.value])
+  bucket   = google_storage_bucket.user_scripts_bucket.name
 }
 
 resource "google_storage_bucket_object" "notebook_post_startup_script" {

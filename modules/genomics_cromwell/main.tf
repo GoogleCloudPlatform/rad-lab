@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.hex
   project = (var.create_project
     ? try(module.project_radlab_gen_cromwell.0, null)
     : try(data.google_project.existing_project.0, null)
   )
 
-  region = var.default_region
+  region = var.region
 
   network = (
     var.create_network
@@ -57,15 +57,15 @@ resource "random_id" "default" {
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  project_id = var.project_id_prefix
 }
 
 module "project_radlab_gen_cromwell" {
   count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 11.0"
+  version = "~> 13.0"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
+  name              = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
@@ -93,7 +93,7 @@ resource "google_project_service" "enabled_services" {
 
 resource "google_storage_bucket" "cromwell_workflow_bucket" {
   name                        = "${local.project.project_id}-cromwell-wf-exec"
-  location                    = var.default_region
+  location                    = var.region
   force_destroy               = true
   uniform_bucket_level_access = true
   project                     = local.project.project_id
@@ -136,4 +136,11 @@ resource "google_storage_bucket_object" "service" {
   name   = "provisioning/cromwell.service"
   source = "scripts/build/cromwell.service"
   bucket = google_storage_bucket.cromwell_workflow_bucket.name
+}
+
+resource "google_project_iam_member" "module_role1" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/viewer"
 }

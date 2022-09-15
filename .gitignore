@@ -1,8 +1,17 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 .DS_Store
 venv
-**/.terraform/*
+# Terraform files
+terraform.tfvars
+**/.terraform/**
+**/backend.tf
 *.tfstate
 *.tfstate.*
+*.lock.hcl
+
+venv
+**/.terraform/*
 crash.log
 credentials.json
 .idea
@@ -10,8 +19,9 @@ credentials.json
 env/
 .envrc
 *.iml
-terraform.tfvars
-*.lock.hcl
 elk/
 test/**
-**/deployments
+
+
+# Skipping any locally existing module deployment files (created by RAD Lab Launcher)
+radlab-launcher/deployments/*

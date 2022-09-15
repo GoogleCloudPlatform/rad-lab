@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ data "google_compute_subnetwork" "default" {
 module "vpc_cromwell" {
   count   = var.create_network ? 1 : 0
   source  = "terraform-google-modules/network/google"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   project_id   = local.project.project_id
   network_name = var.network_name
@@ -77,14 +77,16 @@ module "vpc_cromwell" {
   ]
 
   depends_on = [
-    google_project_service.enabled_services
+    module.project_radlab_gen_cromwell,
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds
   ]
 }
 
 
 module "cloud-nat" {
   source        = "terraform-google-modules/cloud-nat/google"
-  version       = "~> 1.2"
+  version       = "~> 2.0"
   name          = "${var.network_name}-nat"
   project_id    = local.project.project_id
   region        = local.region
@@ -93,17 +95,24 @@ module "cloud-nat" {
   create_router = true
 }
 
-module "private-service-access" {
-  source        = "GoogleCloudPlatform/sql-db/google//modules/private_service_access"
-  version       = "8.0.0"
-  project_id    = local.project.project_id
-  vpc_network   = module.vpc_cromwell.0.network_name
+resource "google_compute_global_address" "google-managed-services-range" {
+  project       = local.project.project_id
+  name          = "google-managed-services-${local.network.name}"
+  purpose       = "VPC_PEERING"
   address       = split("/", var.db_service_network_cidr_range)[0]
   prefix_length = split("/", var.db_service_network_cidr_range)[1]
+  address_type  = "INTERNAL"
+  network       = local.network.name
 
   depends_on = [
     google_project_service.enabled_services,
     time_sleep.wait_120_seconds
   ]
+}
 
+# Creates the peering with the producer network.
+resource "google_service_networking_connection" "private_service_access" {
+  network                 = local.network.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.google-managed-services-range.name]
 }

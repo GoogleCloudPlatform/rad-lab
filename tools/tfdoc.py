@@ -42,7 +42,7 @@ RE_VARIABLES = re.compile(r'''(?smx)
     # variable declaration start
     (?:^\s*variable\s*"([^"]+)"\s*\{$) |
     # variable description start
-    (?:^\s*description\s*=\s*"((?:[^"\\]|\\")+)"\s*$) |
+    (?:^\s*description\s*=\s*"((?:[^"\\]|\\")+)\.) |
     # variable type start
     (?:^\s*type\s*=\s*(.*?)$) |
     # variable default start

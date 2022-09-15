@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ module "deploy_eck_crds" {
   cluster_location        = var.region
   kubectl_create_command  = "kubectl create -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
   kubectl_destroy_command = "kubectl delete -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
+  impersonate_service_account = length(var.resource_creator_identity) != 0 ? var.resource_creator_identity : ""
   skip_download           = true
   upgrade                 = false
 
@@ -44,6 +45,7 @@ module "deploy_eck_operator" {
   cluster_location        = var.region
   kubectl_create_command  = "kubectl apply -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
   kubectl_destroy_command = "${path.module}/scripts/build/remove_eck_operator.sh"
+  impersonate_service_account = length(var.resource_creator_identity) != 0 ? var.resource_creator_identity : ""
   skip_download           = true
   upgrade                 = false
 
@@ -53,22 +55,16 @@ module "deploy_eck_operator" {
   ]
 }
 
-data "template_file" "elastic_search_yaml" {
+resource "local_file" "elastic_search_yaml_output" {
   count    = var.deploy_elastic_search ? 1 : 0
-  template = file("${path.module}/templates/elastic_search_deployment.yaml.tpl")
-  vars = {
+  filename = "${path.module}/elk/elastic_search_deployment.yaml"
+  content = templatefile("${path.module}/templates/elastic_search_deployment.yaml.tpl", {
     NAMESPACE           = local.k8s_namespace
     COUNT               = var.elastic_search_instance_count
     VERSION             = var.elk_version
     GCP_SERVICE_ACCOUNT = google_service_account.elastic_search_gcp_identity.email
     IDENTITY_NAME       = local.elastic_search_identity_name
-  }
-}
-
-resource "local_file" "elastic_search_yaml_output" {
-  count    = var.deploy_elastic_search ? 1 : 0
-  filename = "${path.module}/elk/elastic_search_deployment.yaml"
-  content  = data.template_file.elastic_search_yaml.0.rendered
+  })
 }
 
 module "deploy_elastic_search" {
@@ -80,6 +76,7 @@ module "deploy_elastic_search" {
   cluster_location        = var.region
   kubectl_create_command  = "kubectl apply -f ${path.module}/elk"
   kubectl_destroy_command = "kubectl delete -f ${path.module}/elk"
+  impersonate_service_account = length(var.resource_creator_identity) != 0 ? var.resource_creator_identity : ""
   skip_download           = true
   upgrade                 = false
   use_existing_context    = false

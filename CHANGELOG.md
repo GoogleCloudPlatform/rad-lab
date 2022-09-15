@@ -15,6 +15,21 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [8.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v8.0.0) (2022-09-02)
+ 
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v7.0.0...v8.0.0) 
+
+### Added
+- _RAD Lab Module:_ Added capability to deploy modules via Service Account Identity. [(#73)](https://github.com/GoogleCloudPlatform/rad-lab/pull/73)
+- _RAD Lab Module:_ Added capability to enable Billing Budgets to all the modules. [(#73)](https://github.com/GoogleCloudPlatform/rad-lab/pull/73)
+- _RAD Lab Module:_ Added Monitoring channels for Billing Budgets. [(#73)](https://github.com/GoogleCloudPlatform/rad-lab/pull/73)
+
+### Changed
+- _RAD Lab Launcher:_ Updated RAD Lab Launcher to support changing folder_id. [(ba072e0)](https://github.com/GoogleCloudPlatform/rad-lab/pull/73/commits/ba072e0d23f32310f57b696ec3e36068cf68e134)
+
+### Fixed
+- Fixed Hyperlinks. [(a7a2232)](https://github.com/GoogleCloudPlatform/rad-lab/pull/73/commits/a7a2232e0b4947569cca843aa07b486b649f6756)
+
 ## [7.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v7.0.0) (2022-05-24)
  
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v6.1.1...v7.0.0) 

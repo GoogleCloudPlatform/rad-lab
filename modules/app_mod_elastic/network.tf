@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ data "google_compute_subnetwork" "existing_subnet" {
 module "elastic_search_network" {
   count   = var.create_network ? 1 : 0
   source  = "terraform-google-modules/network/google"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   project_id   = local.project.project_id
   network_name = var.network_name
@@ -74,7 +74,8 @@ module "elastic_search_network" {
 
   depends_on = [
     module.elastic_search_project,
-    google_project_service.enabled_services
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds
   ]
 }
 

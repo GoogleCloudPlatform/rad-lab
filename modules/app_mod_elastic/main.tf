@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
 
 locals {
   # Allow users to either create their own random_id or use a generated one
-  random_id = var.random_id != null ? var.random_id : random_id.random_id.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.random_id.hex
   project = (
     var.create_project
     ? try(module.elastic_search_project.0, null)
     : try(data.google_project.existing_project.0, null)
   )
 
-  project_services = [
+  project_services = var.enable_services ? [
     "compute.googleapis.com",
     "container.googleapis.com",
     "monitoring.googleapis.com",
     "logging.googleapis.com"
-  ]
+  ] : []
 }
 
 resource "random_id" "random_id" {
@@ -37,15 +37,15 @@ resource "random_id" "random_id" {
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  project_id = var.project_id_prefix
 }
 
 module "elastic_search_project" {
   count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 11.0"
+  version = "~> 13.0"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
+  name              = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id = false
   org_id            = var.organization_id
   folder_id         = var.folder_id
@@ -86,4 +86,11 @@ resource "google_service_account_iam_member" "elastic_search_k8s_identity" {
   depends_on = [
     module.gke_cluster
   ]
+}
+
+resource "google_project_iam_member" "module_role1" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/viewer"
 }
