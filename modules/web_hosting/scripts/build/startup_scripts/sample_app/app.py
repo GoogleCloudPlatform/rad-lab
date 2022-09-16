@@ -31,7 +31,6 @@ def create():
         else:
             # Insert record in DB
             create_db_accounts(name, email)
-            # accounts.append({'name': name, 'email': email})
             return redirect(url_for('index'))
 
     return render_template('create.html')
@@ -80,5 +79,4 @@ def create_db_accounts(name, email):
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    # app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=80)
