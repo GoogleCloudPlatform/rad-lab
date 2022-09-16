@@ -5,7 +5,7 @@ import sqlalchemy
 db_user = os.environ.get('CLOUD_SQL_USERNAME')
 db_pass = os.environ.get('CLOUD_SQL_PASSWORD')
 db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
-db_host = os.environ.get('INSTANCE_HOST')
+db_host = "127.0.0.1"
 db_port = "5432"
 
 app = Flask(__name__)
