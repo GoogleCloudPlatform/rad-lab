@@ -1,2 +1,3 @@
 flask
 sqlalchemy
+pg8000
