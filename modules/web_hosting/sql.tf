@@ -129,7 +129,7 @@ resource "time_sleep" "create_sample_db" {
 
 resource "null_resource" "del-sample-db-vm" {
   provisioner "local-exec" {
-    command = "terraform destroy -auto-approve -lock=false --target google_compute_instance.sample-db-vm"
+    command = "gcloud compute instances delete sample-db-vm --zone=us-central1-f --project=${local.project.project_id}"
   }
 
   depends_on = [
