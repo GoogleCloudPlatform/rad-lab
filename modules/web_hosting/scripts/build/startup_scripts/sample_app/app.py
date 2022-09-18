@@ -15,17 +15,13 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    # initialize connector
-    connector = Connector()
     accounts = []
-    accounts = get_db_accounts(accounts, connector)  
+    accounts = get_db_accounts(accounts)
     return render_template('index.html', accounts=accounts)
 
 
 @app.route('/create', methods=('GET', 'POST'))
 def create():
-    # initialize connector
-    connector = Connector()
     accounts = []
     if request.method == 'POST':
         name = request.form['name']
@@ -37,7 +33,7 @@ def create():
             flash('Email is required!')
         else:
             # Insert record in DB
-            create_db_accounts(name, email, connector)
+            create_db_accounts(name, email)
             return redirect(url_for('index'))
 
     return render_template('create.html')
@@ -62,8 +58,10 @@ def create():
 #     return pool
 
 # getconn now set to private IP
-def getconn(connector):
+def getconn():
+
     # initialize connector
+    connector = Connector()
 
     conn = connector.connect(
       db_conn_name,
@@ -73,12 +71,13 @@ def getconn(connector):
       db=db_name,
       ip_type=IPTypes.PRIVATE,
     )
-    return conn
+    return conn, connector
 
 
-def get_db_accounts(accounts, connector):
+def get_db_accounts(accounts):
     # pool = connect_tcp_socket()
-    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn(connector),)
+    conn,connector = getconn()
+    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=conn,)
     with pool.connect() as db_conn:
         # query database
         result = db_conn.execute("SELECT * from accounts").fetchall()
@@ -92,9 +91,10 @@ def get_db_accounts(accounts, connector):
     
     return accounts
 
-def create_db_accounts(name, email, connector):
+def create_db_accounts(name, email):
     # pool = connect_tcp_socket()
-    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn(connector),)
+    conn,connector = getconn()
+    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=conn,)
 
     # insert statement
     insert_stmt = sqlalchemy.text(
