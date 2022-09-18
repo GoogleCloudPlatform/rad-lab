@@ -29,6 +29,10 @@ hostname = output.split('\n')[0]
 @app.route('/')
 def hello_gcp():
     return "Hello from instance:" + str(hostname)
+
+@app.route('/hc')
+def gcp_hc():
+    return "Hello from instance:" + str(hostname)
  
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
