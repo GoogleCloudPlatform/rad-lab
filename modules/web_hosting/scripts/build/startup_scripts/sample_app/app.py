@@ -3,8 +3,6 @@ from flask import Flask, render_template, request, url_for, flash, redirect
 import sqlalchemy
 from google.cloud.sql.connector import Connector, IPTypes
 
-# initialize connector
-connector = Connector()
 
 db_conn_name = os.environ.get('INSTANCE_CONNECTION_NAME')
 db_user = os.environ.get('CLOUD_SQL_USERNAME')
@@ -17,13 +15,17 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
+    # initialize connector
+    connector = Connector()
     accounts = []
-    accounts = get_db_accounts(accounts)  
+    accounts = get_db_accounts(accounts, connector)  
     return render_template('index.html', accounts=accounts)
 
 
 @app.route('/create', methods=('GET', 'POST'))
 def create():
+    # initialize connector
+    connector = Connector()
     accounts = []
     if request.method == 'POST':
         name = request.form['name']
@@ -35,7 +37,7 @@ def create():
             flash('Email is required!')
         else:
             # Insert record in DB
-            create_db_accounts(name, email)
+            create_db_accounts(name, email, connector)
             return redirect(url_for('index'))
 
     return render_template('create.html')
@@ -60,23 +62,23 @@ def create():
 #     return pool
 
 # getconn now set to private IP
-def getconn():
+def getconn(connector):
     # initialize connector
-    
+
     conn = connector.connect(
       db_conn_name,
       "pg8000",
       user=db_user,
       password=db_pass,
       db=db_name,
-      ip_type=IPTypes.PRIVATE
+      ip_type=IPTypes.PRIVATE,
     )
     return conn
 
 
-def get_db_accounts(accounts):
+def get_db_accounts(accounts, connector):
     # pool = connect_tcp_socket()
-    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn,)
+    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn(connector),)
     with pool.connect() as db_conn:
         # query database
         result = db_conn.execute("SELECT * from accounts").fetchall()
@@ -90,9 +92,9 @@ def get_db_accounts(accounts):
     
     return accounts
 
-def create_db_accounts(name, email):
+def create_db_accounts(name, email, connector):
     # pool = connect_tcp_socket()
-    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn,)
+    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn(connector),)
 
     # insert statement
     insert_stmt = sqlalchemy.text(
