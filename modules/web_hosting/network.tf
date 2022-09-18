@@ -103,6 +103,18 @@ resource "google_compute_firewall" "fw-vpc-xlb-allow-iap-ssh" {
   source_ranges = ["35.235.240.0/20"]
 }
 
+
+# FW rule for Intra VPC
+resource "google_compute_firewall" "fw-vpc-xlb-allow-intra-vpc" {
+  name          = "fw-vpc-xlb-allow-intra-vpc"
+  network       = resource.google_compute_network.vpc-xlb.name
+  project       = local.project.project_id
+  allow {
+    protocol    = "all"
+  }
+  source_ranges = ["10.100.20.0/24","10.200.240.0/24"]
+}
+
 #########################################################################
 # vpc-ilb - VPC Network & Subnests
 #########################################################################
