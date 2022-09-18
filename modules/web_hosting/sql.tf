@@ -39,7 +39,7 @@
     disk_size             = 100
     disk_type             = "PD_SSD"
     ip_configuration {
-      ipv4_enabled    = true
+      ipv4_enabled    = false
       private_network = google_compute_network.vpc-xlb.id
     }
     location_preference {
