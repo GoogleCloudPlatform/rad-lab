@@ -60,21 +60,23 @@ def index():
     accounts = get_db_accounts(accounts)
     return render_template('index.html', accounts=accounts)
 
-
 @app.route('/create', methods=('GET', 'POST'))
 def create():
     accounts = []
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
+        sector = request.form['sector']
 
         if not name:
             flash('Name is required!')
         elif not email:
             flash('Email is required!')
+        elif not sector:
+            flash('Sector is required!')
         else:
             # Insert record in DB
-            create_db_accounts(name, email)
+            create_db_accounts(name, email, sector)
             return redirect(url_for('index'))
 
     return render_template('create.html')
@@ -92,7 +94,6 @@ def getconn():
     )
     return conn
 
-
 def get_db_accounts(accounts):
     pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn,)
     with pool.connect() as db_conn:
@@ -101,20 +102,20 @@ def get_db_accounts(accounts):
 
     # Do something with the results
     for row in result:
-        accounts.append({'name': row.name,'email': row.email})
+        accounts.append({'name': row.name,'email': row.email, 'sector': row.sector})
     
     return accounts
 
-def create_db_accounts(name, email):
+def create_db_accounts(name, email, sector):
     pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn,)
 
     # insert statement
     insert_stmt = sqlalchemy.text(
-        "INSERT INTO accounts (name, email) VALUES (:name, :email)",
+        "INSERT INTO accounts (name, email, sector) VALUES (:name, :email, :sector)",
     )
     with pool.connect() as db_conn:
         # query database
-        db_conn.execute(insert_stmt, name=name, email=email)
+        db_conn.execute(insert_stmt, name=name, email=email, sector=sector)
 
 @app.route('/hc')
 def hello_gcp():
@@ -128,7 +129,6 @@ connector.close()
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=80)
-    # app.run(debug=True)
 EOF
 chmod 700 rad-lab/modules/web_hosting/scripts/build/startup_scripts/sample_app/app.py
 sudo python3 rad-lab/modules/web_hosting/scripts/build/startup_scripts/sample_app/app.py

@@ -24,15 +24,16 @@ DROP TABLE IF EXISTS accounts;
 \x
 CREATE TABLE IF NOT EXISTS accounts ( 
       name VARCHAR ( 50 ) NOT NULL, 
-      email VARCHAR ( 255 ) UNIQUE NOT NULL); 
+      email VARCHAR ( 255 ) UNIQUE NOT NULL),
+      sector VARCHAR ( 50 ) NOT NULL; 
 \x
 INSERT INTO accounts (name, email)
 VALUES
-    ('Kris Marrier','kris@myfoo.gov'),
-    ('Fatima Saylors','fsaylors@myfoo.gov'),
-    ('James Butt','jbutt@gmail.com'),
-    ('Jose Stockham','jose@yahoo.com'),
-    ('Tonette Wenner','twenner@aol.com');
+    ('Kris Marrier','kris@myfoo.gov','Federal'),
+    ('Fatima Saylors','fsaylors@myfoo.gov','State & Local'),
+    ('James Butt','jbutt@gmail.com','EdTech'),
+    ('Jose Stockham','jose@mybar.gov','State & Local'),
+    ('Tonette Wenner','twenner@aol.com','EdTech');
 \x
 SELECT * FROM accounts;
 EOF
