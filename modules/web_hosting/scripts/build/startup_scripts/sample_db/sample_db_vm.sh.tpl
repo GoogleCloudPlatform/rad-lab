@@ -24,10 +24,10 @@ DROP TABLE IF EXISTS accounts;
 \x
 CREATE TABLE IF NOT EXISTS accounts ( 
       name VARCHAR ( 50 ) NOT NULL, 
-      email VARCHAR ( 255 ) UNIQUE NOT NULL),
-      sector VARCHAR ( 50 ) NOT NULL; 
+      email VARCHAR ( 50 ) UNIQUE NOT NULL,
+      sector VARCHAR ( 50 ) NOT NULL); 
 \x
-INSERT INTO accounts (name, email)
+INSERT INTO accounts (name, email, sector)
 VALUES
     ('Kris Marrier','kris@myfoo.gov','Federal'),
     ('Fatima Saylors','fsaylors@myfoo.gov','State & Local'),
