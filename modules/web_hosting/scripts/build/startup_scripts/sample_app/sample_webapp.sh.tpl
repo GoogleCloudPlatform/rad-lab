@@ -27,6 +27,7 @@ chmod +x cloud_sql_proxy
 nohup ./cloud_sql_proxy -instances=$INSTANCE_CONNECTION_NAME=tcp:5432 -ip_address_types=PRIVATE &
 
 # Fetch source code
+if [ -d "rad-lab" ]; then rm -Rf rad-lab; fi
 sudo git clone -b web-hosting https://github.com/GoogleCloudPlatform/rad-lab.git
 
 # Deploy Web App
