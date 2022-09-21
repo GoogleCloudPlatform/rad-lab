@@ -36,9 +36,6 @@ sudo pip3 install -r rad-lab/modules/web_hosting/scripts/build/startup_scripts/s
 
 sudo chmod -R 777 rad-lab
 
-# Connect with pssql
-# psql "host=127.0.0.1 sslmode=disable dbname=$CLOUD_SQL_DATABASE_NAME user=$CLOUD_SQL_USERNAME"
-
 cat <<EOF > ./rad-lab/modules/web_hosting/scripts/build/startup_scripts/sample_app/app.py
 import os
 import sqlalchemy
