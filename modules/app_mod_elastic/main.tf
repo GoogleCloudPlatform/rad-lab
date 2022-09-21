@@ -16,22 +16,24 @@
 
 locals {
   # Allow users to either create their own random_id or use a generated one
-  random_id = var.deployment_id != null ? var.deployment_id : random_id.random_id.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
   project = (
     var.create_project
     ? try(module.elastic_search_project.0, null)
     : try(data.google_project.existing_project.0, null)
   )
 
-  project_services = var.enable_services ? [
+  default_apis = [
     "compute.googleapis.com",
     "container.googleapis.com",
     "monitoring.googleapis.com",
     "logging.googleapis.com"
-  ] : []
+  ]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
-resource "random_id" "random_id" {
+resource "random_id" "default" {
+  count       = var.deployment_id == null ? 1 : 0
   byte_length = 2
 }
 

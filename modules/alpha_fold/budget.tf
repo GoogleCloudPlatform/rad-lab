@@ -15,16 +15,16 @@
  */
 
 locals {
-  all_updates_rule = var.billing_budget_pubsub_topic && length(var.billing_budget_notification_email_addresses) == 0 ? [] : ["1"]
+  emails = length(var.trusted_users) > 0 ? distinct(concat(tolist(var.billing_budget_notification_email_addresses), formatlist(tolist(var.trusted_users)[0]))) : tolist(var.billing_budget_notification_email_addresses)
 }
 
 resource "google_monitoring_notification_channel" "email_notif" {
-  count        = length(var.billing_budget_notification_email_addresses)
-  display_name = "Billing Budget Notification Channel - ${element(var.billing_budget_notification_email_addresses, count.index)}"
+  count        = length(local.emails)
+  display_name = "Billing Budget Notification Channel - ${element(local.emails, count.index)}"
   project      = local.project.project_id
   type         = "email"
   labels       = {
-    email_address = "${element(var.billing_budget_notification_email_addresses, count.index)}"
+    email_address = "${element(local.emails, count.index)}"
   }
   
   depends_on   = [
@@ -33,8 +33,15 @@ resource "google_monitoring_notification_channel" "email_notif" {
 }
 
 resource "google_pubsub_topic" "budget_topic" {
-  count   = var.create_budget && var.billing_budget_pubsub_topic ? 1 : 0
+  count   = var.billing_budget_pubsub_topic ? 1 : 0
   name    = "budget-topic-${local.project.project_id}"
+  project = local.project.project_id
+}
+
+resource "google_pubsub_subscription" "budget_topic_subscription" {
+  count   = var.billing_budget_pubsub_topic ? 1 : 0
+  name    = "${google_pubsub_topic.budget_topic[0].name}-subscription"
+  topic   = google_pubsub_topic.budget_topic[0].name
   project = local.project.project_id
 }
 
@@ -66,12 +73,10 @@ resource "google_billing_budget" "budget" {
     }
   }
 
-  dynamic "all_updates_rule" {
-    for_each = local.all_updates_rule
-    content {
-      pubsub_topic                     = var.billing_budget_pubsub_topic ? "${google_pubsub_topic.budget_topic[0].id}" : null
-      monitoring_notification_channels = length(var.billing_budget_notification_email_addresses) > 0 ? toset(google_monitoring_notification_channel.email_notif[*].name) : []
-    }
+  all_updates_rule {
+    disable_default_iam_recipients   = true
+    pubsub_topic                     = var.billing_budget_pubsub_topic ? "${google_pubsub_topic.budget_topic[0].id}" : null
+    monitoring_notification_channels = length(local.emails) > 0 ? toset(google_monitoring_notification_channel.email_notif[*].name) : []
   }
 
   depends_on = [

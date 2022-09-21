@@ -15,7 +15,7 @@
  */
 
 locals {
-  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
   project = (var.create_project
     ? try(module.project_radlab_alpha_fold.0, null)
     : try(data.google_project.existing_project.0, null)
@@ -42,15 +42,17 @@ locals {
     "roles/iam.serviceAccountUser"
   ]
 
-  project_services = var.enable_services ? [
+  default_apis = [
     "compute.googleapis.com",
     "bigquery.googleapis.com",
     "notebooks.googleapis.com",
     "bigquerystorage.googleapis.com"
-  ] : []
+  ]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "default" {
+  count       = var.deployment_id == null ? 1 : 0
   byte_length = 2
 }
 
