@@ -95,8 +95,38 @@ def getconn():
     )
     return conn
 
+def connect_tcp_socket() -> sqlalchemy.engine.base.Engine:
+    # Note: Saving credentials in environment variables is convenient, but not
+    # secure - consider a more secure solution such as
+    # Cloud Secret Manager (https://cloud.google.com/secret-manager) to help
+    # keep secrets safe.
+    db_host = '127.0.0.1'
+    db_user = "${CLOUD_SQL_USERNAME}"
+    db_pass = "${CLOUD_SQL_PASSWORD}"
+    db_name = "${CLOUD_SQL_DATABASE_NAME}"
+    db_port = '5432'
+
+    pool = sqlalchemy.create_engine(
+        # Equivalent URL:
+        # postgresql+pg8000://<db_user>:<db_pass>@<db_host>:<db_port>/<db_name>
+        sqlalchemy.engine.url.URL.create(
+            drivername="postgresql+pg8000",
+            username=db_user,
+            password=db_pass,
+            host=db_host,
+            port=db_port,
+            database=db_name,
+        ),
+        # ...
+    )
+    return pool
+
 def get_db_accounts(accounts):
+
     pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn,)
+
+    # Use below pool when testing the app locally and connecting to CLoud SQL Publicly
+    # pool = connect_tcp_socket()
     with pool.connect() as db_conn:
         # query database
         result = db_conn.execute("SELECT * from accounts").fetchall()
@@ -110,6 +140,8 @@ def get_db_accounts(accounts):
 def create_db_accounts(name, email, sector):
     pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn,)
 
+    # Use below pool when testing the app locally and connecting to CLoud SQL Publicly
+    # pool = connect_tcp_socket()
     # insert statement
     insert_stmt = sqlalchemy.text(
         "INSERT INTO accounts (name, email, sector) VALUES (:name, :email, :sector)",
