@@ -84,67 +84,73 @@ variable "create_budget" {
 }
 
 variable "create_project" {
-  description = "Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false."
+  description = "Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false. {{UIMeta group=1 order=1 }}"
   type        = bool
   default     = true
 }
 
+variable "deployment_id" {
+  description = "Adds a suffix of 4 random characters to the `project_id`."
+  type        = string
+  default     = null
+}
+
 variable "enable_services" {
-  description = "Enable the necessary APIs on the project.  When using an existing project, this can be set to false."
+  description = "Enable the necessary APIs on the project.  When using an existing project, this can be set to false. {{UIMeta group=1 order=3 }}"
   type        = bool
   default     = true
 }
 
 variable "folder_id" {
-  description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. "
+  description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. {{UIMeta group=0 order=2 updatesafe }}"
   type        = string
   default     = ""
 }
 
 variable "organization_id" {
-  description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id"
+  description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id. {{UIMeta group=0 order=1 }}"
   type        = string
   default     = ""
 }
 
-variable "project_name" {
-  description = "Project name or ID, if it's an existing project."
+variable "project_id_prefix" {
+  description = "If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module. {{UIMeta group=1 order=2 }}"
   type        = string
   default     = "radlab-web-hosting"
 }
 
-variable "random_id" {
-  description = "Adds a suffix of 4 random characters to the `project_id`"
+variable "resource_creator_identity" {
+  description = "Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module. {{UIMeta group=0 order=4 updatesafe }}"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "set_bucket_level_access_policy" {
-  description = "Apply org policy to disable Uniform Bucket Level Access on GCS."
-  type        = bool
-  default     = true
-}
-
-variable "set_shielded_vm_policy" {
-  description = "Apply org policy to disable shielded VMs."
+  description = "Apply org policy to disable Uniform Bucket Level Access on GCS. {{UIMeta group=0 order=15 updatesafe }}"
   type        = bool
   default     = true
 }
 
 variable "set_domain_restricted_sharing_policy" {
-  description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=15 updatesafe }}"
+  description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=16 updatesafe }}"
   type        = bool
   default     = false
 }
 
+variable "set_shielded_vm_policy" {
+  description = "Apply org policy to disable shielded VMs. {{UIMeta group=0 order=17 updatesafe }}"
+  type        = bool
+  default     = true
+}
+
 variable "trusted_groups" {
-  description = "The list of trusted groups (e.g. `myteam@abc.com`)."
+  description = "The list of trusted groups (e.g. `myteam@abc.com`). {{UIMeta group=1 order=5 updatesafe }}"
   type        = set(string)
   default     = []
 }
 
 variable "trusted_users" {
-  description = "The list of trusted users (e.g. `username@abc.com`)."
+  description = "The list of trusted users (e.g. `username@abc.com`). {{UIMeta group=1 order=4 updatesafe }}"
   type        = set(string)
   default     = []
 }

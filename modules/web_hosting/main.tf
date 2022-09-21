@@ -15,7 +15,7 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.hex
   project = (var.create_project
     ? try(module.project_radlab_web_hosting.0, null)
     : try(data.google_project.existing_project.0, null)
@@ -40,7 +40,6 @@ locals {
     "networkmanagement.googleapis.com",
     "servicenetworking.googleapis.com",
     "sqladmin.googleapis.com",
-    "dns.googleapis.com"
   ] : []
 }
 
@@ -54,14 +53,14 @@ resource "random_id" "default" {
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  project_id = var.project_id_prefix
 }
 
 module "project_radlab_web_hosting" {
   count               = var.create_project ? 1 : 0
   source              = "terraform-google-modules/project-factory/google"
   version             = "~> 13.0"
-  name                = format("%s-%s", var.project_name, local.random_id)
+  name                = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id   = false
   folder_id           = var.folder_id
   billing_account     = var.billing_account_id
@@ -126,7 +125,7 @@ resource "google_compute_instance" "web1-vpc-xlb" {
   }
   boot_disk {
     initialize_params {
-      image = "debian-11-bullseye-v20220719"
+      image = "debian-11-bullseye-v20220822"
     }
   }
  
@@ -162,7 +161,7 @@ resource "google_compute_instance" "web2-vpc-xlb" {
   }
   boot_disk {
     initialize_params {
-      image = "debian-11-bullseye-v20220719"
+      image = "debian-11-bullseye-v20220822"
     }
   }
  
@@ -198,7 +197,7 @@ resource "google_compute_instance" "web3-vpc-xlb" {
   }
   boot_disk {
     initialize_params {
-      image = "debian-11-bullseye-v20220719"
+      image = "debian-11-bullseye-v20220822"
     }
   }
  
@@ -234,7 +233,7 @@ resource "google_compute_instance" "web4-vpc-xlb" {
   }
   boot_disk {
     initialize_params {
-      image = "debian-11-bullseye-v20220719"
+      image = "debian-11-bullseye-v20220822"
     }
   }
  
@@ -258,82 +257,6 @@ resource "google_compute_instance" "web4-vpc-xlb" {
     ]
 }
 
-#########################################################################
-# Creating GCE VMs in vpc-ilb
-#########################################################################
-
-
-# resource "google_compute_instance" "app1-vpc-ilb" {
-#   project      = local.project.project_id
-#   zone         = "us-central1-c"
-#   name         = "app1-vpc-ilb"
-#   machine_type = "f1-micro"
-#   allow_stopping_for_update = true
-#   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
-#   metadata = {
-#     enable-oslogin = true
-#   }
-#   boot_disk {
-#     initialize_params {
-#       image = "debian-11-bullseye-v20220719"
-#     }
-#   }
- 
-#   network_interface {
-#     subnetwork         = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.name
-#     subnetwork_project = local.project.project_id
-#     network_ip         = "10.100.20.2"
-#     # access_config {
-#     #   // Ephemeral IP
-#     # }
-#   }
-#   service_account {
-#     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-#     email  = google_service_account.sa_p_cloud_sql.email
-#     scopes = ["cloud-platform"]
-#   }
-
-#   depends_on = [
-#     time_sleep.wait_120_seconds,
-#     google_compute_router_nat.nat-gw-vpc-ilb-us-c1
-#     ]
-# }
-
-# resource "google_compute_instance" "app2-vpc-ilb" {
-#   project      = local.project.project_id
-#   zone         = "us-central1-f"
-#   name         = "app2-vpc-ilb"
-#   machine_type = "f1-micro"
-#   allow_stopping_for_update = true
-#   metadata_startup_script   = data.template_file.metadata_startup_script.rendered
-#   metadata = {
-#     enable-oslogin = true
-#   }
-#   boot_disk {
-#     initialize_params {
-#       image = "debian-11-bullseye-v20220719"
-#     }
-#   }
- 
-#   network_interface {
-#     subnetwork         = google_compute_subnetwork.subnetwork-vpc-ilb-us-c1.name
-#     subnetwork_project = local.project.project_id
-#     network_ip         = "10.100.20.3"
-#     # access_config {
-#     #   // Ephemeral IP
-#     # }
-#   }
-#   service_account {
-#     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-#     email  = google_service_account.sa_p_cloud_sql.email
-#     scopes = ["cloud-platform"]
-#   }
-
-#   depends_on = [
-#     time_sleep.wait_120_seconds,
-#     google_compute_router_nat.nat-gw-vpc-ilb-us-c1
-#     ]
-# }
 
 #########################################################################
 # GCS bucket / Bucket Objects / Bucket Bindings

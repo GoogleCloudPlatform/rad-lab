@@ -61,54 +61,30 @@ resource "google_sql_user" "users" {
 }
 
 #########################################################################
-# Startup script for Sample DB VM in vpc-xlb
+# Create Startup script for Sample DB VM in vpc-xlb
 #########################################################################
 
-data "template_file" "sample_db_metadata_startup_script" {
-    # template = "${file("${path.module}/scripts/build/sample_db/sample_db_vm.sh")}"
-    template = "${file("${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh.tpl")}"
-    vars = {
-        DB_NAME = "postgres"
-        DB_IP   = resource.google_sql_database_instance.db_postgres.private_ip_address
-        DB_USER = resource.google_sql_user.users.name
-        DB_PASS = resource.google_sql_user.users.password
-    }
+resource "local_file" "sample_db_metadata_startup_script_output" {
+  filename = "${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh"
+  content = templatefile("${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh.tpl", {
+    DB_NAME = "postgres"
+    DB_IP   = resource.google_sql_database_instance.db_postgres.private_ip_address
+    DB_USER = resource.google_sql_user.users.name
+    DB_PASS = resource.google_sql_user.users.password
+  })
 }
 
+
 #########################################################################
-# Creating GCE VM in vpc-xlb to spin up Sample DB in Postgres CLoud SQL
+# Creating GCE VM used to spin up Sample DB in Postgres Cloud SQL
 #########################################################################
 
-resource "google_compute_instance" "sample-db-vm" {
-  project      = local.project.project_id
-  zone         = "us-central1-f"
-  name         = "sample-db-vm"
-  machine_type = "f1-micro"
-  allow_stopping_for_update = true
-  metadata_startup_script   = data.template_file.sample_db_metadata_startup_script.rendered
-  metadata = {
-    enable-oslogin = true
+resource "null_resource" "create-sample-db-vm" {
+  provisioner "local-exec" {
+
+    command = "gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc-xlb.name} --subnet=${google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh"
   }
-  boot_disk {
-    initialize_params {
-      image = "debian-11-bullseye-v20220719"
-    }
-  }
- 
-  network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name
-    subnetwork_project = local.project.project_id
-    network_ip         = "10.200.20.20"
-    # access_config {
-    #   // Ephemeral IP
-    # }
-  }
-  service_account {
-    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-    email  = google_service_account.sa_p_cloud_sql.email
-    scopes = ["cloud-platform"]
-  }
-  
+
   depends_on = [
     time_sleep.wait_120_seconds,
     google_compute_router_nat.nat-gw-vpc-xlb-us-c1
@@ -119,12 +95,13 @@ resource "time_sleep" "create_sample_db" {
 
   create_duration = "60s"
   depends_on = [
-      google_compute_instance.sample-db-vm,
+      null_resource.create-sample-db-vm,
       ]
 }
 
+
 #########################################################################
-# Deleting GCE VM used to spin up Sample DB in Postgres CLoud SQL
+# Deleting GCE VM used to spin up Sample DB in Postgres Cloud SQL
 #########################################################################
 
 resource "null_resource" "del-sample-db-vm" {

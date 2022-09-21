@@ -1,13 +1,26 @@
 # RAD Lab Web Hosting module
 
+This RAD Lab module builds a 3-tier application architecture which is a modular client-server architecture that consists of a presentation tier, an application tier and a data tier. The data tier stores information, the application tier handles logic and the presentation tier is a graphical user interface (GUI) that communicates with the other two tiers. This modules spins up a sample app aka registration form which takes data from UI (Presentation Layer), process the data on GCE servers (application layer) and selects or insert data into Cloud SQL Postgres DB (database layer)
+
+NOTE: Once the deployment is completed wait for ~5 minutes for the Application and the DB server to roll out completely. 
+
 ## GCP Products/Services
 
+* Virtual Private Cloud (VPC)
+* Compute Engine: Virtual Machines
+* Cloud NAT
+* Cloud Load Balancing
+* Cloud Armor
+* Clous CDN
+* Cloud Storage
+* Cloud SQL
+* Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-[ COMING SOON...]
+![](../../docs/images/V8_Web_Hosting.png)
 
 ## IAM Permissions Prerequisites
 
@@ -41,11 +54,12 @@ NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prere
 | *billing_budget_services* | A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/ | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">null</code> |
 | *create_budget* | If the budget should be created | <code title="">bool</code> |  | <code title="">false</code> |
 | *create_project* | Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false | <code title="">bool</code> |  | <code title="">true</code> |
+| *deployment_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node | <code title="">string</code> |  | <code title=""></code> |
-| *organization_id* | Organization ID where GCP Resources need to get spin up | <code title="">string</code> |  | <code title=""></code> |
-| *project_name* | Project name or ID, if it's an existing project | <code title="">string</code> |  | <code title="">radlab-web-hosting</code> |
-| *random_id* | None | <code title="">string</code> |  | <code title="">null</code> |
+| *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
+| *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-web-hosting</code> |
+| *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
 | *set_bucket_level_access_policy* | Apply org policy to disable Uniform Bucket Level Access on GCS | <code title="">bool</code> |  | <code title="">true</code> |
 | *set_domain_restricted_sharing_policy* | Enable org policy to allow all principals to be added to IAM policies | <code title="">bool</code> |  | <code title="">false</code> |
 | *set_shielded_vm_policy* | Apply org policy to disable shielded VMs | <code title="">bool</code> |  | <code title="">true</code> |

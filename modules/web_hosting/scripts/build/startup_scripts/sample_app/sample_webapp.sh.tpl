@@ -24,7 +24,7 @@ wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_pro
 
 # Setup Cloud SQL Proxy
 chmod +x cloud_sql_proxy
-nohup ./cloud_sql_proxy -instances=$INSTANCE_CONNECTION_NAME=tcp:5432 -ip_address_types=PRIVATE &
+nohup ./cloud_sql_proxy -instances=${INSTANCE_CONNECTION_NAME}=tcp:5432 -ip_address_types=PRIVATE &
 
 # Fetch source code
 if [ -d "rad-lab" ]; then rm -Rf rad-lab; fi
