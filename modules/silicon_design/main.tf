@@ -42,14 +42,15 @@ locals {
     "roles/storage.objectViewer",
   ]
 
-  project_services = var.enable_services ? [
+  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-design-notebook-${i}"]
+  
+  default_apis = [
     "compute.googleapis.com",
     "notebooks.googleapis.com",
     "cloudbuild.googleapis.com",
     "artifactregistry.googleapis.com",
-  ] : []
-
-  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-design-notebook-${i}"]
+  ]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "default" {

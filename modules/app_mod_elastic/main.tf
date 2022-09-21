@@ -23,12 +23,13 @@ locals {
     : try(data.google_project.existing_project.0, null)
   )
 
-  project_services = var.enable_services ? [
+  default_apis = [
     "compute.googleapis.com",
     "container.googleapis.com",
     "monitoring.googleapis.com",
     "logging.googleapis.com"
-  ] : []
+  ]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "random_id" {

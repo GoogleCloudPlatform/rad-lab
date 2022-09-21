@@ -44,13 +44,13 @@ locals {
     "roles/iam.serviceAccountUser"
   ]
 
-  project_services = var.enable_services ? [
+  default_apis = [
     "compute.googleapis.com",
     "lifesciences.googleapis.com",
     "cloudfunctions.googleapis.com",
     "cloudbuild.googleapis.com"
-  ] : []
-
+  ]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "random_id" {
