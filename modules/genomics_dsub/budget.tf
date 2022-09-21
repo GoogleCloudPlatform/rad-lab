@@ -19,7 +19,7 @@ locals {
 }
 
 resource "google_monitoring_notification_channel" "email_notif" {
-  count        = length(local.emails)
+  count        = var.create_budget ? length(local.emails) : 0 
   display_name = "Billing Budget Notification Channel - ${element(local.emails, count.index)}"
   project      = local.project.project_id
   type         = "email"
