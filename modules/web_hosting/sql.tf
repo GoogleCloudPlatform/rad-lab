@@ -82,7 +82,10 @@ resource "local_file" "sample_db_metadata_startup_script_output" {
 resource "null_resource" "create-sample-db-vm" {
   provisioner "local-exec" {
 
-    command = "gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc-xlb.name} --subnet=${google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh"
+    command = <<-EOT
+    gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc-xlb.name} --subnet=${google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename}
+    rm -rf ${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh
+    EOT
   }
 
   depends_on = [
