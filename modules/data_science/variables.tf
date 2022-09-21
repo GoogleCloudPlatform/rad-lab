@@ -67,7 +67,7 @@ variable "billing_budget_services" {
 
 variable "billing_budget_notification_email_addresses" {
   description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 5 channels are allowed. {{UIMeta group=0 order=13 updatesafe }}"
-  type        = list(string)
+  type        = set(string)
   default     = []
 }
 
