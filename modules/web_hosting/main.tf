@@ -34,13 +34,14 @@ locals {
   #   : try(data.google_compute_subnetwork.default.0, null)
   # )
 
-  project_services = var.enable_services ? [
+  default_apis = [
     "compute.googleapis.com",
     "iap.googleapis.com",
     "networkmanagement.googleapis.com",
     "servicenetworking.googleapis.com",
     "sqladmin.googleapis.com",
-  ] : []
+  ]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "default" {
