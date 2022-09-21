@@ -52,6 +52,8 @@ db_conn_name = "${INSTANCE_CONNECTION_NAME}"
 db_user = "${CLOUD_SQL_USERNAME}"
 db_pass = "${CLOUD_SQL_PASSWORD}"
 db_name = "${CLOUD_SQL_DATABASE_NAME}"
+db_host = '127.0.0.1'
+db_port = '5432'
 
 app = Flask(__name__)
 
@@ -82,29 +84,11 @@ def create():
 
     return render_template('create.html')
 
-# getconn now set to private IP
-def getconn():
-
-    conn = connector.connect(
-      db_conn_name,
-      "pg8000",
-      user=db_user,
-      password=db_pass,
-      db=db_name,
-      ip_type=IPTypes.PRIVATE,
-    )
-    return conn
-
 def connect_tcp_socket() -> sqlalchemy.engine.base.Engine:
     # Note: Saving credentials in environment variables is convenient, but not
     # secure - consider a more secure solution such as
     # Cloud Secret Manager (https://cloud.google.com/secret-manager) to help
     # keep secrets safe.
-    db_host = '127.0.0.1'
-    db_user = "${CLOUD_SQL_USERNAME}"
-    db_pass = "${CLOUD_SQL_PASSWORD}"
-    db_name = "${CLOUD_SQL_DATABASE_NAME}"
-    db_port = '5432'
 
     pool = sqlalchemy.create_engine(
         # Equivalent URL:
@@ -123,25 +107,25 @@ def connect_tcp_socket() -> sqlalchemy.engine.base.Engine:
 
 def get_db_accounts(accounts):
 
-    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn,)
-
     # Use below pool when testing the app locally and connecting to CLoud SQL Publicly
-    # pool = connect_tcp_socket()
+    pool = connect_tcp_socket()
+
     with pool.connect() as db_conn:
+
         # query database
         result = db_conn.execute("SELECT * from accounts").fetchall()
 
     # Do something with the results
     for row in result:
+        # print(row)
         accounts.append({'name': row.name,'email': row.email, 'sector': row.sector})
     
     return accounts
 
 def create_db_accounts(name, email, sector):
-    pool = sqlalchemy.create_engine("postgresql+pg8000://",creator=getconn,)
 
     # Use below pool when testing the app locally and connecting to CLoud SQL Publicly
-    # pool = connect_tcp_socket()
+    pool = connect_tcp_socket()
     # insert statement
     insert_stmt = sqlalchemy.text(
         "INSERT INTO accounts (name, email, sector) VALUES (:name, :email, :sector)",
