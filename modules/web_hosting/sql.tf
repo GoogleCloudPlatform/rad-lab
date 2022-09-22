@@ -61,9 +61,10 @@ resource "google_sql_user" "users" {
 }
 
 #########################################################################
-# Create Startup script for Sample DB VM in vpc-xlb
+# Configs for Sample DB Creation
 #########################################################################
 
+# Create Startup script for Sample DB VM in vpc-xlb
 resource "local_file" "sample_db_metadata_startup_script_output" {
   filename = "${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh"
   content = templatefile("${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh.tpl", {
@@ -74,17 +75,13 @@ resource "local_file" "sample_db_metadata_startup_script_output" {
   })
 }
 
-
-#########################################################################
 # Creating GCE VM used to spin up Sample DB in Postgres Cloud SQL
-#########################################################################
-
 resource "null_resource" "create-sample-db-vm" {
   provisioner "local-exec" {
 
     command = <<-EOT
     gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc-xlb.name} --subnet=${google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename}
-    rm -rf ${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh
+    rm -rf ${local_file.sample_db_metadata_startup_script_output.filename}
     EOT
   }
 
@@ -102,11 +99,7 @@ resource "time_sleep" "create_sample_db" {
       ]
 }
 
-
-#########################################################################
 # Deleting GCE VM used to spin up Sample DB in Postgres Cloud SQL
-#########################################################################
-
 resource "null_resource" "del-sample-db-vm" {
   provisioner "local-exec" {
     command = "gcloud compute instances delete sample-db-vm --zone=us-central1-f --project=${local.project.project_id}"
