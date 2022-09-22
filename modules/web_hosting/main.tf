@@ -269,7 +269,9 @@ resource "google_storage_bucket" "gcs_image_bucket" {
   location      = "US"
   project       = local.project.project_id
   force_destroy = true
-  depends_on    = [google_project_service.enabled_services]
+  depends_on    = [
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds]
 }
 
 resource "google_storage_object_access_control" "public_rule" {
