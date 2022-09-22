@@ -14,12 +14,31 @@
  * limitations under the License.
  */
 
+
+output "billing_budget_budget_id" {
+  sensitive   = true
+  description = "Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}`"
+  value       = var.create_budget ? google_billing_budget.budget[0].name : ""
+}
+
 output "deployment_id" {
-  description = "RADLab Module Deployment ID"
+  description = "RAD Lab Module Deployment ID"
   value       = local.random_id
 }
 
-output "project_radlab_web_hosting_id" {
-  description = "Web Hosting Project ID"
+output "project_id" {
+  description = "Web Hosting RAD Lab Project ID"
   value       = local.project.project_id
+}
+
+output "lb_content_based" {
+  description = "URLs to Content Based Load Balancer"
+  value       = concat(formatlist("http://%s:80", google_compute_global_forwarding_rule.fe-http-content-based.ip_address),
+                        formatlist("http://%s:80/create", google_compute_global_forwarding_rule.fe-http-content-based.ip_address),
+                        formatlist("http://%s:80/delete", google_compute_global_forwarding_rule.fe-http-content-based.ip_address))
+}
+
+output "lb_region_based" {
+  description = "URL to Region Based Load Balancer"
+  value       = formatlist("http://%s:80", google_compute_global_forwarding_rule.fe-http-cross-region-cdn.ip_address)
 }

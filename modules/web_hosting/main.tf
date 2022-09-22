@@ -479,7 +479,7 @@ resource "google_compute_url_map" "http-lb-content-based" {
     }
 
     path_rule {
-      paths   = ["/create", "/create/*"]
+      paths   = ["/create", "/create/*", "/delete", "/delete/*"]
       service = google_compute_backend_service.be-http-content-based-create.id
     }
 

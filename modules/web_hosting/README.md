@@ -70,7 +70,10 @@ NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prere
 
 | name | description | sensitive |
 |---|---|:---:|
-| deployment_id | RADLab Module Deployment ID |  |
-| project_radlab_web_hosting_id | Web Hosting Project ID |  |
+| billing_budget_budget_id | Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}` | ✓ |
+| deployment_id | RAD Lab Module Deployment ID |  |
+| lb_content_based | URLs to Content Based Load Balancer |  |
+| lb_region_based | URL to Region Based Load Balancer |  |
+| project_id | Web Hosting RAD Lab Project ID |  |
 <!-- END TFDOC -->
 
