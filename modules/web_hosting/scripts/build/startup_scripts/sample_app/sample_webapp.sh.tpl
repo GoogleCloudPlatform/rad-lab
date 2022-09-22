@@ -75,11 +75,31 @@ def create():
         elif not sector:
             flash('Sector is required!')
         else:
-            # Insert record in DB
-            create_db_accounts(name, email, sector)
-            return redirect(url_for('index'))
+            userexists = count_db_accounts(email)
+            
+            if userexists == False:
+                # Insert record in DB
+                create_db_accounts(name, email, sector)
+                return redirect(url_for('index'))
+            else:
+                flash('User with the same Email ID already exists!')
 
     return render_template('create.html')
+
+@app.route('/delete', methods=('GET', 'POST'))
+def delete():
+    accounts = []
+    if request.method == 'POST':
+        email = request.form['email']
+
+        if not email:
+            flash('Email is required!')
+        else:
+            # Insert record in DB
+            delete_db_accounts(email)
+            return redirect(url_for('index'))
+
+    return render_template('delete.html')
 
 def connect_tcp_socket() -> sqlalchemy.engine.base.Engine:
     # Note: Saving credentials in environment variables is convenient, but not
@@ -119,10 +139,29 @@ def get_db_accounts(accounts):
     
     return accounts
 
+def count_db_accounts(email):
+
+    # Use below pool when testing the app locally and connecting to CLoud SQL Publicly
+    pool = connect_tcp_socket()
+
+    # count statement
+    count_stmt = sqlalchemy.text(
+        "SELECT COUNT(*) from accounts WHERE accounts.email = :email",
+    )
+    with pool.connect() as db_conn:
+        # count query database
+        count = db_conn.execute(count_stmt, email=email).scalar()
+
+        if count > 0:
+            return True
+        else:
+            return False
+
 def create_db_accounts(name, email, sector):
 
     # Use below pool when testing the app locally and connecting to CLoud SQL Publicly
     pool = connect_tcp_socket()
+
     # insert statement
     insert_stmt = sqlalchemy.text(
         "INSERT INTO accounts (name, email, sector) VALUES (:name, :email, :sector)",
@@ -130,6 +169,20 @@ def create_db_accounts(name, email, sector):
     with pool.connect() as db_conn:
         # query database
         db_conn.execute(insert_stmt, name=name, email=email, sector=sector)
+
+
+def delete_db_accounts(email):
+
+    # Use below pool when testing the app locally and connecting to CLoud SQL Publicly
+    pool = connect_tcp_socket()
+
+    # delete statement
+    delete_stmt = sqlalchemy.text(
+        "DELETE FROM accounts WHERE accounts.email = :email",
+    )
+    with pool.connect() as db_conn:
+        # query database
+        db_conn.execute(delete_stmt, email=email)
 
 @app.route('/hc')
 def hello_gcp():
@@ -142,6 +195,7 @@ def hello_gcp():
 connector.close()
 
 if __name__ == '__main__':
+    app.secret_key = 'super secret key'
     app.run(debug=True, host='0.0.0.0', port=80)
 EOF
 chmod 700 rad-lab/modules/web_hosting/scripts/build/startup_scripts/sample_app/app.py
