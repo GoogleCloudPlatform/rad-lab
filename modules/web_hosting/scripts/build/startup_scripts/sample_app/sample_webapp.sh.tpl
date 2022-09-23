@@ -28,7 +28,7 @@ nohup ./cloud_sql_proxy -instances=${INSTANCE_CONNECTION_NAME}=tcp:5432 -ip_addr
 
 # Fetch source code
 if [ -d "rad-lab" ]; then rm -Rf rad-lab; fi
-sudo git clone -b web-hosting https://github.com/GoogleCloudPlatform/rad-lab.git
+sudo git clone https://github.com/GoogleCloudPlatform/rad-lab.git
 
 # Deploy Web App
 sudo pip3 install -r rad-lab/modules/web_hosting/scripts/build/startup_scripts/sample_app/requirements.txt
