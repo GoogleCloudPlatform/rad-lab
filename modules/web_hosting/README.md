@@ -22,12 +22,20 @@ Below Architechture Diagram is the base representation of what will be created a
 
 ![](../../docs/images/V8_Web_Hosting.png)
 
+## API Prerequisites
+
+In the RAD Lab Management Project make sure that _Cloud Billing Budget API (`billingbudgets.googleapis.com`)_ is enabled. 
+NOTE: This is only required if spinning up Billing Budget for the module.
+
 ## IAM Permissions Prerequisites
 
 Ensure that the identity executing this module has the following IAM permissions, **when creating the project** (`create_project` = true): 
 - Parent: `roles/billing.user`
+- Parent: `roles/billing.costsManager` (OPTIONAL - Only when spinning up Billing Budget for the module)
 - Parent: `roles/resourcemanager.projectCreator`
 - Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only required if setting any Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
+
+NOTE: Billing budgets can only be created if you are using a Service Account to deploy the module via Terraform, User account cannot be used.
 
 When deploying in an existing project, ensure the identity has the following permissions on the project:
 - `roles/compute.admin`
@@ -36,6 +44,23 @@ When deploying in an existing project, ensure the identity has the following per
 - `roles/storage.admin`
 
 NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](./radlab-launcher)
+
+### Deployments via Service Account
+
+1. Create a Terraform Service Account in RAD Lab Management Project to execute / deploy the RAD Lab module. Ensure that the Service Account has the above mentioned IAM permissions.
+NOTE: Make sure to set the `resource_creator_identity` variable to the Service Account ID in terraform.tfvars file and pass it in module deployment. Example content of terraform.tfvars: 
+```
+resource_creator_identity = <sa>@<projectID>.iam.gserviceaccount.com 
+```
+
+2. The User, Group, or Service Account who will be deploying the module should have access to impersonate and grant it the roles, `roles/iam.serviceAccountTokenCreator` on the **Terraform Service Account’s IAM Policy**.
+NOTE: This is not a Project IAM Binding; this is a **Service Account** IAM Binding.
+
+NOTE: Additional [permissions](../../radlab-launcher/README.md#iam-permissions-prerequisites) are required when deploying the RAD Lab modules via [RAD Lab Launcher](../../radlab-launcher). Use `--disable-perm-check` or `-dc` arguments when using RAD lab Launcher for the module deployment.
+
+_Usage:_
+
+```python3 radlab.py --disable-perm-check --varfile /<path_to_file>/<file_with_terraform.tfvars_contents>```
 
 <!-- BEGIN TFDOC -->
 ## Variables
