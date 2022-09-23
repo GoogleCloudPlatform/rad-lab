@@ -69,6 +69,10 @@ variable "billing_budget_notification_email_addresses" {
   description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 4 channels are allowed as the first element of `trusted_users` is automatically added as one of the channel. {{UIMeta group=0 order=13 updatesafe }}"
   type        = set(string)
   default     = []
+  validation {
+    condition     = length(var.billing_budget_notification_email_addresses) <= 4
+    error_message = "Maximum of 4 email addresses are allowed for the budget monitoring channel."
+  }
 }
 
 variable "billing_budget_pubsub_topic" {
