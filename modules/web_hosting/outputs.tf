@@ -42,3 +42,8 @@ output "lb_region_based" {
   description = "URL to Region Based Load Balancer"
   value       = formatlist("http://%s:80", google_compute_global_forwarding_rule.fe-http-cross-region-cdn.ip_address)
 }
+
+output "lb_region_based_cdn_gcs" {
+  description = "URL to Region Based Load Balancer with Cloud Storage Static Objects with CDN"
+  value       = formatlist("http://%s:80/%s", google_compute_global_forwarding_rule.fe-http-cross-region-cdn.ip_address, google_storage_bucket_object.picture.name)
+}

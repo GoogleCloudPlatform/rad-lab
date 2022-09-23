@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS accounts (
       email VARCHAR ( 50 ) UNIQUE NOT NULL,
       sector VARCHAR ( 50 ) NOT NULL); 
 \x
+GRANT SELECT, UPDATE, INSERT, DELETE ON accounts TO PUBLIC;
+\x
 ALTER TABLE accounts OWNER TO postgres;
 \x
 INSERT INTO accounts (name, email, sector)

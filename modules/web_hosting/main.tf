@@ -15,24 +15,12 @@
  */
 
 locals {
-  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
   project = (var.create_project
     ? try(module.project_radlab_web_hosting.0, null)
     : try(data.google_project.existing_project.0, null)
   )
   # region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
-
-  # network = (
-  #   var.create_network
-  #   ? try(module.vpc_workbench.0.network.network, null)
-  #   : try(data.google_compute_network.default.0, null)
-  # )
-
-  # subnet = (
-  #   var.create_network
-  #   ? try(module.vpc_workbench.0.subnets["${local.region}/${var.subnet_name}"], null)
-  #   : try(data.google_compute_subnetwork.default.0, null)
-  # )
 
   default_apis = [
     "compute.googleapis.com",
@@ -45,6 +33,7 @@ locals {
 }
 
 resource "random_id" "default" {
+  count       = var.deployment_id == null ? 1 : 0
   byte_length = 2
 }
 
@@ -282,7 +271,7 @@ resource "google_storage_object_access_control" "public_rule" {
 }
 
 resource "google_storage_bucket_object" "picture" {
-  name   = "countryRoad.jpg"
+  name   = "images/countryRoad.jpg"
   source = "./scripts/build/img/clear-day-brock-mountain-drive_800.jpg"
   bucket = google_storage_bucket.gcs_image_bucket.name
 }

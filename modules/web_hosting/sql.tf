@@ -16,7 +16,7 @@
  
  resource "google_sql_database_instance" "db_postgres" {
   database_version    = "POSTGRES_12"
-  name                = format("test-radlab-web-hosting-db-%s", local.random_id)
+  name                = format("radlab-web-hosting-db-%s", local.random_id)
   project             = local.project.project_id
   region              = "us-central1"
   deletion_protection = false
@@ -86,7 +86,6 @@ resource "null_resource" "create-sample-db-vm" {
     else
         gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc-xlb.name} --subnet=${google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename} --impersonate-service-account=${var.resource_creator_identity}
     fi
-    rm -rf ${local_file.sample_db_metadata_startup_script_output.filename}
     EOT
   }
 
