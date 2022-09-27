@@ -14,79 +14,63 @@
  * limitations under the License.
  */
 
+locals {
 
-resource "google_project_organization_policy" "external_ip_policy" {
-  count      = var.set_external_ip_policy ? 1 : 0
-  constraint = "compute.vmExternalIpAccess"
-  project    = local.project.project_id
-
-  list_policy {
-    allow {
-      all = true
+  shielded_vm_policy = {
+    set = {
+      "constraints/compute.requireShieldedVm" = false
     }
+
+    not_set = {}
   }
-  depends_on = [
-    module.project_radlab_ds_analytics
-  ]
-}
 
-resource "google_project_organization_policy" "shielded_vm_policy" {
-  count      = var.set_shielded_vm_policy ? 1 : 0
-  constraint = "compute.requireShieldedVm"
-  project    = local.project.project_id
-
-  boolean_policy {
-    enforced = false
-  }
-  depends_on = [
-    module.project_radlab_ds_analytics
-  ]
-}
-
-resource "google_project_organization_policy" "trustedimage_project_policy" {
-  count      = var.set_trustedimage_project_policy ? 1 : 0
-  constraint = "compute.trustedImageProjects"
-  project    = local.project.project_id
-
-  list_policy {
-    allow {
-      values = [
-        "is:projects/deeplearning-platform-release",
-      ]
+  external_ip_policy = {
+    set = {
+      "constraints/compute.vmExternalIpAccess" = {
+        inherit_from_parent = null
+        suggested_value     = null
+        status              = true
+        values              = null
+      }
     }
+
+    not_set = {}
   }
 
-  depends_on = [
-    module.project_radlab_ds_analytics
-  ]
-}
-
-resource "google_project_organization_policy" "domain_restricted_sharing_policy" {
-  count      = var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic ? 1 : 0
-  constraint = "iam.allowedPolicyMemberDomains"
-  project    = local.project.project_id
-
-  list_policy {
-    allow {
-      all = true
+  trusted_image_project_policy = {
+    set = {
+      "constraints/compute.trustedImageProjects" = {
+        inherit_from_parent = null
+        suggested_value     = null
+        status              = true
+        values              = ["is:projects/deeplearning-platform-release"]
+      }
     }
+
+    not_set = {}
   }
 
-  depends_on = [
-    module.project_radlab_ds_analytics
-  ]
-}
+  domain_restricted_sharing = {
+    set = {
+      "constraints/iam.allowedPolicyMemberDomains" = {
+        inherit_from_parent = false
+        suggested_value     = null
+        status              = true
+        values              = null
+      }
+    }
+    not_set = {}
+  }
 
-resource "time_sleep" "wait_120_seconds" {
-  count = var.set_trustedimage_project_policy || var.set_shielded_vm_policy || var.set_external_ip_policy || (var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic) || var.enable_services ? 1 : 0
+  organization_bool_policies = merge(
+    local.shielded_vm_policy[var.set_shielded_vm_policy ? "set" : "not_set"]
+  )
 
-  depends_on = [
-    google_project_organization_policy.external_ip_policy,
-    google_project_organization_policy.shielded_vm_policy,
-    google_project_organization_policy.trustedimage_project_policy,
-    google_project_organization_policy.domain_restricted_sharing_policy,
-    google_project_service.enabled_services
-  ]
+  organization_list_policies = merge(
+    local.external_ip_policy[var.set_external_ip_policy ? "set" : "not_set"],
+    local.trusted_image_project_policy[var.set_trustedimage_project_policy ? "set" : "not_set"],
+    #    local.domain_restricted_sharing[var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic ? "set" : "not_set"]
+    local.domain_restricted_sharing[var.set_domain_restricted_sharing_policy ? "set" : "not_set"]
+  )
 
-  create_duration = "120s"
 }

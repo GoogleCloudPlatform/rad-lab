@@ -22,7 +22,7 @@ output "billing_budget_budget_id" {
 
 output "deployment_id" {
   description = "RADLab Module Deployment ID"
-  value       = local.random_id
+  value       = module.project.project_id
 }
 
 output "notebooks_googlemanaged_names" {
@@ -51,7 +51,7 @@ output "notebooks_usermanaged_urls" {
 
 output "project_id" {
   description = "Analytics Project ID"
-  value       = local.project.project_id
+  value       = module.project.project_id
 }
 
 output "user_scripts_bucket_uri" {

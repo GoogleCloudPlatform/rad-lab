@@ -21,38 +21,34 @@ locals {
 resource "google_monitoring_notification_channel" "email_notif" {
   count        = var.create_budget ? length(local.emails) : 0 
   display_name = "Billing Budget Notification Channel - ${element(local.emails, count.index)}"
-  project      = local.project.project_id
+  project      = module.project.project_id
   type         = "email"
   labels       = {
     email_address = "${element(local.emails, count.index)}"
   }
-  
-  depends_on   = [
-    time_sleep.wait_120_seconds
-  ]
 }
 
 resource "google_pubsub_topic" "budget_topic" {
   count   = var.billing_budget_pubsub_topic ? 1 : 0
-  name    = "budget-topic-${local.project.project_id}"
-  project = local.project.project_id
+  name    = "budget-topic-${module.project.project_id}"
+  project = module.project.project_id
 }
 
 resource "google_pubsub_subscription" "budget_topic_subscription" {
   count   = var.billing_budget_pubsub_topic ? 1 : 0
   name    = "${google_pubsub_topic.budget_topic[0].name}-subscription"
   topic   = google_pubsub_topic.budget_topic[0].name
-  project = local.project.project_id
+  project = module.project.project_id
 }
 
 resource "google_billing_budget" "budget" {
   count = var.create_budget ? 1 : 0
 
   billing_account = var.billing_account_id
-  display_name    = format("Billing Budget - %s", local.project.project_id)
+  display_name    = format("Billing Budget - %s", module.project.project_id)
 
   budget_filter {
-    projects               = toset(["projects/${local.project.project_id}"])
+    projects               = toset(["projects/${module.project.project_id}"])
     credit_types_treatment = var.billing_budget_credit_types_treatment
     services               = var.billing_budget_services
     labels                 = var.billing_budget_labels
@@ -78,9 +74,4 @@ resource "google_billing_budget" "budget" {
     pubsub_topic                     = var.billing_budget_pubsub_topic ? "${google_pubsub_topic.budget_topic[0].id}" : null
     monitoring_notification_channels = length(local.emails) > 0 ? toset(google_monitoring_notification_channel.email_notif[*].name) : []
   }
-
-  depends_on = [
-    google_project_service.enabled_services,
-    time_sleep.wait_120_seconds
-  ]
 }
