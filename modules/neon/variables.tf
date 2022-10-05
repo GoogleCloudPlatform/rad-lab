@@ -33,7 +33,7 @@ variable "ah_listing_id" {
 }
 
 variable "ah_project_id" {
-  description = "Analytics Hub : Project ID (associalted to the data exchange & listing). {{UIMeta group=4 order=1 }}"
+  description = "Analytics Hub : Project ID (associated to the data exchange & listing). {{UIMeta group=4 order=1 }}"
   type        = string
   default     = "neon-project"
 }
