@@ -21,13 +21,13 @@ variable "ah_data_exchange_id" {
 }
 
 variable "ah_linked_dataset_name" {
-  description = "Analytics Hub : Linked Dataset name (shared with `allauthenticated` users). {{UIMeta group=4 order=4 }}"
+  description = "Analytics Hub : Linked Dataset display name. {{UIMeta group=4 order=4 }}"
   type        = string
   default     = "neon_linked_dataset"
 }
 
 variable "ah_listing_id" {
-  description = "Analytics Hub : Listing ID. {{UIMeta group=4 order=3 }}"
+  description = "Analytics Hub : Listing ID (shared with `allauthenticated` users). {{UIMeta group=4 order=3 }}"
   type        = string
   default     = "neonlistid_456"
 }
