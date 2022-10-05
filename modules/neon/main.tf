@@ -50,6 +50,8 @@ locals {
     "analyticshub.googleapis.com"
   ]
   project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
+
+  token = length(var.resource_creator_identity) != 0 ? data.google_service_account_access_token.default[0].access_token : ""
 }
 
 resource "random_id" "default" {
@@ -329,7 +331,7 @@ resource "null_resource" "subscribe" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "bash ${path.module}/scripts/build/subscribe.sh ${local.project.project_id} ${var.ah_project_id} ${var.ah_data_exchange_id} ${var.ah_listing_id} ${var.ah_linked_dataset_name} ${var.resource_creator_identity} ${data.google_service_account_access_token.default[0].access_token}"
+    command     = "bash ${path.module}/scripts/build/subscribe.sh ${local.project.project_id} ${var.ah_project_id} ${var.ah_data_exchange_id} ${var.ah_listing_id} ${var.ah_linked_dataset_name} ${var.resource_creator_identity} ${local.token}"
   }
   depends_on = [
     time_sleep.wait_120_seconds,
