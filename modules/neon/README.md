@@ -66,10 +66,10 @@ _Usage:_
 | name | description | type | required | default |
 |---|---|:---: |:---:|:---:|
 | billing_account_id | Billing Account associated to the GCP Resources | <code title="">string</code> | ✓ |  |
-| *ah_data_exchange_id* | Analytics Hub : Data Exchange ID | <code title="">string</code> |  | <code title="">neon-exchangeid_123</code> |
-| *ah_linked_dataset_name* | Analytics Hub : Linked Dataset name | <code title="">string</code> |  | <code title="">neon_linked_dataset</code> |
+| *ah_data_exchange_id* | Analytics Hub : Data Exchange ID (shared with `allauthenticated` users) | <code title="">string</code> |  | <code title="">neon-exchangeid_123</code> |
+| *ah_linked_dataset_name* | Analytics Hub : Linked Dataset name (shared with `allauthenticated` users) | <code title="">string</code> |  | <code title="">neon_linked_dataset</code> |
 | *ah_listing_id* | Analytics Hub : Listing ID | <code title="">string</code> |  | <code title="">neonlistid_456</code> |
-| *ah_project_id* | Analytics Hub : Project ID | <code title="">string</code> |  | <code title="">neon-project</code> |
+| *ah_project_id* | Analytics Hub : Project ID (associalted to the data exchange & listing) | <code title="">string</code> |  | <code title="">neon-project</code> |
 | *billing_budget_alert_spend_basis* | The type of basis used to determine if spend has passed the threshold | <code title="">string</code> |  | <code title="">CURRENT_SPEND</code> |
 | *billing_budget_alert_spent_percents* | A list of percentages of the budget to alert on when threshold is exceeded | <code title="list&#40;number&#41;">list(number)</code> |  | <code title="">[0.5, 0.7, 1]</code> |
 | *billing_budget_amount* | The amount to use as the budget in USD | <code title="">number</code> |  | <code title="">500</code> |

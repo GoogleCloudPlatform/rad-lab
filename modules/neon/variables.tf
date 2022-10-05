@@ -15,13 +15,13 @@
  */
 
 variable "ah_data_exchange_id" {
-  description = "Analytics Hub : Data Exchange ID. {{UIMeta group=4 order=2 }}"
+  description = "Analytics Hub : Data Exchange ID (shared with `allauthenticated` users). {{UIMeta group=4 order=2 }}"
   type        = string
   default     = "neon-exchangeid_123"
 }
 
 variable "ah_linked_dataset_name" {
-  description = "Analytics Hub : Linked Dataset name. {{UIMeta group=4 order=4 }}"
+  description = "Analytics Hub : Linked Dataset name (shared with `allauthenticated` users). {{UIMeta group=4 order=4 }}"
   type        = string
   default     = "neon_linked_dataset"
 }
@@ -33,7 +33,7 @@ variable "ah_listing_id" {
 }
 
 variable "ah_project_id" {
-  description = "Analytics Hub : Project ID. {{UIMeta group=4 order=1 }}"
+  description = "Analytics Hub : Project ID (associalted to the data exchange & listing). {{UIMeta group=4 order=1 }}"
   type        = string
   default     = "neon-project"
 }
