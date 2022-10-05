@@ -16,6 +16,7 @@
 
 # [START getting_started_gce_startup_script]
 # Install or update needed software
+sudo apt-get upgrade
 sudo apt-get update
 sudo apt-get install -yq git python3 python3-pip python3-distutils wget postgresql-client
 

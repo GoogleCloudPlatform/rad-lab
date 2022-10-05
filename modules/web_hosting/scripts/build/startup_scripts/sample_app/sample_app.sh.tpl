@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+sudo apt-get upgrade
 sudo apt-get update
 sudo apt-get install -y postgresql-client
 sudo apt-get install -y python3-pip
