@@ -40,7 +40,7 @@
     disk_type             = "PD_SSD"
     ip_configuration {
       ipv4_enabled    = false
-      private_network = google_compute_network.vpc-xlb.id
+      private_network = google_compute_network.vpc_xlb.id
     }
     location_preference {
       zone = "us-central1-c"
@@ -76,22 +76,22 @@ resource "local_file" "sample_db_metadata_startup_script_output" {
 }
 
 # Creating GCE VM used to spin up Sample DB in Postgres Cloud SQL
-resource "null_resource" "create-sample-db-vm" {
+resource "null_resource" "create_sample_db_vm" {
   provisioner "local-exec" {
 
     command = <<-EOT
     if [ "${var.resource_creator_identity}" = "" ];
     then
-        gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc-xlb.name} --subnet=${google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename}
+        gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename}
     else
-        gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc-xlb.name} --subnet=${google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename} --impersonate-service-account=${var.resource_creator_identity}
+        gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename} --impersonate-service-account=${var.resource_creator_identity}
     fi
     EOT
   }
 
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat-gw-vpc-xlb-us-c1
+    google_compute_router_nat.nat_gw_vpc_xlb_us_c1
     ]
 }
 
@@ -99,12 +99,12 @@ resource "time_sleep" "create_sample_db" {
 
   create_duration = "60s"
   depends_on = [
-      null_resource.create-sample-db-vm,
+      null_resource.create_sample_db_vm,
       ]
 }
 
 # Deleting GCE VM used to spin up Sample DB in Postgres Cloud SQL
-resource "null_resource" "del-sample-db-vm" {
+resource "null_resource" "del_sample_db_vm" {
   provisioner "local-exec" {
     command = <<-EOT
     if [ "${var.resource_creator_identity}" = "" ];

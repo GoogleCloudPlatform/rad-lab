@@ -19,7 +19,7 @@
 # vpc-xlb - VPC Network & Subnests
 #########################################################################
 
-resource "google_compute_network" "vpc-xlb" {
+resource "google_compute_network" "vpc_xlb" {
   name                    = "vpc-xlb"
   project                 = local.project.project_id
   auto_create_subnetworks = "false"
@@ -28,21 +28,21 @@ resource "google_compute_network" "vpc-xlb" {
 }
 
 # Creating Sunbet for vpc-xlb VPC network
-resource "google_compute_subnetwork" "subnetwork-vpc-xlb-us-c1" {
+resource "google_compute_subnetwork" "subnetwork_vpc_xlb_us_c1" {
   name                     = "vpc-xlb-us-c1"
   ip_cidr_range            = "10.200.20.0/24"
   region                   = "us-central1"
-  network                  = google_compute_network.vpc-xlb.name
+  network                  = google_compute_network.vpc_xlb.name
   project                  = local.project.project_id
   private_ip_google_access = true
 }
 
 # Creating Sunbet for vpc-xlb VPC network
-resource "google_compute_subnetwork" "subnetwork-vpc-xlb-asia-s1" {
+resource "google_compute_subnetwork" "subnetwork_vpc_xlb_asia_s1" {
   name                     = "vpc-xlb-asia-s1"
   ip_cidr_range            = "10.200.240.0/24"
   region                   = "asia-south1"
-  network                  = google_compute_network.vpc-xlb.name
+  network                  = google_compute_network.vpc_xlb.name
   project                  = local.project.project_id
   private_ip_google_access = true
 }
@@ -55,7 +55,7 @@ resource "google_compute_subnetwork" "subnetwork-vpc-xlb-asia-s1" {
 resource "google_compute_firewall" "fw-vpc-xlb-lb-hc" {
   project       = local.project.project_id
   name          = "fw-vpc-xlb-lb-hc"
-  network       = google_compute_network.vpc-xlb.name
+  network       = google_compute_network.vpc_xlb.name
  
   allow {
     protocol    = "tcp"
@@ -70,7 +70,7 @@ resource "google_compute_firewall" "fw-vpc-xlb-lb-hc" {
 resource "google_compute_firewall" "fw-vpc-xlb-allow-icmp" {
   project       = local.project.project_id
   name          = "fw-vpc-xlb-allow-icmp"
-  network       = google_compute_network.vpc-xlb.name
+  network       = google_compute_network.vpc_xlb.name
   priority      = 65534
   allow {
     protocol    = "icmp"
@@ -82,7 +82,7 @@ resource "google_compute_firewall" "fw-vpc-xlb-allow-icmp" {
 # FW rule for SSH via IAP
 resource "google_compute_firewall" "fw-vpc-xlb-allow-iap-ssh" {
   name          = "fw-vpc-xlb-allow-iap-ssh"
-  network       = resource.google_compute_network.vpc-xlb.name
+  network       = resource.google_compute_network.vpc_xlb.name
   project       = local.project.project_id
   allow {
     protocol    = "tcp"
@@ -95,7 +95,7 @@ resource "google_compute_firewall" "fw-vpc-xlb-allow-iap-ssh" {
 # FW rule for Intra VPC
 resource "google_compute_firewall" "fw-vpc-xlb-allow-intra-vpc" {
   name          = "fw-vpc-xlb-allow-intra-vpc"
-  network       = resource.google_compute_network.vpc-xlb.name
+  network       = resource.google_compute_network.vpc_xlb.name
   project       = local.project.project_id
   allow {
     protocol    = "all"
@@ -108,22 +108,22 @@ resource "google_compute_firewall" "fw-vpc-xlb-allow-intra-vpc" {
 # Creating Cloud NATs for Egress traffic from GCE VMs in vpc-xlb
 #########################################################################
 
-resource "google_compute_router" "cr-vpc-xlb-us-c1" {
+resource "google_compute_router" "cr_vpc_xlb_us_c1" {
   name    = "cr-vpc-xlb-us-c1"
   project = local.project.project_id
-  region  = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.region
-  network = google_compute_network.vpc-xlb.id
+  region  = google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.region
+  network = google_compute_network.vpc_xlb.id
 
   bgp {
     asn = 64514
   }
 }
 
-resource "google_compute_router_nat" "nat-gw-vpc-xlb-us-c1" {
+resource "google_compute_router_nat" "nat_gw_vpc_xlb_us_c1" {
   name                               = "nat-gw-vpc-xlb-us-c1"
   project                            = local.project.project_id
-  router                             = google_compute_router.cr-vpc-xlb-us-c1.name
-  region                             = google_compute_router.cr-vpc-xlb-us-c1.region
+  router                             = google_compute_router.cr_vpc_xlb_us_c1.name
+  region                             = google_compute_router.cr_vpc_xlb_us_c1.region
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 
@@ -133,22 +133,22 @@ resource "google_compute_router_nat" "nat-gw-vpc-xlb-us-c1" {
   }
 }
 
-resource "google_compute_router" "cr-vpc-xlb-asia-s1" {
+resource "google_compute_router" "cr_vpc_xlb_asia_s1" {
   name    = "cr-vpc-xlb-asia-s1"
   project = local.project.project_id
-  region  = google_compute_subnetwork.subnetwork-vpc-xlb-asia-s1.region
-  network = google_compute_network.vpc-xlb.id
+  region  = google_compute_subnetwork.subnetwork_vpc_xlb_asia_s1.region
+  network = google_compute_network.vpc_xlb.id
 
   bgp {
     asn = 64514
   }
 }
 
-resource "google_compute_router_nat" "nat-gw-vpc-xlb-asia-s1" {
+resource "google_compute_router_nat" "nat_gw_vpc_xlb_asia_s1" {
   name                               = "nat-gw-vpc-xlb-asia-s1"
   project                            = local.project.project_id
-  router                             = google_compute_router.cr-vpc-xlb-asia-s1.name
-  region                             = google_compute_router.cr-vpc-xlb-asia-s1.region
+  router                             = google_compute_router.cr_vpc_xlb_asia_s1.name
+  region                             = google_compute_router.cr_vpc_xlb_asia_s1.region
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 
@@ -168,7 +168,7 @@ resource "google_compute_global_address" "psconnect_private_ip_alloc" {
   address_type  = "INTERNAL"
   purpose       = "VPC_PEERING"
   prefix_length = 24
-  network       = google_compute_network.vpc-xlb.id
+  network       = google_compute_network.vpc_xlb.id
   project       = local.project.project_id
 
   depends_on = [
@@ -178,7 +178,7 @@ resource "google_compute_global_address" "psconnect_private_ip_alloc" {
 
 
 resource "google_service_networking_connection" "psconnect" {
-  network                 = google_compute_network.vpc-xlb.id
+  network                 = google_compute_network.vpc_xlb.id
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.psconnect_private_ip_alloc.name]
 }

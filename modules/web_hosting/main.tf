@@ -103,7 +103,7 @@ data "template_file" "sample_app_metadata_startup_script" {
 #########################################################################
 
 
-resource "google_compute_instance" "web1-vpc-xlb" {
+resource "google_compute_instance" "web1_vpc_xlb" {
   project      = local.project.project_id
   zone         = "us-central1-a"
   name         = "web1-vpc-xlb"
@@ -120,7 +120,7 @@ resource "google_compute_instance" "web1-vpc-xlb" {
   }
  
   network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name
+    subnetwork         = google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name
     subnetwork_project = local.project.project_id
     network_ip         = "10.200.20.2"
     # access_config {
@@ -135,11 +135,11 @@ resource "google_compute_instance" "web1-vpc-xlb" {
  
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat-gw-vpc-xlb-us-c1
+    google_compute_router_nat.nat_gw_vpc_xlb_us_c1
     ]
 }
 
-resource "google_compute_instance" "web2-vpc-xlb" {
+resource "google_compute_instance" "web2_vpc_xlb" {
   project      = local.project.project_id
   zone         = "us-central1-b"
   name         = "web2-vpc-xlb"
@@ -156,7 +156,7 @@ resource "google_compute_instance" "web2-vpc-xlb" {
   }
  
   network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name
+    subnetwork         = google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name
     subnetwork_project = local.project.project_id
     network_ip         = "10.200.20.3"
     # access_config {
@@ -171,11 +171,11 @@ resource "google_compute_instance" "web2-vpc-xlb" {
 
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat-gw-vpc-xlb-us-c1
+    google_compute_router_nat.nat_gw_vpc_xlb_us_c1
     ]
 }
  
-resource "google_compute_instance" "web3-vpc-xlb" {
+resource "google_compute_instance" "web3_vpc_xlb" {
   project      = local.project.project_id
   zone         = "us-central1-f"
   name         = "web3-vpc-xlb"
@@ -192,7 +192,7 @@ resource "google_compute_instance" "web3-vpc-xlb" {
   }
  
   network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-us-c1.name
+    subnetwork         = google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name
     subnetwork_project = local.project.project_id
     network_ip         = "10.200.20.4"
     # access_config {
@@ -207,11 +207,11 @@ resource "google_compute_instance" "web3-vpc-xlb" {
   
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat-gw-vpc-xlb-us-c1
+    google_compute_router_nat.nat_gw_vpc_xlb_us_c1
     ]
 }
  
-resource "google_compute_instance" "web4-vpc-xlb" {
+resource "google_compute_instance" "web4_vpc_xlb" {
   project      = local.project.project_id
   zone         = "asia-south1-c"
   name         = "web4-vpc-xlb"
@@ -228,7 +228,7 @@ resource "google_compute_instance" "web4-vpc-xlb" {
   }
  
   network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork-vpc-xlb-asia-s1.name
+    subnetwork         = google_compute_subnetwork.subnetwork_vpc_xlb_asia_s1.name
     subnetwork_project = local.project.project_id
     network_ip         = "10.200.240.2"
     # access_config {
@@ -243,7 +243,7 @@ resource "google_compute_instance" "web4-vpc-xlb" {
 
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat-gw-vpc-xlb-asia-s1
+    google_compute_router_nat.nat_gw_vpc_xlb_asia_s1
     ]
 }
 
@@ -286,12 +286,12 @@ resource "google_storage_bucket_iam_binding" "binding" {
 # Unmanaged Instance Group - vpc-xlb
 #########################################################################
 
-resource "google_compute_instance_group" "ig-us-c1-content-list" {
+resource "google_compute_instance_group" "ig_us_c1_content_list" {
   name        = "ig-us-c1-content-list"
   description = "Unmanaged instance group created via terraform"
   project      = local.project.project_id
   instances = [
-    google_compute_instance.web1-vpc-xlb.self_link
+    google_compute_instance.web1_vpc_xlb.self_link
   ]
  
   named_port {
@@ -300,15 +300,15 @@ resource "google_compute_instance_group" "ig-us-c1-content-list" {
   }
  
   zone = "us-central1-a"
-  depends_on = [google_compute_instance.web1-vpc-xlb]
+  depends_on = [google_compute_instance.web1_vpc_xlb]
 }
 
-resource "google_compute_instance_group" "ig-us-c1-content-create" {
+resource "google_compute_instance_group" "ig_us_c1_content_create" {
   name        = "ig-us-c1-content-create"
   description = "Unmanaged instance group created via terraform"
   project      = local.project.project_id
   instances = [
-    google_compute_instance.web2-vpc-xlb.self_link
+    google_compute_instance.web2_vpc_xlb.self_link
   ]
  
   named_port {
@@ -317,15 +317,15 @@ resource "google_compute_instance_group" "ig-us-c1-content-create" {
   }
  
   zone = "us-central1-b"
-  depends_on = [google_compute_instance.web2-vpc-xlb]
+  depends_on = [google_compute_instance.web2_vpc_xlb]
 }
 
-resource "google_compute_instance_group" "ig-us-c1-region" {
+resource "google_compute_instance_group" "ig_us_c1_region" {
   name        = "ig-us-c1-region"
   description = "Unmanaged instance group created via terraform"
   project      = local.project.project_id
   instances = [
-    google_compute_instance.web3-vpc-xlb.self_link
+    google_compute_instance.web3_vpc_xlb.self_link
   ]
  
   named_port {
@@ -334,15 +334,15 @@ resource "google_compute_instance_group" "ig-us-c1-region" {
   }
  
   zone = "us-central1-f"
-  depends_on = [google_compute_instance.web3-vpc-xlb]
+  depends_on = [google_compute_instance.web3_vpc_xlb]
 }
  
-resource "google_compute_instance_group" "ig-asia-s1-region" {
+resource "google_compute_instance_group" "ig_asia_s1_region" {
   name        = "ig-asia-s1-region"
   description = "Unmanaged instance group created via terraform"
   project      = local.project.project_id
   instances = [
-    google_compute_instance.web4-vpc-xlb.self_link
+    google_compute_instance.web4_vpc_xlb.self_link
   ]
  
   named_port {
@@ -351,7 +351,7 @@ resource "google_compute_instance_group" "ig-asia-s1-region" {
   }
  
   zone = "asia-south1-c"
-  depends_on = [google_compute_instance.web4-vpc-xlb]
+  depends_on = [google_compute_instance.web4_vpc_xlb]
 }
 
 
@@ -393,7 +393,7 @@ resource "google_compute_security_policy" "policy" {
 # Cloud CDN with GCS bucket
 #########################################################################
 
-resource "google_compute_backend_bucket" "be-http-cdn-gcs" {
+resource "google_compute_backend_bucket" "be_http_cdn_gcs" {
   name        =  "be-http-cdn-gcs"
   description = "Contains test images"
   project     = local.project.project_id
@@ -405,7 +405,7 @@ resource "google_compute_backend_bucket" "be-http-cdn-gcs" {
 # L7 HTTP Load Balancer  - Health Check
 #########################################################################
 
-resource "google_compute_health_check" "http-hc" {
+resource "google_compute_health_check" "http_hc" {
   name               = "http-hc"
   timeout_sec        = 1
   check_interval_sec = 30
@@ -420,21 +420,21 @@ resource "google_compute_health_check" "http-hc" {
 # Global HTTP Load Balancer  - Content Based
 #########################################################################
  
-resource "google_compute_backend_service" "be-http-content-based-list" {
+resource "google_compute_backend_service" "be_http_content_based_list" {
   name         = "be-http-content-based-list"
   port_name    = "http"
   protocol     = "HTTP"
   project      = local.project.project_id
   timeout_sec  = 10
   backend {
-    group = google_compute_instance_group.ig-us-c1-content-list.self_link
+    group = google_compute_instance_group.ig_us_c1_content_list.self_link
     balancing_mode  = "UTILIZATION"
     max_utilization = 0.8
   }
-  health_checks = [google_compute_health_check.http-hc.id]
+  health_checks = [google_compute_health_check.http_hc.id]
 }
 
-resource "google_compute_backend_service" "be-http-content-based-create" {
+resource "google_compute_backend_service" "be_http_content_based_create" {
   name            = "be-http-content-based-create"
   port_name       = "http"
   protocol        = "HTTP"
@@ -442,18 +442,18 @@ resource "google_compute_backend_service" "be-http-content-based-create" {
   project         = local.project.project_id
   timeout_sec     = 10
   backend {
-    group = google_compute_instance_group.ig-us-c1-content-create.self_link
+    group = google_compute_instance_group.ig_us_c1_content_create.self_link
     balancing_mode  = "UTILIZATION"
     max_utilization = 0.8
   }
-  health_checks   = [google_compute_health_check.http-hc.id]
+  health_checks   = [google_compute_health_check.http_hc.id]
 }
 
-resource "google_compute_url_map" "http-lb-content-based" {
+resource "google_compute_url_map" "http_lb_content_based" {
   name            = "http-lb-content-based"
   description     = "L7 Global load balancer Content based"
   project         = local.project.project_id
-  default_service = google_compute_backend_service.be-http-content-based-list.id
+  default_service = google_compute_backend_service.be_http_content_based_list.id
  
   host_rule {
     hosts        = ["*"]
@@ -462,30 +462,30 @@ resource "google_compute_url_map" "http-lb-content-based" {
  
   path_matcher {
     name            = "allpaths"
-    default_service = google_compute_backend_service.be-http-content-based-list.id
+    default_service = google_compute_backend_service.be_http_content_based_list.id
  
     path_rule {
       paths   = ["/*"]
-      service = google_compute_backend_service.be-http-content-based-list.id
+      service = google_compute_backend_service.be_http_content_based_list.id
     }
 
     path_rule {
       paths   = ["/create", "/create/*", "/delete", "/delete/*"]
-      service = google_compute_backend_service.be-http-content-based-create.id
+      service = google_compute_backend_service.be_http_content_based_create.id
     }
 
   }
 }
 
-resource "google_compute_target_http_proxy" "target-proxy-content-based" {
+resource "google_compute_target_http_proxy" "target_proxy_content_based" {
   project     = local.project.project_id
   name        = "target-proxy-content-based"
-  url_map     = google_compute_url_map.http-lb-content-based.self_link
+  url_map     = google_compute_url_map.http_lb_content_based.self_link
 }
  
-resource "google_compute_global_forwarding_rule" "fe-http-content-based" {
+resource "google_compute_global_forwarding_rule" "fe_http_content_based" {
   name       = "fe-http-content-based"
-  target     = google_compute_target_http_proxy.target-proxy-content-based.self_link
+  target     = google_compute_target_http_proxy.target_proxy_content_based.self_link
   port_range = "80"
   project    = local.project.project_id
 }
@@ -494,29 +494,29 @@ resource "google_compute_global_forwarding_rule" "fe-http-content-based" {
 # Global HTTP Load Balancer  - Cross Region
 #########################################################################
 
-resource "google_compute_backend_service" "be-http-cross-region" {
+resource "google_compute_backend_service" "be_http_cross_region" {
   name         = "be-http-cross-region"
   port_name    = "http"
   protocol     = "HTTP"
   project      = local.project.project_id
   timeout_sec  = 10
   backend {
-    group = google_compute_instance_group.ig-us-c1-region.self_link
+    group = google_compute_instance_group.ig_us_c1_region.self_link
     balancing_mode  = "UTILIZATION"
     max_utilization = 0.8
   }
   backend {
-    group = google_compute_instance_group.ig-asia-s1-region.self_link
+    group = google_compute_instance_group.ig_asia_s1_region.self_link
   }
 
-  health_checks = [google_compute_health_check.http-hc.id]
+  health_checks = [google_compute_health_check.http_hc.id]
 }
 
-resource "google_compute_url_map" "http-lb-cross-region" {
+resource "google_compute_url_map" "http_lb_cross_region" {
   name        = "http-lb-cross-region"
   description = "L7 Global load balancer Cross Region"
   project      = local.project.project_id
-  default_service = google_compute_backend_service.be-http-cross-region.id
+  default_service = google_compute_backend_service.be_http_cross_region.id
  
   host_rule {
     hosts        = ["*"]
@@ -525,28 +525,28 @@ resource "google_compute_url_map" "http-lb-cross-region" {
  
   path_matcher {
     name            = "allpaths"
-    default_service = google_compute_backend_service.be-http-cross-region.id
+    default_service = google_compute_backend_service.be_http_cross_region.id
  
     path_rule {
       paths   = ["/*"]
-      service = google_compute_backend_service.be-http-cross-region.id
+      service = google_compute_backend_service.be_http_cross_region.id
     }
     path_rule {
       paths = ["/images/*"]
-      service = google_compute_backend_bucket.be-http-cdn-gcs.id
+      service = google_compute_backend_bucket.be_http_cdn_gcs.id
     }
   }
 }
 
-resource "google_compute_target_http_proxy" "target-proxy-cross-region" {
+resource "google_compute_target_http_proxy" "target_proxy_cross_region" {
   project     = local.project.project_id
   name        = "target-proxy-cross-region"
-  url_map     = google_compute_url_map.http-lb-cross-region.self_link
+  url_map     = google_compute_url_map.http_lb_cross_region.self_link
 }
 
-resource "google_compute_global_forwarding_rule" "fe-http-cross-region-cdn" {
+resource "google_compute_global_forwarding_rule" "fe_http_cross_region_cdn" {
   name       = "fe-http-cross-region-cdn"
-  target     = google_compute_target_http_proxy.target-proxy-cross-region.self_link
+  target     = google_compute_target_http_proxy.target_proxy_cross_region.self_link
   port_range = "80"
   project    = local.project.project_id
 }
