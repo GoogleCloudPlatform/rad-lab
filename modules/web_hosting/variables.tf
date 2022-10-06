@@ -93,6 +93,47 @@ variable "create_project" {
   default     = true
 }
 
+variable "db_activation_policy" {
+  description = "This specifies when the instance should be active. {{UIMeta group=3 order=2 options=ALWAYS,NEVER,ON_DEMAND }}"
+  type        = string
+  default     = "ALWAYS"
+}
+
+variable "db_availability_type" {
+  description = "The availability type of the Cloud SQL instance. {{UIMeta group=3 order=3 options=REGIONAL,ZONAL }}"
+  type        = string
+  default     = "REGIONAL"
+}
+
+variable "db_disk_type" {
+  description = "The type of data disk. {{UIMeta group=3 order=4 options=PD_SSD,PD_HDD }}"
+  type        = string
+  default     = "PD_SSD"
+}
+
+variable "db_ipv4_enabled" {
+  description = "Whether this Cloud SQL instance should be assigned a public IPV4 address. {{UIMeta group=3 order=6 }}"
+  type        = bool
+  default     = false
+}
+
+variable "db_tier" {
+  description = "The machine type to use. Postgres supports only shared-core machine types, and custom machine types such as `db-custom-2-13312`. {{UIMeta group=3 order=5 }}"
+  type        = string
+  default     = "db-g1-small"
+}
+
+variable "db_version" {
+  description = "PostgreSQL Server version to use. {{UIMeta group=3 order=1 options=POSTGRES_9_6,POSTGRES_10,POSTGRES_11,POSTGRES_12,POSTGRES_13,POSTGRES_14 }}"
+  type        = string
+  default     = "POSTGRES_12"
+
+  validation {
+    condition     = startswith(var.db_version, "POSTGRES")
+    error_message = "Only POSTGRESQL Server is Supported."
+  }
+}
+
 variable "deployment_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`."
   type        = string

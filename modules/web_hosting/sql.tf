@@ -15,21 +15,21 @@
  */
  
  resource "google_sql_database_instance" "db_postgres" {
-  database_version    = "POSTGRES_12"
+  database_version    = var.db_version
   name                = format("radlab-web-hosting-db-%s", local.random_id)
   project             = local.project.project_id
   region              = var.region
   deletion_protection = false
   settings {
-    activation_policy = "ALWAYS"
-    availability_type = "REGIONAL"
+    activation_policy = var.db_activation_policy
+    availability_type = var.db_availability_type
     backup_configuration {
       backup_retention_settings {
         retained_backups = 7
         retention_unit   = "COUNT"
       }
       enabled                        = true
-      location                       = "us"
+      location                       = var.region
       point_in_time_recovery_enabled = true
       start_time                     = "07:00"
       transaction_log_retention_days = 7
@@ -37,16 +37,16 @@
     disk_autoresize       = true
     disk_autoresize_limit = 0
     disk_size             = 100
-    disk_type             = "PD_SSD"
+    disk_type             = var.db_disk_type
     ip_configuration {
-      ipv4_enabled    = false
+      ipv4_enabled    = var.db_ipv4_enabled
       private_network = google_compute_network.vpc_xlb.id
     }
     location_preference {
       zone = "${var.region}-c"
     }
     pricing_plan = "PER_USE"
-    tier         = "db-g1-small"
+    tier         = var.db_tier
   }
   depends_on = [
     resource.google_service_networking_connection.psconnect,

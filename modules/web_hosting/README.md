@@ -79,6 +79,12 @@ _Usage:_
 | *billing_budget_services* | A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/ | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">null</code> |
 | *create_budget* | If the budget should be created | <code title="">bool</code> |  | <code title="">false</code> |
 | *create_project* | Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false | <code title="">bool</code> |  | <code title="">true</code> |
+| *db_activation_policy* | This specifies when the instance should be active | <code title="">string</code> |  | <code title="">ALWAYS</code> |
+| *db_availability_type* | The availability type of the Cloud SQL instance | <code title="">string</code> |  | <code title="">REGIONAL</code> |
+| *db_disk_type* | The type of data disk | <code title="">string</code> |  | <code title="">PD_SSD</code> |
+| *db_ipv4_enabled* | Whether this Cloud SQL instance should be assigned a public IPV4 address | <code title="">bool</code> |  | <code title="">false</code> |
+| *db_tier* | The machine type to use. Postgres supports only shared-core machine types, and custom machine types such as `db-custom-2-13312` | <code title="">string</code> |  | <code title="">db-g1-small</code> |
+| *db_version* | PostgreSQL Server version to use | <code title="">string</code> |  | <code title="POSTGRES_12&#10;validation &#123;&#10;condition     &#61; startswith&#40;var.db_version, &#34;POSTGRES&#34;&#41;&#10;error_message &#61; &#34;Only POSTGRESQL Server is Supported.&#34;&#10;&#125;">...</code> |
 | *deployment_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node | <code title="">string</code> |  | <code title=""></code> |
