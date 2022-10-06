@@ -20,7 +20,7 @@
 #########################################################################
 
 resource "google_compute_network" "vpc_xlb" {
-  name                    = "vpc-xlb"
+  name                    = var.network_name
   project                 = local.project.project_id
   auto_create_subnetworks = "false"
   routing_mode            = "GLOBAL"
@@ -28,20 +28,20 @@ resource "google_compute_network" "vpc_xlb" {
 }
 
 # Creating Sunbet for vpc-xlb VPC network
-resource "google_compute_subnetwork" "subnetwork_vpc_xlb_us_c1" {
-  name                     = "vpc-xlb-us-c1"
-  ip_cidr_range            = "10.200.20.0/24"
-  region                   = "us-central1"
+resource "google_compute_subnetwork" "subnetwork_primary" {
+  name                     = "vpc-subnet-primary"
+  ip_cidr_range            = tolist(var.ip_cidr_ranges)[0]
+  region                   = var.region
   network                  = google_compute_network.vpc_xlb.name
   project                  = local.project.project_id
   private_ip_google_access = true
 }
 
 # Creating Sunbet for vpc-xlb VPC network
-resource "google_compute_subnetwork" "subnetwork_vpc_xlb_asia_s1" {
-  name                     = "vpc-xlb-asia-s1"
-  ip_cidr_range            = "10.200.240.0/24"
-  region                   = "asia-south1"
+resource "google_compute_subnetwork" "subnetwork_secondary" {
+  name                     = "vpc-subnet-secondary"
+  ip_cidr_range            = tolist(var.ip_cidr_ranges)[1]
+  region                   = var.region_secondary
   network                  = google_compute_network.vpc_xlb.name
   project                  = local.project.project_id
   private_ip_google_access = true
@@ -52,9 +52,9 @@ resource "google_compute_subnetwork" "subnetwork_vpc_xlb_asia_s1" {
 #########################################################################
 
 # FW rule for L7LB healthcheck
-resource "google_compute_firewall" "fw-vpc-xlb-lb-hc" {
+resource "google_compute_firewall" "fw_allow_lb_hc" {
   project       = local.project.project_id
-  name          = "fw-vpc-xlb-lb-hc"
+  name          = "fw-allow-lb-hc"
   network       = google_compute_network.vpc_xlb.name
  
   allow {
@@ -65,23 +65,9 @@ resource "google_compute_firewall" "fw-vpc-xlb-lb-hc" {
   source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
 }
 
-
-# FW rule for ICMP
-resource "google_compute_firewall" "fw-vpc-xlb-allow-icmp" {
-  project       = local.project.project_id
-  name          = "fw-vpc-xlb-allow-icmp"
-  network       = google_compute_network.vpc_xlb.name
-  priority      = 65534
-  allow {
-    protocol    = "icmp"
-  }
- 
-  source_ranges = ["0.0.0.0/0"]
-}
-
 # FW rule for SSH via IAP
-resource "google_compute_firewall" "fw-vpc-xlb-allow-iap-ssh" {
-  name          = "fw-vpc-xlb-allow-iap-ssh"
+resource "google_compute_firewall" "fw_allow_iap_ssh" {
+  name          = "fw-allow-iap-ssh"
   network       = resource.google_compute_network.vpc_xlb.name
   project       = local.project.project_id
   allow {
@@ -91,10 +77,9 @@ resource "google_compute_firewall" "fw-vpc-xlb-allow-iap-ssh" {
   source_ranges = ["35.235.240.0/20"]
 }
 
-
 # FW rule for Intra VPC
-resource "google_compute_firewall" "fw-vpc-xlb-allow-intra-vpc" {
-  name          = "fw-vpc-xlb-allow-intra-vpc"
+resource "google_compute_firewall" "fw_allow_intra_vpc" {
+  name          = "fw-allow-intra-vpc"
   network       = resource.google_compute_network.vpc_xlb.name
   project       = local.project.project_id
   allow {
@@ -108,10 +93,10 @@ resource "google_compute_firewall" "fw-vpc-xlb-allow-intra-vpc" {
 # Creating Cloud NATs for Egress traffic from GCE VMs in vpc-xlb
 #########################################################################
 
-resource "google_compute_router" "cr_vpc_xlb_us_c1" {
-  name    = "cr-vpc-xlb-us-c1"
+resource "google_compute_router" "cr_region_primary" {
+  name    = "cr-${var.region}"
   project = local.project.project_id
-  region  = google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.region
+  region  = google_compute_subnetwork.subnetwork_primary.region
   network = google_compute_network.vpc_xlb.id
 
   bgp {
@@ -119,11 +104,11 @@ resource "google_compute_router" "cr_vpc_xlb_us_c1" {
   }
 }
 
-resource "google_compute_router_nat" "nat_gw_vpc_xlb_us_c1" {
-  name                               = "nat-gw-vpc-xlb-us-c1"
+resource "google_compute_router_nat" "nat_gw_region_primary" {
+  name                               = "nat-gw-${var.region}"
   project                            = local.project.project_id
-  router                             = google_compute_router.cr_vpc_xlb_us_c1.name
-  region                             = google_compute_router.cr_vpc_xlb_us_c1.region
+  router                             = google_compute_router.cr_region_primary.name
+  region                             = google_compute_router.cr_region_primary.region
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 
@@ -133,10 +118,10 @@ resource "google_compute_router_nat" "nat_gw_vpc_xlb_us_c1" {
   }
 }
 
-resource "google_compute_router" "cr_vpc_xlb_asia_s1" {
-  name    = "cr-vpc-xlb-asia-s1"
+resource "google_compute_router" "cr_region_secondary" {
+  name    = "cr-${var.region_secondary}"
   project = local.project.project_id
-  region  = google_compute_subnetwork.subnetwork_vpc_xlb_asia_s1.region
+  region  = google_compute_subnetwork.subnetwork_secondary.region
   network = google_compute_network.vpc_xlb.id
 
   bgp {
@@ -144,11 +129,11 @@ resource "google_compute_router" "cr_vpc_xlb_asia_s1" {
   }
 }
 
-resource "google_compute_router_nat" "nat_gw_vpc_xlb_asia_s1" {
-  name                               = "nat-gw-vpc-xlb-asia-s1"
+resource "google_compute_router_nat" "nat_gw_region_secondary" {
+  name                               = "nat-gw-${var.region_secondary}"
   project                            = local.project.project_id
-  router                             = google_compute_router.cr_vpc_xlb_asia_s1.name
-  region                             = google_compute_router.cr_vpc_xlb_asia_s1.region
+  router                             = google_compute_router.cr_region_secondary.name
+  region                             = google_compute_router.cr_region_secondary.region
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 

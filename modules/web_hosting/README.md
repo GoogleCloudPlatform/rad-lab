@@ -82,8 +82,12 @@ _Usage:_
 | *deployment_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node | <code title="">string</code> |  | <code title=""></code> |
+| *ip_cidr_ranges* | Unique IP CIDR Range for Primary & Secondary subnet | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">["10.200.20.0/24", "10.200.240.0/24"]</code> |
+| *network_name* | Name of the VPC network to be created | <code title="">string</code> |  | <code title="">vpc-xlb</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
 | *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-web-hosting</code> |
+| *region* | Primary region where the CloudSQL, Compute Instance and VPC subnet will be deployed | <code title="">string</code> |  | <code title="">us-central1</code> |
+| *region_secondary* | Secondary region where the Compute Instance and VPC subnet will be deployed | <code title="">string</code> |  | <code title="">asia-south1</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
 | *set_bucket_level_access_policy* | Apply org policy to disable Uniform Bucket Level Access on GCS | <code title="">bool</code> |  | <code title="">true</code> |
 | *set_domain_restricted_sharing_policy* | Enable org policy to allow all principals to be added to IAM policies | <code title="">bool</code> |  | <code title="">false</code> |

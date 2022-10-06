@@ -111,6 +111,18 @@ variable "folder_id" {
   default     = ""
 }
 
+variable "ip_cidr_ranges" {
+  description = "Unique IP CIDR Range for Primary & Secondary subnet. {{UIMeta group=2 order=4 }}"
+  type        = set(string)
+  default     = ["10.200.20.0/24", "10.200.240.0/24"]
+}
+
+variable "network_name" {
+  description = "Name of the VPC network to be created. {{UIMeta group=2 order=1 }}"
+  type        = string
+  default     = "vpc-xlb"
+}
+
 variable "organization_id" {
   description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id. {{UIMeta group=0 order=1 }}"
   type        = string
@@ -121,6 +133,18 @@ variable "project_id_prefix" {
   description = "If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module. {{UIMeta group=1 order=2 }}"
   type        = string
   default     = "radlab-web-hosting"
+}
+
+variable "region" {
+  description = "Primary region where the CloudSQL, Compute Instance and VPC subnet will be deployed. {{UIMeta group=2 order=2 }}"
+  type        = string
+  default     = "us-central1"
+}
+
+variable "region_secondary" {
+  description = "Secondary region where the Compute Instance and VPC subnet will be deployed. {{UIMeta group=2 order=3 }}"
+  type        = string
+  default     = "asia-south1"
 }
 
 variable "resource_creator_identity" {

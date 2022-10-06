@@ -43,5 +43,5 @@ resource "google_project_iam_member" "trusted_user_group_role3" {
 resource "google_project_iam_member" "sa_p_cloud_sql_permissions" {
   project  = local.project.project_id
   role     = "roles/cloudsql.client"
-  member   = format("serviceAccount:%s@%s.iam.gserviceaccount.com", google_service_account.sa_p_cloud_sql.account_id,local.project.project_id)
+  member   = "serviceAccount:${google_service_account.sa_p_cloud_sql.email}"
 }

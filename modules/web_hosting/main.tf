@@ -105,7 +105,7 @@ data "template_file" "sample_app_metadata_startup_script" {
 
 resource "google_compute_instance" "web1_vpc_xlb" {
   project      = local.project.project_id
-  zone         = "us-central1-a"
+  zone         = "${var.region}-a"
   name         = "web1-vpc-xlb"
   machine_type = "f1-micro"
   allow_stopping_for_update = true
@@ -120,9 +120,9 @@ resource "google_compute_instance" "web1_vpc_xlb" {
   }
  
   network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name
+    subnetwork         = google_compute_subnetwork.subnetwork_primary.name
     subnetwork_project = local.project.project_id
-    network_ip         = "10.200.20.2"
+    network_ip         = cidrhost(google_compute_subnetwork.subnetwork_primary.ip_cidr_range, 2)
     # access_config {
     #   // Ephemeral IP
     # }
@@ -135,13 +135,13 @@ resource "google_compute_instance" "web1_vpc_xlb" {
  
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat_gw_vpc_xlb_us_c1
+    google_compute_router_nat.nat_gw_region_primary
     ]
 }
 
 resource "google_compute_instance" "web2_vpc_xlb" {
   project      = local.project.project_id
-  zone         = "us-central1-b"
+  zone         = "${var.region}-b"
   name         = "web2-vpc-xlb"
   machine_type = "f1-micro"
   allow_stopping_for_update = true
@@ -156,10 +156,9 @@ resource "google_compute_instance" "web2_vpc_xlb" {
   }
  
   network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name
+    subnetwork         = google_compute_subnetwork.subnetwork_primary.name
     subnetwork_project = local.project.project_id
-    network_ip         = "10.200.20.3"
-    # access_config {
+    network_ip         = cidrhost(google_compute_subnetwork.subnetwork_primary.ip_cidr_range, 3)
     #   // Ephemeral IP
     # }
   }
@@ -171,13 +170,13 @@ resource "google_compute_instance" "web2_vpc_xlb" {
 
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat_gw_vpc_xlb_us_c1
+    google_compute_router_nat.nat_gw_region_primary
     ]
 }
  
 resource "google_compute_instance" "web3_vpc_xlb" {
   project      = local.project.project_id
-  zone         = "us-central1-f"
+  zone         = "${var.region}-c"
   name         = "web3-vpc-xlb"
   machine_type = "f1-micro"
   allow_stopping_for_update = true
@@ -192,9 +191,9 @@ resource "google_compute_instance" "web3_vpc_xlb" {
   }
  
   network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name
+    subnetwork         = google_compute_subnetwork.subnetwork_primary.name
     subnetwork_project = local.project.project_id
-    network_ip         = "10.200.20.4"
+    network_ip         = cidrhost(google_compute_subnetwork.subnetwork_primary.ip_cidr_range, 4)
     # access_config {
     #   // Ephemeral IP
     # }
@@ -207,7 +206,7 @@ resource "google_compute_instance" "web3_vpc_xlb" {
   
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat_gw_vpc_xlb_us_c1
+    google_compute_router_nat.nat_gw_region_primary
     ]
 }
  
@@ -228,9 +227,9 @@ resource "google_compute_instance" "web4_vpc_xlb" {
   }
  
   network_interface {
-    subnetwork         = google_compute_subnetwork.subnetwork_vpc_xlb_asia_s1.name
+    subnetwork         = google_compute_subnetwork.subnetwork_secondary.name
     subnetwork_project = local.project.project_id
-    network_ip         = "10.200.240.2"
+    network_ip         = cidrhost(google_compute_subnetwork.subnetwork_secondary.ip_cidr_range, 2)
     # access_config {
     #   // Ephemeral IP
     # }
@@ -243,7 +242,7 @@ resource "google_compute_instance" "web4_vpc_xlb" {
 
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat_gw_vpc_xlb_asia_s1
+    google_compute_router_nat.nat_gw_region_secondary
     ]
 }
 
@@ -299,7 +298,7 @@ resource "google_compute_instance_group" "ig_us_c1_content_list" {
     port = "80"
   }
  
-  zone = "us-central1-a"
+  zone = "${var.region}-a"
   depends_on = [google_compute_instance.web1_vpc_xlb]
 }
 
@@ -316,7 +315,7 @@ resource "google_compute_instance_group" "ig_us_c1_content_create" {
     port = "80"
   }
  
-  zone = "us-central1-b"
+  zone = "${var.region}-b"
   depends_on = [google_compute_instance.web2_vpc_xlb]
 }
 
@@ -333,7 +332,7 @@ resource "google_compute_instance_group" "ig_us_c1_region" {
     port = "80"
   }
  
-  zone = "us-central1-f"
+  zone = "${var.region}-c"
   depends_on = [google_compute_instance.web3_vpc_xlb]
 }
  

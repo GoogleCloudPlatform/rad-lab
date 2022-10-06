@@ -18,7 +18,7 @@
   database_version    = "POSTGRES_12"
   name                = format("radlab-web-hosting-db-%s", local.random_id)
   project             = local.project.project_id
-  region              = "us-central1"
+  region              = var.region
   deletion_protection = false
   settings {
     activation_policy = "ALWAYS"
@@ -43,7 +43,7 @@
       private_network = google_compute_network.vpc_xlb.id
     }
     location_preference {
-      zone = "us-central1-c"
+      zone = "${var.region}-c"
     }
     pricing_plan = "PER_USE"
     tier         = "db-g1-small"
@@ -82,16 +82,16 @@ resource "null_resource" "create_sample_db_vm" {
     command = <<-EOT
     if [ "${var.resource_creator_identity}" = "" ];
     then
-        gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename}
+        gcloud compute instances create sample-db-vm --zone=${var.region}-c --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_primary.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename}
     else
-        gcloud compute instances create sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_vpc_xlb_us_c1.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename} --impersonate-service-account=${var.resource_creator_identity}
+        gcloud compute instances create sample-db-vm --zone=${var.region}-c --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_primary.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename} --impersonate-service-account=${var.resource_creator_identity}
     fi
     EOT
   }
 
   depends_on = [
     time_sleep.wait_120_seconds,
-    google_compute_router_nat.nat_gw_vpc_xlb_us_c1
+    google_compute_router_nat.nat_gw_region_primary
     ]
 }
 
@@ -109,9 +109,9 @@ resource "null_resource" "del_sample_db_vm" {
     command = <<-EOT
     if [ "${var.resource_creator_identity}" = "" ];
     then
-        gcloud compute instances delete sample-db-vm --zone=us-central1-f --project=${local.project.project_id}
+        gcloud compute instances delete sample-db-vm --zone=${var.region}-c --project=${local.project.project_id}
     else
-        gcloud compute instances delete sample-db-vm --zone=us-central1-f --project=${local.project.project_id} --impersonate-service-account=${var.resource_creator_identity}
+        gcloud compute instances delete sample-db-vm --zone=${var.region}-c --project=${local.project.project_id} --impersonate-service-account=${var.resource_creator_identity}
     fi
     EOT
   }
