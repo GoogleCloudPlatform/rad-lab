@@ -129,7 +129,7 @@ variable "db_version" {
   default     = "POSTGRES_12"
 
   validation {
-    condition     = startswith(var.db_version, "POSTGRES")
+    condition     = substr(var.db_version, 0, 8) == "POSTGRES"
     error_message = "Only POSTGRESQL Server is Supported."
   }
 }
