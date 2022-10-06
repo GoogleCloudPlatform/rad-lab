@@ -85,7 +85,7 @@ resource "google_compute_firewall" "fw_allow_intra_vpc" {
   allow {
     protocol    = "all"
   }
-  source_ranges = ["10.100.20.0/24","10.200.240.0/24"]
+  source_ranges = var.ip_cidr_ranges
 }
 
 
