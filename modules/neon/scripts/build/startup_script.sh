@@ -16,7 +16,7 @@
 
 # Create dir for neon notebooks
 echo "Creating directory to store neon notebooks."
-mkdir -p /home/jupyter/neon/notebooks
+mkdir -p /home/jupyter/NEON/notebooks
 
 # Setting environment variabled for Project ID
 echo "Setting Project ID variable."
@@ -24,7 +24,7 @@ export PROJECT_ID=$(gcloud config get-value project)
 
 # Copy neon .pynb to the notebook
 echo "Copying sample notebooks to the instance."
-gsutil -m cp -r gs://user-scripts-${PROJECT_ID}/notebooks/*.ipynb /home/jupyter/neon/notebooks
+gsutil -m cp -r gs://user-scripts-${PROJECT_ID}/notebooks/*.ipynb /home/jupyter/NEON/notebooks
 
 echo "Startup script finished."
 

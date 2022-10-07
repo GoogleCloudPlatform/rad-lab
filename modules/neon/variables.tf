@@ -17,25 +17,21 @@
 variable "ah_data_exchange_id" {
   description = "Analytics Hub : Data Exchange ID (shared with `allauthenticated` users). {{UIMeta group=4 order=2 }}"
   type        = string
-  default     = "neon-exchangeid_123"
 }
 
 variable "ah_linked_dataset_name" {
   description = "Analytics Hub : Linked Dataset display name. {{UIMeta group=4 order=4 }}"
   type        = string
-  default     = "neon_linked_dataset"
 }
 
 variable "ah_listing_id" {
   description = "Analytics Hub : Listing ID (shared with `allauthenticated` users). {{UIMeta group=4 order=3 }}"
   type        = string
-  default     = "neonlistid_456"
 }
 
 variable "ah_project_id" {
   description = "Analytics Hub : Project ID (associated to the data exchange & listing). {{UIMeta group=4 order=1 }}"
   type        = string
-  default     = "neon-project"
 }
 
 variable "billing_account_id" {
@@ -276,7 +272,7 @@ variable "set_trustedimage_project_policy" {
 variable "subnet_name" {
   description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=2 order=4 }}"
   type        = string
-  default     = "subnet-ai-notebook"
+  default     = "neon-subnet"
 }
 
 variable "trusted_groups" {

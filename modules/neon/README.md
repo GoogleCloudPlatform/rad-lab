@@ -1,5 +1,7 @@
 # RAD Lab NEON Module
 
+This RAD Lab module provides a managed environment for research and data analytics on publicly shared data of the National Ecological Observatory Network (NEON) by subscribing to NEON Big Query dataset via Analytics Hub and exploring it via Jupyter Notebook(s) running over Vertex AI workbench.
+
 ## GCP Products/Services 
 
 * Vertex AI Workbench Notebooks (a.k.a. AI Platform Notebooks)
@@ -13,7 +15,7 @@
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-COMING SOON...
+![](../../docs/images/V9_NEON.png)
 
 We provide Neon Jupyter Notebooks as part of Neon module deployment. If you would like to include your own Jupyter Notebooks add them into [scripts/build/notebooks](./scripts/build/notebooks) folder and then run the deployment. You will be able to access your Jupyter notebooks from the Vertex AI Workbench Notebook created as part of the deployment.
 
@@ -65,11 +67,11 @@ _Usage:_
 
 | name | description | type | required | default |
 |---|---|:---: |:---:|:---:|
+| ah_data_exchange_id | Analytics Hub : Data Exchange ID (shared with `allauthenticated` users) | <code title="">string</code> | ✓ |  |
+| ah_linked_dataset_name | Analytics Hub : Linked Dataset display name | <code title="">string</code> | ✓ |  |
+| ah_listing_id | Analytics Hub : Listing ID (shared with `allauthenticated` users) | <code title="">string</code> | ✓ |  |
+| ah_project_id | Analytics Hub : Project ID (associated to the data exchange & listing) | <code title="">string</code> | ✓ |  |
 | billing_account_id | Billing Account associated to the GCP Resources | <code title="">string</code> | ✓ |  |
-| *ah_data_exchange_id* | Analytics Hub : Data Exchange ID (shared with `allauthenticated` users) | <code title="">string</code> |  | <code title="">neon-exchangeid_123</code> |
-| *ah_linked_dataset_name* | Analytics Hub : Linked Dataset display name | <code title="">string</code> |  | <code title="">neon_linked_dataset</code> |
-| *ah_listing_id* | Analytics Hub : Listing ID (shared with `allauthenticated` users) | <code title="">string</code> |  | <code title="">neonlistid_456</code> |
-| *ah_project_id* | Analytics Hub : Project ID (associated to the data exchange & listing) | <code title="">string</code> |  | <code title="">neon-project</code> |
 | *billing_budget_alert_spend_basis* | The type of basis used to determine if spend has passed the threshold | <code title="">string</code> |  | <code title="">CURRENT_SPEND</code> |
 | *billing_budget_alert_spent_percents* | A list of percentages of the budget to alert on when threshold is exceeded | <code title="list&#40;number&#41;">list(number)</code> |  | <code title="">[0.5, 0.7, 1]</code> |
 | *billing_budget_amount* | The amount to use as the budget in USD | <code title="">number</code> |  | <code title="">500</code> |
@@ -107,7 +109,7 @@ _Usage:_
 | *set_external_ip_policy* | Enable org policy to allow External (Public) IP addresses on virtual machines | <code title="">bool</code> |  | <code title="">false</code> |
 | *set_shielded_vm_policy* | Apply org policy to disable shielded VMs | <code title="">bool</code> |  | <code title="">false</code> |
 | *set_trustedimage_project_policy* | Apply org policy to set the trusted image projects | <code title="">bool</code> |  | <code title="">false</code> |
-| *subnet_name* | Name of the subnet where to deploy the Notebooks | <code title="">string</code> |  | <code title="">subnet-ai-notebook</code> |
+| *subnet_name* | Name of the subnet where to deploy the Notebooks | <code title="">string</code> |  | <code title="">neon-subnet</code> |
 | *trusted_groups* | The list of trusted groups (e.g. `myteam@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *trusted_users* | The list of trusted users (e.g. `username@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *zone* | Cloud Zone associated to the AI Notebooks | <code title="">string</code> |  | <code title="">us-central1-c</code> |
