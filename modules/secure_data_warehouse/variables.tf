@@ -140,3 +140,33 @@ variable "trusted_users" {
   type        = set(string)
   default     = []
 }
+
+variable "perimeter_additional_members" {
+  description = "The list of all members (users or service accounts) to be added on perimeter access, except the service accounts created by this module."
+  type        = list(string)
+}
+
+variable "security_administrator_group" {
+  description = "Google Cloud IAM group that administers security configurations in the organization(org policies, KMS, VPC service perimeter)."
+  type        = string
+}
+
+variable "network_administrator_group" {
+  description = "Google Cloud IAM group that reviews network configuration. Typically, this includes members of the networking team."
+  type        = string
+}
+
+variable "security_analyst_group" {
+  description = "Google Cloud IAM group that monitors and responds to security incidents."
+  type        = string
+}
+
+variable "data_analyst_group" {
+  description = "Google Cloud IAM group that analyzes the data in the warehouse."
+  type        = string
+}
+
+variable "data_engineer_group" {
+  description = "Google Cloud IAM group that sets up and maintains the data pipeline and warehouse."
+  type        = string
+}

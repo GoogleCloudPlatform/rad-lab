@@ -16,31 +16,6 @@
 
 locals {
   random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
-  # project   = (var.create_project
-  # ? try(module.project_radlab_sdw_data_ingest.0, null)
-  # : try(data.google_project.existing_project.0, null)
-  # )
-  # region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
-
-  # network = (
-  # var.create_network
-  # ? try(module.vpc_ai_notebook.0.network.network, null)
-  # : try(data.google_compute_network.default.0, null)
-  # )
-
-  # subnet = (
-  # var.create_network
-  # ? try(module.vpc_ai_notebook.0.subnets["${local.region}/${var.subnet_name}"], null)
-  # : try(data.google_compute_subnetwork.default.0, null)
-  # )
-
-  # notebook_sa_project_roles = [
-  #   "roles/compute.instanceAdmin",
-  #   "roles/notebooks.admin",
-  #   "roles/bigquery.user",
-  #   "roles/storage.objectViewer",
-  #   "roles/iam.serviceAccountUser"
-  # ]
 
   default_apis_data_ingest = [
     "accesscontextmanager.googleapis.com",
@@ -113,17 +88,18 @@ locals {
 
   enable_services = length(local.project_services_data_ingest)> 0 || length(local.project_services_data_govern)> 0 || length(local.project_services_non_conf_data)> 0 || length(local.project_services_conf_data)> 0 ? true : false
 
+  perimeter_additional_members = toset(concat([
+    for i in var.perimeter_additional_members : (
+      length(regexall("gserviceaccount.com", "${i}")) > 0 ? "serviceAccount:${i}" : "user:${i}"
+    )
+  ]))
+
 }
 
 resource "random_id" "default" {
   count       = var.deployment_id == null ? 1 : 0
   byte_length = 2
 }
-
-# data "google_project" "existing_project" {
-#   count      = var.create_project ? 0 : 1
-#   project_id = var.project_id_prefix
-# }
 
 module "project_radlab_sdw_data_ingest" {
   # count   = var.create_project ? 1 : 0
@@ -230,18 +206,10 @@ resource "google_project_service" "enabled_services_non_conf_data" {
 #   pubsub_resource_location         = var.region
 #   location                         = var.region
 #   delete_contents_on_destroy       = var.delete_contents_on_destroy
-#   perimeter_additional_members     = var.perimeter_additional_members
+#   perimeter_additional_members     = local.perimeter_additional_members
 #   data_engineer_group              = var.data_engineer_group
 #   data_analyst_group               = var.data_analyst_group
 #   security_analyst_group           = var.security_analyst_group
 #   network_administrator_group      = var.network_administrator_group
 #   security_administrator_group     = var.security_administrator_group
-# }
-
-# resource "google_project_service" "enabled_services_data_ingest" {
-#   for_each                   = toset(local.project_services_data_ingest)
-#   project                    = module.project_radlab_sdw_data_ingest.project_id
-#   service                    = each.value
-#   disable_dependent_services = true
-#   disable_on_destroy         = true
 # }
