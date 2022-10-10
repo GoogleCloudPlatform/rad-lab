@@ -54,6 +54,17 @@ _Usage:_
 
 ```python3 radlab.py --disable-perm-check --varfile /<path_to_file>/<file_with_terraform.tfvars_contents>```
 
+The following APIs must be enabled in the RAD Lab Management Project where the service account was created
+- Access Context Manager API: `accesscontextmanager.googleapis.com`
+- App Engine Admin API: `appengine.googleapis.com`
+- Cloud Billing API: `cloudbilling.googleapis.com`
+- Cloud Key Management Service (KMS) API: `cloudkms.googleapis.com`
+- Cloud Pub/Sub API: `pubsub.googleapis.com`
+- Cloud Resource Manager API: `cloudresourcemanager.googleapis.com`
+- Compute Engine API: `compute.googleapis.com`
+- Dataflow API: `dataflow.googleapis.com`
+- Identity and Access Management (IAM) API: `iam.googleapis.com`
+
 <!-- BEGIN TFDOC -->
 ## Variables
 
