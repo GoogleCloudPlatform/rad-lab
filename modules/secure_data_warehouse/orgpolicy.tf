@@ -28,11 +28,14 @@ resource "google_project_organization_policy" "domain_restricted_sharing_policy"
 
 resource "time_sleep" "wait_120_seconds" {
   # count = var.set_trustedimage_project_policy || var.set_shielded_vm_policy || var.set_external_ip_policy || (var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic) || var.enable_services ? 1 : 0
-  count = var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic ? 1 : 0
+  count = (var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic) || local.enable_services ? 1 : 0
 
   depends_on = [
     google_project_organization_policy.domain_restricted_sharing_policy,
-    # google_project_service.enabled_services
+    google_project_service.enabled_services_data_ingest,
+    google_project_service.enabled_services_data_govern,
+    google_project_service.enabled_services_conf_data,
+    google_project_service.enabled_services_non_conf_data
   ]
 
   create_duration = "120s"
