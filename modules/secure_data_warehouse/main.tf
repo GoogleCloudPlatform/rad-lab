@@ -88,7 +88,7 @@ locals {
 
   enable_services = length(local.project_services_data_ingest)> 0 || length(local.project_services_data_govern)> 0 || length(local.project_services_non_conf_data)> 0 || length(local.project_services_conf_data)> 0 ? true : false
 
-  perimeter_additional_members = toset(concat([
+  perimeter_additional_members = distinct(concat([
     for i in var.perimeter_additional_members : (
       length(regexall("gserviceaccount.com", "${i}")) > 0 ? "serviceAccount:${i}" : "user:${i}"
     )
