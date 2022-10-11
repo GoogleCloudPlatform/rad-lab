@@ -21,21 +21,14 @@ NOTE: This is only required if spinning up Billing Budget for the module.
 
 Ensure that the identity executing this module has the following IAM permissions, when **creating the project** (create_project = true): 
 
+- Parent: `roles/accesscontextmanager.policyAdmin`
 - Parent: `roles/billing.user`
 - Parent: `roles/billing.costsManager` (OPTIONAL - Only when spinning up Billing Budget for the module)
 - Parent: `roles/resourcemanager.projectCreator`
-- Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only required if setting any Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
+- Parent: `roles/orgpolicy.policyAdmin`
+- Parent: `roles/resourcemanager.organizationAdmin`
 
 NOTE: Billing budgets can only be created if you are using a Service Account to deploy the module via Terraform, User account cannot be used.
-
-When deploying in an existing project, ensure the identity has the following permissions on the project:
-
-- `roles/compute.admin`
-- `roles/resourcemanager.projectIamAdmin`
-- `roles/iam.serviceAccountAdmin`
-- `roles/storage.admin`
-- `roles/notebooks.admin`
-- `roles/billing.costsManager` (OPTIONAL - Only when spinning up Billing Budget for the module)
 
 ### Deployments via Service Account
 
@@ -71,6 +64,12 @@ The following APIs must be enabled in the RAD Lab Management Project where the s
 | name | description | type | required | default |
 |---|---|:---: |:---:|:---:|
 | billing_account_id | Billing Account associated to the GCP Resources | <code title="">string</code> | ✓ |  |
+| data_analyst_group | Google Cloud IAM group that analyzes the data in the warehouse | <code title="">string</code> | ✓ |  |
+| data_engineer_group | Google Cloud IAM group that sets up and maintains the data pipeline and warehouse | <code title="">string</code> | ✓ |  |
+| network_administrator_group | Google Cloud IAM group that reviews network configuration. Typically, this includes members of the networking team | <code title="">string</code> | ✓ |  |
+| perimeter_additional_members | The list of all members (users or service accounts) to be added on perimeter access, except the service accounts created by this module | <code title="list&#40;string&#41;">list(string)</code> | ✓ |  |
+| security_administrator_group | Google Cloud IAM group that administers security configurations in the organization(org policies, KMS, VPC service perimeter) | <code title="">string</code> | ✓ |  |
+| security_analyst_group | Google Cloud IAM group that monitors and responds to security incidents | <code title="">string</code> | ✓ |  |
 | *billing_budget_alert_spend_basis* | The type of basis used to determine if spend has passed the threshold | <code title="">string</code> |  | <code title="">CURRENT_SPEND</code> |
 | *billing_budget_alert_spent_percents* | A list of percentages of the budget to alert on when threshold is exceeded | <code title="list&#40;number&#41;">list(number)</code> |  | <code title="">[0.5, 0.7, 1]</code> |
 | *billing_budget_amount* | The amount to use as the budget in USD | <code title="">number</code> |  | <code title="">500</code> |
@@ -96,9 +95,26 @@ The following APIs must be enabled in the RAD Lab Management Project where the s
 | name | description | sensitive |
 |---|---|:---:|
 | billing_budget_budget_id | Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}` | ✓ |
+| blueprint_type | Type of blueprint this module represents. |  |
+| cmek_bigquery_crypto_key | The Customer Managed Crypto Key for the BigQuery service. |  |
+| cmek_confidential_bigquery_crypto_key | The Customer Managed Crypto Key for the confidential BigQuery service. |  |
+| cmek_data_ingestion_crypto_key | The Customer Managed Crypto Key for the data ingestion crypto boundary. |  |
+| cmek_reidentification_crypto_key | The Customer Managed Crypto Key for the reidentification crypto boundary. |  |
+| confidential_data_access_level_name | Confidential Data Access Context Manager access level name. |  |
+| confidential_data_service_perimeter_name | Confidential Data VPC Service Controls service perimeter name |  |
+| data_governance_access_level_name | Data Governance Access Context Manager access level name. |  |
+| data_governance_service_perimeter_name | Data Governance VPC Service Controls service perimeter name. |  |
+| data_ingestion_access_level_name | Data Ingestion Access Context Manager access level name. |  |
+| data_ingestion_bigquery_dataset | The bigquery dataset created for data ingestion pipeline. |  |
+| data_ingestion_bucket_name | The name of the bucket created for the data ingestion pipeline. |  |
+| data_ingestion_service_perimeter_name | Data Ingestion VPC Service Controls service perimeter name. |  |
+| data_ingestion_topic_name | The topic created for data ingestion pipeline. |  |
+| dataflow_controller_service_account_email | The Dataflow controller service account email. See https://cloud.google.com/dataflow/docs/concepts/security-and-permissions#specifying_a_user-managed_controller_service_account. |  |
 | deployment_id | RADLab Module Deployment ID |  |
 | project_id_confedential_data | Confedential Data Project ID |  |
 | project_id_data_governance | Data Governance Project ID |  |
 | project_id_data_ingestion | Data Ingestion Project ID |  |
 | project_id_non_confedential_data | Non-Confedential Data Project ID |  |
+| pubsub_writer_service_account_email | The PubSub writer service account email. Should be used to write data to the PubSub topics the data ingestion pipeline reads from. |  |
+| storage_writer_service_account_email | The Storage writer service account email. Should be used to write data to the buckets the data ingestion pipeline reads from. |  |
 <!-- END TFDOC -->

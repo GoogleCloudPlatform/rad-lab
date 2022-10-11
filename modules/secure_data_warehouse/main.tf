@@ -189,26 +189,28 @@ resource "google_project_service" "enabled_services_non_conf_data" {
 }
 
 
-# module "secured_data_warehouse" {
-#   source                           = "../.."
-#   org_id                           = var.organization_id
-#   labels                           = { environment = "dev" }
-#   data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
-#   confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
-#   non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
-#   data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
-#   terraform_service_account        = var.resource_creator_identity
-#   access_context_manager_policy_id = var.access_context_manager_policy_id
-#   bucket_name                      = "simple-example"
-#   dataset_id                       = "simple_example"
-#   cmek_keyring_name                = "simple-example"
-#   pubsub_resource_location         = var.region
-#   location                         = var.region
-#   delete_contents_on_destroy       = var.delete_contents_on_destroy
-#   perimeter_additional_members     = local.perimeter_additional_members
-#   data_engineer_group              = var.data_engineer_group
-#   data_analyst_group               = var.data_analyst_group
-#   security_analyst_group           = var.security_analyst_group
-#   network_administrator_group      = var.network_administrator_group
-#   security_administrator_group     = var.security_administrator_group
-# }
+module "secured_data_warehouse" {
+  source  = "terraform-google-modules/secured-data-warehouse/google"
+  version = "~> 0.1"
+
+  org_id                           = var.organization_id
+  labels                           = { environment = "dev" }
+  data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
+  confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
+  non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
+  data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
+  terraform_service_account        = var.resource_creator_identity
+  # access_context_manager_policy_id = var.access_context_manager_policy_id
+  bucket_name                      = format("radlab-bucket-%s", local.random_id)
+  dataset_id                       = format("radlab-dataset-%s", local.random_id)
+  cmek_keyring_name                = format("radlab-keyring-%s", local.random_id)
+  pubsub_resource_location         = var.region
+  location                         = var.region
+  # delete_contents_on_destroy       = var.delete_contents_on_destroy
+  perimeter_additional_members     = local.perimeter_additional_members
+  data_engineer_group              = var.data_engineer_group
+  data_analyst_group               = var.data_analyst_group
+  security_analyst_group           = var.security_analyst_group
+  network_administrator_group      = var.network_administrator_group
+  security_administrator_group     = var.security_administrator_group
+}
