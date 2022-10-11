@@ -106,8 +106,7 @@ module "project_radlab_sdw_data_ingest" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-data-ingest-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-ingest-1234 #radlab-sdw-data-govern-1234 #radlab-sdw-conf-data-1234 #radlab-sdw-non-conf-data-1234
-  random_project_id = false
+  name              = format("%s-data-ingest-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-ingest-1234
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
   org_id            = var.organization_id
@@ -128,7 +127,7 @@ module "project_radlab_sdw_data_govern" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-data-govern-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-ingest-1234 #radlab-sdw-data-govern-1234 #radlab-sdw-conf-data-1234 #radlab-sdw-non-conf-data-1234
+  name              = format("%s-data-govern-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-govern-1234
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
@@ -150,7 +149,7 @@ module "project_radlab_sdw_conf_data" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-conf-data-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-ingest-1234 #radlab-sdw-data-govern-1234 #radlab-sdw-conf-data-1234 #radlab-sdw-non-conf-data-1234
+  name              = format("%s-conf-data-%s", var.project_id_prefix, local.random_id) #radlab-sdw-conf-data-1234
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
@@ -172,7 +171,7 @@ module "project_radlab_sdw_non_conf_data" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-non-conf-data-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-ingest-1234 #radlab-sdw-data-govern-1234 #radlab-sdw-conf-data-1234 #radlab-sdw-non-conf-data-1234
+  name              = format("%s-non-conf-data-%s", var.project_id_prefix, local.random_id) #radlab-sdw-non-conf-data-1234
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
