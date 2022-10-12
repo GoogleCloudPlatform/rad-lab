@@ -192,6 +192,8 @@ resource "google_project_service" "enabled_services_non_conf_data" {
 module "secured_data_warehouse" {
   source  = "terraform-google-modules/secured-data-warehouse/google"
   version = "~> 0.1"
+  # source  = "GoogleCloudPlatform/secured-data-warehouse/google"
+  # version = "0.2.0"
 
   org_id                           = var.organization_id
   labels                           = { environment = "dev" }
