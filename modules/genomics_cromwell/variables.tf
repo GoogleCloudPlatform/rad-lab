@@ -101,6 +101,7 @@ variable "create_project" {
 
 variable "cromwell_db_name" {
   description = "The name of the SQL Database instance. {{UIMeta group=3 order=1 }}"
+  type        = string
   default     = "cromwelldb"
 }
 
