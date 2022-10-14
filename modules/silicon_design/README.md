@@ -53,6 +53,7 @@ When deploying in an existing project, ensure the identity has the following per
 - `roles/resourcemanager.projectIamAdmin`
 - `roles/iam.serviceAccountAdmin`
 - `roles/iam.serviceAccountUser`
+- `roles/serviceusage.serviceUsageConsumer`
 - `roles/billing.costsManager` (OPTIONAL - Only when spinning up Billing Budget for the module)
 
 ### Deployments via Service Account
