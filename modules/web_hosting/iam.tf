@@ -19,21 +19,21 @@
 # IAM - Trusted User/Group
 #########################################################################
 
-resource "google_project_iam_member" "trusted_user_group_role1" {
+resource "google_project_iam_member" "trusted_user_group_iap_tunnel_accessor" {
   for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id
   member   = each.value
   role     = "roles/iap.tunnelResourceAccessor"
 }
 
-resource "google_project_iam_member" "trusted_user_group_role2" {
+resource "google_project_iam_member" "trusted_user_group_compute_instance_admin" {
   for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id
   member   = each.value
   role     = "roles/compute.instanceAdmin.v1"
 }
 
-resource "google_project_iam_member" "trusted_user_group_role3" {
+resource "google_project_iam_member" "trusted_user_group_viewer" {
   for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id
   member   = each.value
