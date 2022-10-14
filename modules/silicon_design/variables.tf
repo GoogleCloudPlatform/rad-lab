@@ -129,6 +129,12 @@ variable "folder_id" {
   default     = ""
 }
 
+variable "image_name" {
+  description = "Basename for for the compute and container image. {{UIMeta group=3 order=6 }}"
+  type        = string
+  default     = "silicon-design-ubuntu-2004"
+}
+
 variable "ip_cidr_range" {
   description = "Unique IP CIDR Range for AI Notebooks subnet. {{UIMeta group=2 order=5 }}"
   type        = string
