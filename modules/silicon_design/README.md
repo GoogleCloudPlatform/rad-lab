@@ -156,6 +156,7 @@ module "existing_project_and_network" {
 | *deployment_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node | <code title="">string</code> |  | <code title=""></code> |
+| *image_name* | Basename for for the compute and container image | <code title="">string</code> |  | <code title="">silicon-design-ubuntu-2004</code> |
 | *ip_cidr_range* | Unique IP CIDR Range for AI Notebooks subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
 | *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-1</code> |
 | *network_name* | Name of the network to be created | <code title="">string</code> |  | <code title="">ai-notebook</code> |
