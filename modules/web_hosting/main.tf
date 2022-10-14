@@ -85,14 +85,13 @@ resource "google_service_account" "sa_p_cloud_sql" {
 data "template_file" "sample_webapp_metadata_startup_script" {
     template = "${file("${path.module}/scripts/build/startup_scripts/sample_app/sample_webapp.sh.tpl")}"
     vars = {
-        INSTANCE_CONNECTION_NAME = resource.google_sql_database_instance.db_postgres.connection_name
+        INSTANCE_CONNECTION_NAME = module.sql_db_postgresql.instance_connection_name
         CLOUD_SQL_DATABASE_NAME  = "postgres"
-        CLOUD_SQL_USERNAME       = resource.google_sql_user.users.name
-        CLOUD_SQL_PASSWORD       = resource.google_sql_user.users.password
+        CLOUD_SQL_USERNAME       = module.sql_db_postgresql.additional_users[0].name
+        CLOUD_SQL_PASSWORD       = module.sql_db_postgresql.additional_users[0].password
 
     }
 }
-
 
 data "template_file" "sample_app_metadata_startup_script" {
     template = "${file("${path.module}/scripts/build/startup_scripts/sample_app/sample_app.sh.tpl")}"

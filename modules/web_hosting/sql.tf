@@ -13,53 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
- resource "google_sql_database_instance" "db_postgres" {
-  database_version    = var.db_version
-  name                = format("radlab-web-hosting-db-%s", local.random_id)
-  project             = local.project.project_id
-  region              = var.region
-  deletion_protection = false
-  settings {
-    activation_policy = var.db_activation_policy
-    availability_type = var.db_availability_type
-    backup_configuration {
-      backup_retention_settings {
-        retained_backups = 7
-        retention_unit   = "COUNT"
-      }
-      enabled                        = true
-      location                       = var.region
-      point_in_time_recovery_enabled = true
-      start_time                     = "07:00"
-      transaction_log_retention_days = 7
-    }
-    disk_autoresize       = true
-    disk_autoresize_limit = 0
-    disk_size             = 100
-    disk_type             = var.db_disk_type
-    ip_configuration {
-      ipv4_enabled    = var.db_ipv4_enabled
-      private_network = google_compute_network.vpc_xlb.id
-    }
-    location_preference {
-      zone = "${var.region}-c"
-    }
-    pricing_plan = "PER_USE"
-    tier         = var.db_tier
+
+module "sql_db_postgresql" {
+  source  = "GoogleCloudPlatform/sql-db/google//modules/postgresql"
+  version = "12.1.0"
+
+  database_version      = var.db_version
+  name                  = format("radlab-web-hosting-db-%s", local.random_id)
+  project_id            = local.project.project_id
+  region                = var.region
+  deletion_protection   = false
+  activation_policy     = var.db_activation_policy
+  availability_type     = var.db_availability_type
+  
+  backup_configuration  = {
+    enabled                         = true
+    location                        = var.region
+    point_in_time_recovery_enabled  = true
+    retained_backups                = 7
+    retention_unit                  = "COUNT"
+    start_time                      = "07:00"
+    transaction_log_retention_days  = 7
   }
-  depends_on = [
-    resource.google_service_networking_connection.psconnect,
+
+  disk_autoresize       = true
+  disk_autoresize_limit = 0
+  disk_size             = 100
+  disk_type             = var.db_disk_type
+
+  ip_configuration = {
+    authorized_networks = [],
+    ipv4_enabled        = var.db_ipv4_enabled
+    private_network     = google_compute_network.vpc_xlb.id
+    require_ssl         = false
+    allocated_ip_range  = null
+  }
+  
+  pricing_plan          = "PER_USE"
+  zone                  = "${var.region}-c"
+  tier                  = var.db_tier
+
+  additional_users = [
+    {
+      name     = "radlab-sql-user"
+      password = "radlab-sql-password"
+    }
   ]
-}
 
-resource "google_sql_user" "users" {
-  project  = local.project.project_id
-  name     = "radlab-sql-user"
-  instance = google_sql_database_instance.db_postgres.name
-  password = "radlab-sql-password"
+  module_depends_on = [google_service_networking_connection.psconnect,]
 }
-
 #########################################################################
 # Configs for Sample DB Creation
 #########################################################################
@@ -69,9 +71,9 @@ resource "local_file" "sample_db_metadata_startup_script_output" {
   filename = "${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh"
   content = templatefile("${path.module}/scripts/build/startup_scripts/sample_db/sample_db_vm.sh.tpl", {
     DB_NAME = "postgres"
-    DB_IP   = resource.google_sql_database_instance.db_postgres.private_ip_address
-    DB_USER = resource.google_sql_user.users.name
-    DB_PASS = resource.google_sql_user.users.password
+    DB_IP   = module.sql_db_postgresql.private_ip_address
+    DB_USER = module.sql_db_postgresql.additional_users[0].name
+    DB_PASS = module.sql_db_postgresql.additional_users[0].password
   })
 }
 
