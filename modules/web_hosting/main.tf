@@ -101,6 +101,10 @@ data "template_file" "sample_app_metadata_startup_script" {
 # Creating GCE VMs in vpc-xlb
 #########################################################################
 
+data "google_compute_image" "debian_11_bullseye" {
+  family  = "debian-11"
+  project = "debian-cloud"
+}
 
 resource "google_compute_instance" "web1_vpc_xlb" {
   project      = local.project.project_id
@@ -114,7 +118,7 @@ resource "google_compute_instance" "web1_vpc_xlb" {
   }
   boot_disk {
     initialize_params {
-      image = "debian-11-bullseye-v20220822"
+      image = data.google_compute_image.debian_11_bullseye.self_link
     }
   }
  
@@ -122,9 +126,6 @@ resource "google_compute_instance" "web1_vpc_xlb" {
     subnetwork         = google_compute_subnetwork.subnetwork_primary.name
     subnetwork_project = local.project.project_id
     network_ip         = cidrhost(google_compute_subnetwork.subnetwork_primary.ip_cidr_range, 2)
-    # access_config {
-    #   // Ephemeral IP
-    # }
   }
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
@@ -150,7 +151,7 @@ resource "google_compute_instance" "web2_vpc_xlb" {
   }
   boot_disk {
     initialize_params {
-      image = "debian-11-bullseye-v20220822"
+      image = data.google_compute_image.debian_11_bullseye.self_link
     }
   }
  
@@ -158,8 +159,6 @@ resource "google_compute_instance" "web2_vpc_xlb" {
     subnetwork         = google_compute_subnetwork.subnetwork_primary.name
     subnetwork_project = local.project.project_id
     network_ip         = cidrhost(google_compute_subnetwork.subnetwork_primary.ip_cidr_range, 3)
-    #   // Ephemeral IP
-    # }
   }
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
@@ -185,7 +184,7 @@ resource "google_compute_instance" "web3_vpc_xlb" {
   }
   boot_disk {
     initialize_params {
-      image = "debian-11-bullseye-v20220822"
+      image = data.google_compute_image.debian_11_bullseye.self_link
     }
   }
  
@@ -193,9 +192,6 @@ resource "google_compute_instance" "web3_vpc_xlb" {
     subnetwork         = google_compute_subnetwork.subnetwork_primary.name
     subnetwork_project = local.project.project_id
     network_ip         = cidrhost(google_compute_subnetwork.subnetwork_primary.ip_cidr_range, 4)
-    # access_config {
-    #   // Ephemeral IP
-    # }
   }
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
@@ -211,7 +207,7 @@ resource "google_compute_instance" "web3_vpc_xlb" {
  
 resource "google_compute_instance" "web4_vpc_xlb" {
   project      = local.project.project_id
-  zone         = "asia-south1-c"
+  zone         = "${var.region_secondary}-c"
   name         = "web4-vpc-xlb"
   machine_type = "f1-micro"
   allow_stopping_for_update = true
@@ -221,7 +217,7 @@ resource "google_compute_instance" "web4_vpc_xlb" {
   }
   boot_disk {
     initialize_params {
-      image = "debian-11-bullseye-v20220822"
+      image = data.google_compute_image.debian_11_bullseye.self_link
     }
   }
  
@@ -229,9 +225,6 @@ resource "google_compute_instance" "web4_vpc_xlb" {
     subnetwork         = google_compute_subnetwork.subnetwork_secondary.name
     subnetwork_project = local.project.project_id
     network_ip         = cidrhost(google_compute_subnetwork.subnetwork_secondary.ip_cidr_range, 2)
-    # access_config {
-    #   // Ephemeral IP
-    # }
   }
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
@@ -253,7 +246,7 @@ resource "google_compute_instance" "web4_vpc_xlb" {
 
 resource "google_storage_bucket" "gcs_image_bucket" {
   name          = join("",["gcs_image_bucket-",local.project.project_id])
-  location      = "US"
+  location      = var.region
   project       = local.project.project_id
   force_destroy = true
   depends_on    = [
