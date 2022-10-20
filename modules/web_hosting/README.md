@@ -95,9 +95,9 @@ _Usage:_
 | *region* | Primary region where the CloudSQL, Compute Instance and VPC subnet will be deployed | <code title="">string</code> |  | <code title="">us-central1</code> |
 | *region_secondary* | Secondary region where the Compute Instance and VPC subnet will be deployed | <code title="">string</code> |  | <code title="">asia-south1</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
-| *set_bucket_level_access_policy* | Apply org policy to disable Uniform Bucket Level Access on GCS | <code title="">bool</code> |  | <code title="">true</code> |
+| *set_bucket_level_access_policy* | Apply org policy to disable Uniform Bucket Level Access on GCS | <code title="">bool</code> |  | <code title="">false</code> |
 | *set_domain_restricted_sharing_policy* | Enable org policy to allow all principals to be added to IAM policies | <code title="">bool</code> |  | <code title="">false</code> |
-| *set_shielded_vm_policy* | Apply org policy to disable shielded VMs | <code title="">bool</code> |  | <code title="">true</code> |
+| *set_shielded_vm_policy* | Apply org policy to disable shielded VMs | <code title="">bool</code> |  | <code title="">false</code> |
 | *trusted_groups* | The list of trusted groups (e.g. `myteam@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *trusted_users* | The list of trusted users (e.g. `username@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 
