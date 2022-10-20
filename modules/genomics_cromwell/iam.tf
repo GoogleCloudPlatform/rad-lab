@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-
 #########################################################################
 # IAM - Trusted User/Group
 #########################################################################
 
-resource "google_project_iam_member" "trusted_user_group_iap_tunnel_accessor" {
+resource "google_project_iam_member" "role_viewer" {
   for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id
   member   = each.value
-  role     = "roles/iap.tunnelResourceAccessor"
+  role     = "roles/viewer"
 }
 
 resource "google_project_iam_member" "role_compute_instance_admin" {
@@ -33,17 +32,11 @@ resource "google_project_iam_member" "role_compute_instance_admin" {
   role     = "roles/compute.instanceAdmin.v1"
 }
 
-resource "google_project_iam_member" "role_viewer" {
+resource "google_project_iam_member" "role_iap_tunnel_resource_accessor" {
   for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   project  = local.project.project_id
   member   = each.value
-  role     = "roles/viewer"
-}
-
-resource "google_project_iam_member" "role_cloud_sql_client" {
-  project  = local.project.project_id
-  role     = "roles/cloudsql.client"
-  member   = "serviceAccount:${google_service_account.sa_p_cloud_sql.email}"
+  role     = "roles/iap.tunnelResourceAccessor"
 }
 
 #########################################################################

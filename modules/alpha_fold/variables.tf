@@ -208,13 +208,13 @@ variable "organization_id" {
 }
 
 variable "owner_groups" {
-  description = "List of groups that should be added as the owner of the created project"
+  description = "List of groups that should be added as the owner of the created project. {{UIMeta group=1 order=6 updatesafe }}"
   type        = list(string)
   default     = []
 }
 
 variable "owner_users" {
-  description = "List of users that should be added as owner to the created project"
+  description = "List of users that should be added as owner to the created project. {{UIMeta group=1 order=7 updatesafe }}"
   type        = list(string)
   default     = []
 }

@@ -186,24 +186,10 @@ resource "google_service_account_iam_member" "sa_ai_notebook_iam" {
   service_account_id = google_service_account.sa_p_notebook.id
 }
 
-resource "google_project_iam_member" "module_role1" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/notebooks.admin"
-}
-
-resource "google_project_iam_member" "module_role2" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id  
-  member   = each.value
-  role     = "roles/viewer"
-}
-
 resource "google_project_service_identity" "sa_cloudbuild_identity" {
   provider = google-beta
   project  = local.project.project_id  
-  service = "cloudbuild.googleapis.com"
+  service  = "cloudbuild.googleapis.com"
 }
 
 resource "google_project_iam_member" "sa_cloudbuild_permissions" {

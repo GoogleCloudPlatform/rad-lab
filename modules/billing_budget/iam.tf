@@ -14,18 +14,30 @@
  * limitations under the License.
  */
 
+#########################################################################
+# IAM - Trusted User/Group
+#########################################################################
+
+resource "google_project_iam_member" "role_editor" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/editor"
+}
+
+#########################################################################
+# IAM - Owner User/Group
+#########################################################################
+
 /*
   Allows the user to add ownership for other users or groups.  Be very careful when granting these access rights,
   as they have gain full ownership of the projects and can potentially break the entire module.
 
   More information: https://cloud.google.com/iam/docs/understanding-roles#basic
 */
-locals {
-  owners = toset(concat(formatlist("user:%s", var.owner_users), formatlist("group:%s", var.owner_groups)))
-}
 
-resource "google_project_iam_member" "project_ownership" {
-  for_each = local.owners
+resource "google_project_iam_member" "role_owner" {
+  for_each = toset(concat(formatlist("user:%s", var.owner_users), formatlist("group:%s", var.owner_groups)))
   member   = each.value
   project  = local.project.project_id
   role     = "roles/owner"
