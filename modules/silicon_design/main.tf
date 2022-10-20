@@ -15,11 +15,15 @@
  */
 
 locals {
-  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
   project = (var.create_project
     ? try(module.project_radlab_silicon_design.0, null)
     : try(data.google_project.existing_project.0, null)
-  )
+    )
+  project_number = (var.create_project
+    ? try(module.project_radlab_silicon_design.0.project_number, null)
+    : try(data.google_project.existing_project.0.number, null)
+    )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   network = (
@@ -42,17 +46,33 @@ locals {
     "roles/storage.objectViewer",
   ]
 
-  project_services = var.enable_services ? [
+  cloudbuild_sa_project_roles = [
+    "roles/compute.admin",
+    "roles/storage.admin",
+  ]
+
+  image_builder_sa_project_roles = [
+    "roles/compute.instanceAdmin",
+    "roles/compute.storageAdmin",
+    "roles/storage.admin",
+  ]
+
+  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-design-notebook-${i}"]
+  
+  default_apis = [
     "compute.googleapis.com",
     "notebooks.googleapis.com",
     "cloudbuild.googleapis.com",
     "artifactregistry.googleapis.com",
-  ] : []
+  ]
 
-  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-design-notebook-${i}"]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
+
+  gcloud_impersonate_flag = length(var.resource_creator_identity) != 0 ? "--impersonate-service-account=${var.resource_creator_identity}" : ""
 }
 
 resource "random_id" "default" {
+  count       = var.deployment_id == null ? 1 : 0
   byte_length = 2
 }
 
@@ -83,9 +103,9 @@ resource "google_project_service" "enabled_services" {
   for_each                   = toset(local.project_services)
   project                    = local.project.project_id
   service                    = each.value
-  disable_dependent_services = true
-  disable_on_destroy         = true
-
+  disable_dependent_services = false
+  disable_on_destroy         = false
+  
   depends_on = [
     module.project_radlab_silicon_design
   ]
@@ -180,6 +200,37 @@ resource "google_project_iam_member" "module_role2" {
   role     = "roles/viewer"
 }
 
+resource "google_project_service_identity" "sa_cloudbuild_identity" {
+  provider = google-beta
+  project  = local.project.project_id  
+  service = "cloudbuild.googleapis.com"
+}
+
+resource "google_project_iam_member" "sa_cloudbuild_permissions" {
+  for_each = toset(local.cloudbuild_sa_project_roles)
+  project  = local.project.project_id
+  member   =  "serviceAccount:${google_project_service_identity.sa_cloudbuild_identity.email}"
+  role     = each.value
+}
+
+resource "google_service_account_iam_member" "sa_cloudbuild_image_builder_access" {
+  member             = "serviceAccount:${google_project_service_identity.sa_cloudbuild_identity.email}"
+  role               = "roles/iam.serviceAccountUser"
+  service_account_id = google_service_account.sa_image_builder_identity.id
+}
+
+resource "google_service_account" "sa_image_builder_identity" {
+  project    = local.project.project_id
+  account_id = "sa-image-builder-identity"
+}
+
+resource "google_project_iam_member" "sa_image_builder_permissions" {
+  for_each = toset(local.image_builder_sa_project_roles)
+  project  = local.project.project_id
+  member   = "serviceAccount:${google_service_account.sa_image_builder_identity.email}"
+  role     = each.value
+}
+
 resource "google_notebooks_instance" "ai_notebook" {
   count        = var.notebook_count
   project      = local.project.project_id
@@ -188,7 +239,7 @@ resource "google_notebooks_instance" "ai_notebook" {
   machine_type = var.machine_type
 
   container_image {
-    repository = "${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/openlane-jupyterlab"
+    repository = "${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/${var.image_name}"
     tag        = "latest"
   }
 
@@ -223,7 +274,7 @@ resource "google_notebooks_instance" "ai_notebook" {
 resource "null_resource" "ai_notebook_provisioning_state" {
   for_each = toset(google_notebooks_instance.ai_notebook[*].name)
   provisioner "local-exec" {
-    command = "while [ \"$(gcloud notebooks instances list --location ${var.zone} --project ${local.project.project_id} --filter 'NAME:${each.value} AND STATE:ACTIVE' --format 'value(STATE)' | wc -l | xargs)\" != 1 ]; do echo \"${each.value} not active yet.\"; done"
+    command = "while [ \"$(gcloud notebooks instances list ${local.gcloud_impersonate_flag} --location ${var.zone} --project ${local.project.project_id} --verbosity=error --filter 'NAME:${each.value} AND STATE:ACTIVE' --format 'value(STATE)' | wc -l | xargs)\" != 1 ]; do echo \"${each.value} not active yet.\"; done"
   }
 
   depends_on = [google_notebooks_instance.ai_notebook]
@@ -255,18 +306,25 @@ resource "google_storage_bucket" "notebooks_bucket" {
 resource "null_resource" "build_and_push_image" {
   triggers = {
     cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/cloudbuild.yaml")
-    build_script_sha    = filesha1("${path.module}/scripts/build/build.sh")
-    dockerfile_sha      = filesha1("${path.module}/scripts/build/containers/openlane-jupyterlab/Dockerfile")
+    workflow_sha        = filesha1("${path.module}/scripts/build/images/compute_image.wf.json")    
+    dockerfile_sha      = filesha1("${path.module}/scripts/build/images/Dockerfile")
+    environment_sha     = filesha1("${path.module}/scripts/build/images/provision/environment.yml")    
+    env_sha             = filesha1("${path.module}/scripts/build/images/provision/install.tcl")    
+    profile_sha         = filesha1("${path.module}/scripts/build/images/provision/profile.sh")    
     notebook_sha        = filesha1("${path.module}/scripts/build/notebooks/inverter.md")
   }
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "bash ${path.module}/scripts/build/build.sh ${local.project.project_id} ${google_artifact_registry_repository.containers_repo.location} ${google_artifact_registry_repository.containers_repo.repository_id} ${google_storage_bucket.notebooks_bucket.name} ${var.resource_creator_identity}"
+    command     = "gcloud ${local.gcloud_impersonate_flag} --project=${local.project.project_id} builds submit . --config ${path.module}/scripts/build/cloudbuild.yaml --substitutions \"_ZONE=${var.zone},_COMPUTE_IMAGE=${var.image_name},_CONTAINER_IMAGE=${google_artifact_registry_repository.containers_repo.location}-docker.pkg.dev/${local.project.project_id}/${google_artifact_registry_repository.containers_repo.repository_id}/${var.image_name},_NOTEBOOKS_BUCKET=${google_storage_bucket.notebooks_bucket.name},_COMPUTE_NETWORK=${local.network.id},_COMPUTE_SUBNET=${local.subnet.id},_CLOUD_BUILD_SA=${google_service_account.sa_image_builder_identity.email}\""
   }
 
   depends_on = [
+    time_sleep.wait_120_seconds,
     google_artifact_registry_repository.containers_repo,
     google_storage_bucket.notebooks_bucket,
+    google_project_iam_member.sa_image_builder_permissions,
+    google_project_iam_member.sa_cloudbuild_permissions,
+    google_service_account_iam_member.sa_cloudbuild_image_builder_access,
   ]
 }

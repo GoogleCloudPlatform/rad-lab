@@ -15,7 +15,7 @@
  */
 
 locals {
-  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
   project = (var.create_project
     ? try(module.project_radlab_gen_cromwell.0, null)
     : try(data.google_project.existing_project.0, null)
@@ -35,7 +35,7 @@ locals {
     : try(data.google_compute_subnetwork.default.0, null)
   )
 
-  project_services = var.enable_services ? [
+  default_apis = [
     "compute.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "serviceusage.googleapis.com",
@@ -44,10 +44,12 @@ locals {
     "sqladmin.googleapis.com",
     "iam.googleapis.com",
     "lifesciences.googleapis.com"
-  ] : []
+  ]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "default" {
+  count       = var.deployment_id == null ? 1 : 0
   byte_length = 2
 }
 
@@ -143,4 +145,18 @@ resource "google_project_iam_member" "module_role1" {
   project  = local.project.project_id
   member   = each.value
   role     = "roles/viewer"
+}
+
+resource "google_project_iam_member" "module_role2" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/compute.instanceAdmin.v1"
+}
+
+resource "google_project_iam_member" "module_role3" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/iap.tunnelResourceAccessor"
 }

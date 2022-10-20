@@ -1,3 +1,4 @@
+#
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-timeout: 7200s
+timeout: 3600s
 substitutions:
-  _OPENLANE_VERSION: 2022.02.01_02.19.58
-  _REPOSITORY_LOCATION: $LOCATION
-  _REPOSITORY_ID: gcr.io
-  _NOTEBOOKS_BUCKET: $PROJECT_ID-silicon-design-notebooks
+  _ZONE: 'asia-northeast1-a'
+  _COMPUTE_IMAGE: 'silicon-design-ubuntu-2004'
+  _CONTAINER_IMAGE: 'silicon-design-ubuntu-2004'
+  _NOTEBOOKS_BUCKET: 'silicon-design-notebooks'
+  _COMPUTE_NETWORK: 'global/networks/default'
+  _COMPUTE_SUBNET: ''
+  _CLOUD_BUILD_SA: ''
 options:
   logging: CLOUD_LOGGING_ONLY
 steps:
-- name: 'python'
+- id: 'notebooks-build'
+  name: 'python'
   entrypoint: '/bin/bash'
   args:
   - '-c'
@@ -30,29 +35,33 @@ steps:
     env-jupytext/bin/python -m pip install jupytext
     env-jupytext/bin/jupytext --to notebook scripts/build/notebooks/*.md
     echo 'gsutil cp gs://$_NOTEBOOKS_BUCKET/*.ipynb /home/jupyter/' > scripts/build/notebooks/copy-notebooks.sh
-- name: 'gcr.io/cloud-builders/git'
-  args: ['clone', '-b', $_OPENLANE_VERSION, 'https://github.com/The-OpenROAD-Project/OpenLane']
-- name: 'gcr.io/cloud-builders/docker'
-  entrypoint: '/bin/bash'
-  env:
-  - EXTERNAL_PDK_INSTALLATION=0
-  - NO_PDKS=0
+  waitFor: ['-']
+- id: 'compute-image-build'
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: '/bin/bash'  
   args:
   - '-c'
   - |-
-    apt-get update && apt install -yq python3-venv
-    python3 -m venv env-openlane/
-    env-openlane/bin/python -m pip install pyyaml click    
-    source env-openlane/bin/activate
-    docker pull $_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-pdk:$_OPENLANE_VERSION || make -C OpenLane OPENLANE_IMAGE_NAME=$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-pdk:$_OPENLANE_VERSION openlane
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID', '--build-arg', 'REPOSITORY_LOCATION=$_REPOSITORY_LOCATION', '--build-arg', 'PROJECT_ID=$PROJECT_ID', '--build-arg', 'REPOSITORY_ID=$_REPOSITORY_ID', '--build-arg', 'OPENLANE_VERSION=$_OPENLANE_VERSION', '-f', './scripts/build/containers/openlane-jupyterlab/Dockerfile', '.']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID', '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:latest']  
+    cd scripts/build/images/
+    gsutil cp gs://compute-image-tools/release/linux/daisy .
+    chmod +x daisy
+    ./daisy -project $PROJECT_ID -zone $_ZONE -variables image_name=$_COMPUTE_IMAGE,image_tag=$BUILD_ID,network=$_COMPUTE_NETWORK,subnet=$_COMPUTE_SUBNET,service_account=$_CLOUD_BUILD_SA compute_image.wf.json
+  waitFor: ['-']    
+- id: 'container-image-build'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', '$_CONTAINER_IMAGE:$BUILD_ID', './scripts/build/images']
+  waitFor: ['-']  
+- id: 'container-image-tag'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', '$_CONTAINER_IMAGE:$BUILD_ID', '$_CONTAINER_IMAGE:latest']
+  waitFor: ['container-image-build']
+- id: 'container-image-test'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['run', '$_CONTAINER_IMAGE:$BUILD_ID', 'flow.tcl', '-design', 'inverter', '-ignore_mismatches']  
+  waitFor: ['container-image-tag']  
 images:
-- '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-pdk:$_OPENLANE_VERSION'
-- '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:$BUILD_ID'
-- '$_REPOSITORY_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY_ID/openlane-jupyterlab:latest'
+- '$_CONTAINER_IMAGE:$BUILD_ID'
+- '$_CONTAINER_IMAGE:latest'
 artifacts:
   objects:
     location: gs://$_NOTEBOOKS_BUCKET/

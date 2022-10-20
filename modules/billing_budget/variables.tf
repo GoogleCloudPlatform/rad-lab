@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-variable "apis" {
-  description = "The list of GCP apis to enable. {{UIMeta group=1 order=4 updatesafe }}"
-  type        = set(string)
-  default     = ["compute.googleapis.com","bigquery.googleapis.com","bigquerystorage.googleapis.com"]
-}
 
 variable "billing_account_id" {
   description = "Billing Account associated to the GCP Resources.  {{UIMeta group=0 order=3 updatesafe }}"
@@ -72,9 +67,13 @@ variable "billing_budget_services" {
 }
 
 variable "billing_budget_notification_email_addresses" {
-  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 5 channels are allowed. {{UIMeta group=0 order=13 updatesafe }}"
-  type        = list(string)
+  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 4 channels are allowed as the first element of `trusted_users` is automatically added as one of the channel. {{UIMeta group=0 order=13 updatesafe }}"
+  type        = set(string)
   default     = []
+  validation {
+    condition     = length(var.billing_budget_notification_email_addresses) <= 4
+    error_message = "Maximum of 4 email addresses are allowed for the budget monitoring channel."
+  }
 }
 
 variable "billing_budget_pubsub_topic" {
@@ -150,13 +149,13 @@ variable "set_domain_restricted_sharing_policy" {
 }
 
 variable "trusted_groups" {
-  description = "The list of trusted groups (e.g. `myteam@abc.com`). {{UIMeta group=1 order=6 updatesafe }}"
+  description = "The list of trusted groups (e.g. `myteam@abc.com`). {{UIMeta group=1 order=5 updatesafe }}"
   type        = set(string)
   default     = []
 }
 
 variable "trusted_users" {
-  description = "The list of trusted users (e.g. `username@abc.com`). {{UIMeta group=1 order=5 updatesafe }}"
+  description = "The list of trusted users (e.g. `username@abc.com`). {{UIMeta group=1 order=4 updatesafe }}"
   type        = set(string)
   default     = []
 }
