@@ -15,6 +15,16 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [9.1.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v9.1.1) (2022-10-21)
+ 
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v9.0.0...v9.1.1) 
+ 
+### Added
+- _RAD Lab Module:_ Adding Project Owners to the RAD Lab module deployment. [(#75)](https://github.com/GoogleCloudPlatform/rad-lab/pull/75)
+
+### Fixed
+- _RAD Lab Module:_ Adding Storage Admin and Service User Consumer to Vertex AI Workbench Service Account in Data Science module. [(#80)](https://github.com/GoogleCloudPlatform/rad-lab/issues/80)
+
 ## [9.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v9.0.0) (2022-10-20)
 
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v8.0.0...v9.0.0) 
@@ -28,7 +38,7 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
 - _RAD Lab Module:_ Added permission to trusted users/groups for Genomics Cromwell Module. [(#81)](https://github.com/GoogleCloudPlatform/rad-lab/pull/81)
 
 ### Fixed
-- Fixed the deployment issue for App Mod Elastic RAD Lab module. [(#74)](https://github.com/GoogleCloudPlatform/rad-lab/pull/74)
+- _RAD Lab Module:_ Fixed the deployment issue for App Mod Elastic RAD Lab module. [(#74)](https://github.com/GoogleCloudPlatform/rad-lab/pull/74)
 
 ## [8.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v8.0.0) (2022-09-02)
  
