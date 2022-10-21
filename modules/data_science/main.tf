@@ -38,8 +38,9 @@ locals {
     "roles/compute.instanceAdmin",
     "roles/notebooks.admin",
     "roles/bigquery.user",
-    "roles/storage.objectViewer",
-    "roles/iam.serviceAccountUser"
+    "roles/storage.admin",
+    "roles/iam.serviceAccountUser",
+    "roles/serviceusage.serviceUsageConsumer"
   ]
 
   default_apis = [
