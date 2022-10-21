@@ -26,3 +26,7 @@ output "cluster_credentials_cmd" {
 output "project_id" {
   value = module.project.project_id
 }
+
+output "argo_cd_mgmt_identity" {
+  value = google_service_account.argocd_management_identity.email
+}
