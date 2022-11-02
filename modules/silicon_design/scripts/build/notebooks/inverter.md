@@ -39,22 +39,15 @@ See [OpenLane Variables information](https://github.com/The-OpenROAD-Project/Ope
 %%bash -c 'cat > config.tcl; tclsh config.tcl'
 set ::env(DESIGN_NAME) inverter
 
-set script_dir [file dirname [file normalize [info script]]]
-set ::env(VERILOG_FILES) "$script_dir/inverter.v"
+set ::env(VERILOG_FILES) "inverter.v"
+
+set ::env(FP_SIZING) absolute
+set ::env(DIE_AREA) "0 0 50 50"
+set ::env(PL_TARGET_DENSITY) 0.75
 
 set ::env(CLOCK_TREE_SYNTH) 0
 set ::env(CLOCK_PORT) ""
-
-set ::env(PL_RANDOM_GLB_PLACEMENT) 1
-
-set ::env(FP_SIZING) absolute
-set ::env(DIE_AREA) "0 0 34.165 54.885"
-set ::env(PL_TARGET_DENSITY) 0.75
-
-set ::env(FP_PDN_HORIZONTAL_HALO) 6
-set ::env(FP_PDN_VERTICAL_HALO) 6
-
-set ::env(DIODE_INSERTION_STRATEGY) 3
+set ::env(DIODE_INSERTION_STRATEGY) 0
 ```
 
 ## Run OpenLane flow
@@ -62,7 +55,7 @@ set ::env(DIODE_INSERTION_STRATEGY) 3
 [OpenLane](https://github.com/The-OpenROAD-Project/OpenLane) is an automated RTL to GDSII flow based on several components including [OpenROAD](https://github.com/The-OpenROAD-Project/OpenROAD), [Yosys](https://github.com/YosysHQ/yosys), [Magic, Netgen, Fault, CVC, SPEF-Extractor, CU-GR, Klayout and a number of custom scripts for design exploration and optimization.
 
 ```python tags=[]
-!flow.tcl -design .
+!flow.tcl -design . -ignore_mismatches
 ```
 
 ## Display layout with GDSII Tool Kit

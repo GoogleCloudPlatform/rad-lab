@@ -193,6 +193,8 @@ module "elastic_search_project" {
 | *node_pool_min_count* | Minimum instance count for the custom nodepool | <code title="">number</code> |  | <code title="">1</code> |
 | *node_pool_name* | Name of the nodepool | <code title="">string</code> |  | <code title="">elastic-search-pool</code> |
 | *organization_id* | Organization ID where the project will be created. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
+| *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
+| *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *pod_cidr_block* | CIDR block to be assigned to pods running in the GKE cluster | <code title="">string</code> |  | <code title="">10.100.0.0/16</code> |
 | *pod_ip_range_name* | Range name for the pod IP addresses | <code title="">string</code> |  | <code title="">pod-ip-range</code> |
 | *preemptible_nodes* | Use preemptible VMs for the node pools | <code title="">bool</code> |  | <code title="">true</code> |

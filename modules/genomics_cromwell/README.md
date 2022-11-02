@@ -94,7 +94,7 @@ _Usage:_
 | *create_project* | Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *cromwell_PAPI_endpoint* | Endpoint for Life Sciences APIs. For locations other than us-central1, the endpoint needs to be updated to match the location For example for \"europe-west4\" location the endpoint-url should be \"https://europe-west4-lifesciences.googleapi/\" | <code title="">string</code> |  | <code title="">https://lifesciences.googleapis.com</code> |
 | *cromwell_PAPI_location* | Google Cloud region or multi-region where the Life Sciences API endpoint will be used. This does not affect where worker instances or data will be stored | <code title="">string</code> |  | <code title="">us-central1</code> |
-| *cromwell_db_name* | The name of the SQL Database instance | <code title=""></code> |  | <code title="">cromwelldb</code> |
+| *cromwell_db_name* | The name of the SQL Database instance | <code title="">string</code> |  | <code title="">cromwelldb</code> |
 | *cromwell_db_tier* | CloudSQL tier, please refere to the documentation at https://cloud.google.com/sql/docs/mysql/instance-settings#machine-type-2ndgen | <code title="">string</code> |  | <code title="">db-n1-standard-2</code> |
 | *cromwell_port* | Port Cromwell server will use for the REST API and web user interface | <code title="">string</code> |  | <code title="">8000</code> |
 | *cromwell_sa_roles* | List of roles granted to the cromwell service account. This server account will be used to run both the Cromwell server and workers as well | <code title="list&#40;any&#41;">list(any)</code> |  | <code title="&#91;&#10;&#34;roles&#47;lifesciences.workflowsRunner&#34;,&#10;&#34;roles&#47;serviceusage.serviceUsageConsumer&#34;,&#10;&#34;roles&#47;storage.objectAdmin&#34;,&#10;&#34;roles&#47;cloudsql.client&#34;,&#10;&#34;roles&#47;browser&#34;&#10;&#93;">...</code> |
@@ -109,6 +109,8 @@ _Usage:_
 | *ip_cidr_range* | Unique IP CIDR Range for cromwell subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
 | *network_name* | This name will be used for VPC and subnets created | <code title="">string</code> |  | <code title="">cromwell-vpc</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
+| *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
+| *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-genomics-cromwell</code> |
 | *region* | The default region where the CloudSQL, Compute Instance and VPCs will be deployed | <code title="">string</code> |  | <code title="">us-central1</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |

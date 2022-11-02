@@ -129,6 +129,12 @@ variable "folder_id" {
   default     = ""
 }
 
+variable "image_name" {
+  description = "Basename for for the compute and container image. {{UIMeta group=3 order=6 }}"
+  type        = string
+  default     = "silicon-design-ubuntu-2004"
+}
+
 variable "ip_cidr_range" {
   description = "Unique IP CIDR Range for AI Notebooks subnet. {{UIMeta group=2 order=5 }}"
   type        = string
@@ -163,6 +169,18 @@ variable "organization_id" {
   description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id. {{UIMeta group=0 order=1 }}"
   type        = string
   default     = ""
+}
+
+variable "owner_groups" {
+  description = "List of groups that should be added as the owner of the created project. {{UIMeta group=1 order=6 updatesafe }}"
+  type        = list(string)
+  default     = []
+}
+
+variable "owner_users" {
+  description = "List of users that should be added as owner to the created project. {{UIMeta group=1 order=7 updatesafe }}"
+  type        = list(string)
+  default     = []
 }
 
 variable "project_id_prefix" {

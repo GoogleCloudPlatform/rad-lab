@@ -26,7 +26,7 @@ This RAD Lab module provides a managed environment for custom silicon design usi
 
 Below Architecture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V6_Silicon.png)
+![](../../docs/images/V6_SiliconDesign.png)
 
 ## API Prerequisites
 
@@ -53,6 +53,7 @@ When deploying in an existing project, ensure the identity has the following per
 - `roles/resourcemanager.projectIamAdmin`
 - `roles/iam.serviceAccountAdmin`
 - `roles/iam.serviceAccountUser`
+- `roles/serviceusage.serviceUsageConsumer`
 - `roles/billing.costsManager` (OPTIONAL - Only when spinning up Billing Budget for the module)
 
 ### Deployments via Service Account
@@ -155,12 +156,15 @@ module "existing_project_and_network" {
 | *deployment_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node | <code title="">string</code> |  | <code title=""></code> |
+| *image_name* | Basename for for the compute and container image | <code title="">string</code> |  | <code title="">silicon-design-ubuntu-2004</code> |
 | *ip_cidr_range* | Unique IP CIDR Range for AI Notebooks subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
 | *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-1</code> |
 | *network_name* | Name of the network to be created | <code title="">string</code> |  | <code title="">ai-notebook</code> |
 | *notebook_count* | Number of AI Notebooks requested | <code title="">number</code> |  | <code title="">1</code> |
 | *notebook_names* | Names of AI Notebooks requested | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
+| *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
+| *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-silicon-design</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
 | *set_domain_restricted_sharing_policy* | Enable org policy to allow all principals to be added to IAM policies | <code title="">bool</code> |  | <code title="">false</code> |

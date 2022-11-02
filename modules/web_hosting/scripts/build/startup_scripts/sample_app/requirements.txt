@@ -1,0 +1,4 @@
+flask
+pg8000
+sqlalchemy
+cloud-sql-python-connector

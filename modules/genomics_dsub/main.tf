@@ -153,17 +153,6 @@ resource "google_service_account_iam_member" "sa_ngs_iam" {
   service_account_id = google_service_account.sa_p_ngs.id
 }
 
-resource "google_project_iam_binding" "module_role1" {
-  project = local.project.project_id
-  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  role    = "roles/storage.admin"
-}
-
-resource "google_project_iam_binding" "module_role2" {
-  project = local.project.project_id
-  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  role    = "roles/viewer"
-}
 
 # Bucket to store sequence inputs and processed outputs #
 resource "google_storage_bucket" "input_bucket" {
