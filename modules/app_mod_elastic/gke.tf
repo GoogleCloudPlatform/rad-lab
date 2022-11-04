@@ -53,7 +53,7 @@ module "gke_cluster" {
       node_locations = join(",", data.google_compute_zones.zones.names)
       min_count      = var.node_pool_min_count
       max_count      = var.node_pool_max_count
-      image_type     = "COS"
+      image_type     = "COS_CONTAINERD"
       preemptible    = var.preemptible_nodes
       disk_size_gb   = var.disk_size_gb_nodes
       disk_type      = var.disk_type_nodes
