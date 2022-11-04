@@ -89,10 +89,3 @@ resource "google_service_account_iam_member" "elastic_search_k8s_identity" {
     module.gke_cluster
   ]
 }
-
-resource "google_project_iam_member" "module_role1" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/viewer"
-}
