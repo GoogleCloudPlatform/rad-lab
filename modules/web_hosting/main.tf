@@ -345,10 +345,11 @@ resource "google_compute_instance_group" "ig_us_c1_region" {
   depends_on = [google_compute_instance.web3_vpc_xlb]
 }
 
-resource "google_compute_instance_group" "ig_asia_s1_region" {
-  name        = "ig-asia-s1-region"
+resource "google_compute_instance_group" "ig_secondary_region" {
+  name        = "ig-${var.region_secondary}-region"
   description = "Unmanaged instance group created via terraform"
   project     = local.project.project_id
+
   instances = [
     google_compute_instance.web4_vpc_xlb.self_link
   ]
@@ -358,7 +359,7 @@ resource "google_compute_instance_group" "ig_asia_s1_region" {
     port = "80"
   }
 
-  zone       = "asia-south1-c"
+  zone       = data.google_compute_zones.secondary_available_zones.2
   depends_on = [google_compute_instance.web4_vpc_xlb]
 }
 
@@ -512,7 +513,7 @@ resource "google_compute_backend_service" "be_http_cross_region" {
     max_utilization = 0.8
   }
   backend {
-    group = google_compute_instance_group.ig_asia_s1_region.self_link
+    group = google_compute_instance_group.ig_secondary_region.self_link
   }
 
   health_checks = [google_compute_health_check.http_hc.id]
