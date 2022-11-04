@@ -16,6 +16,7 @@
 
 locals {
   random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
+
   project = (var.create_project
     ? try(module.project_radlab_web_hosting.0, null)
     : try(data.google_project.existing_project.0, null)
@@ -28,9 +29,19 @@ locals {
     "servicenetworking.googleapis.com",
     "sqladmin.googleapis.com",
   ]
+
   project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis, [
     "pubsub.googleapis.com"
   ])) : local.default_apis) : []
+
+  web_startup_script = templatefile("${path.module}/scripts/build/startup_scripts/sample_app/sample_webapp.sh.tpl", {
+    INSTANCE_CONNECTION_NAME = module.sql_db_postgresql.instance_connection_name
+    CLOUD_SQL_DATABASE_NAME  = "postgres"
+    CLOUD_SQL_USERNAME       = module.sql_db_postgresql.additional_users[0].name
+    CLOUD_SQL_PASSWORD       = module.sql_db_postgresql.additional_users[0].password
+  })
+
+  sample_app_startup_script = templatefile("${path.module}/scripts/build/startup_scripts/sample_app/sample_app.sh.tpl", {})
 }
 
 resource "random_id" "default" {
@@ -38,9 +49,15 @@ resource "random_id" "default" {
   byte_length = 2
 }
 
-data "google_compute_zones" "available" {
+data "google_compute_zones" "primary_available_zones" {
   project = local.project.project_id
   region  = var.region
+  status  = "UP"
+}
+
+data "google_compute_zones" "secondary_available_zones" {
+  project = local.project.project_id
+  region  = var.region_secondary
   status  = "UP"
 }
 
@@ -75,10 +92,10 @@ resource "google_project_service" "enabled_services" {
     module.project_radlab_web_hosting
   ]
 }
+
 #########################################################################
 # Service Account to connect to Cloud SQL
 #########################################################################
-
 resource "google_service_account" "sa_p_cloud_sql" {
   project      = local.project.project_id
   account_id   = "gce-sql-sa"
@@ -89,20 +106,6 @@ resource "google_service_account" "sa_p_cloud_sql" {
 # Startup script for VMs in vpc-xlb
 #########################################################################
 
-data "template_file" "sample_webapp_metadata_startup_script" {
-  template = file("${path.module}/scripts/build/startup_scripts/sample_app/sample_webapp.sh.tpl")
-  vars = {
-    INSTANCE_CONNECTION_NAME = module.sql_db_postgresql.instance_connection_name
-    CLOUD_SQL_DATABASE_NAME  = "postgres"
-    CLOUD_SQL_USERNAME       = module.sql_db_postgresql.additional_users[0].name
-    CLOUD_SQL_PASSWORD       = module.sql_db_postgresql.additional_users[0].password
-
-  }
-}
-
-data "template_file" "sample_app_metadata_startup_script" {
-  template = file("${path.module}/scripts/build/startup_scripts/sample_app/sample_app.sh.tpl")
-}
 
 #########################################################################
 # Creating GCE VMs in vpc-xlb
@@ -114,13 +117,12 @@ data "google_compute_image" "debian_11_bullseye" {
 }
 
 resource "google_compute_instance" "web1_vpc_xlb" {
-  project = local.project.project_id
-  #  zone                      = "${var.region}-a"
-  zone                      = data.google_compute_zones.available.names.0
+  project                   = local.project.project_id
+  zone                      = data.google_compute_zones.primary_available_zones.names.0
   name                      = "web1-vpc-xlb"
   machine_type              = "f1-micro"
   allow_stopping_for_update = true
-  metadata_startup_script   = data.template_file.sample_webapp_metadata_startup_script.rendered
+  metadata_startup_script   = local.web_startup_script
   metadata = {
     enable-oslogin = true
   }
@@ -148,13 +150,12 @@ resource "google_compute_instance" "web1_vpc_xlb" {
 }
 
 resource "google_compute_instance" "web2_vpc_xlb" {
-  project = local.project.project_id
-  #  zone                      = "${var.region}-b"
-  zone                      = data.google_compute_zones.available.names.1
+  project                   = local.project.project_id
+  zone                      = data.google_compute_zones.primary_available_zones.names.1
   name                      = "web2-vpc-xlb"
   machine_type              = "f1-micro"
   allow_stopping_for_update = true
-  metadata_startup_script   = data.template_file.sample_webapp_metadata_startup_script.rendered
+  metadata_startup_script   = local.web_startup_script
   metadata = {
     enable-oslogin = true
   }
@@ -182,16 +183,17 @@ resource "google_compute_instance" "web2_vpc_xlb" {
 }
 
 resource "google_compute_instance" "web3_vpc_xlb" {
-  project = local.project.project_id
-  #  zone                      = "${var.region}-c"
-  zone                      = data.google_compute_zones.available.names.2
+  project                   = local.project.project_id
+  zone                      = data.google_compute_zones.primary_available_zones.names.2
   name                      = "web3-vpc-xlb"
   machine_type              = "f1-micro"
   allow_stopping_for_update = true
-  metadata_startup_script   = data.template_file.sample_webapp_metadata_startup_script.rendered
+  metadata_startup_script   = local.web_startup_script
+
   metadata = {
     enable-oslogin = true
   }
+
   boot_disk {
     initialize_params {
       image = data.google_compute_image.debian_11_bullseye.self_link
@@ -203,6 +205,7 @@ resource "google_compute_instance" "web3_vpc_xlb" {
     subnetwork_project = local.project.project_id
     network_ip         = cidrhost(google_compute_subnetwork.subnetwork_primary.ip_cidr_range, 4)
   }
+
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
     email  = google_service_account.sa_p_cloud_sql.email
@@ -216,16 +219,17 @@ resource "google_compute_instance" "web3_vpc_xlb" {
 }
 
 resource "google_compute_instance" "web4_vpc_xlb" {
-  project = local.project.project_id
-  #  zone                      = "${var.region_secondary}-c"
-  zone                      = data.google_compute_zones.available.names.2
+  project                   = local.project.project_id
+  zone                      = data.google_compute_zones.secondary_available_zones.names.2
   name                      = "web4-vpc-xlb"
   machine_type              = "f1-micro"
   allow_stopping_for_update = true
-  metadata_startup_script   = data.template_file.sample_app_metadata_startup_script.rendered
+  metadata_startup_script   = local.sample_app_startup_script
+
   metadata = {
     enable-oslogin = true
   }
+
   boot_disk {
     initialize_params {
       image = data.google_compute_image.debian_11_bullseye.self_link
@@ -237,6 +241,7 @@ resource "google_compute_instance" "web4_vpc_xlb" {
     subnetwork_project = local.project.project_id
     network_ip         = cidrhost(google_compute_subnetwork.subnetwork_secondary.ip_cidr_range, 2)
   }
+
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
     email  = google_service_account.sa_p_cloud_sql.email
@@ -302,8 +307,7 @@ resource "google_compute_instance_group" "ig_us_c1_content_list" {
     port = "80"
   }
 
-  #  zone       = "${var.region}-a"
-  zone       = data.google_compute_zones.available.names.0
+  zone       = data.google_compute_zones.primary_available_zones.names.0
   depends_on = [google_compute_instance.web1_vpc_xlb]
 }
 
@@ -320,8 +324,7 @@ resource "google_compute_instance_group" "ig_us_c1_content_create" {
     port = "80"
   }
 
-  zone       = data.google_compute_zones.available.names.1
-#  zone       = "${var.region}-b"
+  zone       = data.google_compute_zones.primary_available_zones.names.1
   depends_on = [google_compute_instance.web2_vpc_xlb]
 }
 
@@ -338,8 +341,7 @@ resource "google_compute_instance_group" "ig_us_c1_region" {
     port = "80"
   }
 
-#  zone       = "${var.region}-c"
-  zone       = data.google_compute_zones.available.names.2
+  zone       = data.google_compute_zones.primary_available_zones.names.2
   depends_on = [google_compute_instance.web3_vpc_xlb]
 }
 
@@ -364,8 +366,6 @@ resource "google_compute_instance_group" "ig_asia_s1_region" {
 #########################################################################
 # Cloud Armor
 #########################################################################
-
-
 resource "google_compute_security_policy" "policy" {
   name    = "security-policy"
   project = local.project.project_id
