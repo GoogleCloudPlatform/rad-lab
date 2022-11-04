@@ -359,7 +359,7 @@ resource "google_compute_instance_group" "ig_secondary_region" {
     port = "80"
   }
 
-  zone       = data.google_compute_zones.secondary_available_zones.2
+  zone       = data.google_compute_zones.secondary_available_zones.names.2
   depends_on = [google_compute_instance.web4_vpc_xlb]
 }
 
