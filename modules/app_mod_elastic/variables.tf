@@ -28,7 +28,7 @@ variable "billing_budget_alert_spend_basis" {
 variable "billing_budget_alert_spent_percents" {
   description = "A list of percentages of the budget to alert on when threshold is exceeded. {{UIMeta group=0 order=7 updatesafe }}"
   type        = list(number)
-  default     = [0.5,0.7,1]
+  default     = [0.5, 0.7, 1]
 }
 
 variable "billing_budget_amount" {
