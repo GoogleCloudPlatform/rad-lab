@@ -53,37 +53,37 @@ resource "google_compute_subnetwork" "subnetwork_secondary" {
 
 # FW rule for L7LB healthcheck
 resource "google_compute_firewall" "fw_allow_lb_hc" {
-  project       = local.project.project_id
-  name          = "fw-allow-lb-hc"
-  network       = google_compute_network.vpc_xlb.name
- 
+  project = local.project.project_id
+  name    = "fw-allow-lb-hc"
+  network = google_compute_network.vpc_xlb.name
+
   allow {
-    protocol    = "tcp"
-    ports       = ["80"]
+    protocol = "tcp"
+    ports    = ["80"]
   }
- 
+
   source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
 }
 
 # FW rule for SSH via IAP
 resource "google_compute_firewall" "fw_allow_iap_ssh" {
-  name          = "fw-allow-iap-ssh"
-  network       = resource.google_compute_network.vpc_xlb.name
-  project       = local.project.project_id
+  name    = "fw-allow-iap-ssh"
+  network = resource.google_compute_network.vpc_xlb.name
+  project = local.project.project_id
   allow {
-    protocol    = "tcp"
-    ports       = ["22"]
+    protocol = "tcp"
+    ports    = ["22"]
   }
   source_ranges = ["35.235.240.0/20"]
 }
 
 # FW rule for Intra VPC
 resource "google_compute_firewall" "fw_allow_intra_vpc" {
-  name          = "fw-allow-intra-vpc"
-  network       = resource.google_compute_network.vpc_xlb.name
-  project       = local.project.project_id
+  name    = "fw-allow-intra-vpc"
+  network = resource.google_compute_network.vpc_xlb.name
+  project = local.project.project_id
   allow {
-    protocol    = "all"
+    protocol = "all"
   }
   source_ranges = var.ip_cidr_ranges
 }
