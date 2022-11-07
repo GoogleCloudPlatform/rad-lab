@@ -120,7 +120,6 @@ variable "region" {
 variable "resource_creator_identity" {
   description = "Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module. {{UIMeta group=0 order=4 updatesafe }}"
   type        = string
-  default     = ""
 }
 
 variable "set_domain_restricted_sharing_policy" {

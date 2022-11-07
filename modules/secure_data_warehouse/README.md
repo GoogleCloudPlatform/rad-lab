@@ -1,16 +1,25 @@
 # RAD Lab Secure Data Warehouse Module
 
+This RAD Lab module is intended for data engineers and security administrators who deploy and secure data warehouses using BigQuery to store confidential data. We have wrapped the [Secure Datawarehouse Blueprint](https://cloud.google.com/architecture/confidential-data-warehouse-blueprint) and referenced terraform configs from [GitHub](https://github.com/GoogleCloudPlatform/terraform-google-secured-data-warehouse) and Terraform [Registry](https://registry.terraform.io/modules/GoogleCloudPlatform/secured-data-warehouse/google/latest/examples/simple-example).
+
 ## GCP Products/Services 
 
 * BigQuery
 * Cloud Storage
 * Billing Budget
+* Big Query
+* Dataflow
+* Cloud Storage
+* PubSub
+* Data Catalog
+* Cloud HSM
+* DLP
 
 ## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-COMING SOON...
+![](../../docs/images/V10_Secure_Datawarehouse.png)
 
 ## API Prerequisites
 
@@ -23,10 +32,11 @@ Ensure that the identity executing this module has the following IAM permissions
 
 - Parent: `roles/accesscontextmanager.policyAdmin`
 - Parent: `roles/billing.user`
-- Parent: `roles/billing.costsManager` (OPTIONAL - Only when spinning up Billing Budget for the module)
 - Parent: `roles/resourcemanager.projectCreator`
 - Parent: `roles/orgpolicy.policyAdmin`
 - Parent: `roles/resourcemanager.organizationAdmin`
+
+OPTIONAL `roles/billing.costsManager` role on Parent is only required when spinning up Billing Budget for the module
 
 NOTE: Billing budgets can only be created if you are using a Service Account to deploy the module via Terraform, User account cannot be used.
 
@@ -68,6 +78,7 @@ The following APIs must be enabled in the RAD Lab Management Project where the s
 | data_engineer_group | Google Cloud IAM group that sets up and maintains the data pipeline and warehouse | <code title="">string</code> | ✓ |  |
 | network_administrator_group | Google Cloud IAM group that reviews network configuration. Typically, this includes members of the networking team | <code title="">string</code> | ✓ |  |
 | perimeter_additional_members | The list of all members (users or service accounts) to be added on perimeter access, except the service accounts created by this module | <code title="list&#40;string&#41;">list(string)</code> | ✓ |  |
+| resource_creator_identity | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> | ✓ |  |
 | security_administrator_group | Google Cloud IAM group that administers security configurations in the organization(org policies, KMS, VPC service perimeter) | <code title="">string</code> | ✓ |  |
 | security_analyst_group | Google Cloud IAM group that monitors and responds to security incidents | <code title="">string</code> | ✓ |  |
 | *billing_budget_alert_spend_basis* | The type of basis used to determine if spend has passed the threshold | <code title="">string</code> |  | <code title="">CURRENT_SPEND</code> |
@@ -85,7 +96,6 @@ The following APIs must be enabled in the RAD Lab Management Project where the s
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
 | *project_id_prefix* | This will be the prefix of the Project ID & name created | <code title="">string</code> |  | <code title="">radlab-sdw</code> |
 | *region* | The default region where the resources will be deployed | <code title="">string</code> |  | <code title="">us-east4</code> |
-| *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
 | *set_domain_restricted_sharing_policy* | Enable org policy to allow all principals to be added to IAM policies | <code title="">bool</code> |  | <code title="">false</code> |
 | *trusted_groups* | The list of trusted groups (e.g. `myteam@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *trusted_users* | The list of trusted users (e.g. `username@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |

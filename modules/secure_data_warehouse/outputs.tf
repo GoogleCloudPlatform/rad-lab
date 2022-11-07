@@ -45,7 +45,6 @@ output "project_id_non_confedential_data" {
   value       = module.project_radlab_sdw_non_conf_data.project_id
 }
 
-
 output "dataflow_controller_service_account_email" {
   description = "The Dataflow controller service account email. See https://cloud.google.com/dataflow/docs/concepts/security-and-permissions#specifying_a_user-managed_controller_service_account."
   value       = module.secured_data_warehouse.dataflow_controller_service_account_email

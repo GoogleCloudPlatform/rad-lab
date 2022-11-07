@@ -104,7 +104,7 @@ resource "random_id" "default" {
 module "project_radlab_sdw_data_ingest" {
   # count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 13.0"
+  version = "~> 10.0"
 
   name              = format("%s-data-ingest-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-ingest-1234
   folder_id         = var.folder_id
@@ -125,7 +125,7 @@ resource "google_project_service" "enabled_services_data_ingest" {
 module "project_radlab_sdw_data_govern" {
   # count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 13.0"
+  version = "~> 10.0"
 
   name              = format("%s-data-govern-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-govern-1234
   random_project_id = false
@@ -147,7 +147,7 @@ resource "google_project_service" "enabled_services_data_govern" {
 module "project_radlab_sdw_conf_data" {
   # count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 13.0"
+  version = "~> 10.0"
 
   name              = format("%s-conf-data-%s", var.project_id_prefix, local.random_id) #radlab-sdw-conf-data-1234
   random_project_id = false
@@ -169,7 +169,7 @@ resource "google_project_service" "enabled_services_conf_data" {
 module "project_radlab_sdw_non_conf_data" {
   # count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 13.0"
+  version = "~> 10.0"
 
   name              = format("%s-non-conf-data-%s", var.project_id_prefix, local.random_id) #radlab-sdw-non-conf-data-1234
   random_project_id = false
@@ -188,28 +188,32 @@ resource "google_project_service" "enabled_services_non_conf_data" {
   disable_on_destroy         = true
 }
 
+# resource "google_access_context_manager_access_policy" "access-policy" {
+#   parent = "organizations/${var.organization_id}"
+#   title  = "Org Access Policy"
+#   # scopes = ["folders/${var.folder_id}"]
+# }
+
 
 module "secured_data_warehouse" {
-  source  = "terraform-google-modules/secured-data-warehouse/google"
-  version = "~> 0.1"
-  # source  = "GoogleCloudPlatform/secured-data-warehouse/google"
-  # version = "0.2.0"
+  source  = "GoogleCloudPlatform/secured-data-warehouse/google"
+  version = "0.2.0"
 
   org_id                           = var.organization_id
-  labels                           = { environment = "dev" }
   data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
   confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
   non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
   data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
   terraform_service_account        = var.resource_creator_identity
-  # access_context_manager_policy_id = var.access_context_manager_policy_id
+  # access_context_manager_policy_id = google_access_context_manager_access_policy.access-policy.id
   bucket_name                      = format("radlab-bucket-%s", local.random_id)
-  dataset_id                       = format("radlab-dataset-%s", local.random_id)
+  dataset_id                       = format("radlab_dataset_%s", local.random_id)
   cmek_keyring_name                = format("radlab-keyring-%s", local.random_id)
   pubsub_resource_location         = var.region
   location                         = var.region
   # delete_contents_on_destroy       = var.delete_contents_on_destroy
   perimeter_additional_members     = local.perimeter_additional_members
+  sdx_project_number               = module.project_radlab_sdw_conf_data.project_number
   data_engineer_group              = var.data_engineer_group
   data_analyst_group               = var.data_analyst_group
   security_analyst_group           = var.security_analyst_group
