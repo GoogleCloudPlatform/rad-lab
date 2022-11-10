@@ -60,8 +60,7 @@ output "user_scripts_bucket_uri" {
 }
 
 
-output "neon_linked_dataset" {
-  description = "Neon Linked Dataset (Subscribed via Analytics Hub)"
-  value       = format("https://console.cloud.google.com/bigquery?project=%s&ws=!1m4!1m3!3m2!1s%s!2s%s", local.project.project_id, local.project.project_id, var.ah_linked_dataset_name)
-
+output "neon_linked_datasets" {
+  description = "Neon Linked Datasets (Subscribed via Analytics Hub)"
+  value       = [ for row in var.ah_listing_dataset_map : format("https://console.cloud.google.com/bigquery?project=%s&ws=!1m4!1m3!3m2!1s%s!2s%s", local.project.project_id, local.project.project_id, row )]
 }

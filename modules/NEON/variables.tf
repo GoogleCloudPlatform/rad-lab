@@ -19,14 +19,9 @@ variable "ah_data_exchange_id" {
   type        = string
 }
 
-variable "ah_linked_dataset_name" {
-  description = "Analytics Hub : Linked Dataset display name. {{UIMeta group=4 order=4 }}"
-  type        = string
-}
-
-variable "ah_listing_id" {
-  description = "Analytics Hub : Listing ID (shared with `allauthenticated` users). {{UIMeta group=4 order=3 }}"
-  type        = string
+variable "ah_listing_dataset_map" {
+  description = "Analytics Hub : Listing ID and Linked Dataset display name key value pair. {{UIMeta group=4 order=3 }}"
+  type        = map(string)
 }
 
 variable "ah_project_id" {
@@ -231,6 +226,18 @@ variable "organization_id" {
   description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id. {{UIMeta group=0 order=1 }}"
   type        = string
   default     = ""
+}
+
+variable "owner_groups" {
+  description = "List of groups that should be added as the owner of the created project. {{UIMeta group=1 order=6 updatesafe }}"
+  type        = list(string)
+  default     = []
+}
+
+variable "owner_users" {
+  description = "List of users that should be added as owner to the created project. {{UIMeta group=1 order=7 updatesafe }}"
+  type        = list(string)
+  default     = []
 }
 
 variable "project_id_prefix" {

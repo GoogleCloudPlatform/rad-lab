@@ -16,14 +16,6 @@
 
 set -ex
 
-PROJECT_ID=$1
-AH_PROJECT_ID=$2
-AH_DATA_EXCHANGE_ID=$3
-AH_LISTING_ID=$4
-AH_LINKED_DATASET=$5
-SERVICE_ACCOUNT=$6
-TOKEN=$7
-
 if [ -n "${SERVICE_ACCOUNT}" ] 
 then
     curl --request POST \

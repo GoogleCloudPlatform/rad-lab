@@ -171,28 +171,6 @@ resource "google_service_account_iam_member" "sa_ai_notebook_iam" {
   service_account_id = google_service_account.sa_p_notebook.id
 }
 
-resource "google_project_iam_member" "module_role1" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/notebooks.admin"
-}
-
-resource "google_project_iam_member" "module_role2" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/viewer"
-}
-
-resource "google_project_iam_member" "module_role3" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/bigquery.admin"
-}
-
-
 resource "null_resource" "ai_notebook_usermanaged_provisioning_state" {
   for_each = toset(google_notebooks_instance.ai_notebook_usermanaged[*].name)
   provisioner "local-exec" {
@@ -328,11 +306,20 @@ resource "google_storage_bucket_iam_binding" "binding" {
 }
 
 resource "null_resource" "subscribe" {
-
+  for_each            = var.ah_listing_dataset_map
   provisioner "local-exec" {
-    working_dir = path.module
-    command     = "bash ${path.module}/scripts/build/subscribe.sh ${local.project.project_id} ${var.ah_project_id} ${var.ah_data_exchange_id} ${var.ah_listing_id} ${var.ah_linked_dataset_name} ${var.resource_creator_identity} ${local.token}"
+    command = "bash ${path.module}/scripts/build/ah_subscribe.sh"
+    environment = {
+      PROJECT_ID          = local.project.project_id
+      AH_PROJECT_ID       = var.ah_project_id
+      AH_DATA_EXCHANGE_ID = var.ah_data_exchange_id
+      AH_LISTING_ID       = each.key
+      AH_LINKED_DATASET   = each.value
+      SERVICE_ACCOUNT     = var.resource_creator_identity
+      TOKEN               = local.token
+    }
   }
+
   depends_on = [
     time_sleep.wait_120_seconds,
   ]
