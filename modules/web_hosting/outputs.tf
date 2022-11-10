@@ -33,9 +33,9 @@ output "project_id" {
 
 output "lb_content_based" {
   description = "URLs to Content Based Load Balancer"
-  value       = concat(formatlist("http://%s:80", google_compute_global_forwarding_rule.fe_http_content_based.ip_address),
-                        formatlist("http://%s:80/create", google_compute_global_forwarding_rule.fe_http_content_based.ip_address),
-                        formatlist("http://%s:80/delete", google_compute_global_forwarding_rule.fe_http_content_based.ip_address))
+  value = concat(formatlist("http://%s:80", google_compute_global_forwarding_rule.fe_http_content_based.ip_address),
+    formatlist("http://%s:80/create", google_compute_global_forwarding_rule.fe_http_content_based.ip_address),
+  formatlist("http://%s:80/delete", google_compute_global_forwarding_rule.fe_http_content_based.ip_address))
 }
 
 output "lb_region_based" {

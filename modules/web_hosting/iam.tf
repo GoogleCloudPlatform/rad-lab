@@ -41,9 +41,9 @@ resource "google_project_iam_member" "role_viewer" {
 }
 
 resource "google_project_iam_member" "role_cloud_sql_client" {
-  project  = local.project.project_id
-  role     = "roles/cloudsql.client"
-  member   = "serviceAccount:${google_service_account.sa_p_cloud_sql.email}"
+  project = local.project.project_id
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.sa_p_cloud_sql.email}"
 }
 
 #########################################################################

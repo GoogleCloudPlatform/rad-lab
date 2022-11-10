@@ -18,22 +18,22 @@ module "sql_db_postgresql" {
   source  = "GoogleCloudPlatform/sql-db/google//modules/postgresql"
   version = "12.1.0"
 
-  database_version      = var.db_version
-  name                  = format("radlab-web-hosting-db-%s", local.random_id)
-  project_id            = local.project.project_id
-  region                = var.region
-  deletion_protection   = false
-  activation_policy     = var.db_activation_policy
-  availability_type     = var.db_availability_type
-  
-  backup_configuration  = {
-    enabled                         = true
-    location                        = var.region
-    point_in_time_recovery_enabled  = true
-    retained_backups                = 7
-    retention_unit                  = "COUNT"
-    start_time                      = "07:00"
-    transaction_log_retention_days  = 7
+  database_version    = var.db_version
+  name                = format("radlab-web-hosting-db-%s", local.random_id)
+  project_id          = local.project.project_id
+  region              = var.region
+  deletion_protection = false
+  activation_policy   = var.db_activation_policy
+  availability_type   = var.db_availability_type
+
+  backup_configuration = {
+    enabled                        = true
+    location                       = var.region
+    point_in_time_recovery_enabled = true
+    retained_backups               = 7
+    retention_unit                 = "COUNT"
+    start_time                     = "07:00"
+    transaction_log_retention_days = 7
   }
 
   disk_autoresize       = true
@@ -48,10 +48,10 @@ module "sql_db_postgresql" {
     require_ssl         = false
     allocated_ip_range  = null
   }
-  
-  pricing_plan          = "PER_USE"
-  zone                  = "${var.region}-c"
-  tier                  = var.db_tier
+
+  pricing_plan = "PER_USE"
+  zone         = data.google_compute_zones.primary_available_zones.names.2
+  tier         = var.db_tier
 
   additional_users = [
     {
@@ -60,7 +60,7 @@ module "sql_db_postgresql" {
     }
   ]
 
-  module_depends_on = [google_service_networking_connection.psconnect,]
+  module_depends_on = [google_service_networking_connection.psconnect, ]
 }
 #########################################################################
 # Configs for Sample DB Creation
@@ -84,9 +84,9 @@ resource "null_resource" "create_sample_db_vm" {
     command = <<-EOT
     if [ "${var.resource_creator_identity}" = "" ];
     then
-        gcloud compute instances create sample-db-vm --zone=${var.region}-c --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_primary.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename}
+        gcloud compute instances create sample-db-vm --zone=${data.google_compute_zones.primary_available_zones.names.2} --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_primary.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename}
     else
-        gcloud compute instances create sample-db-vm --zone=${var.region}-c --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_primary.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename} --impersonate-service-account=${var.resource_creator_identity}
+        gcloud compute instances create sample-db-vm --zone=${data.google_compute_zones.primary_available_zones.names.2} --project=${local.project.project_id} --machine-type=f1-micro --image=debian-11-bullseye-v20220822 --image-project=debian-cloud --network=${google_compute_network.vpc_xlb.name} --subnet=${google_compute_subnetwork.subnetwork_primary.name} --service-account=${google_service_account.sa_p_cloud_sql.email} --scopes=cloud-platform --no-address --metadata=enable-oslogin=true --metadata-from-file=startup-script=${local_file.sample_db_metadata_startup_script_output.filename} --impersonate-service-account=${var.resource_creator_identity}
     fi
     EOT
   }
@@ -94,15 +94,15 @@ resource "null_resource" "create_sample_db_vm" {
   depends_on = [
     time_sleep.wait_120_seconds,
     google_compute_router_nat.nat_gw_region_primary
-    ]
+  ]
 }
 
 resource "time_sleep" "create_sample_db" {
 
   create_duration = "60s"
   depends_on = [
-      null_resource.create_sample_db_vm,
-      ]
+    null_resource.create_sample_db_vm,
+  ]
 }
 
 # Deleting GCE VM used to spin up Sample DB in Postgres Cloud SQL
@@ -111,9 +111,9 @@ resource "null_resource" "del_sample_db_vm" {
     command = <<-EOT
     if [ "${var.resource_creator_identity}" = "" ];
     then
-        gcloud compute instances delete sample-db-vm --zone=${var.region}-c --project=${local.project.project_id}
+        gcloud compute instances delete sample-db-vm --zone=${data.google_compute_zones.primary_available_zones.names.2} --project=${local.project.project_id}
     else
-        gcloud compute instances delete sample-db-vm --zone=${var.region}-c --project=${local.project.project_id} --impersonate-service-account=${var.resource_creator_identity}
+        gcloud compute instances delete sample-db-vm --zone=${data.google_compute_zones.primary_available_zones.names.2} --project=${local.project.project_id} --impersonate-service-account=${var.resource_creator_identity}
     fi
     EOT
   }
