@@ -4,14 +4,21 @@ import styles from "./styles.module.css";
 
 type FeatureItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<"svg">>;
+  img: string;
   description: JSX.Element;
 };
 
+// type SvgFeatureItem = {
+//   title: string;
+//   Svg: React.ComponentType<React.ComponentProps<"svg">>;
+//   description: JSX.Element;
+// };
+
 const FeatureList: FeatureItem[] = [
   {
-    title: "Up and Running--Fast",
-    Svg: require("@site/static/img/great-design.svg").default,
+    title: "Up and Running - Fast",
+    img: "img/quick.png",
+    // Svg: require("@site/static/img/great-design.svg").default,
     description: (
       <>
         RAD Lab features its own UI, which gives non-technical users an
@@ -21,7 +28,8 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: "Promote Collaboration",
-    Svg: require("@site/static/img/team-up.svg").default,
+    img: "img/collaboration.png",
+    // Svg: require("@site/static/img/team-up.svg").default,
     description: (
       <>
         Admins create secure constraints for users then users can deploy the
@@ -31,7 +39,8 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: "Complete and Customizeable",
-    Svg: require("@site/static/img/configurable.svg").default,
+    img: "img/customize.png",
+    // Svg: require("@site/static/img/configurable.svg").default,
     description: (
       <>
         We give you sane and secure defaults out of the box. RAD Lab is open
@@ -41,11 +50,30 @@ const FeatureList: FeatureItem[] = [
   },
 ];
 
-function Feature({ title, Svg, description }: FeatureItem) {
+// function SVGFeature({ title, Svg, description }: FeatureItem) {
+//   return (
+//     <div className={clsx("col col--4")}>
+//       <div className="text--center">
+//         <Svg className={styles.featureSvg} role="img" />
+//       </div>
+//       <div className="text--center padding-horiz--md">
+//         <h3>{title}</h3>
+//         <p>{description}</p>
+//       </div>
+//     </div>
+//   );
+// }
+
+function Feature({ title, img, description }: FeatureItem) {
   return (
-    <div className={clsx("col col--4")}>
+    <div style={{ marginBottom: "4rem" }} className={clsx("col col--4")}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        <img
+          style={{ height: "12rem" }}
+          className="img-fluid"
+          src={img}
+          alt={title}
+        />
       </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>
