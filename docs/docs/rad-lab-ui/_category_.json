@@ -1,0 +1,8 @@
+{
+  "label": "RAD Lab UI",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "RAD Lab solution is primarily a combination of use-case based Terraform modules. As such, it may be difficult for individuals without a strong IT background. RAD Lab UI to the rescue! RAD Lab UI provides an easy to use interface to enter details about your workload and deploy with just a few clicks."
+  }
+}

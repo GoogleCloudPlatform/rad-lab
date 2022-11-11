@@ -1,0 +1,8 @@
+{
+  "label": "Terraform CLI",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Learn how to deploy Terraform modules to Google Cloud."
+  }
+}

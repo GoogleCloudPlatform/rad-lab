@@ -1,0 +1,9 @@
+{
+  "label": "Configure Modules",
+  "position": 4,
+  "link": {
+    "slug": "ui_configure",
+    "type": "generated-index",
+    "description": "Learn how to customize and extend Modules"
+  }
+}

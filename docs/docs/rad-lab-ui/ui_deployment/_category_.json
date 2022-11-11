@@ -1,0 +1,9 @@
+{
+  "label": "Module Deployment",
+  "position": 3,
+  "link": {
+    "slug": "ui_deployment",
+    "type": "generated-index",
+    "description": "Learn how to deploy, update, and delete RAD Lab modules in Google Cloud"
+  }
+}

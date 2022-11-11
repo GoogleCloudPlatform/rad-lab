@@ -1,0 +1,14 @@
+{
+  "signin-title": "Sign In",
+  "signin-description": "Sign in to get started",
+  "signin-google": "Sign in with Google",
+  "signin-password": "Sign in with email and password",
+  "signin": "Sign in",
+  "email": "Email",
+  "password": "Password",
+
+  "reset-password": "Reset your password",
+  "reset": "Reset",
+  "reset-email-sent": "A password reset email has been sent!",
+  "back-to-signin": "Back to signin page"
+}

@@ -1,0 +1,9 @@
+{
+  "label": "Module Deployment",
+  "position": 3,
+  "link": {
+    "slug": "cli_deployment",
+    "type": "generated-index",
+    "description": "Learn how to deploy, update, and delete Google Cloud modules via Terraform."
+  }
+}

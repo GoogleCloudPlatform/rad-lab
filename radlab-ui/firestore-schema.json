@@ -1,0 +1,30 @@
+{
+  "modules": [
+    {
+      "name": "string",
+      "createdAt": "FirestoreTimestamp",
+      "publishedByEmail": "string",
+      "variables": {
+        "#comment": "group=0 (admin-only) variables set at publish time",
+        "admin-module-variable-name1": "admin-module-variable-value1",
+        "admin-module-variable-name2": "admin-module-variable-value2"
+      }
+    }
+  ],
+  "settings": {
+    "admin-variable-name1": "admin-variable-value1",
+    "admin-variable-name2": "admin-variable-value2"
+  },
+  "deployments": {
+    "createdAt": "FirestoreTimestamp",
+    "deploymentId": "string",
+    "deployedByEmail": "string",
+    "module": "string",
+    "projectId": "string",
+    "variables": {
+      "user-variable-name1": "user-variable-value1",
+      "user-variable-name2": "user-variable-value2"
+    }
+  },
+  "#comment": "At deploy time, merge (in priority order) user vars, module vars, global vars and send the combined to PubSub and save in Deployment collection. User provided variables should override module variables if they share the same key. Module variables should override global admin variables if they share the same key"
+}
