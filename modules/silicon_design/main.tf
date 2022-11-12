@@ -58,7 +58,7 @@ locals {
   ]
 
   notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-design-notebook-${i}"]
-  
+
   default_apis = [
     "compute.googleapis.com",
     "notebooks.googleapis.com",
@@ -105,7 +105,7 @@ resource "google_project_service" "enabled_services" {
   service                    = each.value
   disable_dependent_services = false
   disable_on_destroy         = false
-  
+
   depends_on = [
     module.project_radlab_silicon_design
   ]
@@ -153,8 +153,8 @@ module "vpc_ai_notebook" {
       direction   = "INGRESS"
 
       allow = [{
-        protocol = "tcp"
-        ports    = ["0-65535"]
+	protocol = "tcp"
+	ports    = ["0-65535"]
       }]
     }
   ]
@@ -188,7 +188,7 @@ resource "google_service_account_iam_member" "sa_ai_notebook_iam" {
 
 resource "google_project_service_identity" "sa_cloudbuild_identity" {
   provider = google-beta
-  project  = local.project.project_id  
+  project  = local.project.project_id
   service  = "cloudbuild.googleapis.com"
 }
 
@@ -292,11 +292,9 @@ resource "google_storage_bucket" "notebooks_bucket" {
 resource "null_resource" "build_and_push_image" {
   triggers = {
     cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/cloudbuild.yaml")
-    workflow_sha        = filesha1("${path.module}/scripts/build/images/compute_image.wf.json")    
+    workflow_sha        = filesha1("${path.module}/scripts/build/images/compute_image.wf.json")
     dockerfile_sha      = filesha1("${path.module}/scripts/build/images/Dockerfile")
-    environment_sha     = filesha1("${path.module}/scripts/build/images/provision/environment.yml")    
-    env_sha             = filesha1("${path.module}/scripts/build/images/provision/install.tcl")    
-    profile_sha         = filesha1("${path.module}/scripts/build/images/provision/profile.sh")    
+    profile_sha         = filesha1("${path.module}/scripts/build/images/provision/profile.sh")
     notebook_sha        = filesha1("${path.module}/scripts/build/notebooks/inverter.md")
   }
 
