@@ -1,6 +1,6 @@
-# RAD Lab Silicon Design Module
+# RAD Lab Silicon Module
 
-This RAD Lab module provides a managed environment for custom silicon design using Open Source ASIC toolchains.
+This RAD Lab module provides a managed environment for custom Silicon design using Open Source ASIC toolchains.
 
 ## Tools
 
@@ -81,7 +81,7 @@ Here are a couple of examples to use the module directly in your Terraform code,
 
 ```hcl
 module "simple" {
-  source = "./modules/silicon_design"
+  source = "./modules/silicon"
 
   billing_account_id = "123456-123456-123465"
   organization_id    = "12345678901"
@@ -94,14 +94,14 @@ This example assumes that all the necessary APIs have been enabled as well.
 
 ````hcl
 module "existing_project" {
-  source = "./modules/silicon_design"
+  source = "./modules/silicon"
 
   billing_account_id = "123456-123456-123465"
   organization_id    = "12345678901"
   folder_id          = "1234567890"
 
   create_project  = false
-  project_name    = "silicon-design-project-id"
+  project_name    = "silicon-project-id"
   enable_services = false
   
   set_external_ip_policy          = false
@@ -113,20 +113,20 @@ module "existing_project" {
 
 ```hcl
 module "existing_project_and_network" {
-  source = "./modules/silicon_design"
+  source = "./modules/silicon"
 
   billing_account_id = "123456-123456-123465"
   organization_id    = "12345678901"
   folder_id          = "1234567890"
 
   create_project  = false
-  project_name    = "silicon-design-project-id"
+  project_name    = "silicon-project-id"
   enable_services = false
   enable_services = false
   
   create_network = false
-  network_name   = "silicon-design-network"
-  subnet_name    = "silicon-design-subnetwork"
+  network_name   = "silicon-network"
+  subnet_name    = "silicon-subnetwork"
 
   set_external_ip_policy          = false
   set_shielded_vm_policy          = false
@@ -165,7 +165,7 @@ module "existing_project_and_network" {
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
 | *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
-| *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-silicon-design</code> |
+| *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-silicon</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
 | *set_domain_restricted_sharing_policy* | Enable org policy to allow all principals to be added to IAM policies | <code title="">bool</code> |  | <code title="">false</code> |
 | *set_external_ip_policy* | Enable org policy to allow External (Public) IP addresses on virtual machines | <code title="">bool</code> |  | <code title="">false</code> |
@@ -187,9 +187,9 @@ module "existing_project_and_network" {
 | notebook_instance_names | Notebook Instance Names |  |
 | notebook_urls | URLs for the notebook that was created in this module. |  |
 | notebooks_bucket_name | Notebooks GCS Bucket Name |  |
-| project_id | Silicon Design RAD Lab Project ID |  |
+| project_id | Silicon RAD Lab Project ID |  |
 <!-- END TFDOC -->
 
-## Access RAD Lab Silicon Design Notebooks
+## Access RAD Lab Silicon Notebooks
 
 Follow the instructions under [gcp-ai-nootbook-tools Readme](./scripts/usage/README.md).
