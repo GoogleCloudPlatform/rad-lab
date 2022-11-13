@@ -17,11 +17,11 @@
 locals {
   random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
   project = (var.create_project
-    ? try(module.project_radlab_silicon_design.0, null)
+    ? try(module.project_radlab_silicon.0, null)
     : try(data.google_project.existing_project.0, null)
     )
   project_number = (var.create_project
-    ? try(module.project_radlab_silicon_design.0.project_number, null)
+    ? try(module.project_radlab_silicon.0.project_number, null)
     : try(data.google_project.existing_project.0.number, null)
     )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
@@ -57,8 +57,8 @@ locals {
     "roles/storage.admin",
   ]
 
-  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-design-notebook-${i}"]
-  
+  notebook_names = length(var.notebook_names) > 0 ? var.notebook_names : [for i in range(var.notebook_count): "silicon-notebook-${i}"]
+
   default_apis = [
     "compute.googleapis.com",
     "notebooks.googleapis.com",
@@ -77,7 +77,7 @@ resource "random_id" "default" {
 }
 
 ############################
-#  SILICON DESIGN PROJECT  #
+#  SILICON PROJECT  #
 ############################
 
 data "google_project" "existing_project" {
@@ -85,7 +85,7 @@ data "google_project" "existing_project" {
   project_id = var.project_id_prefix
 }
 
-module "project_radlab_silicon_design" {
+module "project_radlab_silicon" {
   count   = var.create_project ? 1 : 0
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
@@ -105,9 +105,9 @@ resource "google_project_service" "enabled_services" {
   service                    = each.value
   disable_dependent_services = false
   disable_on_destroy         = false
-  
+
   depends_on = [
-    module.project_radlab_silicon_design
+    module.project_radlab_silicon
   ]
 }
 
@@ -139,28 +139,28 @@ module "vpc_ai_notebook" {
       subnet_name           = var.subnet_name
       subnet_ip             = var.ip_cidr_range
       subnet_region         = local.region
-      description           = "Subnetwork inside *vpc-silicon-design* VPC network, created via Terraform"
+      description           = "Subnetwork inside *vpc-silicon* VPC network, created via Terraform"
       subnet_private_access = true
     }
   ]
 
   firewall_rules = [
     {
-      name        = "fw-silicon-design-notebook-allow-internal"
-      description = "Firewall rule to allow traffic on all ports inside *vpc-silicon-design* VPC network."
+      name        = "fw-silicon-notebook-allow-internal"
+      description = "Firewall rule to allow traffic on all ports inside *vpc-silicon* VPC network."
       priority    = 65534
       ranges      = ["10.0.0.0/8"]
       direction   = "INGRESS"
 
       allow = [{
-        protocol = "tcp"
-        ports    = ["0-65535"]
+	protocol = "tcp"
+	ports    = ["0-65535"]
       }]
     }
   ]
 
   depends_on = [
-    module.project_radlab_silicon_design,
+    module.project_radlab_silicon,
     google_project_service.enabled_services,
     time_sleep.wait_120_seconds
   ]
@@ -188,7 +188,7 @@ resource "google_service_account_iam_member" "sa_ai_notebook_iam" {
 
 resource "google_project_service_identity" "sa_cloudbuild_identity" {
   provider = google-beta
-  project  = local.project.project_id  
+  project  = local.project.project_id
   service  = "cloudbuild.googleapis.com"
 }
 
@@ -244,7 +244,7 @@ resource "google_notebooks_instance" "ai_notebook" {
   post_startup_script = "gs://${google_storage_bucket.notebooks_bucket.name}/copy-notebooks.sh"
 
   labels = {
-    module = "silicon-design"
+    module = "silicon"
   }
 
   metadata = {
@@ -282,7 +282,7 @@ resource "google_artifact_registry_repository" "containers_repo" {
 
 resource "google_storage_bucket" "notebooks_bucket" {
   project                     = local.project.project_id
-  name                        = "${local.project.project_id}-silicon-design-notebooks"
+  name                        = "${local.project.project_id}-silicon-notebooks"
   location                    = local.region
   force_destroy               = true
   uniform_bucket_level_access = true
@@ -292,11 +292,9 @@ resource "google_storage_bucket" "notebooks_bucket" {
 resource "null_resource" "build_and_push_image" {
   triggers = {
     cloudbuild_yaml_sha = filesha1("${path.module}/scripts/build/cloudbuild.yaml")
-    workflow_sha        = filesha1("${path.module}/scripts/build/images/compute_image.wf.json")    
+    workflow_sha        = filesha1("${path.module}/scripts/build/images/compute_image.wf.json")
     dockerfile_sha      = filesha1("${path.module}/scripts/build/images/Dockerfile")
-    environment_sha     = filesha1("${path.module}/scripts/build/images/provision/environment.yml")    
-    env_sha             = filesha1("${path.module}/scripts/build/images/provision/install.tcl")    
-    profile_sha         = filesha1("${path.module}/scripts/build/images/provision/profile.sh")    
+    profile_sha         = filesha1("${path.module}/scripts/build/images/provision/profile.sh")
     notebook_sha        = filesha1("${path.module}/scripts/build/notebooks/inverter.md")
   }
 

@@ -26,7 +26,7 @@ output "deployment_id" {
 }
 
 output "project_id" {
-  description = "Silicon Design RAD Lab Project ID"
+  description = "Silicon RAD Lab Project ID"
   value       = local.project.project_id
 }
 

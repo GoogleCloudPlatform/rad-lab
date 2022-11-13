@@ -26,7 +26,7 @@ resource "google_project_organization_policy" "external_ip_policy" {
     }
   }
   depends_on = [
-    module.project_radlab_silicon_design
+    module.project_radlab_silicon
   ]
 }
 
@@ -39,7 +39,7 @@ resource "google_project_organization_policy" "shielded_vm_policy" {
     enforced = false
   }
   depends_on = [
-    module.project_radlab_silicon_design
+    module.project_radlab_silicon
   ]
 }
 
@@ -57,7 +57,7 @@ resource "google_project_organization_policy" "trustedimage_project_policy" {
   }
 
   depends_on = [
-    module.project_radlab_silicon_design
+    module.project_radlab_silicon
   ]
 }
 
@@ -73,7 +73,7 @@ resource "google_project_organization_policy" "domain_restricted_sharing_policy"
   }
 
   depends_on = [
-    module.project_radlab_silicon_design
+    module.project_radlab_silicon
   ]
 }
 

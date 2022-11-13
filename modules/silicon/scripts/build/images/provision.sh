@@ -32,19 +32,26 @@ fi
 
 echo "DaisyStatus: installing conda-eda environment"
 curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -C /usr/local -xvj bin/micromamba
-micromamba create --yes -r /opt/conda -n silicon --file ${PROVISION_DIR}/environment.yml
-
-echo "DaisyStatus: installing OpenLane"
-git clone --depth 1 -b ${OPENLANE_VERSION} https://github.com/The-OpenROAD-Project/OpenLane /OpenLane
-
-echo "DaisyStatus: patching OpenLane"
-cp ${PROVISION_DIR}/install.tcl /OpenLane/configuration/
-echo ' install.tcl' >> /OpenLane/configuration/load_order.txt
-mkdir -p /OpenLane/install/build/versions
-for tool in yosys netgen
-do
-  /opt/conda/bin/conda list -c ${tool} > /OpenLane/install/build/versions/${tool}
-done
+micromamba create --yes -r /opt/conda -n silicon
+micromamba install --yes -r /opt/conda -n silicon \
+	   -c nodefaults -c main -c litex-hub \
+	   openlane \
+	   open_pdks.sky130a \
+	   xls \
+	   iverilog \
+	   jupyterlab \
+	   python \
+	   pip
+micromamba install --yes -r /opt/conda -n silicon -c conda-forge \
+	   pyspice \
+	   pymeep=*=mpi_mpich_* \
+	   gdstk \
+	   gdsfactory
+/opt/conda/bin/python -m pip install \
+		      klayout \
+		      scrapbook[gcs] \
+		      google-cloud-aiplatform \
+		      cloudml-hypertune
 
 echo "DaisyStatus: adding profile hook"
 cp ${PROVISION_DIR}/profile.sh /etc/profile.d/silicon-design-profile.sh
