@@ -222,7 +222,7 @@ variable "network_name" {
 }
 
 variable "notebook_count" {
-  description = "Number of Vertex AI Notebooks requested. {{UIMeta group=3 order=2 updatesafe }}"
+  description = "Number of Vertex AI Notebooks requested. NOTE: Reducing the notebook count will delete the notebooks and the data within the same. {{UIMeta group=3 order=2 updatesafe }}"
   type        = number
   default     = 1
 }

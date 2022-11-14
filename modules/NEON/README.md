@@ -101,7 +101,7 @@ _Usage:_
 | *ip_cidr_range* | Unique IP CIDR Range for AI Notebooks subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
 | *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-4</code> |
 | *network_name* | Name of the network to be created | <code title="">string</code> |  | <code title="">neon-network</code> |
-| *notebook_count* | Number of Vertex AI Notebooks requested | <code title="">number</code> |  | <code title="">1</code> |
+| *notebook_count* | Number of Vertex AI Notebooks requested. NOTE: Reducing the notebook count will delete the notebooks and the data within the same | <code title="">number</code> |  | <code title="">1</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
 | *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
