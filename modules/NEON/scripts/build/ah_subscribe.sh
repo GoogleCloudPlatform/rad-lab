@@ -19,20 +19,20 @@ set -ex
 if [ -n "${SERVICE_ACCOUNT}" ] 
 then
     curl --request POST \
-    "https://analyticshub.googleapis.com/v1/projects/${AH_PROJECT_ID}/locations/us/dataExchanges/${AH_DATA_EXCHANGE_ID}/listings/${AH_LISTING_ID}:subscribe" \
+    "https://analyticshub.googleapis.com/v1/projects/${AH_PROJECT_ID}/locations/${AH_DATA_EXCHANGE_LOCATION}/dataExchanges/${AH_DATA_EXCHANGE_ID}/listings/${AH_LISTING_ID}:subscribe" \
     -H "Authorization: Bearer ${TOKEN}" \
     -H "x-goog-user-project: ${PROJECT_ID}" \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
-    --data "{\"destinationDataset\":{\"datasetReference\":{\"datasetId\":\"${AH_LINKED_DATASET}\",\"projectId\":\"${PROJECT_ID}\"},\"location\":\"US\"}}" \
+    --data "{\"destinationDataset\":{\"datasetReference\":{\"datasetId\":\"${AH_LINKED_DATASET}\",\"projectId\":\"${PROJECT_ID}\"},\"location\":\"${AH_DATA_EXCHANGE_LOCATION}\"}}" \
     --compressed
 else
     curl --request POST \
-    "https://analyticshub.googleapis.com/v1/projects/${AH_PROJECT_ID}/locations/us/dataExchanges/${AH_DATA_EXCHANGE_ID}/listings/${AH_LISTING_ID}:subscribe" \
+    "https://analyticshub.googleapis.com/v1/projects/${AH_PROJECT_ID}/locations/${AH_DATA_EXCHANGE_LOCATION}/dataExchanges/${AH_DATA_EXCHANGE_ID}/listings/${AH_LISTING_ID}:subscribe" \
     -H "Authorization: Bearer $(gcloud auth application-default print-access-token)" \
     -H "x-goog-user-project: ${PROJECT_ID}" \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
-    --data "{\"destinationDataset\":{\"datasetReference\":{\"datasetId\":\"${AH_LINKED_DATASET}\",\"projectId\":\"${PROJECT_ID}\"},\"location\":\"US\"}}" \
+    --data "{\"destinationDataset\":{\"datasetReference\":{\"datasetId\":\"${AH_LINKED_DATASET}\",\"projectId\":\"${PROJECT_ID}\"},\"location\":\"${AH_DATA_EXCHANGE_LOCATION}\"}}" \
     --compressed
 fi

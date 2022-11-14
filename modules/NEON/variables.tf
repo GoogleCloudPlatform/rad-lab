@@ -19,8 +19,13 @@ variable "ah_data_exchange_id" {
   type        = string
 }
 
+variable "ah_data_exchange_location" {
+  description = "Analytics Hub : Data Exchange Location. {{UIMeta group=4 order=3 }}"
+  type        = string
+}
+
 variable "ah_listing_dataset_map" {
-  description = "Analytics Hub : Listing ID and Linked Dataset display name key value pair. {{UIMeta group=4 order=3 }}"
+  description = "Analytics Hub : Listing ID and Linked Dataset display name key value pair. {{UIMeta group=4 order=4 }}"
   type        = map(string)
 }
 
@@ -207,7 +212,7 @@ variable "ip_cidr_range" {
 variable "machine_type" {
   description = "Type of VM you would like to spin up. {{UIMeta group=3 order=6 }}"
   type        = string
-  default     = "n1-standard-1"
+  default     = "n1-standard-4"
 }
 
 variable "network_name" {
