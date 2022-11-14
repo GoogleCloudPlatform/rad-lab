@@ -110,11 +110,8 @@ For these next steps, open the <ProjectIdLink href="https://console.firebase.goo
 
 1. Click on **Project Overview** in the sidebar on the left
 1. On the page that opens, click on **Authentication**
-1. Click on **Get Started**, **Sign-in method** and select **Email/Password**
-1. Click on **Enable** at the top and hit **Save**
-1. Click on **Add new provider**
-1. Select **Google**, **Enable**
-1. Add a value for **Application name** and **Project support email**
+1. Click on **Get Started**, **Sign-in method** and select **Google** underneath **Additional providers**
+1. Click on **Enable** and provide a valid **Project support email**
 1. Click on **Save**
 
 As a final step, go Authentication > Settings and click on **Authorized domains**. Add the domain of the App Engine application: <ProjectIdText success={(pid) => <code>{pid}.uc.r.appspot.com</code>} fallback={<code>$RLUI_PROJECT_ID.uc.r.appspot.com</code>} />. You can also get this value by running the following command in the `radlab-ui/automation/terraform/infrastructure` folder:
@@ -159,6 +156,6 @@ npm run deploy
 
 ## RAD Lab UI Webpage
 
-After a successful Terraform apply, you should see a newly generated link to your hosted UI.
+After successful completion, you should be able to access the RAD Lab UI via `$RLUI_PROJECT_ID.uc.r.appspot.com` in the browser.
 
 If you are having issues signing in, please review the [Authorizing Users](../setup-gcp#authorizing-users) section.
