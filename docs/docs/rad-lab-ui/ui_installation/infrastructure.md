@@ -90,6 +90,10 @@ file.
 Run the following commands in a terminal or command window. You can also run this via a CI/CD pipeline if necessary, as
 long as the Service Account has the required IAM permissions as described [here](#iam-permissions).
 
+:::info IMPORTANT
+If you receive an error while running `terraform apply` in the next section, run `terraform init -migrate-state` before running the `terraform apply` command again.
+:::
+
 ```shell
 # Setting up GCP Auth
 gcloud auth application-default login
@@ -163,12 +167,12 @@ Personal Access Token) to fetch the RAD Lab modules from your repo.
 1. To generate the access token, go to [Github.com](https://github.com).  
 1. Click on your user profile in the top corner and open Settings
 1. Scroll all the way to the bottom and click on `</> Developer Settings`
-1. In the **Personal accesss tokens**-section, click on **Generate new token**
+1. In the **Personal accesss tokens**-section, click on **Generate new token**, underneath **Fine-grained tokens**
 1. Enter the following details
    1. Token name: Give it a meaningful name (e.g. `rad-lab-ui`)
    1. Set the expiration date (No expiration is more convenient, but setting a fixed expiration will be more secure)
    1. Underneath **Repository access**, select **Only select repositories** and select the repository where you store the RAD Lab UI code
-   1. For **Contents**, select **Read-Only**
+   1. For **Contents** (underneath **Permissions**), select **Read-Only**
 1. Click on **Generate token**
 1. Copy the value of the token.
 
@@ -258,4 +262,12 @@ Retrieve the ID of the service account by running the following command:
 # Retrieve the RAD Lab deployment identity
 terraform output -json | jq -r .service_account_module_creator.value
 ```
+
+Go back to the [Google Cloud console](https://console.cloud.google.com) and make sure that you select the **organization** at the top of the section.
+1. Open the menu and go to **IAM & Admin** > **IAM**
+2. Click on **Grant Access**
+3. In the section **Add principals**, paste the ID of the service account copied in the previous step.  In **Assign roles**, select **Organization Policy Administrator**
+4. Click **Save**
+
+Make sure to select the RAD Lab UI project after this step in the UI.
 
