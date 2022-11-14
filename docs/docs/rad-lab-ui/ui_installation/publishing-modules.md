@@ -14,7 +14,8 @@ No modules will be available for Users to deploy until an Admin publishes them.
 Some variables are common to all modules. Upon first log in, and Admin will set these variables, so that users will not need to add them. These include (but not limited to):
 
 - Billing ID
-- Folder ID
+- Organization ID (without `organizations/`-prefix)
+- Folder ID (without `folders/`-prefix)
 - Preferred Google Cloud Region and Zone
 
 ## Module Admin Variables
