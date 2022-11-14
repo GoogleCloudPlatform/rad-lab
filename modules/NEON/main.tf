@@ -37,6 +37,7 @@ locals {
   notebook_sa_project_roles = [
     "roles/compute.instanceAdmin",
     "roles/notebooks.admin",
+    "roles/bigquery.dataViewer",
     "roles/bigquery.user",
     "roles/storage.objectViewer",
     "roles/iam.serviceAccountUser"
@@ -310,13 +311,14 @@ resource "null_resource" "subscribe" {
   provisioner "local-exec" {
     command = "bash ${path.module}/scripts/build/ah_subscribe.sh"
     environment = {
-      PROJECT_ID          = local.project.project_id
-      AH_PROJECT_ID       = var.ah_project_id
-      AH_DATA_EXCHANGE_ID = var.ah_data_exchange_id
-      AH_LISTING_ID       = each.key
-      AH_LINKED_DATASET   = each.value
-      SERVICE_ACCOUNT     = var.resource_creator_identity
-      TOKEN               = local.token
+      PROJECT_ID                = local.project.project_id
+      AH_PROJECT_ID             = var.ah_project_id
+      AH_DATA_EXCHANGE_ID       = var.ah_data_exchange_id
+      AH_DATA_EXCHANGE_LOCATION = var.ah_data_exchange_location
+      AH_LISTING_ID             = each.key
+      AH_LINKED_DATASET         = each.value
+      SERVICE_ACCOUNT           = var.resource_creator_identity
+      TOKEN                     = local.token
     }
   }
 
