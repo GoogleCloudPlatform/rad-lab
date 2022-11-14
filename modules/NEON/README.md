@@ -68,6 +68,7 @@ _Usage:_
 | name | description | type | required | default |
 |---|---|:---: |:---:|:---:|
 | ah_data_exchange_id | Analytics Hub : Data Exchange ID (shared with `allauthenticated` users) | <code title="">string</code> | ✓ |  |
+| ah_data_exchange_location | Analytics Hub : Data Exchange Location | <code title="">string</code> | ✓ |  |
 | ah_listing_dataset_map | Analytics Hub : Listing ID and Linked Dataset display name key value pair | <code title="map&#40;string&#41;">map(string)</code> | ✓ |  |
 | ah_project_id | Analytics Hub : Project ID (associated to the data exchange & listing) | <code title="">string</code> | ✓ |  |
 | billing_account_id | Billing Account associated to the GCP Resources | <code title="">string</code> | ✓ |  |
@@ -98,7 +99,7 @@ _Usage:_
 | *image_family* | Image of the AI notebook | <code title="">string</code> |  | <code title="">tf-latest-cpu</code> |
 | *image_project* | Google Cloud project where the image is hosted | <code title="">string</code> |  | <code title="">deeplearning-platform-release</code> |
 | *ip_cidr_range* | Unique IP CIDR Range for AI Notebooks subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
-| *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-1</code> |
+| *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-4</code> |
 | *network_name* | Name of the network to be created | <code title="">string</code> |  | <code title="">neon-network</code> |
 | *notebook_count* | Number of Vertex AI Notebooks requested | <code title="">number</code> |  | <code title="">1</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
