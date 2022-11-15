@@ -51,6 +51,7 @@ resource "google_compute_instance" "nextflow_server" {
   boot_disk {
     initialize_params {
       image = data.google_compute_image.debian.self_link
+      size  =  50
     }
   }
 

@@ -26,8 +26,8 @@ if [[ -f /etc/startup_was_launched ]]; then exit 0; fi
 
 # Install Packages needed
 apt-get update
-apt-get install -y git wget openjdk-11-jdk
-export NXF_EDGE=1
+apt-get install -y git wget openjdk-11-jdk graphviz
+
 wget -qO- https://get.nextflow.io | bash
 mkdir /usr/local/bin/nextflow
 mv ./nextflow /usr/local/bin/nextflow
@@ -42,6 +42,15 @@ gsutil cp ${BUCKET_URL}/provisioning/nextflow.config /etc/nextflow.config
 chmod -R 777 /usr/local/bin/nextflow
 chmod 777 /etc/nextflow.config
 
+cat << EOF >> /etc/motd
+
+██████╗  █████╗ ██████╗ ██╗      █████╗ ██████╗ 
+██╔══██╗██╔══██╗██╔══██╗██║     ██╔══██╗██╔══██╗
+██████╔╝███████║██║  ██║██║     ███████║██████╔╝
+██╔══██╗██╔══██║██║  ██║██║     ██╔══██║██╔══██╗
+██║  ██║██║  ██║██████╔╝███████╗██║  ██║██████╔╝
+╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═════╝ 
+EOF
 
 #Run only once
 touch /etc/startup_was_launched
