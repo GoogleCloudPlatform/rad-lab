@@ -1,0 +1,69 @@
+{
+  "billing_budget_budget_id": {
+    "sensitive": true,
+    "type": "string",
+    "value": ""
+  },
+  "deployment_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "dcc9"
+  },
+  "notebooks_googlemanaged_names": {
+    "sensitive": false,
+    "type": "string",
+    "value": ""
+  },
+  "notebooks_googlemanaged_urls": {
+    "sensitive": false,
+    "type": [
+      "list",
+      "string"
+    ],
+    "value": []
+  },
+  "notebooks_usermanaged_names": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string",
+        "string",
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "usermanaged-notebooks-1",
+      "usermanaged-notebooks-2",
+      "usermanaged-notebooks-3",
+      "usermanaged-notebooks-4",
+      "usermanaged-notebooks-5"
+    ]
+  },
+  "notebooks_usermanaged_urls": {
+    "sensitive": false,
+    "type": [
+      "list",
+      "string"
+    ],
+    "value": [
+      "https://1798a32661575dd3-dot-us-west1.notebooks.googleusercontent.com",
+      "https://6395a5a1ca6cffc3-dot-us-west1.notebooks.googleusercontent.com",
+      "https://64044fd8dd7a3769-dot-us-west1.notebooks.googleusercontent.com",
+      "https://7949623491b41d60-dot-us-west1.notebooks.googleusercontent.com",
+      "https://1e2430e9957004b4-dot-us-west1.notebooks.googleusercontent.com"
+    ]
+  },
+  "project_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "radlab-data-science-dcc9"
+  },
+  "user_scripts_bucket_uri": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://www.googleapis.com/storage/v1/b/user-scripts-radlab-data-science-dcc9"
+  }
+}
