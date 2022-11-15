@@ -17,21 +17,28 @@
 variable "ah_data_exchange_id" {
   description = "Analytics Hub : Data Exchange ID (shared with `allauthenticated` users). {{UIMeta group=4 order=2 }}"
   type        = string
+  default     = "National_Ecological_Observatory_Network_NEON_pilot"
 }
 
 variable "ah_data_exchange_location" {
   description = "Analytics Hub : Data Exchange Location. {{UIMeta group=4 order=3 }}"
   type        = string
+  default     = "us-central1"
 }
 
 variable "ah_listing_dataset_map" {
   description = "Analytics Hub : Listing ID and Linked Dataset display name key value pair. {{UIMeta group=4 order=4 }}"
   type        = map(string)
+  default = {
+    "neon_chemical_properties_of_surface_water" = "neon_chemical_properties_of_surface_water",
+    "neon_continuous_discharge"                 = "neon_continuous_discharge"
+  }
 }
 
 variable "ah_project_id" {
   description = "Analytics Hub : Project ID (associated to the data exchange & listing). {{UIMeta group=4 order=1 }}"
   type        = string
+  default     = "neon-nonprod-bq-datasets"
 }
 
 variable "billing_account_id" {
