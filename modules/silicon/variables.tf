@@ -186,7 +186,7 @@ variable "owner_users" {
 variable "project_id_prefix" {
   description = "If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module. {{UIMeta group=1 order=2 }}"
   type        = string
-  default     = "radlab-silicon-design"
+  default     = "radlab-silicon"
 }
 
 variable "resource_creator_identity" {
