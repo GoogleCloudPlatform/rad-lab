@@ -28,7 +28,7 @@ variable "billing_budget_alert_spend_basis" {
 variable "billing_budget_alert_spent_percents" {
   description = "A list of percentages of the budget to alert on when threshold is exceeded. {{UIMeta group=0 order=7 updatesafe }}"
   type        = list(number)
-  default     = [0.5,0.7,1]
+  default     = [0.5, 0.7, 1]
 }
 
 variable "billing_budget_amount" {
@@ -207,6 +207,18 @@ variable "organization_id" {
   description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id. {{UIMeta group=0 order=1 }}"
   type        = string
   default     = ""
+}
+
+variable "owner_groups" {
+  description = "List of groups that should be added as the owner of the created project. {{UIMeta group=1 order=6 updatesafe }}"
+  type        = list(string)
+  default     = []
+}
+
+variable "owner_users" {
+  description = "List of users that should be added as owner to the created project. {{UIMeta group=1 order=7 updatesafe }}"
+  type        = list(string)
+  default     = []
 }
 
 variable "project_id_prefix" {

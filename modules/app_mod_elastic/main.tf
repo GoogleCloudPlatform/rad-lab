@@ -29,7 +29,7 @@ locals {
     "monitoring.googleapis.com",
     "logging.googleapis.com"
   ]
-  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis, ["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "default" {
@@ -88,11 +88,4 @@ resource "google_service_account_iam_member" "elastic_search_k8s_identity" {
   depends_on = [
     module.gke_cluster
   ]
-}
-
-resource "google_project_iam_member" "module_role1" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/viewer"
 }

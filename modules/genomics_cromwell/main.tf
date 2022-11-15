@@ -45,7 +45,7 @@ locals {
     "iam.googleapis.com",
     "lifesciences.googleapis.com"
   ]
-  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis, ["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "default" {
@@ -138,25 +138,4 @@ resource "google_storage_bucket_object" "service" {
   name   = "provisioning/cromwell.service"
   source = "scripts/build/cromwell.service"
   bucket = google_storage_bucket.cromwell_workflow_bucket.name
-}
-
-resource "google_project_iam_member" "module_role1" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/viewer"
-}
-
-resource "google_project_iam_member" "module_role2" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/compute.instanceAdmin.v1"
-}
-
-resource "google_project_iam_member" "module_role3" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/iap.tunnelResourceAccessor"
 }

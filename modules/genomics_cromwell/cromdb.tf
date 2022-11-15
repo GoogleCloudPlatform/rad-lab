@@ -18,10 +18,10 @@ resource "random_password" "cromwell_db_pass" {
   length  = 16
   special = false
 }
+
 module "cromwell_mysql_db" {
   source  = "GoogleCloudPlatform/sql-db/google//modules/mysql"
   version = "~> 11.0"
-
 
   name       = var.cromwell_db_name
   project_id = local.project.project_id
@@ -29,12 +29,11 @@ module "cromwell_mysql_db" {
   deletion_protection = false
 
   database_version = "MYSQL_8_0"
-  region           = local.region
+  region           = var.region
   zone             = var.zone
   tier             = var.cromwell_db_tier
 
   additional_databases = [{ name = "cromwell", collation = "", charset = "" }]
-
 
   additional_users = [
     {
