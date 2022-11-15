@@ -38,7 +38,7 @@ const FeatureList: FeatureItem[] = [
     ),
   },
   {
-    title: "Complete and Customizeable",
+    title: "Complete and Customizable",
     img: "img/customize.png",
     // Svg: require("@site/static/img/configurable.svg").default,
     description: (
