@@ -1,3 +1,0 @@
-# Function dependencies, for example:
-# package>=version
-dsub==0.4.5
