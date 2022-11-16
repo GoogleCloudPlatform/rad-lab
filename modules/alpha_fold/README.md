@@ -2,11 +2,11 @@
 
 Bio-pharma organizations can now leverage the groundbreaking protein folding system, AlphaFold, with Vertex AI Alphafold Rad lab module. 
 This module does following things:
-1. Craetes a gcp project for researchers.
+1. Creates a gcp project for researchers.
 2. Enables Vertex AI APIs 
 3. Deploys the alphafold container as a notebook in Vertex AI platform workbench. It uses a customized Docker image in Artifact Registry, with preinstalled packages for launching a notebook instance in Vertex AI Workbench and prerequisites for running AlphaFold.
 
-Under the hood, this RAD Lab module utilizes Data Science Module and deploys the AlphaFold configutaions over Vertex AI Workbench.
+Under the hood, this RAD Lab module utilizes Data Science Module and deploys the AlphaFold configurations over Vertex AI Workbench.
 
 ## GCP Products/Services
 Vertex AI lets you develop the entire data science/machine learning workflow in a single development environment, helping you deploy models faster, with fewer lines of code and fewer distractions.

@@ -10,7 +10,7 @@ This module creates a simple GCP project, enables APIs, adds users to the projec
 
 ## Reference Architecture Diagram
 
-Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
+Below Architecture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
 ![](../../docs/images/V7_Billing_Budget.png)
 
