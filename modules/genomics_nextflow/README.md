@@ -19,6 +19,15 @@ Once the module is deployed a Storage Bucket will be automtically created that w
 
 The outputs will include the instance name, the project name, the nextflow server instance id, the service account created and the GCS Bucket configured for workflow execution. If you are using input files that are not publicly accessible, you will need to give access to the service account.
 
+You can SSH to the Nextflow VM from the console or using the gcloud command in the output. You may need to wait for a few minutes for the installtion to complete, if you can see the RADLAB ascii art when you login, exit and ssh again in a few minutes.
+
+You may recieve an error message the first time you run Nextflow, if this is the case, please update Nextflow by running `nextflow -self-update` then check the version installed by running `nextflow -v`
+
+To test the deployment with Life Sciences API you can try to run
+`nextflow -c /etc/nextflow.config run nextflow-io/hello' -profile gls`
+And for Batch Api run
+`nextflow -c /etc/nextflow.config run nextflow-io/hello' -profile gbatch`
+
 
 ## Reference Architecture Diagram
 
