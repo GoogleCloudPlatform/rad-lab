@@ -24,9 +24,9 @@ You can SSH to the Nextflow VM from the console or using the gcloud command in t
 You may recieve an error message the first time you run Nextflow, if this is the case, please update Nextflow by running `nextflow -self-update` then check the version installed by running `nextflow -v`
 
 To test the deployment with Life Sciences API you can try to run
-`nextflow -c /etc/nextflow.config run nextflow-io/hello' -profile gls`
+`nextflow -c /etc/nextflow.config run nextflow-io/hello -profile gls`
 And for Batch Api run
-`nextflow -c /etc/nextflow.config run nextflow-io/hello' -profile gbatch`
+`nextflow -c /etc/nextflow.config run nextflow-io/hello -profile gbatch`
 
 
 ## Reference Architecture Diagram
