@@ -21,7 +21,7 @@ locals {
     : try(data.google_project.existing_project.0, null)
   )
 
-  region = var.default_region
+  region = var.region
 
   network = (
     var.create_network
@@ -111,7 +111,7 @@ resource "google_project_iam_member" "compute_service_account_roles" {
 
 resource "google_storage_bucket" "nextflow_workflow_bucket" {
   name                        = "${local.project.project_id}-nextflow-wf-exec"
-  location                    = var.default_region
+  location                    = local.region
   force_destroy               = true
   uniform_bucket_level_access = true
   project                     = local.project.project_id

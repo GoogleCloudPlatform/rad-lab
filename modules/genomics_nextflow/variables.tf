@@ -15,9 +15,78 @@
  */
 
 variable "billing_account_id" {
-  description = "Billing Account associated to the GCP Resources"
+  description = "Billing Account associated to the GCP Resources.  {{UIMeta group=0 order=3 updatesafe }}"
   type        = string
 }
+
+variable "billing_budget_alert_spend_basis" {
+  description = "The type of basis used to determine if spend has passed the threshold. {{UIMeta group=0 order=6 updatesafe }}"
+  type        = string
+  default     = "CURRENT_SPEND"
+}
+
+variable "billing_budget_alert_spent_percents" {
+  description = "A list of percentages of the budget to alert on when threshold is exceeded. {{UIMeta group=0 order=7 updatesafe }}"
+  type        = list(number)
+  default     = [0.5,0.7,1]
+}
+
+variable "billing_budget_amount" {
+  description = "The amount to use as the budget in USD. {{UIMeta group=0 order=8 updatesafe }}"
+  type        = number
+  default     = 500
+}
+
+variable "billing_budget_amount_currency_code" {
+  description = "The 3-letter currency code defined in ISO 4217 (https://cloud.google.com/billing/docs/resources/currency#list_of_countries_and_regions). It must be the currency associated with the billing account. {{UIMeta group=0 order=9 updatesafe }}"
+  type        = string
+  default     = "USD"
+}
+
+variable "billing_budget_credit_types_treatment" {
+  description = "Specifies how credits should be treated when determining spend for threshold calculations. {{UIMeta group=0 order=10 updatesafe }}"
+  type        = string
+  default     = "INCLUDE_ALL_CREDITS"
+}
+
+variable "billing_budget_labels" {
+  description = "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. {{UIMeta group=0 order=11 updatesafe }}"
+  type        = map(string)
+  default     = {}
+  validation {
+    condition     = length(var.billing_budget_labels) <= 1
+    error_message = "Only 0 or 1 labels may be supplied for the budget filter."
+  }
+}
+
+variable "billing_budget_services" {
+  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe }}"
+  type        = list(string)
+  default     = null
+}
+
+variable "billing_budget_notification_email_addresses" {
+  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 4 channels are allowed as the first element of `trusted_users` is automatically added as one of the channel. {{UIMeta group=0 order=13 updatesafe }}"
+  type        = set(string)
+  default     = []
+  validation {
+    condition     = length(var.billing_budget_notification_email_addresses) <= 4
+    error_message = "Maximum of 4 email addresses are allowed for the budget monitoring channel."
+  }
+}
+
+variable "billing_budget_pubsub_topic" {
+  description = "If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false. {{UIMeta group=0 order=14 updatesafe }}"
+  type        = bool
+  default     = false
+}
+
+variable "create_budget" {
+  description = "If the budget should be created. {{UIMeta group=0 order=5 updatesafe }}"
+  type        = bool
+  default     = false
+}
+
 variable "create_network" {
   description = "If the module has to be deployed in an existing network, set this variable to false."
   type        = bool
@@ -70,16 +139,12 @@ variable "nextflow_zone" {
   default     = "us-central1-a"
 }
 
-variable "default_region" {
+variable "region" {
   description = "The default region where the Compute Instance and VPCs will be deployed"
   type        = string
   default     = "us-central1"
 }
-variable "default_zone" {
-  description = "The default zone where the Compute Instance be deployed"
-  type        = string
-  default     = "us-central1-a"
-}
+
 variable "enable_services" {
   description = "Enable the necessary APIs on the project.  When using an existing project, this can be set to false."
   type        = bool
@@ -103,17 +168,24 @@ variable "network_name" {
   default     = "nextflow-vpc"
 }
 
-variable "subnet_name" {
-  description = "This name will be used for subnet created"
-  type        = string
-  default     = "nextflow-vpc"
-}
-
 variable "organization_id" {
   description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id"
   type        = string
   default     = ""
 }
+
+variable "owner_groups" {
+  description = "List of groups that should be added as the owner of the created project. {{UIMeta group=1 order=6 updatesafe }}"
+  type        = list(string)
+  default     = []
+}
+
+variable "owner_users" {
+  description = "List of users that should be added as owner to the created project. {{UIMeta group=1 order=7 updatesafe }}"
+  type        = list(string)
+  default     = []
+}
+
 variable "project_name" {
   description = "Project name or ID, if it's an existing project."
   type        = string
@@ -126,6 +198,12 @@ variable "random_id" {
   default     = null
 }
 
+variable "resource_creator_identity" {
+  description = "Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module. {{UIMeta group=0 order=4 updatesafe }}"
+  type        = string
+  default     = ""
+}
+
 variable "set_external_ip_policy" {
   description = "If true external IP Policy will be set to allow all"
   type        = bool
@@ -135,18 +213,41 @@ variable "set_external_ip_policy" {
 variable "set_restrict_vpc_peering_policy" {
   description = "If true restrict VPC peering will be set to allow all"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "set_shielded_vm_policy" {
   description = "If true shielded VM Policy will be set to disabled"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "set_trustedimage_project_policy" {
   description = "If true trusted image projects will be set to allow all"
   type        = bool
-  default     = true
+  default     = false
 }
 
+variable "subnet_name" {
+  description = "This name will be used for subnet created"
+  type        = string
+  default     = "nextflow-vpc"
+}
+
+variable "trusted_groups" {
+  description = "The list of trusted groups (e.g. `myteam@abc.com`). {{UIMeta group=1 order=5 updatesafe }}"
+  type        = set(string)
+  default     = []
+}
+
+variable "trusted_users" {
+  description = "The list of trusted users (e.g. `username@abc.com`). {{UIMeta group=1 order=4 updatesafe }}"
+  type        = set(string)
+  default     = []
+}
+
+variable "zone" {
+  description = "The default zone where the Compute Instance be deployed"
+  type        = string
+  default     = "us-central1-a"
+}

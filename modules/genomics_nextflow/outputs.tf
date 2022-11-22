@@ -24,7 +24,7 @@ output "nextflow_server_instance_id" {
 }
 output "nextflow_server_zone" {
   description = "Google Cloud zone in which the server was provisioned"
-  value       = var.default_zone
+  value       = var.zone
 }
 
 output "nextflow_service_account_email" {
@@ -32,13 +32,13 @@ output "nextflow_service_account_email" {
   value       = module.nextflow_service_account.email
 }
 
-output "GCS_Bucket_URL" {
+output "gcs_bucket_url" {
   description = "Google Cloud Storage Bucket configured for workflow execution"
   value       = google_storage_bucket.nextflow_workflow_bucket.url
 }
 
 output "gcloud_ssh_command" {
   description = "To connect to the Nextflow instance using Identity Aware Proxy, run the following command"
-  value       = "gcloud compute ssh ${google_compute_instance.nextflow_server.name} --zone=${var.default_zone} --project ${local.project.project_id}"
+  value       = "gcloud compute ssh ${google_compute_instance.nextflow_server.name} --zone=${var.zone} --project ${local.project.project_id}"
 }
 

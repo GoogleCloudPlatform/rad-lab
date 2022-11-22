@@ -45,7 +45,7 @@ resource "google_compute_instance" "nextflow_server" {
   project                   = local.project.project_id
   name                      = var.nextflow_server_instance_name
   machine_type              = var.nextflow_server_instance_type
-  zone                      = var.default_zone
+  zone                      = var.zone
   allow_stopping_for_update = true
 
   boot_disk {
