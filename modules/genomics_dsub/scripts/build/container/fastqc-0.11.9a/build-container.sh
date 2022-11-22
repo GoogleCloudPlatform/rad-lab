@@ -14,7 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PROJECT_ID=$1
+# PROJECT_ID=$1
 
-gcloud config set project ${PROJECT_ID}
-gcloud builds submit . --config ./scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml
+# gcloud config set project ${PROJECT_ID}
+# gcloud builds submit . --config ./scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml
+
+
+
+PROJECT_ID=$1
+SERVICE_ACCOUNT=$2
+
+if [ -n "${SERVICE_ACCOUNT}" ] 
+then
+    echo "SERVICE_ACCOUNT is set to a non-empty string"
+    gcloud config set project ${PROJECT_ID} --impersonate-service-account=${SERVICE_ACCOUNT}
+    gcloud builds submit . --config ./scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml --impersonate-service-account=${SERVICE_ACCOUNT}
+else
+    echo "SERVICE_ACCOUNT is set to an empty string"
+    gcloud config set project ${PROJECT_ID}
+    gcloud builds submit . --config ./scripts/build/container/fastqc-0.11.9a/cloudbuild.yaml
+fi

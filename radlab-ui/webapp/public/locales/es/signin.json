@@ -1,0 +1,14 @@
+{
+  "signin-title": "Registrarse",
+  "signin-description": "Inicia sesión para empezar",
+  "signin-google": "Inicia sesión con Google",
+  "signin-password": "Iniciar sesión con correo electrónico y contraseña",
+  "signin": "Registrarse",
+  "email": "Correo electrónico",
+  "password": "Clave",
+
+  "reset-password": "Restablecer su contraseña",
+  "reset": "Reiniciar",
+  "reset-email-sent": "¡Se ha enviado un correo electrónico de restablecimiento de contraseña!",
+  "back-to-signin": "Volver a la página de inicio de sesión"
+}

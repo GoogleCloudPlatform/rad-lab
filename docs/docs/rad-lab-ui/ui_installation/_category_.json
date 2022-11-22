@@ -1,0 +1,9 @@
+{
+  "label": "Installation",
+  "position": 2,
+  "link": {
+    "slug": "ui_installation",
+    "type": "generated-index",
+    "description": "Cloud Admins can set up a privately hosted version of RAD Lab UI for their organization to use. The application is highly configurable with regards to what modules they want to publish to their users. Users can then use this application to spin up Google Cloud projects within the bounds set by the Cloud Admins."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "create_deployment",
+  "version": "1.0.0",
+  "description": "Create a RAD Lab module deployment",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm -- run unit-test"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@google-cloud/cloudbuild": "^3.1.0",
+    "@google-cloud/functions-framework": "^3.1.2",
+    "@google-cloud/storage": "^6.2.3",
+    "firebase-admin": "^11.0.1"
+  }
+}

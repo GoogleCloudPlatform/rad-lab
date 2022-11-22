@@ -15,7 +15,7 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
   project = (var.create_project
     ? try(module.project_radlab_alpha_fold.0, null)
     : try(data.google_project.existing_project.0, null)
@@ -42,15 +42,17 @@ locals {
     "roles/iam.serviceAccountUser"
   ]
 
-  project_services = var.enable_services ? [
+  default_apis = [
     "compute.googleapis.com",
     "bigquery.googleapis.com",
     "notebooks.googleapis.com",
     "bigquerystorage.googleapis.com"
-  ] : []
+  ]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "default" {
+  count       = var.deployment_id == null ? 1 : 0
   byte_length = 2
 }
 
@@ -60,7 +62,7 @@ resource "random_id" "default" {
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  project_id = var.project_id_prefix
 }
 
 module "project_radlab_alpha_fold" {
@@ -68,7 +70,7 @@ module "project_radlab_alpha_fold" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
+  name              = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
@@ -138,7 +140,9 @@ module "vpc_workbench" {
   ]
 
   depends_on = [
-    google_project_service.enabled_services
+    module.project_radlab_alpha_fold,
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds
   ]
 }
 
@@ -155,25 +159,11 @@ resource "google_project_iam_member" "sa_p_workbench_permissions" {
   role     = each.value
 }
 
-resource "google_service_account_iam_member" "sa_ai_workbench_user_iam" {
-  for_each           = var.trusted_users
+resource "google_service_account_iam_member" "sa_ai_workbench_iam" {
+  for_each           = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
   member             = each.value
   role               = "roles/iam.serviceAccountUser"
   service_account_id = google_service_account.sa_p_workbench.id
-}
-
-resource "google_project_iam_member" "workbench_user_role1" {
-  for_each = var.trusted_users
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/notebooks.admin"
-}
-
-resource "google_project_iam_member" "workbench_user_role2" {
-  for_each = var.trusted_users
-  project  = local.project.project_id
-  member   = each.value
-  role     = "roles/viewer"
 }
 
 resource "google_notebooks_instance" "workbench" {
@@ -235,10 +225,19 @@ resource "google_notebooks_instance" "workbench" {
     ]
 }
 
+resource "null_resource" "workbench_provisioning_state" {
+  for_each = toset(google_notebooks_instance.workbench[*].name)
+  provisioner "local-exec" {
+    command = "while [ \"$(gcloud notebooks instances list --location ${var.zone} --project ${local.project.project_id} --filter 'NAME:${each.value} AND STATE:ACTIVE' --format 'value(STATE)' | wc -l | xargs)\" != 1 ]; do echo \"${each.value} not active yet.\"; done"
+  }
+
+  depends_on = [google_notebooks_instance.workbench]
+}
+
 resource "google_storage_bucket" "user_scripts_bucket" {
   project                     = local.project.project_id
   name                        = join("", ["user-scripts-", local.project.project_id])
-  location                    = "US"
+  location                    = local.region
   force_destroy               = true
   uniform_bucket_level_access = true
 
@@ -253,7 +252,7 @@ resource "google_storage_bucket" "user_scripts_bucket" {
 resource "google_storage_bucket_iam_binding" "binding" {
   bucket  = google_storage_bucket.user_scripts_bucket.name
   role    = "roles/storage.admin"
-  members = var.trusted_users
+  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
 }
 
 resource "google_storage_bucket_object" "workbench_post_startup_script" {

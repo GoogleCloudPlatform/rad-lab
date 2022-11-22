@@ -14,22 +14,39 @@
  * limitations under the License.
  */
 
+output "billing_budget_budget_id" {
+  sensitive   = true
+  description = "Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}`"
+  value       = var.create_budget ? google_billing_budget.budget[0].name : ""
+}
+
 output "deployment_id" {
   description = "RADLab Module Deployment ID"
   value       = local.random_id
 }
 
-output "project-radlab-alpha-fold-id" {
+output "project_id" {
   description = "Alpha Fold Project ID"
   value       = local.project.project_id
 }
 
-output "workbench-instance-names" {
+output "user_scripts_bucket_uri" {
+  description = "User Script Bucket URI"
+  value       = google_storage_bucket.user_scripts_bucket.self_link
+}
+
+output "workbench_instance_names" {
   description = "Vertex AI Workbench Names"
   value       = join(", ", google_notebooks_instance.workbench[*].name)
 }
 
-output "user-scripts-bucket-uri" {
-  description = "User Script Bucket URI"
-  value       = google_storage_bucket.user_scripts_bucket.self_link
+output "workbench_instance_urls" {
+  description = "Vertex AI Workbench Notebook URLS"
+  value       = formatlist("https://%s", google_notebooks_instance.workbench[*].proxy_uri)
+  
+  depends_on = [
+    null_resource.workbench_provisioning_state
+  ]
+
 }
+
