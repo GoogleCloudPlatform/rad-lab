@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
   project = (var.create_project
     ? try(module.project_radlab_gen_cromwell.0, null)
     : try(data.google_project.existing_project.0, null)
   )
 
-  region = var.default_region
+  region = var.region
 
   network = (
     var.create_network
@@ -35,7 +35,7 @@ locals {
     : try(data.google_compute_subnetwork.default.0, null)
   )
 
-  project_services = var.enable_services ? [
+  default_apis = [
     "compute.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "serviceusage.googleapis.com",
@@ -44,10 +44,12 @@ locals {
     "sqladmin.googleapis.com",
     "iam.googleapis.com",
     "lifesciences.googleapis.com"
-  ] : []
+  ]
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis, ["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
 resource "random_id" "default" {
+  count       = var.deployment_id == null ? 1 : 0
   byte_length = 2
 }
 
@@ -57,7 +59,7 @@ resource "random_id" "default" {
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  project_id = var.project_id_prefix
 }
 
 module "project_radlab_gen_cromwell" {
@@ -65,7 +67,7 @@ module "project_radlab_gen_cromwell" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name              = format("%s-%s", var.project_name, local.random_id)
+  name              = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id = false
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
@@ -76,6 +78,8 @@ module "project_radlab_gen_cromwell" {
 
   activate_apis = []
 }
+
+
 
 resource "google_project_service" "enabled_services" {
   for_each                   = toset(local.project_services)
@@ -91,7 +95,7 @@ resource "google_project_service" "enabled_services" {
 
 resource "google_storage_bucket" "cromwell_workflow_bucket" {
   name                        = "${local.project.project_id}-cromwell-wf-exec"
-  location                    = var.default_region
+  location                    = var.region
   force_destroy               = true
   uniform_bucket_level_access = true
   project                     = local.project.project_id

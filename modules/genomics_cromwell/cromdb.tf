@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ resource "random_password" "cromwell_db_pass" {
   length  = 16
   special = false
 }
+
 module "cromwell_mysql_db" {
   source  = "GoogleCloudPlatform/sql-db/google//modules/mysql"
   version = "~> 11.0"
-
 
   name       = var.cromwell_db_name
   project_id = local.project.project_id
@@ -29,12 +29,11 @@ module "cromwell_mysql_db" {
   deletion_protection = false
 
   database_version = "MYSQL_8_0"
-  region           = local.region
-  zone             = var.default_zone
+  region           = var.region
+  zone             = var.zone
   tier             = var.cromwell_db_tier
 
   additional_databases = [{ name = "cromwell", collation = "", charset = "" }]
-
 
   additional_users = [
     {
@@ -52,5 +51,5 @@ module "cromwell_mysql_db" {
   }
 
   // Optional: used to enforce ordering in the creation of resources.
-  module_depends_on = [module.private-service-access.peering_completed]
+  module_depends_on = [google_service_networking_connection.private_service_access]
 }

@@ -1,0 +1,8 @@
+{
+  "label": "RAD Lab Launcher",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "The RAD Lab Launcher is the guided CLI tool built upon Python to deploy RAD Lab modules in your Google Cloud environment."
+  }
+}

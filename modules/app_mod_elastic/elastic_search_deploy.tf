@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,14 @@ locals {
 module "deploy_eck_crds" {
   source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
 
-  project_id              = local.project.project_id
-  cluster_name            = module.gke_cluster.name
-  cluster_location        = var.region
-  kubectl_create_command  = "kubectl create -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
-  kubectl_destroy_command = "kubectl delete -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
-  skip_download           = true
-  upgrade                 = false
+  project_id                  = local.project.project_id
+  cluster_name                = module.gke_cluster.name
+  cluster_location            = var.region
+  kubectl_create_command      = "kubectl create -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
+  kubectl_destroy_command     = "kubectl delete -f https://download.elastic.co/downloads/eck/1.8.0/crds.yaml"
+  impersonate_service_account = length(var.resource_creator_identity) != 0 ? var.resource_creator_identity : ""
+  skip_download               = true
+  upgrade                     = false
 
   module_depends_on = [
     module.gke_cluster.endpoint,
@@ -39,13 +40,14 @@ module "deploy_eck_crds" {
 module "deploy_eck_operator" {
   source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
 
-  project_id              = local.project.project_id
-  cluster_name            = module.gke_cluster.name
-  cluster_location        = var.region
-  kubectl_create_command  = "kubectl apply -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
-  kubectl_destroy_command = "${path.module}/scripts/build/remove_eck_operator.sh"
-  skip_download           = true
-  upgrade                 = false
+  project_id                  = local.project.project_id
+  cluster_name                = module.gke_cluster.name
+  cluster_location            = var.region
+  kubectl_create_command      = "kubectl apply -f https://download.elastic.co/downloads/eck/1.8.0/operator.yaml"
+  kubectl_destroy_command     = "${path.module}/scripts/build/remove_eck_operator.sh"
+  impersonate_service_account = length(var.resource_creator_identity) != 0 ? var.resource_creator_identity : ""
+  skip_download               = true
+  upgrade                     = false
 
   module_depends_on = [
     module.gke_cluster.endpoint, # Force dependency between modules
@@ -56,7 +58,6 @@ module "deploy_eck_operator" {
 resource "local_file" "elastic_search_yaml_output" {
   count    = var.deploy_elastic_search ? 1 : 0
   filename = "${path.module}/elk/elastic_search_deployment.yaml"
-
   content = templatefile("${path.module}/templates/elastic_search_deployment.yaml.tpl", {
     NAMESPACE           = local.k8s_namespace
     COUNT               = var.elastic_search_instance_count
@@ -70,14 +71,15 @@ module "deploy_elastic_search" {
   count  = var.deploy_elastic_search ? 1 : 0
   source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
 
-  project_id              = local.project.project_id
-  cluster_name            = module.gke_cluster.name
-  cluster_location        = var.region
-  kubectl_create_command  = "kubectl apply -f ${path.module}/elk"
-  kubectl_destroy_command = "kubectl delete -f ${path.module}/elk"
-  skip_download           = true
-  upgrade                 = false
-  use_existing_context    = false
+  project_id                  = local.project.project_id
+  cluster_name                = module.gke_cluster.name
+  cluster_location            = var.region
+  kubectl_create_command      = "kubectl apply -f ${path.module}/elk"
+  kubectl_destroy_command     = "kubectl delete -f ${path.module}/elk"
+  impersonate_service_account = length(var.resource_creator_identity) != 0 ? var.resource_creator_identity : ""
+  skip_download               = true
+  upgrade                     = false
+  use_existing_context        = false
 
   module_depends_on = [
     module.gke_cluster.endpoint,

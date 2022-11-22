@@ -1,0 +1,9 @@
+{
+  "label": "Configure Modules",
+  "position": 2,
+  "link": {
+    "slug": "cli_configure",
+    "type": "generated-index",
+    "description": "Learn how to customize Modules"
+  }
+}
