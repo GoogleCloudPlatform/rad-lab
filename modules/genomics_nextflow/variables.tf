@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ variable "billing_budget_alert_spend_basis" {
 variable "billing_budget_alert_spent_percents" {
   description = "A list of percentages of the budget to alert on when threshold is exceeded. {{UIMeta group=0 order=7 updatesafe }}"
   type        = list(number)
-  default     = [0.5,0.7,1]
+  default     = [0.5, 0.7, 1]
 }
 
 variable "billing_budget_amount" {
@@ -191,6 +191,7 @@ variable "project_name" {
   type        = string
   default     = "radlab-genomics-nextflow"
 }
+
 
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
