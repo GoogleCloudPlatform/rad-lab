@@ -220,7 +220,7 @@ variable "set_restrict_vpc_peering_policy" {
 variable "set_shielded_vm_policy" {
   description = "If true shielded VM Policy will be set to disabled. {{UIMeta group=0 order=17 updatesafe }}"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "set_trustedimage_project_policy" {
