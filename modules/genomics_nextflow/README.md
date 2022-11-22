@@ -65,39 +65,40 @@ NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prere
 | *billing_budget_notification_email_addresses* | A list of email addresses which will be recieving billing budget notification alerts. A maximum of 4 channels are allowed as the first element of `trusted_users` is automatically added as one of the channel | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="&#91;&#93;&#10;validation &#123;&#10;condition     &#61; length&#40;var.billing_budget_notification_email_addresses&#41; &#60;&#61; 4&#10;error_message &#61; &#34;Maximum of 4 email addresses are allowed for the budget monitoring channel.&#34;&#10;&#125;">...</code> |
 | *billing_budget_pubsub_topic* | If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false | <code title="">bool</code> |  | <code title="">false</code> |
 | *billing_budget_services* | A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/ | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">null</code> |
+| *create_budget* | If the budget should be created | <code title="">bool</code> |  | <code title="">false</code> |
 | *create_network* | If the module has to be deployed in an existing network, set this variable to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *create_project* | Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false | <code title="">bool</code> |  | <code title="">true</code> |
-| *default_zone* | None | <code title="">string</code> |  | <code title="">us-central1-a</code> |
+| *deployment_id* | None | <code title="">string</code> |  | <code title="">null</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *folder_id* | Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node | <code title="">string</code> |  | <code title=""></code> |
-| *ip_cidr_range* | None | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
-| *network_name* | None | <code title="">string</code> |  | <code title="">nextflow-vpc</code> |
-| *nextflow_API_location* | Google Cloud region or multi-region where the Life Sciences API endpoint will be used. This does not affect where worker instances or data will be stored | <code title="">string</code> |  | <code title="">us-central1</code> |
+| *ip_cidr_range* | Unique IP CIDR Range for nextflow subnet | <code title="">string</code> |  | <code title="">10.142.190.0/24</code> |
+| *network_name* | This name will be used for VPC and subnets created | <code title="">string</code> |  | <code title="">nextflow-vpc</code> |
+| *nextflow_api_location* | Google Cloud region or multi-region where the Life Sciences API endpoint will be used. This does not affect where worker instances or data will be stored | <code title="">string</code> |  | <code title="">us-central1</code> |
 | *nextflow_sa_roles* | List of roles granted to the nextflow service account. This server account will be used to run both the nextflow server and workers as well | <code title="list&#40;any&#41;">list(any)</code> |  | <code title="&#91;&#10;&#34;roles&#47;lifesciences.workflowsRunner&#34;,&#10;&#34;roles&#47;serviceusage.serviceUsageConsumer&#34;,&#10;&#34;roles&#47;storage.objectAdmin&#34;,&#10;&#34;roles&#47;batch.jobsAdmin&#34;,&#10;&#34;roles&#47;batch.agentReporter&#34;,&#10;&#34;roles&#47;batch.serviceAgent&#34;,&#10;&#34;roles&#47;iam.serviceAccountUser&#34;,&#10;&#34;roles&#47;browser&#34;,&#10;&#34;roles&#47;logging.viewer&#34;&#10;&#93;">...</code> |
 | *nextflow_server_instance_name* | Name of the VM instance that will be used to deploy nextflow Server, this should be a valid Google Cloud instance name | <code title="">string</code> |  | <code title="">nextflow-server</code> |
-| *nextflow_server_instance_type* | None | <code title="">string</code> |  | <code title="">e2-standard-4</code> |
+| *nextflow_server_instance_type* | Nextflow server instance type | <code title="">string</code> |  | <code title="">e2-standard-4</code> |
 | *nextflow_zone* | GCP Zone that will be set as the default runtime in nextflow config file | <code title="">string</code> |  | <code title="">us-central1-a</code> |
-| *organization_id* | Organization ID where GCP Resources need to get spin up | <code title="">string</code> |  | <code title=""></code> |
+| *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
 | *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
-| *project_name* | Project name or ID, if it's an existing project | <code title="">string</code> |  | <code title="">radlab-genomics-nextflow</code> |
-| *random_id* | None | <code title="">string</code> |  | <code title="">null</code> |
-| *region* | None | <code title="">string</code> |  | <code title="">us-central1</code> |
+| *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-genomics-nextflow</code> |
+| *region* | The default region where the Compute Instance and VPCs will be deployed | <code title="">string</code> |  | <code title="">us-central1</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
-| *set_external_ip_policy* | None | <code title="">bool</code> |  | <code title="">false</code> |
-| *set_restrict_vpc_peering_policy* | None | <code title="">bool</code> |  | <code title="">false</code> |
-| *set_shielded_vm_policy* | None | <code title="">bool</code> |  | <code title="">false</code> |
-| *set_trustedimage_project_policy* | None | <code title="">bool</code> |  | <code title="">false</code> |
-| *subnet_name* | None | <code title="">string</code> |  | <code title="">nextflow-vpc</code> |
+| *set_external_ip_policy* | If true external IP Policy will be set to allow all | <code title="">bool</code> |  | <code title="">false</code> |
+| *set_restrict_vpc_peering_policy* | If true restrict VPC peering will be set to allow all | <code title="">bool</code> |  | <code title="">false</code> |
+| *set_shielded_vm_policy* | If true shielded VM Policy will be set to disabled | <code title="">bool</code> |  | <code title="">false</code> |
+| *set_trustedimage_project_policy* | If true trusted image projects will be set to allow all | <code title="">bool</code> |  | <code title="">false</code> |
+| *subnet_name* | This name will be used for subnet created | <code title="">string</code> |  | <code title="">nextflow-vpc</code> |
 | *trusted_groups* | The list of trusted groups (e.g. `myteam@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *trusted_users* | The list of trusted users (e.g. `username@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
+| *zone* | The default zone where the Compute Instance be deployed | <code title="">string</code> |  | <code title="">us-central1-a</code> |
 
 ## Outputs
 
 | name | description | sensitive |
 |---|---|:---:|
-| GCS_Bucket_URL | Google Cloud Storage Bucket configured for workflow execution |  |
 | gcloud_ssh_command | To connect to the Nextflow instance using Identity Aware Proxy, run the following command |  |
+| gcs_bucket_url | Google Cloud Storage Bucket configured for workflow execution |  |
 | nextflow_server_instance_id | VM instance name running the nextflow server |  |
 | nextflow_server_zone | Google Cloud zone in which the server was provisioned |  |
 | nextflow_service_account_email | Email address of service account running the server and worker nodes |  |

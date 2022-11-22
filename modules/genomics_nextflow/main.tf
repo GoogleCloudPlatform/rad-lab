@@ -15,7 +15,7 @@
  */
 
 locals {
-  random_id = var.random_id != null ? var.random_id : random_id.default.hex
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.hex
   project = (var.create_project
     ? try(module.project_radlab_gen_nextflow.0, null)
     : try(data.google_project.existing_project.0, null)
@@ -57,7 +57,7 @@ resource "random_id" "default" {
 
 data "google_project" "existing_project" {
   count      = var.create_project ? 0 : 1
-  project_id = var.project_name
+  project_id = var.project_id_prefix
 }
 
 module "project_radlab_gen_nextflow" {
@@ -65,7 +65,7 @@ module "project_radlab_gen_nextflow" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0"
 
-  name                    = format("%s-%s", var.project_name, local.random_id)
+  name                    = format("%s-%s", var.project_id_prefix, local.random_id)
   random_project_id       = false
   folder_id               = var.folder_id
   billing_account         = var.billing_account_id
@@ -133,7 +133,7 @@ resource "google_storage_bucket_object" "config" {
     NEXTFLOW_NETWORK         = var.network_name
     NEXTFLOW_SUBNET          = var.subnet_name
     NEXTFLOW_SERVICE_ACCOUNT = module.nextflow_service_account.email,
-    NEXTFLOW_LOCATION        = var.nextflow_API_location,
+    NEXTFLOW_LOCATION        = var.nextflow_api_location,
     NEXTFLOW_ZONE            = var.nextflow_zone
   })
 }

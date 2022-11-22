@@ -28,7 +28,7 @@ variable "billing_budget_alert_spend_basis" {
 variable "billing_budget_alert_spent_percents" {
   description = "A list of percentages of the budget to alert on when threshold is exceeded. {{UIMeta group=0 order=7 updatesafe }}"
   type        = list(number)
-  default     = [0.5, 0.7, 1]
+  default     = [0.5,0.7,1]
 }
 
 variable "billing_budget_amount" {
@@ -88,26 +88,55 @@ variable "create_budget" {
 }
 
 variable "create_network" {
-  description = "If the module has to be deployed in an existing network, set this variable to false."
+  description = "If the module has to be deployed in an existing network, set this variable to false. {{UIMeta group=2 order=1 }}"
   type        = bool
   default     = true
 }
 
 variable "create_project" {
-  description = "Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false."
+  description = "Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false. {{UIMeta group=1 order=1 }}"
   type        = bool
   default     = true
 }
 
+variable "deployment_id" {
+  description = "Adds a suffix of 4 random characters to the `project_id`"
+  type        = string
+  default     = null
+}
 
-variable "nextflow_API_location" {
-  description = "Google Cloud region or multi-region where the Life Sciences API endpoint will be used. This does not affect where worker instances or data will be stored."
+variable "enable_services" {
+  description = "Enable the necessary APIs on the project.  When using an existing project, this can be set to false. {{UIMeta group=1 order=3 }}"
+  type        = bool
+  default     = true
+}
+
+variable "folder_id" {
+  description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. {{UIMeta group=0 order=2 updatesafe }}"
+  type        = string
+  default     = ""
+}
+
+variable "ip_cidr_range" {
+  description = "Unique IP CIDR Range for nextflow subnet. {{UIMeta group=2 order=6 }}"
+  type        = string
+  default     = "10.142.190.0/24"
+}
+
+variable "network_name" {
+  description = "This name will be used for VPC and subnets created. {{UIMeta group=2 order=2 }}"
+  type        = string
+  default     = "nextflow-vpc"
+}
+
+variable "nextflow_api_location" {
+  description = "Google Cloud region or multi-region where the Life Sciences API endpoint will be used. This does not affect where worker instances or data will be stored. {{UIMeta group=3 order=3 }}"
   type        = string
   default     = "us-central1"
 }
 
 variable "nextflow_sa_roles" {
-  description = "List of roles granted to the nextflow service account. This server account will be used to run both the nextflow server and workers as well."
+  description = "List of roles granted to the nextflow service account. This server account will be used to run both the nextflow server and workers as well. {{UIMeta group=3 order=5 updatesafe }}"
   type        = list(any)
   default = [
     "roles/lifesciences.workflowsRunner",
@@ -123,53 +152,25 @@ variable "nextflow_sa_roles" {
 }
 
 variable "nextflow_server_instance_name" {
-  description = "Name of the VM instance that will be used to deploy nextflow Server, this should be a valid Google Cloud instance name."
+  description = "Name of the VM instance that will be used to deploy nextflow Server, this should be a valid Google Cloud instance name. {{UIMeta group=3 order=1 }}"
   type        = string
   default     = "nextflow-server"
 }
+
 variable "nextflow_server_instance_type" {
-  description = "nextflow server instance type"
+  description = "Nextflow server instance type. {{UIMeta group=3 order=2 }}"
   type        = string
   default     = "e2-standard-4"
 }
 
 variable "nextflow_zone" {
-  description = "GCP Zone that will be set as the default runtime in nextflow config file."
+  description = "GCP Zone that will be set as the default runtime in nextflow config file. {{UIMeta group=3 order=4 }}"
   type        = string
   default     = "us-central1-a"
 }
 
-variable "region" {
-  description = "The default region where the Compute Instance and VPCs will be deployed"
-  type        = string
-  default     = "us-central1"
-}
-
-variable "enable_services" {
-  description = "Enable the necessary APIs on the project.  When using an existing project, this can be set to false."
-  type        = bool
-  default     = true
-}
-
-variable "folder_id" {
-  description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. "
-  type        = string
-  default     = ""
-}
-variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for nextflow subnet"
-  type        = string
-  default     = "10.142.190.0/24"
-}
-
-variable "network_name" {
-  description = "This name will be used for VPC created"
-  type        = string
-  default     = "nextflow-vpc"
-}
-
 variable "organization_id" {
-  description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id"
+  description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id. {{UIMeta group=0 order=1 }}"
   type        = string
   default     = ""
 }
@@ -186,17 +187,16 @@ variable "owner_users" {
   default     = []
 }
 
-variable "project_name" {
-  description = "Project name or ID, if it's an existing project."
+variable "project_id_prefix" {
+  description = "If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module. {{UIMeta group=1 order=2 }}"
   type        = string
   default     = "radlab-genomics-nextflow"
 }
 
-
-variable "random_id" {
-  description = "Adds a suffix of 4 random characters to the `project_id`"
+variable "region" {
+  description = "The default region where the Compute Instance and VPCs will be deployed. {{UIMeta group=2 order=4 }}"
   type        = string
-  default     = null
+  default     = "us-central1"
 }
 
 variable "resource_creator_identity" {
@@ -206,31 +206,31 @@ variable "resource_creator_identity" {
 }
 
 variable "set_external_ip_policy" {
-  description = "If true external IP Policy will be set to allow all"
+  description = "If true external IP Policy will be set to allow all. {{UIMeta group=0 order=15 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_restrict_vpc_peering_policy" {
-  description = "If true restrict VPC peering will be set to allow all"
+  description = "If true restrict VPC peering will be set to allow all. {{UIMeta group=0 order=16 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_shielded_vm_policy" {
-  description = "If true shielded VM Policy will be set to disabled"
+  description = "If true shielded VM Policy will be set to disabled. {{UIMeta group=0 order=17 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_trustedimage_project_policy" {
-  description = "If true trusted image projects will be set to allow all"
+  description = "If true trusted image projects will be set to allow all. {{UIMeta group=0 order=18 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "subnet_name" {
-  description = "This name will be used for subnet created"
+  description = "This name will be used for subnet created. {{UIMeta group=2 order=3 }}"
   type        = string
   default     = "nextflow-vpc"
 }
@@ -248,7 +248,7 @@ variable "trusted_users" {
 }
 
 variable "zone" {
-  description = "The default zone where the Compute Instance be deployed"
+  description = "The default zone where the Compute Instance be deployed. {{UIMeta group=2 order=5 }}"
   type        = string
   default     = "us-central1-a"
 }
