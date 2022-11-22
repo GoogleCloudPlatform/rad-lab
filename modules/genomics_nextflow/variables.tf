@@ -18,6 +18,76 @@ variable "billing_account_id" {
   description = "Billing Account associated to the GCP Resources"
   type        = string
 }
+
+variable "billing_budget_alert_spend_basis" {
+  description = "The type of basis used to determine if spend has passed the threshold. {{UIMeta group=0 order=6 updatesafe }}"
+  type        = string
+  default     = "CURRENT_SPEND"
+}
+
+variable "billing_budget_alert_spent_percents" {
+  description = "A list of percentages of the budget to alert on when threshold is exceeded. {{UIMeta group=0 order=7 updatesafe }}"
+  type        = list(number)
+  default     = [0.5, 0.7, 1]
+}
+
+variable "billing_budget_amount" {
+  description = "The amount to use as the budget in USD. {{UIMeta group=0 order=8 updatesafe }}"
+  type        = number
+  default     = 500
+}
+
+variable "billing_budget_amount_currency_code" {
+  description = "The 3-letter currency code defined in ISO 4217 (https://cloud.google.com/billing/docs/resources/currency#list_of_countries_and_regions). It must be the currency associated with the billing account. {{UIMeta group=0 order=9 updatesafe }}"
+  type        = string
+  default     = "USD"
+}
+
+variable "billing_budget_credit_types_treatment" {
+  description = "Specifies how credits should be treated when determining spend for threshold calculations. {{UIMeta group=0 order=10 updatesafe }}"
+  type        = string
+  default     = "INCLUDE_ALL_CREDITS"
+}
+
+variable "billing_budget_labels" {
+  description = "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. {{UIMeta group=0 order=11 updatesafe }}"
+  type        = map(string)
+  default     = {}
+  validation {
+    condition     = length(var.billing_budget_labels) <= 1
+    error_message = "Only 0 or 1 labels may be supplied for the budget filter."
+  }
+}
+
+variable "billing_budget_services" {
+  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe }}"
+  type        = list(string)
+  default     = null
+}
+
+variable "billing_budget_notification_email_addresses" {
+  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 4 channels are allowed as the first element of `trusted_users` is automatically added as one of the channel. {{UIMeta group=0 order=13 updatesafe }}"
+  type        = set(string)
+  default     = []
+  validation {
+    condition     = length(var.billing_budget_notification_email_addresses) <= 4
+    error_message = "Maximum of 4 email addresses are allowed for the budget monitoring channel."
+  }
+}
+
+variable "billing_budget_pubsub_topic" {
+  description = "If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false. {{UIMeta group=0 order=14 updatesafe }}"
+  type        = bool
+  default     = false
+}
+
+variable "create_budget" {
+  description = "If the budget should be created. {{UIMeta group=0 order=5 updatesafe }}"
+  type        = bool
+  default     = false
+}
+
+
 variable "create_network" {
   description = "If the module has to be deployed in an existing network, set this variable to false."
   type        = bool
@@ -114,11 +184,25 @@ variable "organization_id" {
   type        = string
   default     = ""
 }
+
+variable "owner_groups" {
+  description = "List of groups that should be added as the owner of the created project. {{UIMeta group=1 order=6 updatesafe }}"
+  type        = list(string)
+  default     = []
+}
+
+variable "owner_users" {
+  description = "List of users that should be added as owner to the created project. {{UIMeta group=1 order=7 updatesafe }}"
+  type        = list(string)
+  default     = []
+}
+
 variable "project_name" {
   description = "Project name or ID, if it's an existing project."
   type        = string
   default     = "radlab-genomics-nextflow"
 }
+
 
 variable "random_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`"
@@ -150,3 +234,14 @@ variable "set_trustedimage_project_policy" {
   default     = true
 }
 
+variable "trusted_groups" {
+  description = "The list of trusted groups (e.g. `myteam@abc.com`). {{UIMeta group=1 order=5 updatesafe }}"
+  type        = set(string)
+  default     = []
+}
+
+variable "trusted_users" {
+  description = "The list of trusted users (e.g. `username@abc.com`). {{UIMeta group=1 order=4 updatesafe }}"
+  type        = set(string)
+  default     = []
+}
