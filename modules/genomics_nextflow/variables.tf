@@ -205,26 +205,32 @@ variable "resource_creator_identity" {
   default     = ""
 }
 
+variable "set_domain_restricted_sharing_policy" {
+  description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=15 updatesafe }}"
+  type        = bool
+  default     = false
+}
+
 variable "set_external_ip_policy" {
-  description = "If true external IP Policy will be set to allow all. {{UIMeta group=0 order=15 updatesafe }}"
+  description = "If true external IP Policy will be set to allow all. {{UIMeta group=0 order=16 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_restrict_vpc_peering_policy" {
-  description = "If true restrict VPC peering will be set to allow all. {{UIMeta group=0 order=16 updatesafe }}"
+  description = "If true restrict VPC peering will be set to allow all. {{UIMeta group=0 order=17 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_shielded_vm_policy" {
-  description = "If true shielded VM Policy will be set to disabled. {{UIMeta group=0 order=17 updatesafe }}"
+  description = "If true shielded VM Policy will be set to disabled. {{UIMeta group=0 order=18 updatesafe }}"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "set_trustedimage_project_policy" {
-  description = "If true trusted image projects will be set to allow all. {{UIMeta group=0 order=18 updatesafe }}"
+  description = "If true trusted image projects will be set to allow all. {{UIMeta group=0 order=19 updatesafe }}"
   type        = bool
   default     = false
 }
