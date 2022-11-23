@@ -63,7 +63,7 @@ resource "google_compute_instance" "nextflow_server" {
   tags = ["nextflow-iap"]
 
   metadata = {
-    startup-script-url = "${google_storage_bucket.nextflow_workflow_bucket.url}/provisioning/bootstrap.sh"
+    startup-script-url = "${google_storage_bucket.nextflow_workflow_bucket.url}/${google_storage_bucket_object.bootstrap.name}"
   }
 
   service_account {
@@ -72,7 +72,6 @@ resource "google_compute_instance" "nextflow_server" {
     scopes = ["cloud-platform"]
   }
   depends_on = [
-    google_storage_bucket_object.bootstrap,
     google_storage_bucket_object.config,
     time_sleep.wait_120_seconds
   ]
