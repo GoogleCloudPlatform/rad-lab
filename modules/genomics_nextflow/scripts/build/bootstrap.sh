@@ -33,7 +33,6 @@ mkdir /usr/local/bin/nextflow
 mv ./nextflow /usr/local/bin/nextflow
 
 echo "export PATH=/usr/local/bin/nextflow:$PATH" >> /etc/profile
-echo "export NXF_EDGE=1" >> /etc/profile
 
 # Copy Config and Service files from Bucket
 gsutil cp ${BUCKET_URL}/provisioning/nextflow.config /etc/nextflow.config

@@ -39,6 +39,15 @@ resource "google_project_iam_member" "role_iap_tunnel_resource_accessor" {
   role     = "roles/iap.tunnelResourceAccessor"
 }
 
+resource "google_project_iam_member" "role_service_account_user" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  project  = local.project.project_id
+  member   = each.value
+  role     = "roles/iam.serviceAccountUser"
+}
+
+
+
 #########################################################################
 # IAM - Owner User/Group
 #########################################################################
