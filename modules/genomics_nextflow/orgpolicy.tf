@@ -60,7 +60,7 @@ resource "google_project_organization_policy" "domain_restricted_sharing_policy"
 }
 
 resource "time_sleep" "wait_120_seconds" {
-  count = var.set_trustedimage_project_policy || var.set_shielded_vm_policy || var.set_restrict_vpc_peering_policy || var.set_external_ip_policy || (var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic) || var.enable_services ? 1 : 0
+  count = var.set_trustedimage_project_policy || var.set_shielded_vm_policy || (var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic) || var.enable_services ? 1 : 0
 
   depends_on = [
     google_project_organization_policy.shielded_vm_policy,
