@@ -12,7 +12,6 @@ import { useTranslation } from "next-i18next"
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { BUILD_HEADER, LOGS_HEADERS } from "@/utils/data"
-import ModuleCharts from "@/components/charts/ModuleChart"
 import DeleteDeploymentModal from "@/components/DeleteDeploymentModal"
 import axios from "axios"
 import { IDeployment, Deployment, DEPLOYMENT_STATUS } from "@/utils/types"
@@ -24,7 +23,6 @@ import ModuleBuilds from "@/components/builds/ModuleBuilds"
 enum TAB_DETAILS {
   OUTPUTS,
   LOG,
-  BILLING,
   BUILDS,
 }
 
@@ -211,7 +209,6 @@ const DeploymentDetails: React.FC<IDeploymentDetails> = ({}) => {
           <div className="tabs mt-8 rounded-t-lg">
             {renderTabHeader(TAB_DETAILS.OUTPUTS, t("outputs"), tabStatus)}
             {renderTabHeader(TAB_DETAILS.LOG, t("logs"), tabStatus)}
-            {/*{renderTabHeader(TAB_DETAILS.BILLING, t("billing"), tabStatus)} */}
             {renderTabHeader(TAB_DETAILS.BUILDS, t("builds"), tabStatus)}
           </div>
           <div className="p-8 bg-base-100 rounded-b-lg rounded-tr-lg shadow-lg">
@@ -228,9 +225,6 @@ const DeploymentDetails: React.FC<IDeploymentDetails> = ({}) => {
                     deploymentId={deployId}
                     tableHeaders={LOGS_HEADERS}
                   />
-                )}
-                {tabStatus === TAB_DETAILS.BILLING && (
-                  <ModuleCharts deploymentId={deployId} />
                 )}
                 {tabStatus === TAB_DETAILS.BUILDS && (
                   <ModuleBuilds
