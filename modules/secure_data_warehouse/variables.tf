@@ -169,3 +169,13 @@ variable "data_engineer_group" {
   description = "Google Cloud IAM group that sets up and maintains the data pipeline and warehouse."
   type        = string
 }
+variable "owner_users" {
+  description = "List of users that should be added as owner to the created project."
+  type        = list(string)
+  default     = []
+}
+variable "owner_groups" {
+  description = "List of groups that should be added as the owner of the created project."
+  type        = list(string)
+  default     = []
+}
