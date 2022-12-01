@@ -81,7 +81,7 @@ Run the following commands in a terminal or command window:
 export RLUI_PROJECT_ID=$(terraform show -json | jq -r .values.outputs.project_id.value)
 
 # Install Firebase Tools
-npm install --location=global firebase-tools
+npm install -g firebase-tools
 
 # Switch to the webapp directory
 cd ../../../webapp

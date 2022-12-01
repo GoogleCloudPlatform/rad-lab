@@ -191,10 +191,14 @@ terraform output -json | jq -r.project_id.value
 
 ### Connect Repository
 
+:::info NOTE
+Make sure to **manually** connect your forked RAD Lab repo before start deploying the RAD Lab modules.
+:::
+
 To be able to retrieve the list of available modules, variables and deployment files, Cloud Build requires access to
 your repository. This is a step that only has to be executed once. 
 1. Open the [Google Cloud console](https://console.cloud.google.com)
-2. navigate to Cloud Build in the newly created project.
+2. Navigate to Cloud Build in the newly created project.
 3. Go to the Cloud Build > [Triggers](https://console.cloud.google.com/cloud-build/triggers)
 4. click on **Connect Repository**. 
 5. Follow the necessary steps to connect your repository to the Google Cloud project. 
