@@ -28,4 +28,4 @@ Only Users and Admins that have been placed in the appropriate Google Cloud Iden
 
 You will then provide these groups to the RAD Lab UI setup. When users sign in to the RAD Lab UI, they will be checked for membership in either of these two groups and assigned a role appropriately (or blocked if in neither group).
 
-For the UI to be able to do this, the service account attached to the web application must be granted certain permissions at Google Admin level.  The user granting these permissions should have Super Admin access. 
+For the UI to be able to do this, the service account attached to the web application must be granted certain permissions at Google Admin level.  The user granting these permissions should have Super Admin access. Follow steps [here](infrastructure.md#admin-api).
