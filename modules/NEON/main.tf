@@ -326,3 +326,66 @@ resource "null_resource" "subscribe" {
     time_sleep.wait_120_seconds,
   ]
 }
+
+# resource "null_resource" "subscribe" {
+#   # On success, this will attempt to execute the true command in the
+#   # shell environment running terraform.
+#   # On failure, this will attempt to execute the false command in the
+#   # shell environment running terraform.
+#   for_each            = var.ah_listing_dataset_map
+
+#   provisioner "local-exec" {
+#     # command = contains([201, 204], data.http.subscribe[*].status_code)
+#     # command = data.http.subscribe[*]
+#     # command = data.http.subscribe[*].response_body 
+#   }
+# }
+
+# provider "http" {
+#   # Configuration options
+# }
+
+# data "http" "subscribe" {
+#   for_each            = var.ah_listing_dataset_map
+
+#   url = "https://analyticshub.googleapis.com/v1/projects/${var.ah_project_id}/locations/${var.ah_data_exchange_location}/dataExchanges/${var.ah_data_exchange_id}/listings/${each.key}:subscribe"
+#   method = "POST"
+
+#   # request headers
+#   request_headers = {
+#     Authorization       = length(var.resource_creator_identity) != 0 ? "Bearer ${local.token}" : "Bearer $(gcloud auth application-default print-access-token)",
+#     x-goog-user-project = "${local.project.project_id}",
+#     Accept              = "application/json",
+#     Content-Type        = "application/json"
+#   }
+
+#   # request body
+#   request_body = "{\"destinationDataset\":{\"datasetReference\":{\"datasetId\":\"${each.value}\",\"projectId\":\"${local.project.project_id}\"},\"location\":\"${var.ah_data_exchange_location}\"}}"
+
+#   depends_on = [
+#     time_sleep.wait_120_seconds,
+#   ]
+# }
+
+
+# provider "http-full" {}
+
+# data "http" "subscribe" {
+#   for_each            = var.ah_listing_dataset_map
+
+#   provider = http-full
+#   url = "https://analyticshub.googleapis.com/v1/projects/${var.ah_project_id}/locations/${var.ah_data_exchange_location}/dataExchanges/${var.ah_data_exchange_id}/listings/${each.key}:subscribe"
+
+#   method = "POST"
+
+#   request_headers = {
+#     Authorization       = length(var.resource_creator_identity) != 0 ? "Bearer ${local.token}" : "Bearer $(gcloud auth application-default print-access-token)",
+#     x-goog-user-project = "${local.project.project_id}",
+#     Accept              = "application/json",
+#     Content-Type        = "application/json"
+#   }
+
+#   # request_body = jsonencode({foo = "bar",bar = "bar"})
+#   request_body = "{\"destinationDataset\":{\"datasetReference\":{\"datasetId\":\"${each.value}\",\"projectId\":\"${local.project.project_id}\"},\"location\":\"${var.ah_data_exchange_location}\"}}"
+
+# }
