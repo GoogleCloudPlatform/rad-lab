@@ -33,7 +33,7 @@ And for Batch Api run
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V1_Nextflow.png)
+![](../../docs/images/V10_Genomics_Nextflow.png)
 
 ## IAM Permissions Prerequisites
 
