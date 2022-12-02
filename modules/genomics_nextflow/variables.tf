@@ -212,13 +212,13 @@ variable "set_domain_restricted_sharing_policy" {
 }
 
 variable "set_shielded_vm_policy" {
-  description = "If true shielded VM Policy will be set to disabled. {{UIMeta group=0 order=18 updatesafe }}"
+  description = "If true shielded VM Policy will be set to disabled. {{UIMeta group=0 order=16 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_trustedimage_project_policy" {
-  description = "If true trusted image projects will be set to allow all. {{UIMeta group=0 order=19 updatesafe }}"
+  description = "If true trusted image projects will be set to allow all. {{UIMeta group=0 order=17 updatesafe }}"
   type        = bool
   default     = false
 }
