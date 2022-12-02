@@ -17,6 +17,11 @@ const GIT_URL = envOrFail(
   process.env.NEXT_PUBLIC_GIT_URL,
 )
 
+const GIT_BRANCH = envOrFail(
+  "NEXT_PUBLIC_GIT_BRANCH",
+  process.env.NEXT_PUBLIC_GIT_BRANCH,
+)
+
 const Deploy: React.FC<DeployProps> = () => {
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -34,7 +39,7 @@ const Deploy: React.FC<DeployProps> = () => {
 
   const handleInfoClick = (moduleTitle: string) => {
     //to open git module url
-    const gitPageUrl = `${GIT_URL}/tree/main/modules/${moduleTitle}`
+    const gitPageUrl = `${GIT_URL}/tree/${GIT_BRANCH}/modules/${moduleTitle}`
     window.open(gitPageUrl, "_blank")
   }
 

@@ -37,6 +37,7 @@ ADMIN_GROUP_NAME=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.admin_grou
 USER_GROUP_NAME=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.user_group_name.value)
 MODULE_DEPLOYMENT_BUCKET_NAME=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.module_deployment_bucket_name.value)
 GITHUB_URL=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.git_repo_url.value)
+GITHUB_BRANCH=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.git_repo_branch.value)
 GIT_TOKEN_SECRET_KEY_NAME=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.git_personal_access_token_secret_id.value)
 cd $WEBAPP_DIR
 
@@ -70,6 +71,7 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=${FIREBASE_MEASUREMENT_ID}
 
 # Github Configuration
 NEXT_PUBLIC_GIT_URL=${GITHUB_URL}
+NEXT_PUBLIC_GIT_BRANCH=${GITHUB_BRANCH}
 NEXT_PUBLIC_GIT_API_URL=${GITHUB_API_URL}
 
 # Google Cloud Configuration

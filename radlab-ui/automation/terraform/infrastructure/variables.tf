@@ -139,12 +139,6 @@ variable "git_ref" {
   default     = "refs/heads/main"
 }
 
-variable "git_repo_branch" {
-  description = "Branch that should be used to build the modules."
-  type        = string
-  default     = "^main$"
-}
-
 variable "git_repo_access_token" {
   description = "Name for the secret that will store the Personal Access Token for the UI to talk to GitHub repository."
   type        = string
