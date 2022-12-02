@@ -66,7 +66,7 @@ In addition to the [module](../modules) specific minimum [IAM](https://cloud.goo
 You can use the Google Cloud Console to [view](https://cloud.google.com/iam/docs/manage-access-other-resources) or [change](https://cloud.google.com/iam/docs/manage-access-other-resources#single-role) IAM permissions.
 
 ## Deploy a RAD Lab Module
-**If you encounter errors during deployment, please see [Troubleshooting Common Problems](../docs/TROUBLESHOOTING.md) section for a list of common problems and fixes.**  If you don't see a solution listed, please create an [Issue](https://github.com/GoogleCloudPlatform/rad-lab/issues). 
+**If you encounter errors during deployment, please see [Troubleshooting Common Problems](https://googlecloudplatform.github.io/rad-lab/docs/rad-lab-launcher/troubleshooting) section for a list of common problems and fixes.**  If you don't see a solution listed, please create an [Issue](https://github.com/GoogleCloudPlatform/rad-lab/issues). 
 
 
 1. Navigate to the RAD Lab Launcher folder from the main directory:
@@ -171,11 +171,11 @@ TERRAFORM DEPLOYMENT COMPLETED!!!
 
 NOTE: Save the **deployment_id** for future reference, for making any updates or delete the RAD Lab Module created.
 
-NOTE: If you see any errors on your deployment run please follow the [Troubleshooting doc](../docs/TROUBLESHOOTING.md#rad-lab-troubleshooting) to lookup for errors and corresponding solutions.
+NOTE: If you see any errors on your deployment run please follow the [Troubleshooting doc](https://googlecloudplatform.github.io/rad-lab/docs/rad-lab-launcher/troubleshooting) to lookup for errors and corresponding solutions.
 
 ## Troubleshooting Common Problems
 
-1. [Project quota exceeded](../docs/TROUBLESHOOTING.md#project-quota-exceeded)
-2. [Unable to modify Organization Policy Constraints](../docs/TROUBLESHOOTING.md#google-organization-policies---unable-to-modify-constraints)
-3. [Local Terraform Deployment ID Directory Already Exists](../docs/TROUBLESHOOTING.md#local-terraform-deployment-id-directory-already-exists)
-4. [Timeout when Destroying the deployment](../docs/TROUBLESHOOTING.md#timeout-when-destroying-the-deployment)
+1. [Project quota exceeded](https://googlecloudplatform.github.io/rad-lab/docs/rad-lab-launcher/troubleshooting.md#project-quota-exceeded)
+2. [Unable to modify Organization Policy Constraints](https://googlecloudplatform.github.io/rad-lab/docs//rad-lab-launcher/troubleshooting.md#google-organization-policies---unable-to-modify-constraints)
+3. [Local Terraform Deployment ID Directory Already Exists](https://googlecloudplatform.github.io/rad-lab/docs//rad-lab-launcher/troubleshooting.md#local-terraform-deployment-id-directory-already-exists)
+4. [Timeout when Destroying the deployment](https://googlecloudplatform.github.io/rad-lab/docs//rad-lab-launcher/troubleshooting.md#timeout-when-destroying-the-deployment)

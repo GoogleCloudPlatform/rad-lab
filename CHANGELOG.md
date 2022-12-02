@@ -15,6 +15,20 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [10.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v10.0.0) (2022-11-14)
+ 
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v9.1.1...v10.0.0) 
+
+### Added
+- _RAD Lab UI:_ Releasing RAD Lab UI [(#85)](https://github.com/GoogleCloudPlatform/rad-lab/pull/85)
+- _RAD Lab Module:_ Releasing RAD Lab NEON Module [(#87)](https://github.com/GoogleCloudPlatform/rad-lab/pull/87)
+- _Repo:_ Releasing RAD Lab Documentation [(#85)](https://github.com/GoogleCloudPlatform/rad-lab/pull/85)
+ 
+### Fixed
+- _RAD Lab Module:_ Fixed deployment issue for Silicon Design module. [(#86)](https://github.com/GoogleCloudPlatform/rad-lab/pull/86)
+- _RAD Lab Module:_ Updated nodepool image in AppModElastic module. [(#83)](https://github.com/GoogleCloudPlatform/rad-lab/pull/83)
+- _RAD Lab Module:_ Removed hardcoded references for zones in WebHosting module. [(#82)](https://github.com/GoogleCloudPlatform/rad-lab/pull/82)
+
 ## [9.1.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v9.1.1) (2022-10-21)
  
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v9.0.0...v9.1.1) 
