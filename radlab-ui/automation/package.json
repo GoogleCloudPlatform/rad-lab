@@ -1,0 +1,31 @@
+{
+  "name": "rad-lab-test",
+  "version": "1.0.0",
+  "description": "RAD Lab enables users to deploy infrastructure on Google Cloud Platform (GCP) to support specific use cases. Infrastructure is created and managed through [Terraform](https://www.terraform.io/) in conjunction with support scripts written in Python. The templates, code, and documentation for each use case are bundled into [modules](./modules).",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "startSettingsListener": "node pubsub/settingsListener.js",
+    "startDeploymentsListener": "node pubsub/deploymentListener.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cvadepalli/rad-lab-test.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cvadepalli/rad-lab-test/issues"
+  },
+  "homepage": "https://github.com/cvadepalli/rad-lab-test#readme",
+  "dependencies": {
+    "@google-cloud/iam-credentials": "^2.0.1",
+    "@google-cloud/pubsub": "^3.0.1",
+    "@google-cloud/storage": "^6.2.2",
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1"
+  }
+}
