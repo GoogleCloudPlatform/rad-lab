@@ -94,6 +94,15 @@ locals {
     )
   ]))
 
+  projects_ids = {
+    data_ingestion   = module.project_radlab_sdw_data_ingest.project_id,
+    governance       = module.project_radlab_sdw_data_govern.project_id,
+    non_confidential = module.project_radlab_sdw_non_conf_data.project_id,
+    confidential     = module.project_radlab_sdw_conf_data.project_id
+  }
+
+  key_rotation_period_seconds = "2592000s" #30 days
+
 }
 
 resource "random_id" "default" {
@@ -189,9 +198,12 @@ resource "google_project_service" "enabled_services_non_conf_data" {
 }
 
 # resource "google_access_context_manager_access_policy" "access-policy" {
+#   for_each = local.projects_ids
+
 #   parent = "organizations/${var.organization_id}"
 #   title  = "Org Access Policy"
 #   # scopes = ["folders/${var.folder_id}"]
+#   scopes = ["projects/${each.value}"]
 # }
 
 
@@ -211,7 +223,7 @@ module "secured_data_warehouse" {
   cmek_keyring_name                = format("radlab-keyring-%s", local.random_id)
   pubsub_resource_location         = var.region
   location                         = var.region
-  # delete_contents_on_destroy       = var.delete_contents_on_destroy
+  delete_contents_on_destroy       = var.delete_contents_on_destroy
   perimeter_additional_members     = local.perimeter_additional_members
   sdx_project_number               = module.project_radlab_sdw_conf_data.project_number
   data_engineer_group              = var.data_engineer_group
@@ -219,4 +231,29 @@ module "secured_data_warehouse" {
   security_analyst_group           = var.security_analyst_group
   network_administrator_group      = var.network_administrator_group
   security_administrator_group     = var.security_administrator_group
+}
+
+module "iam_projects" {
+  source = "GoogleCloudPlatform/secured-data-warehouse/google//test/setup/iam-projects"
+
+  data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
+  non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
+  data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
+  confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
+  service_account_email            = var.resource_creator_identity
+}
+
+module "centralized_logging" {
+  source                      = "GoogleCloudPlatform/secured-data-warehouse/google//modules/centralized-logging"
+  projects_ids                = local.projects_ids
+  logging_project_id          = module.project_radlab_sdw_data_govern.project_id
+  kms_project_id              = module.project_radlab_sdw_data_govern.project_id
+  bucket_name                 = "bkt-logging-${module.project_radlab_sdw_data_govern.project_id}"
+  logging_location            = var.region
+  delete_contents_on_destroy  = var.delete_contents_on_destroy
+  key_rotation_period_seconds = local.key_rotation_period_seconds
+
+  depends_on = [
+    module.iam_projects
+  ]
 }

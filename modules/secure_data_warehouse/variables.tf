@@ -150,6 +150,12 @@ variable "security_administrator_group" {
   type        = string
 }
 
+variable "delete_contents_on_destroy" {
+  description = "(Optional) If set to true, delete all the tables in the dataset when destroying the resource; otherwise, destroying the resource will fail if tables are present."
+  type        = bool
+  default     = false
+}
+
 variable "network_administrator_group" {
   description = "Google Cloud IAM group that reviews network configuration. Typically, this includes members of the networking team."
   type        = string
