@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+variable "access_context_manager_policy_id" {
+  description = "The id of the default Access Context Manager policy. Can be obtained by running `gcloud access-context-manager policies list --organization YOUR-ORGANIZATION_ID --format=\"value(name)\"`."
+  type        = string
+  default     = ""
+}
+
 variable "billing_account_id" {
   description = "Billing Account associated to the GCP Resources.  {{UIMeta group=0 order=3 updatesafe }}"
   type        = string
