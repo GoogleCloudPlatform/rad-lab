@@ -191,3 +191,25 @@ variable "owner_groups" {
   type        = list(string)
   default     = []
 }
+variable "docker_repository_id" {
+  description = "ID of the docker flex template repository."
+  type        = string
+  default     = "flex-templates"
+}
+
+variable "python_repository_id" {
+  description = "ID of the Python repository."
+  type        = string
+  default     = "python-modules"
+}
+
+variable "location" {
+  description = "The location of Artifact registry. Run `gcloud artifacts locations list` to list available locations."
+  type        = string
+  default     = "us-east4"
+}
+variable "subnet_ip" {
+  description = "The CDIR IP range of the subnetwork."
+  type        = string
+  default = "10.0.0.0/16"
+}

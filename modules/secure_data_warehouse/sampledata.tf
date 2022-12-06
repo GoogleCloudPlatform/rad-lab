@@ -24,6 +24,17 @@ resource "google_storage_bucket_object" "file_upload" {
   source = "${path.module}/scripts/build/dataset/drivers_license.csv"
 }
 
+resource "google_storage_bucket_object" "template_upload" {
+  name   = "template"
+  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
+  source = "${path.module}/templates/deidentification.tpl"
+}
+resource "google_storage_bucket_object" "schema_upload" {
+  name   = "schema"
+  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
+  source = "${path.module}/templates/schema.tpl"
+}
+
 resource "google_bigquery_table" "sdw_non_conf_sample_data" {
   dataset_id = format("radlab_dataset_%s", local.random_id)
   table_id   = "non-conf-sample-data"
