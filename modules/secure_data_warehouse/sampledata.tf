@@ -20,18 +20,18 @@ data "google_storage_bucket" "sdw-data-ingest" {
 
 resource "google_storage_bucket_object" "file_upload" {
   name   = "drivers_license"
-  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
+  bucket = data.google_storage_bucket.sdw-data-ingest.name
   source = "${path.module}/scripts/build/dataset/drivers_license.csv"
 }
 
 resource "google_storage_bucket_object" "template_upload" {
   name   = "template"
-  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
+  bucket = data.google_storage_bucket.sdw-data-ingest.name
   source = "${path.module}/templates/deidentification.tpl"
 }
 resource "google_storage_bucket_object" "schema_upload" {
   name   = "schema"
-  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
+  bucket = data.google_storage_bucket.sdw-data-ingest.name
   source = "${path.module}/templates/schema.tpl"
 }
 
