@@ -48,7 +48,8 @@ locals {
     "dlp.googleapis.com",
     "iam.googleapis.com",
     "serviceusage.googleapis.com",
-    "storage-api.googleapis.com"
+    "storage-api.googleapis.com",
+    "secretmanager.googleapis.com"
   ]
 
   project_services_data_govern = var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis_data_govern,["pubsub.googleapis.com"])) : local.default_apis_data_govern
@@ -94,14 +95,7 @@ locals {
     )
   ]))
 
-  projects_ids = {
-    data_ingestion   = module.project_radlab_sdw_data_ingest.project_id,
-    governance       = module.project_radlab_sdw_data_govern.project_id,
-    non_confidential = module.project_radlab_sdw_non_conf_data.project_id,
-    confidential     = module.project_radlab_sdw_conf_data.project_id
-  }
-
-  key_rotation_period_seconds = "2592000s" #30 days
+  gcloud_impersonate_flag = length(var.resource_creator_identity) != 0 ? "--impersonate-service-account=${var.resource_creator_identity}" : ""
 
 }
 
@@ -197,16 +191,6 @@ resource "google_project_service" "enabled_services_non_conf_data" {
   disable_on_destroy         = true
 }
 
-# resource "google_access_context_manager_access_policy" "access-policy" {
-#   for_each = local.projects_ids
-
-#   parent = "organizations/${var.organization_id}"
-#   title  = "Org Access Policy"
-#   # scopes = ["folders/${var.folder_id}"]
-#   scopes = ["projects/${each.value}"]
-# }
-
-
 module "secured_data_warehouse" {
   source  = "GoogleCloudPlatform/secured-data-warehouse/google"
   version = "0.2.0"
@@ -217,7 +201,7 @@ module "secured_data_warehouse" {
   non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
   data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
   terraform_service_account        = var.resource_creator_identity
-  # access_context_manager_policy_id = google_access_context_manager_access_policy.access-policy.id
+  access_context_manager_policy_id = var.access_context_manager_policy_id
   bucket_name                      = format("radlab-bucket-%s", local.random_id)
   dataset_id                       = format("radlab_dataset_%s", local.random_id)
   cmek_keyring_name                = format("radlab-keyring-%s", local.random_id)
@@ -241,19 +225,4 @@ module "iam_projects" {
   data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
   confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
   service_account_email            = var.resource_creator_identity
-}
-
-module "centralized_logging" {
-  source                      = "GoogleCloudPlatform/secured-data-warehouse/google//modules/centralized-logging"
-  projects_ids                = local.projects_ids
-  logging_project_id          = module.project_radlab_sdw_data_govern.project_id
-  kms_project_id              = module.project_radlab_sdw_data_govern.project_id
-  bucket_name                 = "bkt-logging-${module.project_radlab_sdw_data_govern.project_id}"
-  logging_location            = var.region
-  delete_contents_on_destroy  = var.delete_contents_on_destroy
-  key_rotation_period_seconds = local.key_rotation_period_seconds
-
-  depends_on = [
-    module.iam_projects
-  ]
 }
