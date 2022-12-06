@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+variable "access_context_manager_policy_id" {
+  description = "The id of the default Access Context Manager policy. Can be obtained by running `gcloud access-context-manager policies list --organization YOUR-ORGANIZATION_ID --format=\"value(name)\"`."
+  type        = string
+  default     = ""
+}
+
 variable "billing_account_id" {
   description = "Billing Account associated to the GCP Resources.  {{UIMeta group=0 order=3 updatesafe }}"
   type        = string
@@ -150,6 +156,12 @@ variable "security_administrator_group" {
   type        = string
 }
 
+variable "delete_contents_on_destroy" {
+  description = "(Optional) If set to true, delete all the tables in the dataset when destroying the resource; otherwise, destroying the resource will fail if tables are present."
+  type        = bool
+  default     = false
+}
+
 variable "network_administrator_group" {
   description = "Google Cloud IAM group that reviews network configuration. Typically, this includes members of the networking team."
   type        = string
@@ -168,4 +180,36 @@ variable "data_analyst_group" {
 variable "data_engineer_group" {
   description = "Google Cloud IAM group that sets up and maintains the data pipeline and warehouse."
   type        = string
+}
+variable "owner_users" {
+  description = "List of users that should be added as owner to the created project."
+  type        = list(string)
+  default     = []
+}
+variable "owner_groups" {
+  description = "List of groups that should be added as the owner of the created project."
+  type        = list(string)
+  default     = []
+}
+variable "docker_repository_id" {
+  description = "ID of the docker flex template repository."
+  type        = string
+  default     = "flex-templates"
+}
+
+variable "python_repository_id" {
+  description = "ID of the Python repository."
+  type        = string
+  default     = "python-modules"
+}
+
+variable "location" {
+  description = "The location of Artifact registry. Run `gcloud artifacts locations list` to list available locations."
+  type        = string
+  default     = "us-east4"
+}
+variable "subnet_ip" {
+  description = "The CDIR IP range of the subnetwork."
+  type        = string
+  default = "10.0.0.0/16"
 }

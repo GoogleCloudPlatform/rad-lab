@@ -48,7 +48,8 @@ locals {
     "dlp.googleapis.com",
     "iam.googleapis.com",
     "serviceusage.googleapis.com",
-    "storage-api.googleapis.com"
+    "storage-api.googleapis.com",
+    "secretmanager.googleapis.com"
   ]
 
   project_services_data_govern = var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis_data_govern,["pubsub.googleapis.com"])) : local.default_apis_data_govern
@@ -93,6 +94,8 @@ locals {
       length(regexall("gserviceaccount.com", "${i}")) > 0 ? "serviceAccount:${i}" : "user:${i}"
     )
   ]))
+
+  gcloud_impersonate_flag = length(var.resource_creator_identity) != 0 ? "--impersonate-service-account=${var.resource_creator_identity}" : ""
 
 }
 
@@ -188,13 +191,6 @@ resource "google_project_service" "enabled_services_non_conf_data" {
   disable_on_destroy         = true
 }
 
-# resource "google_access_context_manager_access_policy" "access-policy" {
-#   parent = "organizations/${var.organization_id}"
-#   title  = "Org Access Policy"
-#   # scopes = ["folders/${var.folder_id}"]
-# }
-
-
 module "secured_data_warehouse" {
   source  = "GoogleCloudPlatform/secured-data-warehouse/google"
   version = "0.2.0"
@@ -205,13 +201,13 @@ module "secured_data_warehouse" {
   non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
   data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
   terraform_service_account        = var.resource_creator_identity
-  # access_context_manager_policy_id = google_access_context_manager_access_policy.access-policy.id
+  access_context_manager_policy_id = var.access_context_manager_policy_id
   bucket_name                      = format("radlab-bucket-%s", local.random_id)
   dataset_id                       = format("radlab_dataset_%s", local.random_id)
   cmek_keyring_name                = format("radlab-keyring-%s", local.random_id)
   pubsub_resource_location         = var.region
   location                         = var.region
-  # delete_contents_on_destroy       = var.delete_contents_on_destroy
+  delete_contents_on_destroy       = var.delete_contents_on_destroy
   perimeter_additional_members     = local.perimeter_additional_members
   sdx_project_number               = module.project_radlab_sdw_conf_data.project_number
   data_engineer_group              = var.data_engineer_group
@@ -219,4 +215,14 @@ module "secured_data_warehouse" {
   security_analyst_group           = var.security_analyst_group
   network_administrator_group      = var.network_administrator_group
   security_administrator_group     = var.security_administrator_group
+}
+
+module "iam_projects" {
+  source = "GoogleCloudPlatform/secured-data-warehouse/google//test/setup/iam-projects"
+
+  data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
+  non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
+  data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
+  confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
+  service_account_email            = var.resource_creator_identity
 }
