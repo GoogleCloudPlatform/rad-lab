@@ -8,6 +8,18 @@ This is the primary flow and purpose for RAD Lab UI. A step-by-step graphical in
 
 Admins and Users are both able to deploy modules.
 
+Below video provides a quick overview on how to setup RAD Lab UI and deploy RAD Lab modules with the same.
+
+<iframe
+    width="980"
+    height="480"
+    src="https://www.youtube.com/embed/Ir79gCzleLU"
+    frameborder="0"
+    allow="autoplay; encrypted-media"
+    allowfullscreen
+>
+</iframe>
+
 ## Prerequisites
 
 Users can only deploy modules that Admins have explicitly published. If there are no options available, please talk to your Admin.
