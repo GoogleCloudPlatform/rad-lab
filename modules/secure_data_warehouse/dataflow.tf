@@ -14,7 +14,7 @@ locals {
   source = "GoogleCloudPlatform/secured-data-warehouse/google//modules/dataflow-flex-job"
   project_id              = module.project_radlab_sdw_data_ingest.project_id
   name                    = "dataflow-flex-regional-dlp-deid-job-python-query"
-  container_spec_gcs_path = "gs://bkt-radlab-sdw-data-ingest-7ea8-radlab-bucket-7ea8-ebb5260f/template"
+  container_spec_gcs_path = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/template"
   job_language            = "PYTHON"
   region                  = local.location
   service_account_email   = module.secured_data_warehouse.dataflow_controller_service_account_email
@@ -43,7 +43,7 @@ module "regional_reid_pipeline" {
 
   project_id              = module.project_radlab_sdw_conf_data.project_id
   name                    = "dataflow-flex-regional-dlp-reid-job-python-query"
-  container_spec_gcs_path = "gs://bkt-radlab-sdw-data-ingest-7ea8-radlab-bucket-7ea8-ebb5260f/template"
+  container_spec_gcs_path = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/template"
   job_language            = "PYTHON"
   region                  = local.location
   service_account_email   = module.secured_data_warehouse.dataflow_controller_service_account_email
@@ -70,7 +70,7 @@ module "regional_reid_pipeline" {
   region                  = local.location
   service_account_email   = module.secured_data_warehouse.dataflow_controller_service_account_email
   kms_key_name            = module.secured_data_warehouse.cmek_data_ingestion_crypto_key
-  template_gcs_path = "gs://bkt-radlab-sdw-data-ingest-7ea8-radlab-bucket-7ea8-ebb5260f/template"
+  template_gcs_path = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/template"
   temp_gcs_location = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/tmp/"
   parameters = {
    query                          = "SELECT email, name, street, city, state, zip, dob, dl_id, exp_date FROM [bigquery-public-data:irs_990.irs_990_ein] LIMIT 10000"
