@@ -5,12 +5,6 @@ locals {
     key_rotation_period_seconds         = "2592000s" #30 days
     use_temporary_crypto_operator_role  = true
 
-    projects_ids = {
-        data_ingestion   = module.project_radlab_sdw_data_ingest.project_id,
-        governance       = module.project_radlab_sdw_data_govern.project_id,
-        non_confidential = module.project_radlab_sdw_non_conf_data.project_id,
-        confidential     = module.project_radlab_sdw_conf_data.project_id
-  }
 }
 
 module "kek" {
@@ -89,19 +83,4 @@ module "de_identification_template" {
   dlp_location              = var.region
   template_id_prefix        = "de_identification"
   template_file             = "${path.module}/templates/deidentification.tpl"
-}
-
-module "centralized_logging" {
-  source                      = "GoogleCloudPlatform/secured-data-warehouse/google//modules/centralized-logging"
-  projects_ids                = local.projects_ids
-  logging_project_id          = module.project_radlab_sdw_data_govern.project_id
-  kms_project_id              = module.project_radlab_sdw_data_govern.project_id
-  bucket_name                 = "bkt-logging-${module.project_radlab_sdw_data_govern.project_id}"
-  logging_location            = var.region
-  delete_contents_on_destroy  = var.delete_contents_on_destroy
-  key_rotation_period_seconds = local.key_rotation_period_seconds
-
-  depends_on = [
-    module.iam_projects
-  ]
 }

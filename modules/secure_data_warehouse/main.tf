@@ -226,3 +226,23 @@ module "iam_projects" {
   confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
   service_account_email            = var.resource_creator_identity
 }
+
+module "centralized_logging" {
+  source                      = "GoogleCloudPlatform/secured-data-warehouse/google//modules/centralized-logging"
+  projects_ids                = {
+                                  data_ingestion   = module.project_radlab_sdw_data_ingest.project_id,
+                                  governance       = module.project_radlab_sdw_data_govern.project_id,
+                                  non_confidential = module.project_radlab_sdw_non_conf_data.project_id,
+                                  confidential     = module.project_radlab_sdw_conf_data.project_id
+                                }
+  logging_project_id          = module.project_radlab_sdw_data_govern.project_id
+  kms_project_id              = module.project_radlab_sdw_data_govern.project_id
+  bucket_name                 = "bkt-logging-${module.project_radlab_sdw_data_govern.project_id}"
+  logging_location            = var.region
+  delete_contents_on_destroy  = var.delete_contents_on_destroy
+  key_rotation_period_seconds = local.key_rotation_period_seconds
+
+  depends_on = [
+    module.iam_projects
+  ]
+}
