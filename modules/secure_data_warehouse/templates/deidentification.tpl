@@ -8,10 +8,10 @@
                     {
                         "fields": [
                             {
-                                "name": "Email"
+                                "name": "email"
                             },
                             {
-                                "name": "DriverLicenseID"
+                                "name": "dl_id"
                             }
                         ],
                         "primitiveTransformation": {

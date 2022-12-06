@@ -87,6 +87,7 @@ module "de_identification_template" {
   crypto_key                = module.kek.keys[local.kek_key_name]
   wrapped_key               = chomp(data.google_secret_manager_secret_version.wrapped_key.secret_data)
   dlp_location              = var.region
+  template_id_prefix        = "de_identification"
   template_file             = "${path.module}/templates/deidentification.tpl"
 }
 
