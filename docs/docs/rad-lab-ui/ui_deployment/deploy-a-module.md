@@ -15,7 +15,7 @@ Below video provides a quick overview on how to setup RAD Lab UI and deploy RAD 
     height="480"
     src="https://www.youtube.com/embed/Ir79gCzleLU"
     frameborder="0"
-    allow="autoplay; encrypted-media"
+    allow="encrypted-media"
     allowfullscreen
 >
 </iframe>
