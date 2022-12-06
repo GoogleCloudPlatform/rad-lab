@@ -8,7 +8,7 @@ This is the primary flow and purpose for RAD Lab UI. A step-by-step graphical in
 
 Admins and Users are both able to deploy modules.
 
-Below video provides a quick overview on how to setup RAD Lab UI and deploy RAD Lab modules with the same.
+The video below provides a quick overview on how to setup RAD Lab UI variables and deploy RAD Lab modules.
 
 <iframe
     width="980"
