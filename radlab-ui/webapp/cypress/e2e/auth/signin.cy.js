@@ -55,7 +55,7 @@ describe("RAD Lab UI sign in", () => {
 
   it(
     "signs in with unauthorized user",
-    { defaultCommandTimeout: 10000 },
+    { defaultCommandTimeout: 30000 },
     () => {
       cy.get("#email").type(UNAUTHORIZED_EMAIL)
       cy.get("#password").type(CORRECT_PASSWORD)

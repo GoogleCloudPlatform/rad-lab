@@ -50,14 +50,14 @@ yarn-error.log*
 
 # Terraform files
 terraform.tfvars
-**/.terraform/**
+**/.terraform*
 **/backend.tf
 *.tfstate
 *.tfstate.*
 *.lock.hcl
+*.out
 
 venv
-**/.terraform/*
 crash.log
 credentials.json
 .vscode/
@@ -76,3 +76,6 @@ radlab-launcher/deployments/*
 
 terraform.tfvars
 backend.tf
+
+# Cypress
+*.cy.js.mp4

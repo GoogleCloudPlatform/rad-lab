@@ -21,6 +21,7 @@ on:
       - main
   push:
     branches:
+      - staging
       - feature/e2e-testing
 jobs:
   unit-tests:

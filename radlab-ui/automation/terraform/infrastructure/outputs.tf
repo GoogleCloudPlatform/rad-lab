@@ -50,6 +50,10 @@ output "git_repo_url" {
   value = var.git_repo_url
 }
 
+output "git_repo_branch" {
+  value = element(split("/", var.git_ref), length(split("/", var.git_ref)) - 1)
+}
+
 output "module_deployment_bucket_name" {
   value = google_storage_bucket.radlab_module_deployments_storage.name
 }

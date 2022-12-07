@@ -38,7 +38,6 @@
     "next-swagger-doc": "^0.3.4",
     "ramda": "^0.28.0",
     "react": "^17.0.2",
-    "react-chartjs-2": "^4.2.0",
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.3.0",
     "styled-jsx-plugin-postcss": "^4.0.1",

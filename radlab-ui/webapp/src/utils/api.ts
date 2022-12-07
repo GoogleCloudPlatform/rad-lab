@@ -32,6 +32,11 @@ const NEXT_PUBLIC_GIT_API_URL = envOrFail(
   process.env.NEXT_PUBLIC_GIT_API_URL,
 )
 
+const NEXT_PUBLIC_GIT_BRANCH = envOrFail(
+  "NEXT_PUBLIC_GIT_BRANCH",
+  process.env.NEXT_PUBLIC_GIT_BRANCH,
+)
+
 export const generateAccessToken = async function () {
   try {
     // Creates a client
@@ -161,7 +166,7 @@ export const getGitHubModules = async (token: string) => {
   try {
     const result = await axios({
       method: "GET",
-      url: `${NEXT_PUBLIC_GIT_API_URL}/contents/modules`,
+      url: `${NEXT_PUBLIC_GIT_API_URL}/contents/modules?ref=${NEXT_PUBLIC_GIT_BRANCH}`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -177,7 +182,7 @@ export const getGitHubVariables = async (moduleName: string, token: string) => {
   try {
     const result = await axios({
       method: "GET",
-      url: `${NEXT_PUBLIC_GIT_API_URL}/contents/modules/${moduleName}/variables.tf`,
+      url: `${NEXT_PUBLIC_GIT_API_URL}/contents/modules/${moduleName}/variables.tf?ref=${NEXT_PUBLIC_GIT_BRANCH}`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
