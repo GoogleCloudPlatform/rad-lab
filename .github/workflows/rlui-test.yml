@@ -71,7 +71,7 @@ jobs:
     - name: "Install Node dependencies"
       run: npm ci
     - name: Test Cases
-      run: npm e2e
+      run: npm run e2e
   build:
     name: NextJS Build
     runs-on: ubuntu-latest
