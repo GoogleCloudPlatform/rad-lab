@@ -209,12 +209,16 @@ module "secured_data_warehouse" {
   location                         = var.region
   delete_contents_on_destroy       = var.delete_contents_on_destroy
   perimeter_additional_members     = local.perimeter_additional_members
-  sdx_project_number               = module.project_radlab_sdw_conf_data.project_number
+  sdx_project_number               = module.project_radlab_sdw_data_ingest.project_number
   data_engineer_group              = var.data_engineer_group
   data_analyst_group               = var.data_analyst_group
   security_analyst_group           = var.security_analyst_group
   network_administrator_group      = var.network_administrator_group
   security_administrator_group     = var.security_administrator_group
+
+  depends_on = [
+    time_sleep.wait_120_seconds
+  ]
 }
 
 module "iam_projects" {
@@ -225,6 +229,10 @@ module "iam_projects" {
   data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
   confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
   service_account_email            = var.resource_creator_identity
+  
+  depends_on = [
+    time_sleep.wait_120_seconds
+  ]
 }
 
 module "centralized_logging" {

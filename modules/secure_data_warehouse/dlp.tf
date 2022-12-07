@@ -19,6 +19,10 @@ module "kek" {
   keys                 = [local.kek_key_name]
   key_protection_level = "HSM"
   prevent_destroy      = !var.delete_contents_on_destroy
+
+  depends_on = [
+    time_sleep.wait_120_seconds
+  ]
 }
 
 resource "google_secret_manager_secret" "wrapped_key_secret" {

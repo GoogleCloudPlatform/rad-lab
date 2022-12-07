@@ -67,7 +67,7 @@ generate_wrapped_key() {
     --project="${project_id}"
 
     if [ ${temporary_crypto_operator_role} == "true" ]; then
-      gcloud kms keys remove-iam-policy-binding ${key_name} --keyring=${key_ring} --location=${key_location} --member=serviceAccount:${terraform_service_account} --role=roles/cloudkms.cryptoOperator --project=${project_id}
+      gcloud kms keys remove-iam-policy-binding ${key_name} --keyring=${key_ring} --location=${key_location} --member=serviceAccount:${terraform_service_account} --role=roles/cloudkms.cryptoOperator --project=${project_id} ${gcloud_impersonate_flag}
     fi
 }
 

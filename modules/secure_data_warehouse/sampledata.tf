@@ -13,48 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-data "google_storage_bucket" "sdw-data-ingest" {
-  name = module.secured_data_warehouse.data_ingestion_bucket_name
-}
 
 resource "google_storage_bucket_object" "file_upload" {
   name   = "drivers_license"
-  bucket = data.google_storage_bucket.sdw-data-ingest.name
+  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
   source = "${path.module}/scripts/build/dataset/drivers_license.csv"
 }
 
 resource "google_storage_bucket_object" "template_upload" {
   name   = "template"
-  bucket = data.google_storage_bucket.sdw-data-ingest.name
+  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
   source = "${path.module}/templates/deidentification.tpl"
 }
+
 resource "google_storage_bucket_object" "schema_upload" {
   name   = "schema"
-  bucket = data.google_storage_bucket.sdw-data-ingest.name
+  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
   source = "${path.module}/templates/schema.tpl"
 }
 
-resource "google_bigquery_table" "sdw_non_conf_sample_data" {
-  dataset_id = format("radlab_dataset_%s", local.random_id)
-  table_id   = "non-conf-sample-data"
-  project             = module.project_radlab_sdw_non_conf_data.project_id
-  deletion_protection = false 
-  external_data_configuration {
-    autodetect    = true
-    source_format = "CSV"
-
-    csv_options {
-      quote                 = ""
-        allow_jagged_rows     = false 
-        allow_quoted_newlines = false
-        encoding              = "UTF-8"
-        field_delimiter       = ","
-        skip_leading_rows     = 1
-    }
-
-    source_uris = [
-      "${data.google_storage_bucket.sdw-data-ingest.url}/${google_storage_bucket_object.file_upload.output_name}",
-    ]
-  }
+data "google_storage_bucket" "sdw-data-ingest" {
+  name = module.secured_data_warehouse.data_ingestion_bucket_name
 }
+
+# resource "google_bigquery_table" "sdw_data_ingest_sample_data" {
+#   dataset_id          = module.secured_data_warehouse.data_ingestion_bigquery_dataset.dataset_id
+#   table_id            = "dl_data"
+#   project             = module.project_radlab_sdw_data_ingest.project_id
+#   deletion_protection = false 
+#   external_data_configuration {
+#     autodetect    = true
+#     source_format = "CSV"
+
+#     csv_options {
+#       quote                 = ""
+#       allow_jagged_rows     = false 
+#       allow_quoted_newlines = false
+#       encoding              = "UTF-8"
+#       field_delimiter       = ","
+#       skip_leading_rows     = 1
+#     }
+
+#     source_uris = [
+#       "${data.google_storage_bucket.sdw-data-ingest.url}/${google_storage_bucket_object.file_upload.output_name}",
+#     ]
+#   }
+# }

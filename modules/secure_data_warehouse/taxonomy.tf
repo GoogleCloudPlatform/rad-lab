@@ -127,10 +127,10 @@ resource "google_data_catalog_policy_tag" "sensitive_tags" {
 }
 
 resource "google_bigquery_table" "re_id" {
-  dataset_id          = "secured_dataset"
+  dataset_id          = local.confidential_dataset_id
   project             = module.project_radlab_sdw_conf_data.project_id
-  table_id            = "dl_re_id"
-  friendly_name       = "dl_re_id"
+  table_id            = local.confidential_table_id
+  friendly_name       = local.confidential_table_id
   deletion_protection = !var.delete_contents_on_destroy
 
   schema = templatefile("${path.module}/templates/schema.tpl",
