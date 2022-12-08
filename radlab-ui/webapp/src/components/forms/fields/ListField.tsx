@@ -49,11 +49,19 @@ const ListField: React.FC<ListField> = ({ variable }) => {
           return (
             <div>
               {values[variable.name].map((setvalue: string, index: number) => (
-                <div key={index} className="badge badge-info gap-2 m-1">
-                  <span>{setvalue}</span>
+                <div
+                  key={index}
+                  className="badge badge-info gap-1 mt-2 w-auto h-auto py-1 px-2 md:py-1 md:px-4"
+                >
+                  <span
+                    className="text-xs w-11/12"
+                    style={{ overflowWrap: "anywhere" }}
+                  >
+                    {setvalue}
+                  </span>
                   <XIcon
                     onClick={() => remove(index)}
-                    className="h-4 w-4 cursor-pointer"
+                    className="h-6 w-6 cursor-pointer"
                   />
                 </div>
               ))}
