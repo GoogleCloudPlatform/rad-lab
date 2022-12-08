@@ -13,7 +13,7 @@ The video below provides a quick overview on how to setup RAD Lab UI variables a
 <iframe
     width="980"
     height="480"
-    src="https://www.youtube.com/embed/Ir79gCzleLU"
+    src="https://www.youtube.com/embed/8KNDAIb-Z2I"
     frameborder="0"
     allow="encrypted-media"
     allowfullscreen
