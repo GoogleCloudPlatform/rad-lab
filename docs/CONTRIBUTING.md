@@ -17,21 +17,21 @@ again.
 
 ## RAD Lab Repository
 
-We love and encourage your contributions to RAD Lab repo. Follow below steps to contribute on `features` and `bug fixes` for RAD Lab:
+We love and encourage your contributions to the RAD Lab repo. Follow the steps below to contribute on `features` and `bug fixes` for RAD Lab:
 
 1. **Fork** the public [RAD Lab repo](https://github.com/GoogleCloudPlatform/rad-lab)
 2. Create a `feature branch` from the `main` branch of your **forked** repo.
 
     NOTE: Before you create the `feature branch` make sure that the `main` branch of your **forked** repo is in sync with the `main` branch of public RAD Lab repo.
 
-3. Once the development is completed, raise a PR to merge the `feature branch` (of **forked** repo) into [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch of **RAD Lab** public repo.
+3. Once the development is completed, raise a PR to merge the `feature branch` (of your **forked** repo) into [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch of the **RAD Lab** public repo.
 
-    NOTE: Make sure that there are **no conflicts** and most of the _testing is completed on the raised PR itself_.
+    NOTE: Make sure that there are **no conflicts** and the _testing is completed on the raised PR itself_.
 
-4. [Code Owners](../CODEOWNERS) will [review the PR](CONTRIBUTING.md#code-reviews) and merge it into [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch of **RAD Lab** public repo.
-5. GitHub action tests and UI Testing will be done on the internal RAD Lab Staging environment pointing to the [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch of **RAD Lab** public repo.
-6. After all the testing is completed [Code Owners](../CODEOWNERS) with raise a PR from `staging` branch and merge into `main` branch of **RAD Lab** public repo.
-7. Once the PR is merged into `main` branch, [Code Owners](../CODEOWNERS) to **rebase** the `staging` branch from `main` branch of **RAD Lab** public repo.
+4. [Code Owners](../CODEOWNERS) will [review the PR](CONTRIBUTING.md#code-reviews) and squash & merge it into [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch of the **RAD Lab** public repo.
+5. GitHub Actions tests and UI testing will be done on the internal RAD Lab staging environment, which points to the [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch of the **RAD Lab** public repo.
+6. After all the testing is completed, [Code Owners](../CODEOWNERS) with raise a PR from [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch and merge into [`main`](https://github.com/GoogleCloudPlatform/rad-lab/tree/main) branch of the **RAD Lab** public repo.
+7. Once the PR is merged into [`main`](https://github.com/GoogleCloudPlatform/rad-lab/tree/main) branch, [Code Owners](../CODEOWNERS) to **rebase** the [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch from [`main`](https://github.com/GoogleCloudPlatform/rad-lab/tree/main) branch of the **RAD Lab** public repo.
 ## Repository Structure
 
 The project has the following file structure:
