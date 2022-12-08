@@ -30,8 +30,8 @@ We love and encourage your contributions to RAD Lab repo. Follow below steps to 
 
 4. [Code Owners](../CODEOWNERS) will [review the PR](CONTRIBUTING.md#code-reviews) and merge it into [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch of **RAD Lab** public repo.
 5. GitHub action tests and UI Testing will be done on the internal RAD Lab Staging environment pointing to the [`staging`](https://github.com/GoogleCloudPlatform/rad-lab/tree/staging) branch of **RAD Lab** public repo.
-6. After all the testing is completed [Code Owners](../CODEOWNERS) with raise a PR from `staging` branch and merge into `main` branch  of **RAD Lab** public repo.
-
+6. After all the testing is completed [Code Owners](../CODEOWNERS) with raise a PR from `staging` branch and merge into `main` branch of **RAD Lab** public repo.
+7. Once the PR is merged into `main` branch, [Code Owners](../CODEOWNERS) to **rebase** the `staging` branch from `main` branch of **RAD Lab** public repo.
 ## Repository Structure
 
 The project has the following file structure:
