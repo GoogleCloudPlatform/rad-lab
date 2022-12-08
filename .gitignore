@@ -76,3 +76,6 @@ radlab-launcher/deployments/*
 
 terraform.tfvars
 backend.tf
+
+# Cypress
+*.cy.js.mp4

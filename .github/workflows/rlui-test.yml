@@ -19,7 +19,10 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
       - staging
+      - feature/e2e-testing
 jobs:
   unit-tests:
     name: Unit Tests
@@ -45,6 +48,30 @@ jobs:
       run: npm ci
     - name: Test Cases
       run: npm test
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./radlab-ui/webapp
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: npm
+        cache-dependency-path: ./radlab-ui/webapp/package-lock.json 
+    - name: Load .env file
+      uses: xom9ikk/dotenv@v1.0.2
+      with:
+        path: radlab-ui/webapp
+        mode: production
+    - name: "Install Node dependencies"
+      run: npm ci
+    - name: Test Cases
+      run: npm run e2e
   build:
     name: NextJS Build
     runs-on: ubuntu-latest
