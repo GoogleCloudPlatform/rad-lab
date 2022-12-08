@@ -35,8 +35,8 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
     return error
   }
 
-  const zoneGetByRegion = (regionName: string) => {
-    const zoneListData = ZONE_LIST.filter((v) => {
+  const getZoneByRegion = (regionName: string) => {
+    const zoneFilterData = ZONE_LIST.filter((v) => {
       const toMatchData = v.split("-")
       toMatchData.pop()
       const checkMatch = toMatchData.join("-")
@@ -46,12 +46,16 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
         return ""
       }
     })
-    setZoneListData(zoneListData)
+    return zoneFilterData
   }
 
   const onChangeRegion = (event: React.ChangeEvent<HTMLInputElement>) => {
     values[event.target.name] = event.target.value
-    zoneGetByRegion(event.target.value)
+    const zoneByRegion = getZoneByRegion(event.target.value)
+    setZoneListData(zoneByRegion)
+
+    // set first value as default zone while region changed
+    values["zone"] = zoneByRegion[0]
   }
 
   const renderControls = (variable: IUIVariable) => {
@@ -78,7 +82,12 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
 
   useEffect(() => {
     // To dispaly default list of zone based on region
-    zoneGetByRegion(values.region)
+    const zoneByRegion = getZoneByRegion(values.region)
+    setZoneListData(zoneByRegion)
+    // set first value as default zone while load
+    if (!zoneByRegion.includes(values["zone"])) {
+      values["zone"] = zoneByRegion[0]
+    }
   }, [])
 
   return (
