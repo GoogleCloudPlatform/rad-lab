@@ -15,10 +15,6 @@
  */
 
 locals {
-
-  taxonomy_name                   = "secured_taxonomy"
-  taxonomy_display_name           = "${local.taxonomy_name}-${local.random_id}"
-
   confidential_tags = {
     dl = {
       display_name = "US_DL_IDENTIFICATION_DOCUMENT"
@@ -156,6 +152,9 @@ resource "google_bigquery_table" "re_id" {
 
 data "google_bigquery_default_service_account" "bq_sa" {
   project = module.project_radlab_sdw_conf_data.project_id
+  depends_on = [
+    time_sleep.wait_120_seconds
+  ]
 }
 
 resource "google_data_catalog_taxonomy_iam_binding" "confidential_bq_binding" {

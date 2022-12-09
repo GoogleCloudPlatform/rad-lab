@@ -15,242 +15,176 @@
  */
 
 locals {
-  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
-
-  default_apis_data_ingest = [
-    "accesscontextmanager.googleapis.com",
-    "appengine.googleapis.com",
-    "artifactregistry.googleapis.com",
-    "bigquery.googleapis.com",
-    "cloudbilling.googleapis.com",
-    "cloudbuild.googleapis.com",
-    "cloudkms.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "cloudscheduler.googleapis.com",
-    "compute.googleapis.com",
-    "datacatalog.googleapis.com",
-    "dataflow.googleapis.com",
-    "dlp.googleapis.com",
-    "dns.googleapis.com",
-    "iam.googleapis.com",
-    "pubsub.googleapis.com",
-    "serviceusage.googleapis.com",
-    "storage-api.googleapis.com"
-  ]
-  project_services_data_ingest = local.default_apis_data_ingest
-
-  default_apis_data_govern = [
-    "accesscontextmanager.googleapis.com",
-    "cloudbilling.googleapis.com",
-    "cloudkms.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "datacatalog.googleapis.com",
-    "dlp.googleapis.com",
-    "iam.googleapis.com",
-    "serviceusage.googleapis.com",
-    "storage-api.googleapis.com",
-    "secretmanager.googleapis.com"
-  ]
-
-  project_services_data_govern = var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis_data_govern,["pubsub.googleapis.com"])) : local.default_apis_data_govern
-
-  default_apis_non_conf_data = [
-    "accesscontextmanager.googleapis.com",
-    "bigquery.googleapis.com",
-    "cloudbilling.googleapis.com",
-    "cloudkms.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "iam.googleapis.com",
-    "serviceusage.googleapis.com",
-    "storage-api.googleapis.com"
-  ]
-
-  project_services_non_conf_data = local.default_apis_non_conf_data
-
-  default_apis_conf_data = [
-    "accesscontextmanager.googleapis.com",
-    "artifactregistry.googleapis.com",
-    "bigquery.googleapis.com",
-    "cloudbilling.googleapis.com",
-    "cloudbuild.googleapis.com",
-    "cloudkms.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "compute.googleapis.com",
-    "datacatalog.googleapis.com",
-    "dataflow.googleapis.com",
-    "dlp.googleapis.com",
-    "dns.googleapis.com",
-    "iam.googleapis.com",
-    "serviceusage.googleapis.com",
-    "storage-api.googleapis.com"
-  ]
-
-  project_services_conf_data = local.default_apis_conf_data
-
-  enable_services = length(local.project_services_data_ingest)> 0 || length(local.project_services_data_govern)> 0 || length(local.project_services_non_conf_data)> 0 || length(local.project_services_conf_data)> 0 ? true : false
-
-  perimeter_additional_members = distinct(concat([
-    for i in var.perimeter_additional_members : (
-      length(regexall("gserviceaccount.com", "${i}")) > 0 ? "serviceAccount:${i}" : "user:${i}"
-    )
-  ]))
-
-  gcloud_impersonate_flag = length(var.resource_creator_identity) != 0 ? "--impersonate-service-account=${var.resource_creator_identity}" : ""
-
+  non_confidential_dataset_id     = "non_confidential_dataset"
+  confidential_dataset_id         = "secured_dataset"
+  taxonomy_name                   = "secured_taxonomy"
+  taxonomy_display_name           = "${local.taxonomy_name}-${local.random_id}"
+  confidential_table_id           = "dl_re_id"
+  non_confidential_table_id       = "dl_de_id"
+  wrapped_key_secret_data         = chomp(data.google_secret_manager_secret_version.wrapped_key.secret_data)
+  bq_schema_dl                    = "email:STRING, name:STRING, street:STRING, city:STRING, state:STRING, zip:INTEGER, dob:DATE, dl_id:STRING, exp_date:DATE, issue_date:DATE"
+  bigquery_non_confidential_table = "${module.project_radlab_sdw_non_conf_data.project_id}:${local.non_confidential_dataset_id}.${local.non_confidential_table_id}"
+  bigquery_confidential_table     = "${module.project_radlab_sdw_conf_data.project_id}:${local.confidential_dataset_id}.${local.confidential_table_id}"
 }
 
-resource "random_id" "default" {
-  count       = var.deployment_id == null ? 1 : 0
-  byte_length = 2
-}
-
-module "project_radlab_sdw_data_ingest" {
-  # count   = var.create_project ? 1 : 0
-  source  = "terraform-google-modules/project-factory/google"
-  version = "~> 10.0"
-
-  name              = format("%s-data-ingest-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-ingest-1234
-  folder_id         = var.folder_id
-  billing_account   = var.billing_account_id
-  org_id            = var.organization_id
-
-  activate_apis = []
-}
-
-resource "google_project_service" "enabled_services_data_ingest" {
-  for_each                   = toset(local.project_services_data_ingest)
-  project                    = module.project_radlab_sdw_data_ingest.project_id
-  service                    = each.value
-  disable_dependent_services = true
-  disable_on_destroy         = true
-}
-
-module "project_radlab_sdw_data_govern" {
-  # count   = var.create_project ? 1 : 0
-  source  = "terraform-google-modules/project-factory/google"
-  version = "~> 10.0"
-
-  name              = format("%s-data-govern-%s", var.project_id_prefix, local.random_id) #radlab-sdw-data-govern-1234
-  random_project_id = false
-  folder_id         = var.folder_id
-  billing_account   = var.billing_account_id
-  org_id            = var.organization_id
-
-  activate_apis = []
-}
-
-resource "google_project_service" "enabled_services_data_govern" {
-  for_each                   = toset(local.project_services_data_govern)
-  project                    = module.project_radlab_sdw_data_govern.project_id
-  service                    = each.value
-  disable_dependent_services = true
-  disable_on_destroy         = true
-}
-
-module "project_radlab_sdw_conf_data" {
-  # count   = var.create_project ? 1 : 0
-  source  = "terraform-google-modules/project-factory/google"
-  version = "~> 10.0"
-
-  name              = format("%s-conf-data-%s", var.project_id_prefix, local.random_id) #radlab-sdw-conf-data-1234
-  random_project_id = false
-  folder_id         = var.folder_id
-  billing_account   = var.billing_account_id
-  org_id            = var.organization_id
-
-  activate_apis = []
-}
-
-resource "google_project_service" "enabled_services_conf_data" {
-  for_each                   = toset(local.project_services_conf_data)
-  project                    = module.project_radlab_sdw_conf_data.project_id
-  service                    = each.value
-  disable_dependent_services = true
-  disable_on_destroy         = true
-}
-
-module "project_radlab_sdw_non_conf_data" {
-  # count   = var.create_project ? 1 : 0
-  source  = "terraform-google-modules/project-factory/google"
-  version = "~> 10.0"
-
-  name              = format("%s-non-conf-data-%s", var.project_id_prefix, local.random_id) #radlab-sdw-non-conf-data-1234
-  random_project_id = false
-  folder_id         = var.folder_id
-  billing_account   = var.billing_account_id
-  org_id            = var.organization_id
-
-  activate_apis = []
-}
-
-resource "google_project_service" "enabled_services_non_conf_data" {
-  for_each                   = toset(local.project_services_non_conf_data)
-  project                    = module.project_radlab_sdw_non_conf_data.project_id
-  service                    = each.value
-  disable_dependent_services = true
-  disable_on_destroy         = true
-}
 
 module "secured_data_warehouse" {
   source  = "GoogleCloudPlatform/secured-data-warehouse/google"
-  version = "0.2.0"
+  # version = "0.2.0"
 
   org_id                           = var.organization_id
   data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
   confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
   non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
   data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
+  sdx_project_number               = module.template_project.sdx_project_number
   terraform_service_account        = var.resource_creator_identity
   access_context_manager_policy_id = var.access_context_manager_policy_id
   bucket_name                      = format("radlab-bucket-%s", local.random_id)
-  dataset_id                       = format("radlab_dataset_%s", local.random_id)
+  dataset_id                       = local.non_confidential_dataset_id
+  confidential_dataset_id          = local.confidential_dataset_id
   cmek_keyring_name                = format("radlab-keyring-%s", local.random_id)
   pubsub_resource_location         = var.region
   location                         = var.region
   delete_contents_on_destroy       = var.delete_contents_on_destroy
   perimeter_additional_members     = local.perimeter_additional_members
-  sdx_project_number               = module.project_radlab_sdw_data_ingest.project_number
   data_engineer_group              = var.data_engineer_group
   data_analyst_group               = var.data_analyst_group
   security_analyst_group           = var.security_analyst_group
   network_administrator_group      = var.network_administrator_group
   security_administrator_group     = var.security_administrator_group
-
   depends_on = [
-    time_sleep.wait_120_seconds
+    time_sleep.wait_120_seconds,
+    module.iam_projects,
+    module.centralized_logging,
+    # google_project_iam_binding.remove_owner_role
   ]
 }
 
-module "iam_projects" {
-  source = "GoogleCloudPlatform/secured-data-warehouse/google//test/setup/iam-projects"
 
-  data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
-  non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
-  data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
-  confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
-  service_account_email            = var.resource_creator_identity
-  
+module "de_identification_template" {
+  source = "GoogleCloudPlatform/secured-data-warehouse/google//modules/de-identification-template"
+
+  project_id                = module.project_radlab_sdw_data_govern.project_id
+  terraform_service_account = var.resource_creator_identity
+  crypto_key                = module.kek.keys[local.kek_key_name]
+  wrapped_key               = local.wrapped_key_secret_data
+  dlp_location              = var.region
+  template_id_prefix        = "de_identification"
+  template_file             = "${path.module}/templates/deidentification.tpl"
+  dataflow_service_account  = module.secured_data_warehouse.dataflow_controller_service_account_email
+
+}
+
+
+resource "google_artifact_registry_repository_iam_member" "docker_reader" {
+  provider = google-beta
+
+  project    = module.template_project.project_id
+  location   = var.region
+  repository = "flex-templates"
+  role       = "roles/artifactregistry.reader"
+  member     = "serviceAccount:${module.secured_data_warehouse.dataflow_controller_service_account_email}"
+}
+
+resource "google_artifact_registry_repository_iam_member" "confidential_docker_reader" {
+  provider = google-beta
+
+  project    = module.template_project.project_id
+  location   = var.region
+  repository = "flex-templates"
+  role       = "roles/artifactregistry.reader"
+  member     = "serviceAccount:${module.secured_data_warehouse.confidential_dataflow_controller_service_account_email}"
+}
+
+resource "google_artifact_registry_repository_iam_member" "python_reader" {
+  provider = google-beta
+
+  project    = module.template_project.project_id
+  location   = var.region
+  repository = "python-modules"
+  role       = "roles/artifactregistry.reader"
+  member     = "serviceAccount:${module.secured_data_warehouse.dataflow_controller_service_account_email}"
+}
+
+resource "google_artifact_registry_repository_iam_member" "confidential_python_reader" {
+  provider = google-beta
+
+  project    = module.template_project.project_id
+  location   = var.region
+  repository = "python-modules"
+  role       = "roles/artifactregistry.reader"
+  member     = "serviceAccount:${module.secured_data_warehouse.confidential_dataflow_controller_service_account_email}"
+}
+
+
+// The sample data we are using is a Public Bigquery Dataset Table
+// that contains a United States Internal Revenue Service form
+// that provides the public with financial information about a nonprofit organization
+// (https://console.cloud.google.com/marketplace/product/internal-revenue-service/irs-990?project=bigquery-public-data)
+module "regional_deid_pipeline" {
+  source = "GoogleCloudPlatform/secured-data-warehouse/google//modules/dataflow-flex-job"
+
+  project_id              = module.project_radlab_sdw_data_ingest.project_id
+  name                    = "dataflow-flex-regional-dlp-deid-job-python-query"
+  container_spec_gcs_path = module.template_project.python_re_identify_template_gs_path
+  job_language            = "PYTHON"
+  region                  = var.region
+  service_account_email   = module.secured_data_warehouse.dataflow_controller_service_account_email
+  subnetwork_self_link    = module.dwh_networking_data_ingest.subnets_self_links[0]
+  kms_key_name            = module.secured_data_warehouse.cmek_data_ingestion_crypto_key
+  temp_location           = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/tmp/"
+  staging_location        = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/staging/"
+
+  parameters = {
+    # query                          = "SELECT ein, name, ico, street, city, state, income_amt, revenue_amt FROM [bigquery-public-data:irs_990.irs_990_ein] LIMIT 10000"
+    query                          = "SELECT email, name, street, city, state, zip, dob, dl_id, exp_date FROM [${module.project_radlab_sdw_data_ingest.project_id}:${module.sdw_data_ingest_bq_dataset.bigquery_dataset.dataset_id}.${module.sdw_data_ingest_bq_dataset.external_table_ids[0]}] LIMIT 10000"
+    deidentification_template_name = module.de_identification_template.template_full_path
+    window_interval_sec            = 30
+    batch_size                     = 1000
+    dlp_location                   = var.region
+    dlp_project                    = module.project_radlab_sdw_data_govern.project_id
+    bq_schema                      = local.bq_schema_dl
+    output_table                   = local.bigquery_non_confidential_table
+    dlp_transform                  = "DE-IDENTIFY"
+  }
+}
+
+resource "time_sleep" "wait_de_identify_job_execution" {
+  create_duration = "600s"
+
   depends_on = [
-    time_sleep.wait_120_seconds
+    module.regional_deid_pipeline
   ]
 }
 
-module "centralized_logging" {
-  source                      = "GoogleCloudPlatform/secured-data-warehouse/google//modules/centralized-logging"
-  projects_ids                = {
-                                  data_ingestion   = module.project_radlab_sdw_data_ingest.project_id,
-                                  governance       = module.project_radlab_sdw_data_govern.project_id,
-                                  non_confidential = module.project_radlab_sdw_non_conf_data.project_id,
-                                  confidential     = module.project_radlab_sdw_conf_data.project_id
-                                }
-  logging_project_id          = module.project_radlab_sdw_data_govern.project_id
-  kms_project_id              = module.project_radlab_sdw_data_govern.project_id
-  bucket_name                 = "bkt-logging-${module.project_radlab_sdw_data_govern.project_id}"
-  logging_location            = var.region
-  delete_contents_on_destroy  = var.delete_contents_on_destroy
-  key_rotation_period_seconds = local.key_rotation_period_seconds
+module "regional_reid_pipeline" {
+  source = "GoogleCloudPlatform/secured-data-warehouse/google//modules/dataflow-flex-job"
 
+  project_id              = module.project_radlab_sdw_conf_data.project_id
+  name                    = "dataflow-flex-regional-dlp-reid-job-python-query"
+  container_spec_gcs_path = module.template_project.python_re_identify_template_gs_path
+  job_language            = "PYTHON"
+  region                  = var.region
+  service_account_email   = module.secured_data_warehouse.dataflow_controller_service_account_email
+  subnetwork_self_link    = module.dwh_networking_conf.subnets_self_links[0]
+  kms_key_name            = module.secured_data_warehouse.cmek_reidentification_crypto_key
+  temp_location           = "gs://${module.secured_data_warehouse.confidential_data_dataflow_bucket_name}/tmp/"
+  staging_location        = "gs://${module.secured_data_warehouse.confidential_data_dataflow_bucket_name}/staging/"
+
+  parameters = {
+    input_table                    = "${module.project_radlab_sdw_non_conf_data.project_id}:${local.non_confidential_dataset_id}.${local.non_confidential_table_id}"
+    deidentification_template_name = module.de_identification_template.template_full_path
+    window_interval_sec            = 30
+    batch_size                     = 1000
+    dlp_location                   = var.region
+    dlp_project                    = module.project_radlab_sdw_data_govern.project_id
+    bq_schema                      = local.bq_schema_dl
+    output_table                   = local.bigquery_confidential_table
+    dlp_transform                  = "RE-IDENTIFY"
+  }
   depends_on = [
-    module.iam_projects
+    time_sleep.wait_de_identify_job_execution,
+    google_bigquery_table.re_id
   ]
 }

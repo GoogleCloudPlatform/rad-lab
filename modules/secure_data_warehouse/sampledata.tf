@@ -36,6 +36,9 @@ resource "google_storage_bucket_object" "schema_upload" {
 
 data "google_storage_bucket" "sdw-data-ingest" {
   name = module.secured_data_warehouse.data_ingestion_bucket_name
+  depends_on = [
+    time_sleep.wait_120_seconds
+  ]
 }
 
 module "sdw_data_ingest_bq_dataset" {

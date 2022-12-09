@@ -46,6 +46,12 @@ resource "google_project_iam_member" "role_viewer_sdw_conf_data" {
   role     = "roles/viewer"
 }
 
+resource "google_project_iam_member" "role_viewer_template" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  member   = each.value
+  project  = module.template_project.project_id
+  role     = "roles/viewer"
+}
 
 #########################################################################
 # IAM - Owner User/Group
@@ -83,5 +89,12 @@ resource "google_project_iam_member" "role_owner_sdw_conf_data" {
   for_each = toset(concat(formatlist("user:%s", var.owner_users), formatlist("group:%s", var.owner_groups)))
   member   = each.value
   project  = module.project_radlab_sdw_conf_data.project_id
+  role     = "roles/owner"
+}
+
+resource "google_project_iam_member" "role_owner_template" {
+  for_each = toset(concat(formatlist("user:%s", var.owner_users), formatlist("group:%s", var.owner_groups)))
+  member   = each.value
+  project  = module.template_project.project_id
   role     = "roles/owner"
 }
