@@ -17,7 +17,7 @@
 resource "google_storage_bucket_object" "file_upload" {
   name   = "sample_data/drivers_license.csv"
   bucket = module.secured_data_warehouse.data_ingestion_bucket_name
-  source = "${path.module}/scripts/build/dataset/drivers_license.csv"
+  source = "${path.module}/scripts/build/sample_data/drivers_license.csv"
 }
 
 resource "google_storage_bucket_object" "template_upload" {
