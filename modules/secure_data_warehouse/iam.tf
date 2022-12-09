@@ -18,6 +18,33 @@
 # IAM - Trusted User/Group
 #########################################################################
 
+resource "google_project_iam_member" "role_viewer_sdw_data_ingest" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  member   = each.value
+  project  = module.project_radlab_sdw_data_ingest.project_id
+  role     = "roles/viewer"
+}
+
+resource "google_project_iam_member" "role_viewer_sdw_data_govern" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  member   = each.value
+  project  = module.project_radlab_sdw_data_govern.project_id
+  role     = "roles/viewer"
+}
+
+resource "google_project_iam_member" "role_viewer_sdw_non_conf_data" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  member   = each.value
+  project  = module.project_radlab_sdw_non_conf_data.project_id
+  role     = "roles/viewer"
+}
+
+resource "google_project_iam_member" "role_viewer_sdw_conf_data" {
+  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+  member   = each.value
+  project  = module.project_radlab_sdw_conf_data.project_id
+  role     = "roles/viewer"
+}
 
 
 #########################################################################
