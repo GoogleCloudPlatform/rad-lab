@@ -76,3 +76,8 @@ radlab-launcher/deployments/*
 
 terraform.tfvars
 backend.tf
+
+staging.terraform.tfbackend
+terraform.tfvars.staging
+
+app.yaml
