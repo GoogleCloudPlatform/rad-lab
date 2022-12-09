@@ -32,7 +32,8 @@ resource "google_project_iam_member" "webapp_identity_permissions" {
     "roles/iam.serviceAccountTokenCreator",
     "roles/datastore.user",
     "roles/storage.admin", #TODO: Only give permissions to the deployment bucket
-    "roles/cloudbuild.builds.viewer"
+    "roles/cloudbuild.builds.viewer",
+    "roles/compute.viewer"
   ])
   project = module.project.project_id
   member  = "serviceAccount:${google_service_account.radlab_ui_webapp_identity.email}"
