@@ -93,6 +93,12 @@ variable "create_budget" {
   default     = false
 }
 
+variable "dataset_location" {
+  description = "The regional location for the dataset only US and EU are allowed in module."
+  type        = string
+  default     = "US"
+}
+
 variable "deployment_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`."
   type        = string
@@ -191,6 +197,7 @@ variable "owner_groups" {
   type        = list(string)
   default     = []
 }
+
 variable "docker_repository_id" {
   description = "ID of the docker flex template repository."
   type        = string
@@ -203,11 +210,6 @@ variable "python_repository_id" {
   default     = "python-modules"
 }
 
-variable "location" {
-  description = "The location of Artifact registry. Run `gcloud artifacts locations list` to list available locations."
-  type        = string
-  default     = "us-east4"
-}
 variable "subnet_ip" {
   description = "The CDIR IP range of the subnetwork."
   type        = string

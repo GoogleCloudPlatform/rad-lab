@@ -15,47 +15,63 @@
  */
 
 resource "google_storage_bucket_object" "file_upload" {
-  name   = "drivers_license"
+  name   = "sample_data/drivers_license.csv"
   bucket = module.secured_data_warehouse.data_ingestion_bucket_name
   source = "${path.module}/scripts/build/dataset/drivers_license.csv"
 }
 
 resource "google_storage_bucket_object" "template_upload" {
-  name   = "template"
+  name   = "templates/deidentification.tpl"
   bucket = module.secured_data_warehouse.data_ingestion_bucket_name
   source = "${path.module}/templates/deidentification.tpl"
 }
 
 resource "google_storage_bucket_object" "schema_upload" {
-  name   = "schema"
+  name   = "templates/schema.tpl"
   bucket = module.secured_data_warehouse.data_ingestion_bucket_name
   source = "${path.module}/templates/schema.tpl"
 }
+
+// BELOW CONFIGS TO BE REMOVED ONCE THE SDW MODULE DEVELOPMENT IS COMPLETED
 
 data "google_storage_bucket" "sdw-data-ingest" {
   name = module.secured_data_warehouse.data_ingestion_bucket_name
 }
 
-# resource "google_bigquery_table" "sdw_data_ingest_sample_data" {
-#   dataset_id          = module.secured_data_warehouse.data_ingestion_bigquery_dataset.dataset_id
-#   table_id            = "dl_data"
-#   project             = module.project_radlab_sdw_data_ingest.project_id
-#   deletion_protection = false 
-#   external_data_configuration {
-#     autodetect    = true
-#     source_format = "CSV"
+module "sdw_data_ingest_bq_dataset" {
+  source  = "terraform-google-modules/bigquery/google"
+  version = "~> 5.2.0"
 
-#     csv_options {
-#       quote                 = ""
-#       allow_jagged_rows     = false 
-#       allow_quoted_newlines = false
-#       encoding              = "UTF-8"
-#       field_delimiter       = ","
-#       skip_leading_rows     = 1
-#     }
+  project_id                  = module.project_radlab_sdw_data_ingest.project_id
+  dataset_id                  = "dl_data_dataset"
+  dataset_name                = "dl_data_dataset"
+  description                 = "Sample Driver License Data"
+  location                    = var.region
+  delete_contents_on_destroy  = var.delete_contents_on_destroy
+  external_tables = [
+    {
+      table_id              = "dl_data"
+      autodetect            = true
+      compression           = null
+      ignore_unknown_values = true
+      max_bad_records       = 0
+      source_format         = "CSV"
+      schema                = null
+      expiration_time       = null
 
-#     source_uris = [
-#       "${data.google_storage_bucket.sdw-data-ingest.url}/${google_storage_bucket_object.file_upload.output_name}",
-#     ]
-#   }
-# }
+      labels = {
+      }
+      source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/${google_storage_bucket_object.file_upload.output_name}"]
+      csv_options = {
+        quote                 = ""
+        allow_jagged_rows     = false
+        allow_quoted_newlines = false
+        encoding              = "UTF-8"
+        field_delimiter       = ","
+        skip_leading_rows     = 1
+      }
+      hive_partitioning_options = null
+      google_sheets_options     = null
+    },
+  ]
+}
