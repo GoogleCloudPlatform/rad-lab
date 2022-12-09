@@ -39,7 +39,7 @@ locals {
 #   staging_location        = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/staging/"
 
 #   parameters = {
-#     query                          = "SELECT email, name, street, city, state, zip, dob, dl_id, exp_date FROM [${module.project_radlab_sdw_non_conf_data.project_id}:${google_bigquery_table.sdw_non_conf_sample_data.dataset_id}.${google_bigquery_table.sdw_non_conf_sample_data.table_id}] LIMIT 10000"
+#     query                          = "SELECT email, name, street, city, state, zip, dob, dl_id, exp_date FROM [${module.project_radlab_sdw_data_ingest.project_id}:${module.sdw_data_ingest_bq_dataset.bigquery_dataset.dataset_id}.${module.sdw_data_ingest_bq_dataset.external_table_ids[0]}] LIMIT 10000"
 #     deidentification_template_name = module.de_identification_template.template_full_path
 #     window_interval_sec            = 30
 #     batch_size                     = 1000
