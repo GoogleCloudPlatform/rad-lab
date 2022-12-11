@@ -138,6 +138,7 @@ module "project_radlab_sdw_data_ingest" {
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
   org_id            = var.organization_id
+  default_service_account = "deprivilege"
 
   activate_apis = []
 }
@@ -160,6 +161,7 @@ module "project_radlab_sdw_data_govern" {
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
   org_id            = var.organization_id
+  default_service_account = "deprivilege"
 
   activate_apis = []
 }
@@ -182,6 +184,7 @@ module "project_radlab_sdw_conf_data" {
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
   org_id            = var.organization_id
+  default_service_account = "deprivilege"
 
   activate_apis = []
 }
@@ -204,6 +207,7 @@ module "project_radlab_sdw_non_conf_data" {
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
   org_id            = var.organization_id
+  default_service_account = "deprivilege"
 
   activate_apis = []
 }
