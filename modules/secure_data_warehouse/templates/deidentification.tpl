@@ -15,14 +15,13 @@
                             }
                         ],
                         "primitiveTransformation": {
-                            "cryptoReplaceFfxFpeConfig": {
+                            "cryptoDeterministicConfig": {
                                 "cryptoKey": {
                                     "kmsWrapped": {
                                         "cryptoKeyName": "${crypto_key}",
                                         "wrappedKey": "${wrapped_key}"
                                     }
                                 },
-                                "commonAlphabet": "ALPHA_NUMERIC"
                             }
                         }
                     }
