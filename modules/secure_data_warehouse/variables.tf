@@ -140,6 +140,11 @@ variable "set_domain_restricted_sharing_policy" {
   default     = false
 }
 
+variable "set_shielded_vm_policy" {
+  description = "Apply org policy to disable shielded VMs. {{UIMeta group=0 order=17 updatesafe }}"
+  type        = bool
+  default     = true
+}
 variable "trusted_groups" {
   description = "The list of trusted groups (e.g. `myteam@abc.com`). {{UIMeta group=1 order=5 updatesafe }}"
   type        = set(string)

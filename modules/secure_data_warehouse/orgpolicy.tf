@@ -26,8 +26,28 @@ resource "google_project_organization_policy" "domain_restricted_sharing_policy"
   }
 }
 
+resource "google_project_organization_policy" "shielded_vm_policy_sdw_data_ingest" {
+  count      = var.set_shielded_vm_policy ? 1 : 0
+  constraint = "compute.requireShieldedVm"
+  project    = module.project_radlab_sdw_data_ingest.project_id
+
+  boolean_policy {
+    enforced = false
+  }
+}
+
+resource "google_project_organization_policy" "shielded_vm_policy_sdw_conf" {
+  count      = var.set_shielded_vm_policy ? 1 : 0
+  constraint = "compute.requireShieldedVm"
+  project    = module.project_radlab_sdw_conf_data.project_id
+
+  boolean_policy {
+    enforced = false
+  }
+}
+
 resource "time_sleep" "wait_120_seconds" {
-  count = (var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic) || local.enable_services ? 1 : 0
+  count = (var.set_domain_restricted_sharing_policy && var.create_budget && var.billing_budget_pubsub_topic) || var.set_shielded_vm_policy ||local.enable_services ? 1 : 0
 
   depends_on = [
     google_project_organization_policy.domain_restricted_sharing_policy,
