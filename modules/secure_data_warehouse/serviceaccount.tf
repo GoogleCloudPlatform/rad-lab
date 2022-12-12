@@ -34,7 +34,7 @@ locals {
   ]
 }
 
- resource "google_project_iam_member" "dfc_sa_sdw_data_ingest_roles" {
+resource "google_project_iam_member" "dfc_sa_sdw_data_ingest_roles" {
   for_each = toset(local.data_ingest_bigquery_read_roles)
 
   project = module.project_radlab_sdw_data_ingest.project_id
@@ -56,4 +56,16 @@ resource "google_project_iam_member" "dfc_sa_sdw_non_conf_data_roles" {
   project = module.project_radlab_sdw_non_conf_data.project_id
   role    = each.value
   member  = "serviceAccount:${module.secured_data_warehouse.dataflow_controller_service_account_email}"
+}
+
+resource "google_service_account_iam_member" "terraform_sa_service_account_user" {
+  service_account_id = "projects/${module.project_radlab_sdw_data_ingest.project_id}/serviceAccounts/${module.secured_data_warehouse.dataflow_controller_service_account_email}"
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${var.resource_creator_identity}"
+}
+
+resource "google_storage_bucket_iam_member" "dfc_sa_sdw_data_ingest_objectAdmin" {
+  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${module.secured_data_warehouse.dataflow_controller_service_account_email}"
 }
