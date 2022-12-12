@@ -106,7 +106,7 @@ const ProvisionModule: React.FC<provisionMouduleInterface> = ({}) => {
             <div className="flex w-full px-4 sm:px-8 md:w-3/4 lg:w-1/2 mx-auto">
               <CreateForm
                 formVariables={moduleParseData}
-                data={selectedModuleName}
+                selectedModuleName={selectedModuleName}
                 update={false}
                 handleLoading={setSubmitLoading}
               />

@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from "react"
 import { FormikStepper } from "@/components/forms/FormikStepper"
 import StepCreator from "@/components/forms/StepCreator"
-import { IUIVariable, Deployment, DEPLOYMENT_STATUS } from "@/utils/types"
-import { groupVariables, initialFormikData } from "@/utils/terraform"
+import {
+  IUIVariable,
+  Deployment,
+  DEPLOYMENT_STATUS,
+  IFormData,
+} from "@/utils/types"
+import {
+  groupVariables,
+  initialFormikData,
+  getAdminSettingData,
+  getPublishedDataByModuleName,
+  defaultVariableData,
+} from "@/utils/terraform"
 import axios from "axios"
 import { useNavigate, useParams } from "react-router-dom"
 import { alertStore, userStore } from "@/store"
@@ -14,20 +25,14 @@ import { whereEq } from "ramda"
 
 interface CreateForm {
   formVariables: IUIVariable[]
-  data: string
+  selectedModuleName: string
   update: boolean
   handleLoading: Function
-}
-interface IFormatData {
-  [key: string]: any
-}
-type IObjKeyPair = {
-  [key: string]: string
 }
 
 const CreateForm: React.FC<CreateForm> = ({
   formVariables,
-  data,
+  selectedModuleName,
   update,
   handleLoading,
 }) => {
@@ -46,8 +51,8 @@ const CreateForm: React.FC<CreateForm> = ({
 
   if (!user) throw new Error("No signed in user")
 
-  const removeAdminData = (datam: IFormatData) => {
-    const filterData: IFormatData = []
+  const removeAdminData = (datam: IFormData) => {
+    const filterData: IFormData = []
     Object.keys(datam).forEach((value) => {
       const dataSelected = datam[value]
       /* not consider admin user related variable data which group has value 0 */
@@ -65,46 +70,33 @@ const CreateForm: React.FC<CreateForm> = ({
    * @param {string}  data - filtered data @removeAdminData
    */
 
-  const initialFormikDefaultData = async (data: IFormatData) => {
+  const initialFormikDefaultData = async (data: IFormData) => {
+    const defaultVars = defaultVariableData(data)
+    const adminVars = await getAdminSettingData()
+    const moduleVars = await getPublishedDataByModuleName(selectedModuleName)
     if (update) {
       await axios
         .get(`/api/deployments/${params.deployId}`)
         .then((res) => {
           const deployment = Deployment.parse(res.data.deployment)
-          setInitialData(deployment.variables)
+          const userVars = deployment.variables
+          const variables = Object.assign(
+            {},
+            defaultVars,
+            adminVars,
+            moduleVars,
+            userVars,
+          )
+          setInitialData(variables)
         })
         .catch((error) => {
           console.error(error)
         })
         .finally(() => setLoading(false))
     } else {
-      const initialObjData: IObjKeyPair = {}
-      for (let i = 0; i < data.length; i++) {
-        const element = data[i]
-        for (let j = 0; j < element.length; j++) {
-          const title = element[j].name
-          let defaultValue = element[j].default
-          let type = element[j].type
-          if (
-            defaultValue === null &&
-            (type === "list(string)" ||
-              type === "list(number)" ||
-              type === "set(number)" ||
-              type === "set(string)")
-          ) {
-            defaultValue = []
-          } else if (defaultValue === null && type === "number") {
-            defaultValue = 0
-          } else if (defaultValue === null && type === "bool") {
-            defaultValue = false
-          } else if (defaultValue === null) {
-            defaultValue = ""
-          }
-          initialObjData[title] = defaultValue
-        }
-        setLoading(false)
-      }
-      setInitialData(initialObjData)
+      const variables = Object.assign({}, defaultVars, adminVars, moduleVars)
+      setInitialData(variables)
+      setLoading(false)
     }
   }
 
@@ -136,10 +128,10 @@ const CreateForm: React.FC<CreateForm> = ({
     }
   }
 
-  const handleSubmit = async (values: IFormatData) => {
+  const handleSubmit = async (values: IFormData) => {
     handleLoading(true)
     const payload = {
-      module: data,
+      module: selectedModuleName,
       deployedByEmail: user.email,
       variables: values,
       status: DEPLOYMENT_STATUS.QUEUED,
@@ -201,7 +193,7 @@ const CreateForm: React.FC<CreateForm> = ({
   return (
     <>
       <div className="w-full">
-        {formData && (
+        {formData && initialFormData && (
           <FormikStepper
             initialValues={initialFormData}
             onSubmit={(values) => handleSubmit(values)}

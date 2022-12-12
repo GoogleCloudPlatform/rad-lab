@@ -2,8 +2,9 @@
 import * as hclParse from "hcl2-parser"
 import groupBy from "lodash/groupBy"
 import startCase from "lodash/startCase"
-import { IUIVariable, IObjKeyPair, IFormData } from "@/utils/types"
+import { IUIVariable, IObjKeyPair, IFormData, IModule } from "@/utils/types"
 import axios from "axios"
+import { envOrFail } from "@/utils/env"
 
 type IHCLVariable = {
   type: string
@@ -214,4 +215,63 @@ const checkModuleVariablesZero = async (moduleName: string) => {
       console.error(error)
     })
   return returnModuleVariableData
+}
+
+// To get Admin settings updated variables data
+const GCP_PROJECT_ID = envOrFail(
+  "NEXT_PUBLIC_GCP_PROJECT_ID",
+  process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
+)
+
+export const getAdminSettingData = async () => {
+  const adminVariableData = await axios
+    .get(`/api/settings?projectId=${GCP_PROJECT_ID}`)
+    .then((res) => {
+      return res.data.settings.variables
+    })
+    .catch((error) => {
+      console.error(error)
+      return {}
+    })
+
+  return adminVariableData
+}
+
+export const getPublishedDataByModuleName = async (moduleName: string) => {
+  const moduleVariableData = await axios
+    .get(`/api/modules`)
+    .then((res) => {
+      const getPublishedModulesData: IModule[] = res.data.modules
+      const indexPublishedModule = getPublishedModulesData.findIndex(
+        (item) => item.name === moduleName,
+      )
+      const moduleVariables =
+        indexPublishedModule !== -1
+          ? getPublishedModulesData[indexPublishedModule]!.variables
+          : {}
+
+      return moduleVariables
+    })
+    .catch((error) => {
+      console.error(error)
+      return {}
+    })
+
+  return moduleVariableData
+}
+
+export const defaultVariableData = (data: IFormData) => {
+  const defaultVarObjData: IObjKeyPair = {}
+  for (let i = 0; i < data.length; i++) {
+    const element = data[i]
+    for (let j = 0; j < element.length; j++) {
+      const title = element[j].name
+      let defaultValue = formDefaultValidation(
+        element[j].default,
+        element[j].type,
+      )
+      defaultVarObjData[title] = defaultValue
+    }
+  }
+  return defaultVarObjData
 }

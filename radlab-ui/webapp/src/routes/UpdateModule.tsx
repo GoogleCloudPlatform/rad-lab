@@ -106,7 +106,7 @@ const UpdateModule: React.FC<IUpdateModule> = ({}) => {
             <div className="flex w-full sm:w-2/5 mx-auto">
               <CreateForm
                 formVariables={moduleParseData}
-                data={selectedModuleName}
+                selectedModuleName={selectedModuleName}
                 update={true}
                 handleLoading={setSubmitLoading}
               />
