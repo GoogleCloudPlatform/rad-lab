@@ -35,9 +35,9 @@ INSERT INTO accounts (name, email, sector)
 VALUES
     ('Kris Marrier','kris@myfoo.gov','Federal'),
     ('Fatima Saylors','fsaylors@myfoo.gov','State & Local'),
-    ('James Butt','jbutt@gmail.com','EdTech'),
+    ('James Baker','jbaker@myedu.com','EdTech'),
     ('Jose Stockham','jose@mybar.gov','State & Local'),
-    ('Tonette Wenner','twenner@aol.com','EdTech');
+    ('Tonette Williams','twilliams@myedu.com','EdTech');
 \x
 SELECT * FROM accounts;
 EOF
