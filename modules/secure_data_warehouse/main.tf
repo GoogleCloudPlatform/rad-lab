@@ -166,7 +166,8 @@ module "regional_reid_pipeline" {
   container_spec_gcs_path = module.template_project.python_re_identify_template_gs_path
   job_language            = "PYTHON"
   region                  = var.region
-  service_account_email   = module.secured_data_warehouse.dataflow_controller_service_account_email
+  #service_account_email   = module.secured_data_warehouse.dataflow_controller_service_account_email
+  service_account_email   = module.secured_data_warehouse.confidential_dataflow_controller_service_account_email
   subnetwork_self_link    = module.dwh_networking_conf.subnets_self_links[0]
   kms_key_name            = module.secured_data_warehouse.cmek_reidentification_crypto_key
   temp_location           = "gs://${module.secured_data_warehouse.confidential_data_dataflow_bucket_name}/tmp/"
