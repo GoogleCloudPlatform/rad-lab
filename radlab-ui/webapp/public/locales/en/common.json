@@ -74,5 +74,7 @@
   "publish-module": "Modules are getting ready to be published...",
   "refreshing": "Refreshing...",
   "loading": "Loading",
-  "no-modules-message":"If your not seeing the module you want, ask your Admin"
+  "no-modules-message": "If your not seeing the module you want, ask your Admin",
+  "clear": "Clear",
+  "no-results": "No matches found!"
 }

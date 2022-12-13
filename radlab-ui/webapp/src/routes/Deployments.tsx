@@ -11,13 +11,15 @@ import {
 import { useTranslation } from "next-i18next"
 import { classNames } from "@/utils/dom"
 import axios from "axios"
-import { alertStore, userStore } from "@/store"
+import { alertStore, deploymentStore, userStore } from "@/store"
 import Loading from "@/navigation/Loading"
 import { ALERT_TYPE } from "@/utils/types"
 import AdminSettingsButton from "@/components/AdminSettingsButton"
 import NewDeploymentButton from "@/components/NewDeploymentButton"
 import EmptyAdminState from "@/components/EmptyAdminState"
 import EmptyState from "@/components/EmptyState"
+import FilterComponent from "@/components/FilterComponent"
+import EmptySearch from "@/components/EmptySearch"
 
 enum DEPLOYMENT_TAB {
   ALL,
@@ -36,6 +38,10 @@ const Deployments: React.FC<DeploymentsProps> = () => {
   const [deploymentTab, setDeploymentTab] = useState(
     isAdmin ? DEPLOYMENT_TAB.ALL : DEPLOYMENT_TAB.MINE,
   )
+  const filteredDeployments = deploymentStore(
+    (state) => state.filteredDeployments,
+  )
+  const setDeployments = deploymentStore((state) => state.setDeployments)
 
   const fetchData = async () => {
     Promise.all([
@@ -51,6 +57,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
         )
         setAllList(allDeployData)
         setMyList(myDeployData)
+        setDeployments(allDeployData || null)
       })
       .catch((error) => {
         console.error(error)
@@ -77,7 +84,10 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           deploymentTab === DEPLOYMENT_TAB.ALL ? "tab-active" : "",
         )}
         data-testid="all-deployments"
-        onClick={() => setDeploymentTab(DEPLOYMENT_TAB.ALL)}
+        onClick={() => {
+          setDeploymentTab(DEPLOYMENT_TAB.ALL),
+            setDeployments(listAllDeployments || null)
+        }}
       >
         {t("all-deployments")}
       </a>
@@ -92,7 +102,10 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           deploymentTab === DEPLOYMENT_TAB.MINE ? "tab-active" : "",
         )}
         data-testid="my-deployments"
-        onClick={() => setDeploymentTab(DEPLOYMENT_TAB.MINE)}
+        onClick={() => {
+          setDeploymentTab(DEPLOYMENT_TAB.MINE),
+            setDeployments(listMyDeployments || null)
+        }}
       >
         {t("my-deployments")}
       </a>
@@ -101,6 +114,10 @@ const Deployments: React.FC<DeploymentsProps> = () => {
 
   const renderEmptyState = () => {
     return isAdmin ? <EmptyAdminState /> : <EmptyState />
+  }
+
+  const renderEmptySearch = () => {
+    return <EmptySearch message={t("no-results")} />
   }
 
   if (isLoading)
@@ -134,28 +151,43 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           )}
         </div>
       </div>
-      {deploymentTab === DEPLOYMENT_TAB.ALL &&
-        (listAllDeployments?.length ? (
-          <ModuleDeployment
-            headers={DEPLOYMENT_HEADERS}
-            deployments={listAllDeployments}
-            defaultSortField={SORT_FIELD.CREATEDAT}
-            defaultSortDirection={SORT_DIRECTION.DESC}
-          />
-        ) : (
-          renderEmptyState()
-        ))}
-      {deploymentTab === DEPLOYMENT_TAB.MINE &&
-        (listMyDeployments?.length ? (
-          <ModuleDeployment
-            headers={DEPLOYMENT_HEADERS}
-            deployments={listMyDeployments}
-            defaultSortField={SORT_FIELD.CREATEDAT}
-            defaultSortDirection={SORT_DIRECTION.DESC}
-          />
-        ) : (
-          renderEmptyState()
-        ))}
+      <FilterComponent />
+      {deploymentTab === DEPLOYMENT_TAB.ALL && (
+        <>
+          {listAllDeployments?.length ? (
+            (filteredDeployments || listAllDeployments)?.length ? (
+              <ModuleDeployment
+                headers={DEPLOYMENT_HEADERS}
+                deployments={filteredDeployments || listAllDeployments || []}
+                defaultSortField={SORT_FIELD.CREATEDAT}
+                defaultSortDirection={SORT_DIRECTION.DESC}
+              />
+            ) : (
+              renderEmptySearch()
+            )
+          ) : (
+            renderEmptyState()
+          )}
+        </>
+      )}
+      {deploymentTab === DEPLOYMENT_TAB.MINE && (
+        <>
+          {listMyDeployments?.length ? (
+            (filteredDeployments || listMyDeployments)?.length ? (
+              <ModuleDeployment
+                headers={DEPLOYMENT_HEADERS}
+                deployments={filteredDeployments || listMyDeployments || []}
+                defaultSortField={SORT_FIELD.CREATEDAT}
+                defaultSortDirection={SORT_DIRECTION.DESC}
+              />
+            ) : (
+              renderEmptySearch()
+            )
+          ) : (
+            renderEmptyState()
+          )}
+        </>
+      )}
     </RouteContainer>
   )
 }
