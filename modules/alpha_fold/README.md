@@ -1,4 +1,10 @@
-# RAD Lab alpha fold module
+# RAD Lab AlphaFold module
+
+```
+AlphaFold Data Copyright (2022) DeepMind Technologies Limited.
+
+The structures provided via this resource are predictions with varying levels of confidence and should be interpreted carefully. They are for theoretical modelling only, caution should be exercised in their use. They are provided ‘as-is’ without any warranty of any kind, whether expressed or implied. The information is not intended to be a substitute for professional medical advice, diagnosis, or treatment, and does not constitute medical or other professional advice.
+```
 
 Bio-pharma organizations can now leverage the groundbreaking protein folding system, AlphaFold, with Vertex AI Alphafold Rad lab module. 
 This module does following things:
