@@ -76,5 +76,6 @@
   "loading": "Cargando",
   "no-modules-message": "Si no ve el módulo que desea, pregúntele a su administrador",
   "clear": "Claro",
-  "no-results": "No se encontraron coincidencias"
+  "no-results": "No se encontraron coincidencias",
+  "search_module_or_status": "Buscar por nombre de módulo o estado..."
 }

@@ -76,5 +76,6 @@
   "loading": "Loading",
   "no-modules-message": "If your not seeing the module you want, ask your Admin",
   "clear": "Clear",
-  "no-results": "No matches found!"
+  "no-results": "No matches found!",
+  "search_module_or_status": "Search by module name or status..."
 }

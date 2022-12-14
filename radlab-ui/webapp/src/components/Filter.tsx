@@ -1,12 +1,12 @@
 import Search, { ISearchResults } from "@/components/Search"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "next-i18next"
-import { DEPLOYMENT_STATUS, IDeployment, IModule } from "@/utils/types"
+import { DEPLOYMENT_STATUS, FirestoreTimestamp, IModule } from "@/utils/types"
 import { deploymentStore } from "@/store"
 
 type IFilterType = "module" | "createdAt" | "status"
 type IModuleName = string | ""
-type IDate = typeof DEPLOYMENT_STATUS | string | ""
+type IDate = typeof FirestoreTimestamp
 
 export default function Filter({
   filters,
@@ -15,7 +15,7 @@ export default function Filter({
   modules,
 }: {
   filters: IFilterType[]
-  statuses: typeof DEPLOYMENT_STATUS
+  statuses: typeof DEPLOYMENT_STATUS[]
   defaultStatus?: typeof DEPLOYMENT_STATUS
   modules: IModule[] | null
 }) {
@@ -23,7 +23,7 @@ export default function Filter({
   const [search, setSearch] = useState<ISearchResults | null>(null)
   const [status, setStatus] = useState(defaultStatus || "")
   const [moduleName, setModuleName] = useState<IModuleName>("")
-  const [date, setDate] = useState<IDate>("")
+  // const [createdAt, setCreatedAt] = useState<IDate | null>(null)
 
   const { t } = useTranslation()
 
@@ -33,10 +33,8 @@ export default function Filter({
   const deployments = deploymentStore((state) => state.deployments)
 
   // TODO. Likely change this to the firebase.uid for the record
-  const refField = "name"
-  const handleQuery = (search: ISearchResults) => {
-    setSearch(search)
-  }
+  const refField = "module"
+  const handleQuery = (search: ISearchResults) => setSearch(search)
 
   // Owner Filter list
   // const loginPartnerName = partner?.name
@@ -50,7 +48,7 @@ export default function Filter({
     }
 
     //No active filtering happening
-    if (!search?.query && status === "" && moduleName === "" && date === "") {
+    if (!search?.query && status === "" && moduleName === "") {
       setFilteredDeployments(null)
       return
     }
@@ -58,73 +56,76 @@ export default function Filter({
     let filtered = deployments
 
     if (search?.query) {
+      filtered = filtered.filter(
+        (e) =>
+          e.module.toLowerCase().startsWith(search.query.toLowerCase()) ||
+          (e.status.toLowerCase().startsWith(search.query.toLowerCase()) &&
+            !e.deletedAt),
+      )
       // @ts-ignore TS is wrong about possible type (can't be udefined[] because of filter(Boolean) step)
-      filtered = search.result
-        .sort((a, b) => b.score - a.score)
-        .map((result) => result.ref)
-        .map((ref) =>
-          // @ts-ignore
-          deployments.find((deployment) => deployment[refField] === ref),
-        )
-        .filter(Boolean)
+      // filtered = search.result
+      //   // .sort((a, b) => b.score - a.score)
+      //   // .map((result) => result.ref)
+      //   // .map((ref) =>
+      //   //   // @ts-ignore
+      //   //   deployments.find((deployment) => deployment[refField] === ref),
+      //   // )
+
+      //   .filter(Boolean)
     }
 
-    // if (status !== "")
-    //   // @ts-ignore
-    //   filtered = filtered.filter((demo) => demo.onboarding.status === status)
+    if (status !== "") {
+      // @ts-ignore
+      status !== "DELETED"
+        ? (filtered = filtered.filter(
+            (deployment) =>
+              deployment.status === status && !deployment.deletedAt,
+          ))
+        : (filtered = filtered.filter((deployment) => deployment.deletedAt))
+    }
+
     if (moduleName !== "")
       filtered = filtered.filter(
         (deployments) => deployments.module === moduleName,
       )
-    // if (date !== "")
-    //   filtered = filtered.filter((demo) => demo.vertical === vertical)
+    // if (!createdAt)
+    //   filtered = filtered.filter(
+    //     (deployment) => deployment.createdAt === createdAt,
+    //   )
     // if (owner === "Google")
     //   filtered = filtered.filter((demo) => !demo.hasOwnProperty("partnerId"))
     // if (owner !== "" && owner !== "Google")
     //   filtered = filtered.filter((demo) => demo.hasOwnProperty("partnerId"))
 
     setFilteredDeployments(filtered)
-  }, [moduleName, deployments, search])
+  }, [moduleName, deployments, search, status])
 
   const clearAllFilters = () => {
     // @ts-ignore
-    //inputRef.current.value = ""
-    // console.log("module name", moduleName)
+    inputRef.current.value = ""
     setSearch(null)
     setModuleName("")
+    setStatus("")
   }
 
   return (
-    <div className="w-full bg-base-200 p-2">
+    <div className="w-full bg-base-100 p-2">
       <Search
         inputRef={inputRef}
-        placeholder="Search by module name or status"
+        placeholder={t("search_module_or_status")}
         // @ts-ignore
         documents={deployments}
         refField={refField}
         handleQuery={handleQuery}
       />
 
-      <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 mt-4">
-        {/* {filters.includes("status") && (
-          <select
-            onChange={(e) => setStatus(e.target.value)}
-            value={status}
-            className="select col-span-2"
-          >
-            <option value="">{t("onboarding-status")}</option>
-            {statuses.map((status) => (
-              <option key={status}>{status}</option>
-            ))}
-          </select>
-        )} */}
-
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-4">
         {filters.includes("module") && (
           <select
             onChange={(e) => setModuleName(e.target.value)}
             // @ts-ignore
             value={moduleName}
-            className="select col-span-2"
+            className="select select-bordered w-full max-w-xs"
           >
             <option value="">{t("module-name")}</option>
             {modules?.map((module, index) => (
@@ -132,36 +133,42 @@ export default function Filter({
             ))}
           </select>
         )}
-        {/* 
-        {filters.includes("vertical") && (
+        {filters.includes("status") && (
           <select
-            onChange={(e) => setVertical(e.target.value)}
-            value={vertical}
-            className="select col-span-2"
+            onChange={(e) => setStatus(e.target.value)}
+            // @ts-ignore
+            value={status}
+            className="select select-bordered w-full max-w-xs"
           >
-            <option value="">{t("vertical")}</option>
-            {DemoVerticals.map((vertical) => (
-              <option key={vertical}>{vertical}</option>
+            <option value="">{t("status")}</option>
+            {statuses.map((status, index) => (
+              <option key={index}>{status}</option>
             ))}
           </select>
         )}
+        {filters.includes("createdAt") && (
+          <input
+            className="rounded-md border-base-300"
+            type="date"
+            placeholder="Start Date"
+          />
+        )}
+        {filters.includes("createdAt") && (
+          <input
+            className="rounded-md  border-base-300"
+            type="date"
+            placeholder="End date"
+          />
+        )}
 
-        {filters.includes("owner") && (
-          <select
-            onChange={(e) => setOwner(e.target.value)}
-            value={owner}
-            className="select col-span-1"
+        <div className="md:text-right">
+          <button
+            className="btn btn-outline btn-md w-1/2"
+            onClick={clearAllFilters}
           >
-            <option value="">{t("owner")}</option>
-            {OWNERS.map((owner) => (
-              <option key={owner}>{owner}</option>
-            ))}
-          </select>
-        )} */}
-
-        <button className="btn btn-outline" onClick={clearAllFilters}>
-          {t("clear")}
-        </button>
+            {t("clear")}
+          </button>
+        </div>
       </div>
     </div>
   )

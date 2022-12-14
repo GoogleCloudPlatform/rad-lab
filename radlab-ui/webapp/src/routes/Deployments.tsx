@@ -7,6 +7,8 @@ import {
   SORT_FIELD,
   Deployments as DeploymentsParser,
   IDeployment,
+  DEPLOYMENT_STATUS,
+  IModule,
 } from "@/utils/types"
 import { useTranslation } from "next-i18next"
 import { classNames } from "@/utils/dom"
@@ -18,8 +20,8 @@ import AdminSettingsButton from "@/components/AdminSettingsButton"
 import NewDeploymentButton from "@/components/NewDeploymentButton"
 import EmptyAdminState from "@/components/EmptyAdminState"
 import EmptyState from "@/components/EmptyState"
-import FilterComponent from "@/components/FilterComponent"
 import EmptySearch from "@/components/EmptySearch"
+import Filter from "@/components/Filter"
 
 enum DEPLOYMENT_TAB {
   ALL,
@@ -42,6 +44,35 @@ const Deployments: React.FC<DeploymentsProps> = () => {
     (state) => state.filteredDeployments,
   )
   const setDeployments = deploymentStore((state) => state.setDeployments)
+  const [modules, setModules] = useState<IModule[] | null>(null)
+
+  const deletedAt = "DELETED"
+
+  const activeStatuses = [
+    DEPLOYMENT_STATUS.SUCCESS,
+    DEPLOYMENT_STATUS.PENDING,
+    DEPLOYMENT_STATUS.QUEUED,
+    DEPLOYMENT_STATUS.FAILURE,
+    DEPLOYMENT_STATUS.EXPIRE,
+    DEPLOYMENT_STATUS.CANCELLED,
+    DEPLOYMENT_STATUS.INTERNAL_ERROR,
+    DEPLOYMENT_STATUS.STATUS_UNKNOWN,
+    DEPLOYMENT_STATUS.TIMEOUT,
+    DEPLOYMENT_STATUS.WORKING,
+    deletedAt,
+  ]
+
+  const fetchModules = async () => {
+    await axios
+      .get(`/api/github/modules`)
+      .then((res) => {
+        setModules(res.data)
+      })
+      .catch((error) => console.error(error))
+      .finally(() => {
+        setLoading(false)
+      })
+  }
 
   const fetchData = async () => {
     Promise.all([
@@ -67,13 +98,11 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           type: ALERT_TYPE.ERROR,
         })
       })
-      .finally(() => {
-        setLoading(false)
-      })
   }
 
   useEffect(() => {
     fetchData()
+    fetchModules()
   }, [])
 
   const renderAllTab = () => {
@@ -151,7 +180,18 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           )}
         </div>
       </div>
-      <FilterComponent />
+      <div className="bg-base-100 rounded-md shadow-md">
+        <div className="w-full p-4">
+          {!isLoading && (
+            <Filter
+              filters={["module", "createdAt", "status"]}
+              // @ts-ignore
+              statuses={activeStatuses}
+              modules={modules}
+            />
+          )}
+        </div>
+      </div>
       {deploymentTab === DEPLOYMENT_TAB.ALL && (
         <>
           {listAllDeployments?.length ? (
