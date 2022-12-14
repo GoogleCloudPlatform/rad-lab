@@ -1,14 +1,7 @@
 # RAD Lab Genomics-Nextflow Module
 
-## GCP Products/Services 
+## Module Overview
 
-* Life Sciences API
-* Batch API
-* Cloud Compute
-* Cloud Storage
-* Virtual Private Cloud (VPC)
-
-## Module Overview 
 Nextflow is a bioinformatics workflow manager that enables the development of portable and reproducible workflows. It supports deploying workflows on a variety of execution platforms including local, HPC schedulers, Google Cloud Life Sciences, Google Batch and Kubernetes. Additionally, it provides support for manage your workflow dependencies through built-in support for Conda, Docker. You can read more about Nextflow at [https://www.nextflow.io/docs/latest//](https://www.nextflow.io/docs/latest/)
 
 The RAD Lab Genomics Nextflow module deploys a Nextflow server along with a Service Account and adds a firewall rule enabling access to the server through IAP Tunnel.
@@ -28,12 +21,20 @@ To test the deployment with Life Sciences API you can try to run
 And for Batch Api run
 `nextflow -c /etc/nextflow.config run nextflow-io/hello -profile gbatch`
 
+## GCP Products/Services 
+
+1. Life Sciences API
+2. Batch API
+3. Cloud Compute
+4. Cloud Storage
+5. Virtual Private Cloud (VPC)
+6. Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V10_Genomics_Nextflow.png)
+![](../../docs/images/v10_genomics_nextflow.png)
 
 ## IAM Permissions Prerequisites
 

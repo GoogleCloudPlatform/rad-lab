@@ -1,14 +1,16 @@
 # RAD Lab Silicon Module
 
+## Module Overview
+
 This RAD Lab module provides a managed environment for custom Silicon design using Open Source ASIC toolchains.
 
-## Tools
+### Tools
 
 - [JupyterLab](https://jupyter.org/)
 - [SkyWater Open Source PDK](https://github.com/google/skywater-pdk)
 - [OpenLane](https://github.com/The-OpenROAD-Project/OpenLane)
 
-## Samples notebooks
+### Samples notebooks
 
 - [Inverter](scripts/build/notebooks/inverter.md)
 
@@ -16,11 +18,12 @@ This RAD Lab module provides a managed environment for custom Silicon design usi
 
 ## GCP Products/Services 
 
-* AI Platform Notebooks
-* Virtual Private Cloud (VPC)
-* Cloud Storage
-* Cloud Build
-* Container Registry
+1. AI Platform Notebooks
+2. Virtual Private Cloud (VPC)
+3. Cloud Storage
+4. Cloud Build
+5. Container Registry
+6. Billing Budget
 
 ## Reference Architecture Diagram
 

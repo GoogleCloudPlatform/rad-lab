@@ -1,14 +1,7 @@
 # RAD Lab Genomics-Cromwell Module
 
-## GCP Products/Services 
+## Module Overview
 
-* Life Sciences API
-* Cloud Compute
-* CloudSQL
-* Cloud Storage
-* Virtual Private Cloud (VPC)
-
-## Module Overview 
 Cromwell is a Workflow Management System geared towards scientific workflows. Cromwell is open sourced under the BSD 3-Clause license. Checkout Cromwell documentation at [https://cromwell.readthedocs.io/](https://cromwell.readthedocs.io/)
 
 The RAD Lab Genomics module deploys Cromwell server along with a a CloudSQL instance and adds a firewall rule enabling access to the server through IAP Tunnel.
@@ -28,11 +21,20 @@ Once you run the command above simply click on the web preview button in the top
 * On your local device
 You can start an IAP tunnel on your local device from the terminal and then from the broswer browse to http://localhost:8080 . This would also work on Chromebooks with running the command from the Linux container, note that port 8080 is already mapped to localhost, so you only need to browse to  http://localhost:8080. you can also use CLI as shown above.
 
+## GCP Products/Services 
+
+1. Life Sciences API
+2. Cloud Compute
+3. CloudSQL
+4. Cloud Storage
+5. Virtual Private Cloud (VPC)
+6. Billing Budget
+
 ## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V4_Genomics_Cromwell.png)
+![](../../docs/images/v4_genomics_cromwell.png)
 
 ## API Prerequisites
 

@@ -1,16 +1,6 @@
 # RAD Lab Genomics Module
 
-## GCP Products/Services 
-
-* Cloud Functions
-* Cloud Storage
-* Virtual Private Cloud (VPC)
-* Lifesceinces API
-* Compute engine
-* Container registry
-
-
-## Module Overview 
+## Module Overview
 
 This RAD Lab Genomics module demonstrates how to take a serverless approach to automate execution of pipeline jobs. e.g running QC checks on incoming fastq files using FastQC.
 
@@ -26,12 +16,21 @@ FastQC tool is built as a container and stored in the Google cloud Container reg
 
 * Once the module is deployed, to start using the pipelines, upload your fastq or fastq.qz files to the input GCS bucket (ngs-input-bucket-xxx), this automatically triggers the FastQC pipeline and the output QC reports and exeuction logs are stored in the output bucket (ngs-output-bucket-xxx)
 
+## GCP Products/Services 
+
+1. Cloud Functions
+2. Cloud Storage
+3. Virtual Private Cloud (VPC)
+4. Lifesceinces API
+5. Cloud Compute engine
+6. Container registry
+7. Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architecture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V3_Genomics.png)
+![](../../docs/images/v3_genomics_dsub.png)
 
 ## API Prerequisites
 

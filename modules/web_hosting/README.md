@@ -1,4 +1,6 @@
-# RAD Lab Web Hosting module
+# RAD Lab Web Hosting Module
+
+## Module Overview
 
 This RAD Lab module builds a 3-tier application architecture which is a modular client-server architecture that consists of a presentation tier, an application tier and a data tier. The data tier stores information, the application tier handles logic and the presentation tier is a graphical user interface (GUI) that communicates with the other two tiers. This modules spins up a sample app aka registration form which takes data from UI (Presentation Layer), process the data on GCE servers (application layer) and selects or insert data into Cloud SQL Postgres DB (database layer)
 
@@ -6,21 +8,21 @@ NOTE: Once the deployment is completed wait for ~10 minutes for the Application 
 
 ## GCP Products/Services
 
-* Virtual Private Cloud (VPC)
-* Compute Engine: Virtual Machines
-* Cloud NAT
-* Cloud Load Balancing
-* Cloud Armor
-* Clous CDN
-* Cloud Storage
-* Cloud SQL
-* Billing Budget
+1. Virtual Private Cloud (VPC)
+2. Compute Engine: Virtual Machines
+3. Cloud NAT
+4. Cloud Load Balancing
+5. Cloud Armor
+6. Clous CDN
+7. Cloud Storage
+8. Cloud SQL
+9. Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V8_Web_Hosting.png)
+![](../../docs/images/v8_web_hosting.png)
 
 ## API Prerequisites
 

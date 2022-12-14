@@ -1,9 +1,10 @@
-# RAD Lab AlphaFold module
-
+# RAD Lab AlphaFold Module
 
 _AlphaFold Data Copyright (2022) DeepMind Technologies Limited._
 
 _The structures provided via this resource are predictions with varying levels of confidence and should be interpreted carefully. They are for theoretical modelling only, caution should be exercised in their use. They are provided ‘as-is’ without any warranty of any kind, whether expressed or implied. The information is not intended to be a substitute for professional medical advice, diagnosis, or treatment, and does not constitute medical or other professional advice._
+
+## Module Overview
 
 Bio-pharma organizations can now leverage the groundbreaking protein folding system, AlphaFold, with Vertex AI Alphafold Rad lab module. 
 This module does following things:
@@ -11,20 +12,22 @@ This module does following things:
 2. Enables Vertex AI APIs 
 3. Deploys the alphafold container as a notebook in Vertex AI platform workbench. It uses a customized Docker image in Artifact Registry, with preinstalled packages for launching a notebook instance in Vertex AI Workbench and prerequisites for running AlphaFold.
 
-Under the hood, this RAD Lab module utilizes Data Science Module and deploys the AlphaFold configutaions over Vertex AI Workbench.
+Under the hood, this RAD Lab module utilizes Data Science Module and deploys the AlphaFold configutaions over Vertex AI Workbench. Vertex AI lets you develop the entire data science/machine learning workflow in a single development environment, helping you deploy models faster, with fewer lines of code and fewer distractions.
 
 ## GCP Products/Services
-Vertex AI lets you develop the entire data science/machine learning workflow in a single development environment, helping you deploy models faster, with fewer lines of code and fewer distractions.
 
-1. Vertex AI Workbench Notebooks with alphafold container to run alphafold demo
-2. Google Cloud Storage
-3. Artifact Repository to fetch the alphafold conatiner image for notebook deployment.
+1. Vertex AI Workbench Notebooks
+2. BigQuery
+3. Cloud Storage
+4. Virtual Private Cloud (VPC)
+5. Artifact Repository
+6. Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V5_Alphafold.png)
+![](../../docs/images/v5_alpha_fold.png)
 
 For running AlphaFold, we choose Vertex AI Workbench user-managed notebooks, which uses Jupyter notebooks and offers both various preinstalled suites of deep learning packages and full control over the environment. We also use Google Cloud Storage and Google Cloud Artifact Registry, as shown in the architecture diagram above.We provide a customized Docker image in Artifact Registry, with preinstalled packages for launching a notebook instance in Vertex AI Workbench and prerequisites for running AlphaFold.
 

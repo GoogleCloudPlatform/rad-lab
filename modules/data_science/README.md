@@ -1,18 +1,20 @@
 # RAD Lab Data Science Module
 
-## GCP Products/Services 
+## Module Overview
 
-* Vertex AI Workbench Notebooks (a.k.a. AI Platform Notebooks)
-* BigQuery
-* Cloud Storage
-* Virtual Private Cloud (VPC)
-* Billing Budget
+## GCP Products/Services
+
+1. Vertex AI Workbench Notebooks
+2. BigQuery
+3. Cloud Storage
+4. Virtual Private Cloud (VPC)
+5. Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V1_DataScience.png)
+![](../../docs/images/v1_data_science.png)
 
 We provide sample Jupyter Notebooks as part of data science module deployment. If you would like to include your own Jupyter Notebooks add them into [scripts/build/notebooks](./scripts/build/notebooks) folder and then run the deployment. You will be able to access your Jupyter notebooks from the Vertex AI Workbench Notebook created as part of the deployment.
 
