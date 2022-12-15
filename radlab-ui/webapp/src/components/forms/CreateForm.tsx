@@ -51,10 +51,10 @@ const CreateForm: React.FC<CreateForm> = ({
 
   if (!user) throw new Error("No signed in user")
 
-  const removeAdminData = (datam: IFormData) => {
+  const removeAdminData = (data: IFormData) => {
     const filterData: IFormData = []
-    Object.keys(datam).forEach((value) => {
-      const dataSelected = datam[value]
+    Object.keys(data).forEach((value) => {
+      const dataSelected = data[value]
       /* not consider admin user related variable data which group has value 0 */
       if (dataSelected[0].group !== 0) {
         filterData.push(dataSelected)
@@ -71,32 +71,40 @@ const CreateForm: React.FC<CreateForm> = ({
    */
 
   const initialFormikDefaultData = async (data: IFormData) => {
-    const defaultVars = defaultVariableData(data)
-    const adminVars = await getAdminSettingData()
-    const moduleVars = await getPublishedDataByModuleName(selectedModuleName)
-    if (update) {
-      await axios
-        .get(`/api/deployments/${params.deployId}`)
-        .then((res) => {
-          const deployment = Deployment.parse(res.data.deployment)
-          const userVars = deployment.variables
-          const variables = Object.assign(
-            {},
-            defaultVars,
-            adminVars,
-            moduleVars,
-            userVars,
-          )
-          setInitialData(variables)
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-        .finally(() => setLoading(false))
-    } else {
-      const variables = Object.assign({}, defaultVars, adminVars, moduleVars)
-      setInitialData(variables)
-      setLoading(false)
+    try {
+      const defaultVars = defaultVariableData(data)
+      const [adminVars, moduleVars] = await Promise.all([
+        getAdminSettingData(),
+        getPublishedDataByModuleName(selectedModuleName),
+      ])
+
+      if (update) {
+        await axios
+          .get(`/api/deployments/${params.deployId}`)
+          .then((res) => {
+            const deployment = Deployment.parse(res.data.deployment)
+            const userVars = deployment.variables
+            const variables = Object.assign(
+              {},
+              defaultVars,
+              adminVars,
+              moduleVars,
+              userVars,
+            )
+            setInitialData(variables)
+          })
+          .catch((error) => {
+            console.error(error)
+          })
+          .finally(() => setLoading(false))
+      } else {
+        // Merging variable by their priority
+        const variables = Object.assign({}, defaultVars, adminVars, moduleVars)
+        setInitialData(variables)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error(error)
     }
   }
 

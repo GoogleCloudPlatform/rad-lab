@@ -223,11 +223,11 @@ const GCP_PROJECT_ID = envOrFail(
   process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
 )
 
-export const getAdminSettingData = async () => {
-  const adminVariableData = await axios
+export const getAdminSettingData = () => {
+  const adminVariableData = axios
     .get(`/api/settings?projectId=${GCP_PROJECT_ID}`)
     .then((res) => {
-      return res.data.settings.variables
+      return res.data.settings?.variables || {}
     })
     .catch((error) => {
       console.error(error)
@@ -237,20 +237,16 @@ export const getAdminSettingData = async () => {
   return adminVariableData
 }
 
-export const getPublishedDataByModuleName = async (moduleName: string) => {
-  const moduleVariableData = await axios
+export const getPublishedDataByModuleName = (moduleName: string) => {
+  const moduleVariableData = axios
     .get(`/api/modules`)
     .then((res) => {
       const getPublishedModulesData: IModule[] = res.data.modules
-      const indexPublishedModule = getPublishedModulesData.findIndex(
+      const publishedModuleData = getPublishedModulesData.find(
         (item) => item.name === moduleName,
       )
-      const moduleVariables =
-        indexPublishedModule !== -1
-          ? getPublishedModulesData[indexPublishedModule]!.variables
-          : {}
 
-      return moduleVariables
+      return publishedModuleData?.variables || {}
     })
     .catch((error) => {
       console.error(error)
@@ -259,6 +255,12 @@ export const getPublishedDataByModuleName = async (moduleName: string) => {
 
   return moduleVariableData
 }
+
+/**
+ * Represents the formik field default value
+ * @ defaultVariableData
+ * @param {string}  data - filtered initial form data @defaultVariableData
+ */
 
 export const defaultVariableData = (data: IFormData) => {
   const defaultVarObjData: IObjKeyPair = {}
