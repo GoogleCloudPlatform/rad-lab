@@ -48,7 +48,9 @@ Every individual module is contained in it subdirectory and should follow these 
 
 - If any additional scripts (apart from **terraform** configs) are required to support the module either to *build* or *use* the module, move them to individual module's subdirectory, example: `/modules/[MODULE-NAME]/scripts/build` & `/modules/[MODULE-NAME]/scripts/usage` respectively. 
 
-- A **README.md** containing more information about the modules, required IAM permissions and any specific instructions to create the infrastructure, etc. Make sure to add atleast below mentioned Headings & Sub Headings:
+- Add the GCP architecture diagram under `modules/[MODULE_NAME]/images` with filename as `architecture.png` for respective module.
+
+- A **README.md** containing more information about the modules, required IAM permissions and any specific instructions to create the infrastructure, etc. Make sure to add at least the below mentioned Headings & Sub Headings:
 
     - HEADING:
         - `# RAD LAB [MODULE-NAME] Module` : Title of the Module Specific README.
@@ -56,9 +58,9 @@ Every individual module is contained in it subdirectory and should follow these 
     - SUB-HEADINGS:
         - `## Module Overview` : Description about the module. 
         - `## GCP Products/Services`: List the GCP products and the sevices used in the respective module development.
-        - `## Reference Architecture Diagram` : Add the GCP architecture diagram under this section. Images for module specific architechture diagrams are stored under [docs/images](./images/) directory.
+        - `## Reference Architecture Diagram` : Add the GCP architecture diagram under this section. Images for module specific architechture diagrams should be stored under `modules/[MODULE_NAME]/images` with filename as `architecture.png` for respective module.
 
-    NOTE: Add below 2 tags in the RAD-Lab module specific README.md for populating structured Variables and Outputs automatically via [tfdoc.py](../tools/tfdoc.py).
+    NOTE: Add the below two tags in the RAD-Lab module specific README.md for populating structured Variables and Outputs automatically via [tfdoc.py](../tools/tfdoc.py).
 
     ```
     <!-- BEGIN TFDOC -->
