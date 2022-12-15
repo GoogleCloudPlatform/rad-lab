@@ -215,3 +215,16 @@ const checkModuleVariablesZero = async (moduleName: string) => {
     })
   return returnModuleVariableData
 }
+
+export const getRegionZoneList = () => {
+  const regionZoneData = axios
+    .get(`/api/regions`)
+    .then((res) => {
+      return res.data.regions
+    })
+    .catch((error) => {
+      console.error(error)
+      return []
+    })
+  return regionZoneData
+}

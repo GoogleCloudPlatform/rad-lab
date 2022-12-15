@@ -2,18 +2,17 @@ import sortBy from "lodash/sortBy"
 import { useFormikContext, FormikValues } from "formik"
 import { FormikStep } from "@/components/forms/FormikStepper"
 
-import { IUIVariable } from "@/utils/types"
+import { IUIVariable, IRegion } from "@/utils/types"
 import { useState, useEffect } from "react"
 
 import StringField from "@/components/forms/fields/StringField"
 import RegionStringField from "@/components/forms/fields/RegionStringField"
 import ZoneStringField from "@/components/forms/fields/ZoneStringField"
 
-import { ZONE_LIST } from "@/utils/data"
-
 interface IDefaultStepCreatorProps {
   variableList: IUIVariable[]
   idx: number
+  regionZoneListData: IRegion[]
 }
 
 type IFieldValidateValue = { value: string | number | boolean }
@@ -21,9 +20,11 @@ type IFieldValidateValue = { value: string | number | boolean }
 const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
   variableList,
   idx,
+  regionZoneListData,
 }) => {
   const [zoneListData, setZoneListData] = useState<string[]>([])
   const { values } = useFormikContext<FormikValues>()
+  const [regionListData, setRegionListData] = useState<string[]>([])
 
   let sortedList = sortBy(variableList, "order")
 
@@ -35,17 +36,19 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
     return error
   }
 
-  const getZoneByRegion = (regionName: string) => {
-    const zoneFilterData = ZONE_LIST.filter((v) => {
-      const toMatchData = v.split("-")
-      toMatchData.pop()
-      const checkMatch = toMatchData.join("-")
-      if (checkMatch === regionName) {
-        return v
-      } else {
-        return ""
-      }
+  const fetchRegionList = () => {
+    const regionsList = regionZoneListData.map((regionItems: IRegion) => {
+      return regionItems.name
     })
+    setRegionListData(regionsList)
+  }
+
+  const getZoneByRegion = (regionName: string) => {
+    const selectedRegion = regionZoneListData.find(
+      (reginItems) => reginItems.name === regionName,
+    )
+    const zoneFilterData = selectedRegion?.zones || []
+
     return zoneFilterData
   }
 
@@ -60,6 +63,7 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
 
   const renderControls = (variable: IUIVariable) => {
     if (variable.name === "region") {
+      variable.options = regionListData
       return (
         <RegionStringField
           variable={variable}
@@ -81,6 +85,7 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
   }
 
   useEffect(() => {
+    fetchRegionList()
     // To dispaly default list of zone based on region
     const zoneByRegion = getZoneByRegion(values.region)
     setZoneListData(zoneByRegion)
