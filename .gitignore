@@ -65,6 +65,7 @@ env/
 .envrc
 elk/
 test/**
+**/kms_helper_venv
 
 # Zip files for function code
 *.zip
