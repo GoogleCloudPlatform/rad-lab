@@ -6,9 +6,9 @@ This module allows the user to create an Elasticsearch cluster, deployed on a GK
 
 ## GCP Products/Services 
 
-1. Google Kubernetes Engine
-2. Virtual Private Cloud (VPC)
-3. Billing Budget
+* Google Kubernetes Engine
+* Virtual Private Cloud (VPC)
+* Billing Budget
 
 ## Reference Architecture Diagram
 

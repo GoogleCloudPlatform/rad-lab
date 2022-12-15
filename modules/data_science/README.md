@@ -4,11 +4,11 @@
 
 ## GCP Products/Services
 
-1. Vertex AI Workbench Notebooks
-2. BigQuery
-3. Cloud Storage
-4. Virtual Private Cloud (VPC)
-5. Billing Budget
+* Vertex AI Workbench Notebooks
+* BigQuery
+* Cloud Storage
+* Virtual Private Cloud (VPC)
+* Billing Budget
 
 ## Reference Architecture Diagram
 

@@ -8,15 +8,15 @@ NOTE: Once the deployment is completed wait for ~10 minutes for the Application 
 
 ## GCP Products/Services
 
-1. Virtual Private Cloud (VPC)
-2. Compute Engine: Virtual Machines
-3. Cloud NAT
-4. Cloud Load Balancing
-5. Cloud Armor
-6. Clous CDN
-7. Cloud Storage
-8. Cloud SQL
-9. Billing Budget
+* Virtual Private Cloud (VPC)
+* Compute Engine: Virtual Machines
+* Cloud NAT
+* Cloud Load Balancing
+* Cloud Armor
+* Clous CDN
+* Cloud Storage
+* Cloud SQL
+* Billing Budget
 
 ## Reference Architecture Diagram
 

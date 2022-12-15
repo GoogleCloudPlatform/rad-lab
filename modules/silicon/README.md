@@ -18,12 +18,12 @@ This RAD Lab module provides a managed environment for custom Silicon design usi
 
 ## GCP Products/Services 
 
-1. AI Platform Notebooks
-2. Virtual Private Cloud (VPC)
-3. Cloud Storage
-4. Cloud Build
-5. Container Registry
-6. Billing Budget
+* AI Platform Notebooks
+* Virtual Private Cloud (VPC)
+* Cloud Storage
+* Cloud Build
+* Container Registry
+* Billing Budget
 
 ## Reference Architecture Diagram
 

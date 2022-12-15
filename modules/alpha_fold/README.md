@@ -16,12 +16,12 @@ Under the hood, this RAD Lab module utilizes Data Science Module and deploys the
 
 ## GCP Products/Services
 
-1. Vertex AI Workbench Notebooks
-2. BigQuery
-3. Cloud Storage
-4. Virtual Private Cloud (VPC)
-5. Artifact Repository
-6. Billing Budget
+* Vertex AI Workbench Notebooks
+* BigQuery
+* Cloud Storage
+* Virtual Private Cloud (VPC)
+* Artifact Repository
+* Billing Budget
 
 ## Reference Architecture Diagram
 

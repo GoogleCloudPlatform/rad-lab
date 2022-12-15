@@ -23,12 +23,12 @@ And for Batch Api run
 
 ## GCP Products/Services 
 
-1. Life Sciences API
-2. Batch API
-3. Cloud Compute
-4. Cloud Storage
-5. Virtual Private Cloud (VPC)
-6. Billing Budget
+* Life Sciences API
+* Batch API
+* Cloud Compute
+* Cloud Storage
+* Virtual Private Cloud (VPC)
+* Billing Budget
 
 ## Reference Architecture Diagram
 

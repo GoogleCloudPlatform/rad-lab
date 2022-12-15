@@ -6,8 +6,8 @@ This module creates a simple GCP project, enables APIs, adds users to the projec
 
 ## GCP Products/Services
 
-1. GCP Project
-2. Billing Budget
+* GCP Project
+* Billing Budget
 
 ## Reference Architecture Diagram
 

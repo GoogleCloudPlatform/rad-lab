@@ -23,12 +23,12 @@ You can start an IAP tunnel on your local device from the terminal and then from
 
 ## GCP Products/Services 
 
-1. Life Sciences API
-2. Cloud Compute
-3. CloudSQL
-4. Cloud Storage
-5. Virtual Private Cloud (VPC)
-6. Billing Budget
+* Life Sciences API
+* Cloud Compute
+* CloudSQL
+* Cloud Storage
+* Virtual Private Cloud (VPC)
+* Billing Budget
 
 ## Reference Architecture Diagram
 

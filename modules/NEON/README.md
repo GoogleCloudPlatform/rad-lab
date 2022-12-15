@@ -6,12 +6,12 @@ This RAD Lab module provides a managed environment for research and data analyti
 
 ## GCP Products/Services 
 
-1. Vertex AI Workbench Notebooks
-2. Virtual Private Cloud (VPC)
-3. BigQuery
-4. Analytics Hub
-5. Cloud Storage
-6. Billing Budget
+* Vertex AI Workbench Notebooks
+* Virtual Private Cloud (VPC)
+* BigQuery
+* Analytics Hub
+* Cloud Storage
+* Billing Budget
 
 ## Reference Architecture Diagram
 
