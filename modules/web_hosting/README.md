@@ -22,7 +22,7 @@ NOTE: Once the deployment is completed wait for ~10 minutes for the Application 
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/v8_web_hosting.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 

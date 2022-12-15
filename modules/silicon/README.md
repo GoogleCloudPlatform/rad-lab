@@ -29,7 +29,7 @@ This RAD Lab module provides a managed environment for custom Silicon design usi
 
 Below Architecture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V6_SiliconDesign.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 

@@ -34,7 +34,7 @@ You can start an IAP tunnel on your local device from the terminal and then from
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/v4_genomics_cromwell.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 

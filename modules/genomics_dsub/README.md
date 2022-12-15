@@ -30,7 +30,7 @@ FastQC tool is built as a container and stored in the Google cloud Container reg
 
 Below Architecture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/v3_genomics_dsub.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 

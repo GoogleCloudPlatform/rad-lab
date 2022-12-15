@@ -13,7 +13,7 @@ This module creates a simple GCP project, enables APIs, adds users to the projec
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/v7_billing_budget.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 
