@@ -1,4 +1,6 @@
-# RAD Lab Web Hosting module
+# RAD Lab Web Hosting Module
+
+## Module Overview
 
 This RAD Lab module builds a 3-tier application architecture which is a modular client-server architecture that consists of a presentation tier, an application tier and a data tier. The data tier stores information, the application tier handles logic and the presentation tier is a graphical user interface (GUI) that communicates with the other two tiers. This modules spins up a sample app aka registration form which takes data from UI (Presentation Layer), process the data on GCE servers (application layer) and selects or insert data into Cloud SQL Postgres DB (database layer)
 
@@ -20,7 +22,7 @@ NOTE: Once the deployment is completed wait for ~10 minutes for the Application 
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V8_Web_Hosting.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 
