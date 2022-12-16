@@ -1,14 +1,16 @@
 # RAD Lab Silicon Module
 
+## Module Overview
+
 This RAD Lab module provides a managed environment for custom Silicon design using Open Source ASIC toolchains.
 
-## Tools
+### Tools
 
 - [JupyterLab](https://jupyter.org/)
 - [SkyWater Open Source PDK](https://github.com/google/skywater-pdk)
 - [OpenLane](https://github.com/The-OpenROAD-Project/OpenLane)
 
-## Samples notebooks
+### Samples notebooks
 
 - [Inverter](scripts/build/notebooks/inverter.md)
 
@@ -21,12 +23,13 @@ This RAD Lab module provides a managed environment for custom Silicon design usi
 * Cloud Storage
 * Cloud Build
 * Container Registry
+* Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architecture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V6_SiliconDesign.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 
