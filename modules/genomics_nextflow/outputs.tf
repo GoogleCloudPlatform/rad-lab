@@ -18,10 +18,12 @@ output "project_id" {
   description = "Project ID where resources where created"
   value       = local.project.project_id
 }
+
 output "nextflow_server_instance_id" {
   description = "VM instance name running the nextflow server"
   value       = google_compute_instance.nextflow_server.name
 }
+
 output "nextflow_server_zone" {
   description = "Google Cloud zone in which the server was provisioned"
   value       = var.zone

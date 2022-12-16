@@ -9,11 +9,11 @@ title: Deployment via RAD Lab Launcher
 Below video provides a quick overview on how to setup RAD Lab Launcher and deploy RAD Lab modules with the same.
 
 <iframe
-    width="640"
+    width="980"
     height="480"
-    src="https://www.youtube.com/embed/4SkiTyY9M_4"
+    src="https://www.youtube.com/embed/mHc914BkFkM"
     frameborder="0"
-    allow="autoplay; encrypted-media"
+    allow="encrypted-media"
     allowfullscreen
 >
 </iframe>
