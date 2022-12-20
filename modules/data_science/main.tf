@@ -15,26 +15,32 @@
  */
 
 locals {
+  random_id = var.deployment_id != null ? var.deployment_id : random_id.default.0.hex
+  project   = (var.create_project
+  ? try(module.project_radlab_ds_analytics.0, null)
+  : try(data.google_project.existing_project.0, null)
+  )
   region = join("-", [split("-", var.zone)[0], split("-", var.zone)[1]])
 
   network = (
-    var.create_network
-    ? try(module.vpc_ai_notebook.0.network.network, null)
-    : try(data.google_compute_network.default.0, null)
+  var.create_network
+  ? try(module.vpc_ai_notebook.0.network.network, null)
+  : try(data.google_compute_network.default.0, null)
   )
 
   subnet = (
-    var.create_network
-    ? try(module.vpc_ai_notebook.0.subnets["${local.region}/${var.subnet_name}"], null)
-    : try(data.google_compute_subnetwork.default.0, null)
+  var.create_network
+  ? try(module.vpc_ai_notebook.0.subnets["${local.region}/${var.subnet_name}"], null)
+  : try(data.google_compute_subnetwork.default.0, null)
   )
 
   notebook_sa_project_roles = [
     "roles/compute.instanceAdmin",
     "roles/notebooks.admin",
     "roles/bigquery.user",
-    "roles/storage.objectViewer",
-    "roles/iam.serviceAccountUser"
+    "roles/storage.admin",
+    "roles/iam.serviceAccountUser",
+    "roles/serviceusage.serviceUsageConsumer"
   ]
 
   default_apis = [
@@ -43,36 +49,58 @@ locals {
     "notebooks.googleapis.com",
     "bigquerystorage.googleapis.com"
   ]
-  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis, ["pubsub.googleapis.com"])) : local.default_apis) : []
+  project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 }
 
-module "project" {
-  source = "../../helpers/tf-support-modules/project"
-
-  billing_account_id = var.billing_account_id
-  project_id_prefix  = var.project_id_prefix
-  create_project     = var.create_project
-  deployment_id      = var.deployment_id
-  organization_id    = var.organization_id
-  folder_id          = var.folder_id
-  project_apis       = local.project_services
-
-  organization_policies_bool = local.organization_bool_policies
-  organization_policies_list = local.organization_list_policies
+resource "random_id" "default" {
+  count       = var.deployment_id == null ? 1 : 0
+  byte_length = 2
 }
 
 #####################
 # ANALYTICS PROJECT #
 #####################
+
+data "google_project" "existing_project" {
+  count      = var.create_project ? 0 : 1
+  project_id = var.project_id_prefix
+}
+
+module "project_radlab_ds_analytics" {
+  count   = var.create_project ? 1 : 0
+  source  = "terraform-google-modules/project-factory/google"
+  version = "~> 13.0"
+
+  name              = format("%s-%s", var.project_id_prefix, local.random_id)
+  random_project_id = false
+  folder_id         = var.folder_id
+  billing_account   = var.billing_account_id
+  org_id            = var.organization_id
+
+  activate_apis = []
+}
+
+resource "google_project_service" "enabled_services" {
+  for_each                   = toset(local.project_services)
+  project                    = local.project.project_id
+  service                    = each.value
+  disable_dependent_services = true
+  disable_on_destroy         = true
+
+  depends_on = [
+    module.project_radlab_ds_analytics
+  ]
+}
+
 data "google_compute_network" "default" {
   count   = var.create_network ? 0 : 1
-  project = module.project.project_id
+  project = local.project.project_id
   name    = var.network_name
 }
 
 data "google_compute_subnetwork" "default" {
   count   = var.create_network ? 0 : 1
-  project = module.project.project_id
+  project = local.project.project_id
   name    = var.subnet_name
   region  = local.region
 }
@@ -82,7 +110,7 @@ module "vpc_ai_notebook" {
   source  = "terraform-google-modules/network/google"
   version = "~> 5.0"
 
-  project_id   = module.project.project_id
+  project_id   = local.project.project_id
   network_name = var.network_name
   routing_mode = "GLOBAL"
   description  = "VPC Network created via Terraform"
@@ -113,17 +141,23 @@ module "vpc_ai_notebook" {
       ]
     }
   ]
+
+  depends_on = [
+    module.project_radlab_ds_analytics,
+    google_project_service.enabled_services,
+    time_sleep.wait_120_seconds
+  ]
 }
 
 resource "google_service_account" "sa_p_notebook" {
-  project      = module.project.project_id
-  account_id   = format("sa-p-notebook-%s", module.project.deployment_id)
+  project      = local.project.project_id
+  account_id   = format("sa-p-notebook-%s", local.random_id)
   display_name = "Notebooks in trusted environment"
 }
 
 resource "google_project_iam_member" "sa_p_notebook_permissions" {
   for_each = toset(local.notebook_sa_project_roles)
-  project  = module.project.project_id
+  project  = local.project.project_id
   member   = "serviceAccount:${google_service_account.sa_p_notebook.email}"
   role     = each.value
 }
@@ -135,24 +169,10 @@ resource "google_service_account_iam_member" "sa_ai_notebook_iam" {
   service_account_id = google_service_account.sa_p_notebook.id
 }
 
-resource "google_project_iam_member" "module_role1" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = module.project.project_id
-  member   = each.value
-  role     = "roles/notebooks.admin"
-}
-
-resource "google_project_iam_member" "module_role2" {
-  for_each = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
-  project  = module.project.project_id
-  member   = each.value
-  role     = "roles/viewer"
-}
-
 resource "null_resource" "ai_notebook_usermanaged_provisioning_state" {
   for_each = toset(google_notebooks_instance.ai_notebook_usermanaged[*].name)
   provisioner "local-exec" {
-    command = "while [ \"$(gcloud notebooks instances list --location ${var.zone} --project ${module.project.project_id} --filter 'NAME:${each.value} AND STATE:ACTIVE' --format 'value(STATE)' | wc -l | xargs)\" != 1 ]; do echo \"${each.value} not active yet.\"; done"
+    command = "while [ \"$(gcloud notebooks instances list --location ${var.zone} --project ${local.project.project_id} --filter 'NAME:${each.value} AND STATE:ACTIVE' --format 'value(STATE)' | wc -l | xargs)\" != 1 ]; do echo \"${each.value} not active yet.\"; done"
   }
 
   depends_on = [google_notebooks_instance.ai_notebook_usermanaged]
@@ -160,7 +180,7 @@ resource "null_resource" "ai_notebook_usermanaged_provisioning_state" {
 
 resource "google_notebooks_instance" "ai_notebook_usermanaged" {
   count        = var.notebook_count > 0 && var.create_usermanaged_notebook ? var.notebook_count : 0
-  project      = module.project.project_id
+  project      = local.project.project_id
   name         = "usermanaged-notebooks-${count.index + 1}"
   location     = var.zone
   machine_type = var.machine_type
@@ -213,6 +233,7 @@ resource "google_notebooks_instance" "ai_notebook_usermanaged" {
     proxy-mode = "mail"
   }
   depends_on = [
+    time_sleep.wait_120_seconds,
     google_storage_bucket_object.notebooks
   ]
 }
@@ -220,7 +241,7 @@ resource "google_notebooks_instance" "ai_notebook_usermanaged" {
 resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
   count    = var.notebook_count > 0 && !var.create_usermanaged_notebook ? var.notebook_count : 0
   name     = "googlemanaged-notebooks-${count.index + 1}"
-  project  = module.project.project_id
+  project  = local.project.project_id
   location = local.region
   access_config {
     access_type   = "SERVICE_ACCOUNT"
@@ -256,13 +277,14 @@ resource "google_notebooks_runtime" "ai_notebook_googlemanaged" {
     }
   }
   depends_on = [
+    time_sleep.wait_120_seconds,
     google_storage_bucket_object.notebooks
   ]
 }
 
 resource "google_storage_bucket" "user_scripts_bucket" {
-  project                     = module.project.project_id
-  name                        = join("", ["user-scripts-", module.project.project_id])
+  project                     = local.project.project_id
+  name                        = join("", ["user-scripts-", local.project.project_id])
   location                    = local.region
   force_destroy               = true
   uniform_bucket_level_access = true

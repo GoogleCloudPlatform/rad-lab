@@ -12,9 +12,11 @@
 
 /.github/                       @guptamukul-google
 
-/docs/                          @agussman @BrianReevz @debakkerb @guptamukul-google
+/docs/                          @acolver @agussman @BrianReevz @debakkerb @guptamukul-google
 
 /modules/                       @debakkerb @guptamukul-google @debakkerb
+
+/radlab-ui/                     @acolver @debakkerb @guptamukul-google
 
 /scripts/                       @guptamukul-google
 
@@ -30,7 +32,7 @@
 
 *.json   @guptamukul-google 
 
-*.md    @agussman @BrianReevz @debakkerb @guptamukul-google @hradhakrishnan
+*.md    @acolver @agussman @BrianReevz @debakkerb @guptamukul-google @hradhakrishnan
 
 *.py    @guptamukul-google
 

@@ -1,37 +1,36 @@
 # RAD Lab Genomics Module
 
-## GCP Products/Services 
-
-* Cloud Functions
-* Cloud Storage
-* Virtual Private Cloud (VPC)
-* Lifesceinces API
-* Compute engine
-* Container registry
-
-
 ## Module Overview 
 
 This RAD Lab Genomics module demonstrates how to take a serverless approach to automate execution of pipeline jobs. e.g running QC checks on incoming fastq files using FastQC.
 
-The module is packaged to use databiosphere dsub as a Workflow engine, containerized tools (FastQC) and Google cloud lifescience API to automate execution of pipeline jobs. The function can be easily modified to adopt to other bioinformatic tools out there.
+The module is packaged to use databiosphere dsub as a Workflow engine, containerized tools (FastQC) and [Google Cloud Life Sciences API](https://cloud.google.com/life-sciences) to automate execution of pipeline jobs. The function can be easily modified to adopt to other bioinformatic tools out there.
 
 dsub is a command-line tool that makes it easy to submit and run batch scripts in the cloud. The cloud function has embedded dsub libraries to execute pipeline jobs in Google cloud.
 
-we will run FastQC (credit to https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) as a docker container using lifesciences API against fastq files and store the QC reports generated in output GCS bucket.
+we will run FastQC (credit to https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) as a docker container using Life Sciences API against fastq files and store the QC reports generated in output GCS bucket.
 
-Cloud Life Sciences API provides a simple way to execute a series of Compute Engine containers on Google Cloud.
+Google Cloud Life Sciences API provides a simple way to execute a series of Compute Engine containers on Google Cloud.
 
 FastQC tool is built as a container and stored in the Google cloud Container registry from where it can be called. 
 
 * Once the module is deployed, to start using the pipelines, upload your fastq or fastq.qz files to the input GCS bucket (ngs-input-bucket-xxx), this automatically triggers the FastQC pipeline and the output QC reports and exeuction logs are stored in the output bucket (ngs-output-bucket-xxx)
 
+## GCP Products/Services 
+
+* Cloud Functions
+* Cloud Storage
+* Virtual Private Cloud (VPC)
+* Life Sciences API
+* Compute Engine
+* Container Registry
+* Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architecture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V3_Genomics.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 
@@ -100,6 +99,8 @@ _Usage:_
 | *machine_type* | Type of VM you would like to spin up | <code title="">string</code> |  | <code title="">n1-standard-2</code> |
 | *network* | Network associated to the project | <code title="">string</code> |  | <code title="">ngs-network</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
+| *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
+| *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-genomics-dsub</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
 | *set_cloudfunctions_ingress_project_policy* | Apply org policy to set the ingress settings for cloud functions | <code title="">bool</code> |  | <code title="">false</code> |

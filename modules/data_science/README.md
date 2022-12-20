@@ -1,8 +1,10 @@
 # RAD Lab Data Science Module
 
-## GCP Products/Services 
+## Module Overview
 
-* Vertex AI Workbench Notebooks (a.k.a. AI Platform Notebooks)
+## GCP Products/Services
+
+* Vertex AI Workbench Notebooks
 * BigQuery
 * Cloud Storage
 * Virtual Private Cloud (VPC)
@@ -12,7 +14,7 @@
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V1_DataScience.png)
+![](./images/architecture.png)
 
 We provide sample Jupyter Notebooks as part of data science module deployment. If you would like to include your own Jupyter Notebooks add them into [scripts/build/notebooks](./scripts/build/notebooks) folder and then run the deployment. You will be able to access your Jupyter notebooks from the Vertex AI Workbench Notebook created as part of the deployment.
 
@@ -156,6 +158,8 @@ module "existing_project_and_network" {
 | *network_name* | Name of the network to be created | <code title="">string</code> |  | <code title="">ai-notebook</code> |
 | *notebook_count* | Number of AI Notebooks requested | <code title="">number</code> |  | <code title="">1</code> |
 | *organization_id* | Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id | <code title="">string</code> |  | <code title=""></code> |
+| *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
+| *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-data-science</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
 | *set_domain_restricted_sharing_policy* | Enable org policy to allow all principals to be added to IAM policies | <code title="">bool</code> |  | <code title="">false</code> |
