@@ -52,7 +52,6 @@ locals {
   ]
   project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis,["pubsub.googleapis.com"])) : local.default_apis) : []
 
-  token = length(var.resource_creator_identity) != 0 ? data.google_service_account_access_token.default[0].access_token : ""
 }
 
 resource "random_id" "default" {
@@ -300,29 +299,36 @@ resource "google_storage_bucket" "user_scripts_bucket" {
   }
 }
 
-resource "google_storage_bucket_iam_binding" "binding" {
-  bucket  = google_storage_bucket.user_scripts_bucket.name
-  role    = "roles/storage.admin"
-  members = toset(concat(formatlist("user:%s", var.trusted_users), formatlist("group:%s", var.trusted_groups)))
+data "external" "get_token" {
+  count   = length(var.resource_creator_identity) != 0 ? 0 : 1
+  program = ["/bin/bash", "-c", "echo \"{\\\"token\\\":\\\"$(gcloud auth application-default print-access-token)\\\"}\""]
 }
 
-resource "null_resource" "subscribe" {
+data "http" "subscribe" {
   for_each            = var.ah_listing_dataset_map
-  provisioner "local-exec" {
-    command = "bash ${path.module}/scripts/build/ah_subscribe.sh"
-    environment = {
-      PROJECT_ID                = local.project.project_id
-      AH_PROJECT_ID             = var.ah_project_id
-      AH_DATA_EXCHANGE_ID       = var.ah_data_exchange_id
-      AH_DATA_EXCHANGE_LOCATION = var.ah_data_exchange_location
-      AH_LISTING_ID             = each.key
-      AH_LINKED_DATASET         = each.value
-      SERVICE_ACCOUNT           = var.resource_creator_identity
-      TOKEN                     = local.token
-    }
+
+  url = "https://analyticshub.googleapis.com/v1/projects/${var.ah_project_id}/locations/${var.ah_data_exchange_location}/dataExchanges/${var.ah_data_exchange_id}/listings/${each.key}:subscribe"
+  method = "POST"
+
+  # request headers
+  request_headers = {
+    Authorization       = length(var.resource_creator_identity) != 0 ? "Bearer ${data.google_service_account_access_token.default[0].access_token}" : "Bearer ${data.external.get_token[0].result.token}",
+    x-goog-user-project = "${local.project.project_id}",
+    Accept              = "application/json",
+    Content-Type        = "application/json"
   }
+
+  # request body
+  request_body = "{\"destinationDataset\":{\"datasetReference\":{\"datasetId\":\"${each.value}\",\"projectId\":\"${local.project.project_id}\"},\"location\":\"${var.ah_data_exchange_location}\"}}"
 
   depends_on = [
     time_sleep.wait_120_seconds,
   ]
+}
+
+resource "null_resource" "subscribe_listing_check" {
+  for_each            = var.ah_listing_dataset_map
+  provisioner "local-exec" {
+    command = contains([200], data.http.subscribe[each.key].status_code)
+  }
 }

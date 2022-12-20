@@ -1,10 +1,12 @@
 # RAD Lab NEON Module
 
+## Module Overview
+
 This RAD Lab module provides a managed environment for research and data analytics on publicly shared data of the National Ecological Observatory Network (NEON) by subscribing to NEON Big Query dataset via Analytics Hub and exploring it via Jupyter Notebook(s) running over Vertex AI workbench.
 
 ## GCP Products/Services 
 
-* Vertex AI Workbench Notebooks (a.k.a. AI Platform Notebooks)
+* Vertex AI Workbench Notebooks
 * Virtual Private Cloud (VPC)
 * BigQuery
 * Analytics Hub
@@ -15,7 +17,7 @@ This RAD Lab module provides a managed environment for research and data analyti
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V9_NEON.png)
+![](./images/architecture.png)
 
 We provide Neon Jupyter Notebooks as part of Neon module deployment. If you would like to include your own Jupyter Notebooks add them into [scripts/build/notebooks](./scripts/build/notebooks) folder and then run the deployment. You will be able to access your Jupyter notebooks from the Vertex AI Workbench Notebook created as part of the deployment.
 
