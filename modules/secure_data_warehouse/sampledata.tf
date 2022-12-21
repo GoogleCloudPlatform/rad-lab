@@ -14,21 +14,29 @@
  * limitations under the License.
  */
 
-resource "google_storage_bucket_object" "file_upload" {
+/*resource "google_storage_bucket_object" "file_upload" {
   name   = "sample_data/drivers_license.csv"
   bucket = module.secured_data_warehouse.data_ingestion_bucket_name
   source = "${path.module}/scripts/build/sample_data/drivers_license.csv"
+}*/
+
+resource "google_storage_bucket_object" "upload" {
+  for_each = fileset("${path.module}/scripts/build/", "sample_data/*.csv")
+  name     = each.value
+  source   = join("/", ["${path.module}/scripts/build/", each.value])
+  bucket   = data.google_storage_bucket.sdw-data-ingest.name
 }
 
 resource "google_storage_bucket_object" "template_upload" {
   name   = "templates/deidentification.tpl"
-  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
+  bucket = data.google_storage_bucket.sdw-data-ingest.name
   source = "${path.module}/templates/deidentification.tpl"
 }
 
 resource "google_storage_bucket_object" "schema_upload" {
   name   = "templates/schema.tpl"
-  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
+  bucket = data.google_storage_bucket.sdw-data-ingest.name
+  #bucket = module.secured_data_warehouse.data_ingestion_bucket_name
   source = "${path.module}/templates/schema.tpl"
 }
 
@@ -64,7 +72,8 @@ module "sdw_data_ingest_bq_dataset" {
 
       labels = {
       }
-      source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/${google_storage_bucket_object.file_upload.output_name}"]
+      #source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/${google_storage_bucket_object.file_upload.output_name}"]
+      source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/sample_data/*.csv"]
       csv_options = {
         quote                 = ""
         allow_jagged_rows     = false
@@ -76,5 +85,8 @@ module "sdw_data_ingest_bq_dataset" {
       hive_partitioning_options = null
       google_sheets_options     = null
     },
+  ]
+  depends_on = [
+    google_storage_bucket_object.upload
   ]
 }
