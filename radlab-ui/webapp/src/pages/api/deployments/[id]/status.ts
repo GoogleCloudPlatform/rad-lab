@@ -55,6 +55,9 @@ const getDeploymentStatus = async (
       return
     }
   })
+  const tfSteps = cloudBuild.steps.map((step: Record<string, any>) => {
+    return { id: step.id, status: step.status }
+  })
   const updateBuilds = {
     status: cloudBuild.status,
     buildId: mostRecentBuild.buildId,
@@ -67,6 +70,7 @@ const getDeploymentStatus = async (
   res.status(200).json({
     buildStatus: cloudBuild.status,
     tfApplyState: tfState,
+    tfSteps
   })
 }
 
