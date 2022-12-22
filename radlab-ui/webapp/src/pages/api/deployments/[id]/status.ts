@@ -5,7 +5,7 @@ import {
   updateByField,
   updateBuildStatus,
 } from "@/utils/Api_SeverSideCon"
-import { IBuild, IDeployment } from "@/utils/types"
+import { IBuild, IDeployment, IBuildSteps } from "@/utils/types"
 
 const getDeploymentStatus = async (
   _: NextApiRequest,
@@ -49,13 +49,13 @@ const getDeploymentStatus = async (
   }
 
   let tfState = ""
-  cloudBuild.steps.forEach((step: Record<string, any>) => {
+  cloudBuild.steps.forEach((step: IBuildSteps) => {
     if (step.id === "Apply") {
       tfState = step.status
       return
     }
   })
-  const tfSteps = cloudBuild.steps.map((step: Record<string, any>) => {
+  const buildSteps = cloudBuild.steps.map((step: IBuildSteps) => {
     return { id: step.id, status: step.status }
   })
   const updateBuilds = {
@@ -70,7 +70,7 @@ const getDeploymentStatus = async (
   res.status(200).json({
     buildStatus: cloudBuild.status,
     tfApplyState: tfState,
-    tfSteps
+    buildSteps
   })
 }
 
