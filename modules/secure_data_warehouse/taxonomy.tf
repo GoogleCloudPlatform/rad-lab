@@ -13,30 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-locals {
-  confidential_tags = {
-    name = {
-      display_name = "FULL_NAME"
-      description  = "A full person name, which can include first names, middle names or initials, and last names."
-    }
-  }
-
-  private_tags = {
-    dob = {
-      display_name = "DOB"
-      description  = "Date of Birth of the person."
-    }
-  }
-
-  sensitive_tags = {
-    dlid = {
-      display_name = "DRIVER_LICENSE_ID"
-      description  = "Driver License document ID."
-    }
-  }
-}
-
+ 
 resource "google_data_catalog_taxonomy" "secure_taxonomy" {
   provider                  = google-beta
 
@@ -62,7 +39,7 @@ resource "google_data_catalog_policy_tag" "policy_tag_confidential" {
 resource "google_data_catalog_policy_tag" "confidential_tags" {
   provider = google-beta
 
-  for_each = local.confidential_tags
+  for_each = var.confidential_tags
 
   taxonomy          = google_data_catalog_taxonomy.secure_taxonomy.id
   display_name      = each.value["display_name"]
@@ -82,7 +59,7 @@ resource "google_data_catalog_policy_tag" "policy_tag_private" {
 resource "google_data_catalog_policy_tag" "private_tags" {
   provider = google-beta
 
-  for_each = local.private_tags
+  for_each = var.private_tags
 
   taxonomy          = google_data_catalog_taxonomy.secure_taxonomy.id
   display_name      = each.value["display_name"]
@@ -102,7 +79,7 @@ resource "google_data_catalog_policy_tag" "policy_tag_sensitive" {
 resource "google_data_catalog_policy_tag" "sensitive_tags" {
   provider = google-beta
 
-  for_each = local.sensitive_tags
+  for_each = var.sensitive_tags
 
   taxonomy          = google_data_catalog_taxonomy.secure_taxonomy.id
   display_name      = each.value["display_name"]

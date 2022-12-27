@@ -145,6 +145,7 @@ variable "set_shielded_vm_policy" {
   type        = bool
   default     = true
 }
+
 variable "trusted_groups" {
   description = "The list of trusted groups (e.g. `myteam@abc.com`). {{UIMeta group=1 order=5 updatesafe }}"
   type        = set(string)
@@ -192,11 +193,13 @@ variable "data_engineer_group" {
   description = "Google Cloud IAM group that sets up and maintains the data pipeline and warehouse."
   type        = string
 }
+
 variable "owner_users" {
   description = "List of users that should be added as owner to the created project."
   type        = list(string)
   default     = []
 }
+
 variable "owner_groups" {
   description = "List of groups that should be added as the owner of the created project."
   type        = list(string)
@@ -219,4 +222,52 @@ variable "subnet_ip" {
   description = "The CDIR IP range of the subnetwork."
   type        = string
   default = "10.0.0.0/16"
+}
+
+variable "confidential_tags" {
+  description = "Provide list of confidential tags"
+  type        = map(object({
+    display_name  = string
+    description   = string
+  }))
+  default     = {
+    name = {
+        display_name    = "FULL_NAME"
+        description     = "A full person name, which can include first names, middle names or initials, and last names."
+    }
+  }
+}
+
+variable "private_tags" {
+  description = "Provide list of private tags"
+  type        = map(object({
+    display_name  = string
+    description   = string
+  }))
+  default     = {
+    dob = {
+        display_name    = "DOB"
+        description     = "Date of Birth of the person."
+    }
+  }
+}
+
+variable "sensitive_tags" {
+  description = "Provide list of sensitive tags"
+  type        = map(object({
+    display_name  = string
+    description   = string
+  }))
+  default     = {
+    dlid = {
+        display_name    = "DRIVER_LICENSE_ID"
+        description     = "Driver License document ID."
+    }
+  }
+}
+
+variable "deidentified_fields" {
+  description = "Provide list of fields / columns need to get de-identified."
+  type        = list
+  default     = ["email", "dl_id"]
 }

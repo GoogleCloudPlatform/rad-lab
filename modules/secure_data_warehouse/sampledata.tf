@@ -27,19 +27,6 @@ resource "google_storage_bucket_object" "upload" {
   bucket   = data.google_storage_bucket.sdw-data-ingest.name
 }
 
-resource "google_storage_bucket_object" "template_upload" {
-  name   = "templates/deidentification.tpl"
-  bucket = data.google_storage_bucket.sdw-data-ingest.name
-  source = "${path.module}/templates/deidentification.tpl"
-}
-
-resource "google_storage_bucket_object" "schema_upload" {
-  name   = "templates/schema.tpl"
-  bucket = data.google_storage_bucket.sdw-data-ingest.name
-  #bucket = module.secured_data_warehouse.data_ingestion_bucket_name
-  source = "${path.module}/templates/schema.tpl"
-}
-
 module "sdw_data_ingest_bq_dataset" {
   source  = "terraform-google-modules/bigquery/google"
   version = "~> 5.2.0"
