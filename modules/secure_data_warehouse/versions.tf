@@ -20,5 +20,9 @@ terraform {
   required_providers {
     google      = "~> 3.77"
     google-beta = "~> 3.77"
+    
+    local = {
+      version = "~> 2.1"
+    }
   }
 }

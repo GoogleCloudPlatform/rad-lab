@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-/*resource "google_storage_bucket_object" "file_upload" {
-  name   = "sample_data/drivers_license.csv"
-  bucket = module.secured_data_warehouse.data_ingestion_bucket_name
-  source = "${path.module}/scripts/build/sample_data/drivers_license.csv"
-}*/
-
+data "google_storage_bucket" "sdw-data-ingest" {
+  name = module.secured_data_warehouse.data_ingestion_bucket_name
+  depends_on = [
+    time_sleep.wait_120_seconds
+  ]
+}
 resource "google_storage_bucket_object" "upload" {
   for_each = fileset("${path.module}/scripts/build/", "sample_data/*.csv")
   name     = each.value
@@ -38,15 +38,6 @@ resource "google_storage_bucket_object" "schema_upload" {
   bucket = data.google_storage_bucket.sdw-data-ingest.name
   #bucket = module.secured_data_warehouse.data_ingestion_bucket_name
   source = "${path.module}/templates/schema.tpl"
-}
-
-// BELOW CONFIGS TO BE REMOVED ONCE THE SDW MODULE DEVELOPMENT IS COMPLETED
-
-data "google_storage_bucket" "sdw-data-ingest" {
-  name = module.secured_data_warehouse.data_ingestion_bucket_name
-  depends_on = [
-    time_sleep.wait_120_seconds
-  ]
 }
 
 module "sdw_data_ingest_bq_dataset" {
@@ -72,7 +63,6 @@ module "sdw_data_ingest_bq_dataset" {
 
       labels = {
       }
-      #source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/${google_storage_bucket_object.file_upload.output_name}"]
       source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/sample_data/*.csv"]
       csv_options = {
         quote                 = ""
