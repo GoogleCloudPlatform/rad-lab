@@ -1,6 +1,6 @@
 ---
-title: 07 - Cleanup Environment
-sidebar_position: 7
+title: 06 - Cleanup Environment
+sidebar_position: 6
 ---
 
 The RAD Lab UI project can be deleted by executing the following steps in the `radlab-ui/automation/terraform/infrastructure` folder.

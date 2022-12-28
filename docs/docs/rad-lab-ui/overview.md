@@ -1,6 +1,5 @@
 ---
 sidebar_position: 1
-title: 01 - Overview
 ---
 # Overview
 
@@ -8,7 +7,7 @@ The RAD Lab UI codebase contains the necessary Terraform and frontend code to de
 
 ## Architecture
 
-![](../../../../radlab-ui/images/architecture.png)
+![](../../../radlab-ui/images/architecture.png)
 
 To install the UI, a combination of Terraform and shell scripts is used to create the necessary Google Cloud components and configure the web application.  Once this step is completed, users will be able to create RAD Lab modules via the user interface, once they've been given access.  The components that are part of the purple box are the services used to run the user interface.  The components in the blue box are RAD Lab modules that are created by the user and where the lifecycle is managed via the UI.
 
@@ -43,13 +42,13 @@ Invoking Firebase APIs via Infrastructure as Code from a terminal requires the u
 
 ## Flow
 
-![](../../../../radlab-ui/images/flow.png)
+![](../../../radlab-ui/images/flow.png)
 
 ### Steps
 
 When users create a RAD Lab module, the following steps are being executed by the underlying backend components:
 1. Users select a module from the UI and click Create, supplying the necessary values for the Terraform variables.
-2. The UI posts a message to a Pub/Sub topic, passing the values for the variables in `variables.tf` for that specific module and some [additional information](../../../../radlab-ui/automation/terraform/infrastructure/function/create_deployment/index.js).
+2. The UI posts a message to a Pub/Sub topic, passing the values for the variables in `variables.tf` for that specific module and some [additional information](../../../radlab-ui/automation/terraform/infrastructure/function/create_deployment/index.js).
 3. The Cloud Function creates 2 files, `backend.tf` and `terraform.tfvars.json`.  `backend.tf` contains information regarding Terraform remote state for that specific module creation and `terraform.tfvars.json` contains the values for `variables.tf` for that specific module.
 4. Once the previous step is completed, the Cloud Function invokes the Cloud Build trigger to create the RAD Lab modules and stores the unique build ID from Cloud Build in Firestore.
-5. The RAD Lab UI retrieves the build ID for that specific RAD Lab module and polls the Cloud Build APIs for the build status and logs for that particular RAD Lab module.
+5. The RAD Lab UI retrieves the build ID for that specific RAD Lab module and polls the Cloud Build APIs for the build status and logs for that particular RAD Lab module and updates the UI for the end user.

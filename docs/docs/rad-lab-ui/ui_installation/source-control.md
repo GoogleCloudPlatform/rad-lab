@@ -1,6 +1,6 @@
 ---
-sidebar_position: 2
-title: 02 - Source Control
+sidebar_position: 1
+title: 01 - Source Control
 ---
 
 # Source Control
