@@ -32,14 +32,14 @@ module "sdw_data_ingest_bq_dataset" {
   version = "~> 5.2.0"
 
   project_id                  = module.project_radlab_sdw_data_ingest.project_id
-  dataset_id                  = "dl_data_dataset"
-  dataset_name                = "dl_data_dataset"
-  description                 = "Sample Driver License Data"
+  dataset_id                  = "sample_dataset"
+  dataset_name                = "sample_dataset"
+  description                 = "Sample Data"
   location                    = var.region
   delete_contents_on_destroy  = var.delete_contents_on_destroy
   external_tables = [
     {
-      table_id              = "dl_data"
+      table_id              = "sample_data"
       autodetect            = true
       compression           = null
       ignore_unknown_values = true
