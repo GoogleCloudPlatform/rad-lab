@@ -44,8 +44,6 @@ export const ProjectIdText = ({ success, fallback, children }) => {
   return projectId ? success(projectId) : fallback;
 };
 
-# RAD Lab UI Webapp
-
 The RAD Lab UI application is a Firebase application, which requires a number of manual steps to complete the installation.
 
 To retrieve the correct project ID, either open a web browser and go to the [Google Cloud console](https://console.cloud.google.com) or run the following command in the `radlab-ui/automation/terraform/infrastructure` folder:
@@ -60,19 +58,19 @@ Add your Project ID here to have the documentation be be customized to your Goog
 
 <ProjectIdInput />
 
-## Add Firebase
+# Add Firebase
 
-:::important First time
-If you have never used Firebase in your Google Cloud organization, you need to manually add it to the Google Cloud project created in the first step. This is necessary as you have to accept the Terms & Conditions first.
+:::warning
+If you've never used Firebase in your Google Cloud organization before, please execute [First Time Use](#first-time-use).  If you already have Firebase projects running in your Google Cloud organization or you have in the past, please execute [Returning Firebase User](#returning-firebase-user).
+
+If you're not sure, simply execute the steps as described in [First Time Use](#first-time-use).
 :::
 
-### Manually
+## First Time Use
 
 Open the [Firebase console](https://console.firebase.google.com) and click on "Create a project" (or add Firebase to an existing project). When prompted with "Enter your project name", enter the project ID you copied from the previous step, and accept the Firebase terms and conditions. Confirm the Firebase billing plan when prompted (and if necessary) and step through the remaining steps in the wizard.
 
 NOTE: Firebase analytics does not impact the deployment of the RAD Lab UI application, so feel free to select whatever you think makes most sense for your deployment.
-
-### Command Line
 
 Run the following commands in a terminal or command window:
 
@@ -87,7 +85,38 @@ npm install -g firebase-tools
 cd ../../../webapp
 
 # Login to Firebase. If you are already logged in with the correct user, feel free to continue. If not, run firebase login:add and firebase login:use to select the correct user.
-firebase login
+firebase login --no-localhost
+
+# Set the RAD Lab UI project as the default project
+firebase use ${RLUI_PROJECT_ID}
+
+# Upload Firestore rules
+firebase deploy --only firestore:rules
+
+# Upload Firestore indexes
+firebase deploy --only firestore:indexes
+```
+
+## Returning Firebase User
+
+:::warning first time
+Only execute these steps if you already have one or more Firebase applications in your Google Cloud organization.  If that is not the case, or you are not sure, please run the steps in the previous section, titled **First time Firebase use**.
+:::
+
+Run the following commands in a terminal or command window:
+
+```shell
+# Replace [PROJECT_ID] with the actual project ID.
+export RLUI_PROJECT_ID=$(terraform show -json | jq -r .values.outputs.project_id.value)
+
+# Install Firebase Tools
+npm install -g firebase-tools
+
+# Switch to the webapp directory
+cd ../../../webapp
+
+# Login to Firebase. If you are already logged in with the correct user, feel free to continue. If not, run firebase login:add and firebase login:use to select the correct user.
+firebase login --no-localhost
 
 # Add Firebase to the Google Cloud project
 firebase projects:addfirebase ${RLUI_PROJECT_ID}
@@ -126,7 +155,7 @@ The final step is to add the configuration to your local directory. Navigate to 
 
 ### RAD Lab UI Configuration
 
-We are now going to create the local configuration files to be able to deploy the web application to your Firebase environment.
+We are now going to create the local configuration files to be able to deploy the web application to your Firebase environment.  To execute the steps in these sections, return to your Terminal or Cloud Shell.
 
 :::info Environments
 We are making the assumption here that both development and production will point to the same configuration. If you choose to approach this differently, feel free to update the files and use different values for your `development` and `production` environments.

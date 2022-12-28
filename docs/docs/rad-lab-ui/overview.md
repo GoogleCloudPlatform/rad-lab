@@ -40,9 +40,11 @@ Invoking Firebase APIs via Infrastructure as Code from a terminal requires the u
 - Create the Firebase application
 - Enable authentication mechanisms
 
-## Flow
+## Deploying a RAD Lab Module
 
 ![](../../../radlab-ui/images/flow.png)
+
+The diagram depicts the flow to deploy a RAD Lab module, as a RAD Lab user, via the UI.  The steps to update and delete a module follow a similar pattern, so they are not repeated here. 
 
 ### Steps
 
