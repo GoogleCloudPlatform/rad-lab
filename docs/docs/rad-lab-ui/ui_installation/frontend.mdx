@@ -151,7 +151,18 @@ echo "$(cd ../automation/terraform/infrastructure && terraform show -json | jq -
 
 ### Firebase app
 
-The final step is to add the configuration to your local directory. Navigate to <ProjectIdLink href="https://console.firebase.google.com/project/${RLUI_PROJECT_ID}/settings/general" fallback="https://console.firebase.google.com">Firebase Console</ProjectIdLink> (Project Settings) and add a Web Application by clicking on the `</>`-icon at the bottom of the page. Set the **App nickname** to **RAD Lab UI**, click on **Register app** and click on **Continue to console**.
+The final step is to add the configuration to your local directory. Navigate to <ProjectIdLink href="https://console.firebase.google.com/project/${RLUI_PROJECT_ID}/settings/general" fallback="https://console.firebase.google.com">Firebase Console</ProjectIdLink> and go to your Project settings:
+
+![Project settings for your Firebase project](../../../../radlab-ui/images/settings.png)
+
+Add a Web Application by clicking on the `</>`-icon at the bottom of the page:
+![Web application settings](../../../../radlab-ui/images/web_settings.png)
+
+Set the **App nickname** to **RAD Lab UI**, click on **Register app**:
+![Web application settings](../../../../radlab-ui/images/add_firebase_one.png)
+
+Click on **Continue to console**.
+![Web application settings - finalization](../../../../radlab-ui/images/add_firebase_two.png)
 
 ### RAD Lab UI Configuration
 
