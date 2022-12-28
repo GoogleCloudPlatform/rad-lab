@@ -224,6 +224,62 @@ variable "subnet_ip" {
   default = "10.0.0.0/16"
 }
 
+variable "sample_data_fields" {
+  description = "Sample data fields"
+  type        = map(object({
+    name  = string
+    mode  = string
+    type  = string
+  }))
+  default     = {
+    field_1 = {
+      name  = "email"
+      mode  = "NULLABLE"
+      type  = "STRING"
+    },
+    field_2 = {
+      name  = "name"
+      mode  = "NULLABLE"
+      type  = "STRING"
+    },
+    field_3 = {
+      name  = "street"
+      mode  = "NULLABLE"
+      type  = "STRING"
+    },
+    field_4 = {
+      name  = "city"
+      mode  = "NULLABLE"
+      type  = "STRING"
+    },
+    field_5 = {
+      name  = "state"
+      mode  = "NULLABLE"
+      type  = "STRING"
+    },
+    field_6 = {
+      name  = "zip"
+      mode  = "NULLABLE"
+      type  = "INTEGER"
+    },
+    field_7 = {
+      name  = "dob"
+      mode  = "NULLABLE"
+      type  = "DATE"
+    },
+    field_8 = {
+      name  = "dl_id"
+      mode  = "NULLABLE"
+      type  = "STRING"
+    },
+    field_9 = {
+      name  = "exp_date"
+      mode  = "NULLABLE"
+      type  = "DATE"
+    }
+  }
+}
+
 variable "confidential_tags" {
   description = "Provide list of confidential tags"
   type        = map(object({
@@ -259,7 +315,7 @@ variable "sensitive_tags" {
     description   = string
   }))
   default     = {
-    dlid = {
+    dl_id = {
         display_name    = "DRIVER_LICENSE_ID"
         description     = "Driver License document ID."
     }

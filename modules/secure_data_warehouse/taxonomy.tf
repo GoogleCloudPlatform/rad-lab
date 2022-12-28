@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 resource "google_data_catalog_taxonomy" "secure_taxonomy" {
   provider                  = google-beta
 
@@ -87,6 +87,17 @@ resource "google_data_catalog_policy_tag" "sensitive_tags" {
   parent_policy_tag = google_data_catalog_policy_tag.policy_tag_sensitive.id
 }
 
+resource "local_file" "schema_template_file" {
+  filename  = format("${path.module}/templates/schema.tpl")
+  content   = templatefile("${path.module}/templates/schema_template.tpl",
+  {
+    fields            = var.sample_data_fields
+    confidential_tags = var.confidential_tags
+    private_tags      = var.private_tags
+    sensitive_tags    = var.sensitive_tags
+  })
+}
+
 resource "google_bigquery_table" "re_id" {
   dataset_id          = local.confidential_dataset_id
   project             = module.project_radlab_sdw_conf_data.project_id
@@ -96,9 +107,9 @@ resource "google_bigquery_table" "re_id" {
 
   schema = templatefile("${path.module}/templates/schema.tpl",
     {
-      pt_name = google_data_catalog_policy_tag.confidential_tags["name"].id,
-      pt_dob  = google_data_catalog_policy_tag.private_tags["dob"].id,
-      pt_dlid = google_data_catalog_policy_tag.sensitive_tags["dlid"].id
+      pt_confidential = google_data_catalog_policy_tag.confidential_tags["name"].id,
+      pt_private      = google_data_catalog_policy_tag.private_tags["dob"].id,
+      pt_sensitive    = google_data_catalog_policy_tag.sensitive_tags["dl_id"].id
   })
 
   lifecycle {
