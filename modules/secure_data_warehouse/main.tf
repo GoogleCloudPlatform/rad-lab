@@ -19,8 +19,8 @@ locals {
   confidential_dataset_id         = "secured_dataset"
   taxonomy_name                   = "secured_taxonomy"
   taxonomy_display_name           = "${local.taxonomy_name}-${local.random_id}"
-  confidential_table_id           = "dl_re_id"
-  non_confidential_table_id       = "dl_de_id"
+  confidential_table_id           = "re_data"
+  non_confidential_table_id       = "de_data"
   wrapped_key_secret_data         = chomp(data.google_secret_manager_secret_version.wrapped_key.secret_data)
   bq_schema_dl                    = "email:STRING, name:STRING, street:STRING, city:STRING, state:STRING, zip:INTEGER, dob:DATE, dl_id:STRING, exp_date:DATE"
   bigquery_non_confidential_table = "${module.project_radlab_sdw_non_conf_data.project_id}:${local.non_confidential_dataset_id}.${local.non_confidential_table_id}"
@@ -63,7 +63,7 @@ module "secured_data_warehouse" {
 
 resource "local_file" "template_file" {
   filename  = format("${path.module}/templates/deidentification.tpl")
-  content   = templatefile("${path.module}/templates/deid_template.tpl",
+  content   = templatefile("${path.module}/templates/deidentification_template.tpl",
   {       
     display_name  = "$${display_name}"
     description   = "$${description}"
