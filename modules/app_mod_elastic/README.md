@@ -1,17 +1,20 @@
 # RAD Lab Application Mordernization Module (w/ Elasticsearch) 
 
+## Module Overview
+
 This module allows the user to create an Elasticsearch cluster, deployed on a GKE cluster in Google Cloud Platform.  It follows the [Quickstart-tutorial](https://www.elastic.co/guide/en/cloud-on-k8s/1.8/index.html) available on https://elastic.co.   
 
 ## GCP Products/Services 
 
 * Google Kubernetes Engine
 * Virtual Private Cloud (VPC)
+* Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher).
 
-![](../../docs/images/V2_AppModElasticSearch.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 

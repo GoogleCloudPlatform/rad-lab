@@ -1,18 +1,19 @@
 # RAD Lab Billing Budget Module
 
+## Module Overview
+
 This module creates a simple GCP project, enables APIs, adds users to the project and also creates a Billing Budget for the Project. 
 
-## GCP Products/Services 
+## GCP Products/Services
 
 * GCP Project
-* APIs & Services
 * Billing Budget
 
 ## Reference Architecture Diagram
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V7_Billing_Budget.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 
