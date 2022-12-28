@@ -1,6 +1,6 @@
 ---
-sidebar_position: 2
-title: 02 - Google Cloud
+sidebar_position: 3
+title: 03 - Google Cloud
 # TODO: See if there's a way to provide icons to steps
 ---
 

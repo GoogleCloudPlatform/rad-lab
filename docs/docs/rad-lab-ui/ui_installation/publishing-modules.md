@@ -1,6 +1,6 @@
 ---
-sidebar_position: 5
-title: 05 - Publishing Modules
+sidebar_position: 6
+title: 06 - Publishing Modules
 ---
 
 # Publishing Modules

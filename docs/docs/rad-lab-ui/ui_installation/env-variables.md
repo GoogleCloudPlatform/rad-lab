@@ -1,6 +1,6 @@
 ---
-title: 07 - Environment Variables
-sidebar_position: 7
+title: 08 - Environment Variables
+sidebar_position: 8
 ---
 
 Environment variables are kept in .env files.

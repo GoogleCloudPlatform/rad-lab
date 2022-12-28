@@ -1,6 +1,6 @@
 ---
-sidebar_position: 3
-title: 03 - Infrastructure
+sidebar_position: 4
+title: 04 - Infrastructure
 ---
 
 # Terraform
