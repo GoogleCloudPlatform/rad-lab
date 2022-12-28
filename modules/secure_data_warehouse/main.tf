@@ -61,7 +61,7 @@ module "secured_data_warehouse" {
   ]
 }
 
-resource "local_file" "template_file" {
+resource "local_file" "deidentification_template_file" {
   filename  = format("${path.module}/templates/deidentification.tpl")
   content   = templatefile("${path.module}/templates/deidentification_template.tpl",
   {       
@@ -83,8 +83,7 @@ module "de_identification_template" {
   wrapped_key               = local.wrapped_key_secret_data
   dlp_location              = var.region
   template_id_prefix        = "de_identification"
-  # template_file             = "${path.module}/templates/deidentification.tpl"
-  template_file             = local_file.template_file.filename
+  template_file             = local_file.deidentification_template_file.filename
   dataflow_service_account  = module.secured_data_warehouse.dataflow_controller_service_account_email
 
 }
