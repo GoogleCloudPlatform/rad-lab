@@ -22,7 +22,7 @@ locals {
   confidential_table_id           = "re_data"
   non_confidential_table_id       = "de_data"
   wrapped_key_secret_data         = chomp(data.google_secret_manager_secret_version.wrapped_key.secret_data)
-  bq_schema_dl                    = "email:STRING, name:STRING, street:STRING, city:STRING, state:STRING, zip:INTEGER, dob:DATE, dl_id:STRING, exp_date:DATE"
+  bq_schema_dl                    = join(", ",[ for key, value in var.sample_data_fields : "${key}:${value.type}" ])
   bigquery_non_confidential_table = "${module.project_radlab_sdw_non_conf_data.project_id}:${local.non_confidential_dataset_id}.${local.non_confidential_table_id}"
   bigquery_confidential_table     = "${module.project_radlab_sdw_conf_data.project_id}:${local.confidential_dataset_id}.${local.confidential_table_id}"
 }
@@ -146,7 +146,7 @@ module "regional_deid_pipeline" {
   staging_location        = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/staging/"
 
   parameters = {
-    query                          = "SELECT email, name, street, city, state, zip, dob, dl_id, exp_date FROM [${module.project_radlab_sdw_data_ingest.project_id}:${module.sdw_data_ingest_bq_dataset.bigquery_dataset.dataset_id}.${module.sdw_data_ingest_bq_dataset.external_table_ids[0]}] LIMIT 10000"
+    query                          = "SELECT ${join(", ",[ for key, value in var.sample_data_fields : "${key}" ])} FROM [${module.project_radlab_sdw_data_ingest.project_id}:${module.sdw_data_ingest_bq_dataset.bigquery_dataset.dataset_id}.${module.sdw_data_ingest_bq_dataset.external_table_ids[0]}] LIMIT 10000"
     deidentification_template_name = module.de_identification_template.template_full_path
     window_interval_sec            = 30
     batch_size                     = 1000
@@ -174,7 +174,6 @@ module "regional_reid_pipeline" {
   container_spec_gcs_path = module.template_project.python_re_identify_template_gs_path
   job_language            = "PYTHON"
   region                  = var.region
-  #service_account_email   = module.secured_data_warehouse.dataflow_controller_service_account_email
   service_account_email   = module.secured_data_warehouse.confidential_dataflow_controller_service_account_email
   subnetwork_self_link    = module.dwh_networking_conf.subnets_self_links[0]
   kms_key_name            = module.secured_data_warehouse.cmek_reidentification_crypto_key
