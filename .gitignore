@@ -82,3 +82,5 @@ staging.terraform.tfbackend
 terraform.tfvars.staging
 
 app.yaml
+modules/secure_data_warehouse/templates/schema.tpl
+modules/secure_data_warehouse/templates/deidentification.tpl
