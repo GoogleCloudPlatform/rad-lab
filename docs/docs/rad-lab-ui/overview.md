@@ -15,13 +15,13 @@ To install the UI, a combination of Terraform and shell scripts is used to creat
 
 ### Terraform
 As part of the installation instructions, Terraform will be used to create the following components:
-- Google Cloud project, including APIs
-- A number of Cloud Functions, which are used by the RAD Lab UI to create RAD Lab Mod
-- Google App Engine application to host the UI
-- Firebase application to manage routing, security, ...
-- Google Cloud Storage buckets for the Terraform state files, for both the UI and the individual RAD Lab modules
-- Necessary service accounts with IAM permissions, needed for their activities
-- Cloud Build triggers to deploy the RAD Lab modules
+- Google Cloud project, including APIs.
+- A number of Cloud Functions, which are used by the RAD Lab UI to create RAD Lab Module.
+- Google App Engine application to host the UI.
+- Firebase application to manage routing, security, etc.
+- Google Cloud Storage buckets for the Terraform state files, for both the UI and the individual RAD Lab modules.
+- Necessary service accounts with IAM permissions, needed for their activities.
+- Cloud Build triggers to deploy the RAD Lab modules.
 
 ### Shell scripts
 The Cloud Admin will have to run a number of Shell scripts to configure the Firebase application, incl. Firestore rules and configuration specific to the UI.
@@ -32,10 +32,10 @@ The manual activities can be split in two separate sections:
 - Google Admin
 - Firebase
 
-### Google Admin
+#### Google Admin
 To grant access to users and to ensure that the application can validate group memberships, it's necessary to create groups and assign a custom role to service accounts when installing the RAD Lab UI.
 
-### Firebase 
+#### Firebase 
 Invoking Firebase APIs via Infrastructure as Code from a terminal requires the use of a Google Cloud service account.  This is not supported by the RAD Lab UI, so the following steps have to be completed manually before the installation can be completed:
 - Create the Firebase application
 - Enable authentication mechanisms
