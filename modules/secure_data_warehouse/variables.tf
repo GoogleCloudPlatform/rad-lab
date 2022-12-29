@@ -227,53 +227,44 @@ variable "subnet_ip" {
 variable "sample_data_fields" {
   description = "Sample data fields"
   type        = map(object({
-    name  = string
+    # name  = string
     mode  = string
     type  = string
   }))
   default     = {
-    field_1 = {
-      name  = "email"
+    email = {
       mode  = "NULLABLE"
       type  = "STRING"
     },
-    field_2 = {
-      name  = "name"
+    name = {
       mode  = "NULLABLE"
       type  = "STRING"
     },
-    field_3 = {
-      name  = "street"
+    street = {
       mode  = "NULLABLE"
       type  = "STRING"
     },
-    field_4 = {
-      name  = "city"
+    city = {
       mode  = "NULLABLE"
       type  = "STRING"
     },
-    field_5 = {
-      name  = "state"
+    state = {
       mode  = "NULLABLE"
       type  = "STRING"
     },
-    field_6 = {
-      name  = "zip"
+    zip = {
       mode  = "NULLABLE"
       type  = "INTEGER"
     },
-    field_7 = {
-      name  = "dob"
+    dob = {
       mode  = "NULLABLE"
       type  = "DATE"
     },
-    field_8 = {
-      name  = "dl_id"
+    dl_id = {
       mode  = "NULLABLE"
       type  = "STRING"
     },
-    field_9 = {
-      name  = "exp_date"
+    exp_date = {
       mode  = "NULLABLE"
       type  = "DATE"
     }
