@@ -12,7 +12,7 @@
                                 "name": "${name}"
                                 },
                                 %{endfor}                 
-                ],
+                            ],
                         "primitiveTransformation": {
                             "cryptoDeterministicConfig": {
                                 "cryptoKey": {
