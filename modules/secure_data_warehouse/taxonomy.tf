@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+locals {
+  pt_confidential = [ for key, value in var.confidential_tags : { "${key}" = "${google_data_catalog_policy_tag.confidential_tags["${key}"].id}" } ]
+  pt_private      = [ for key, value in var.private_tags : { "${key}" = "${google_data_catalog_policy_tag.private_tags["${key}"].id}" } ]
+  pt_sensitive    = [ for key, value in var.sensitive_tags : { "${key}" = "${google_data_catalog_policy_tag.sensitive_tags["${key}"].id}" } ]
+}
 resource "google_data_catalog_taxonomy" "secure_taxonomy" {
   provider                  = google-beta
 
@@ -95,6 +100,9 @@ resource "local_file" "schema_template_file" {
     confidential_tags = var.confidential_tags
     private_tags      = var.private_tags
     sensitive_tags    = var.sensitive_tags
+    pt_confidential   = merge(local.pt_confidential...)
+    pt_private        = merge(local.pt_private...)
+    pt_sensitive      = merge(local.pt_sensitive...)
   })
 }
 
@@ -105,13 +113,7 @@ resource "google_bigquery_table" "re_id" {
   friendly_name       = local.confidential_table_id
   deletion_protection = !var.delete_contents_on_destroy
 
-  schema = templatefile("${path.module}/templates/schema.tpl",
-    {
-      pt_confidential = google_data_catalog_policy_tag.confidential_tags["name"].id,
-      pt_private      = google_data_catalog_policy_tag.private_tags["dob"].id,
-      pt_sensitive    = google_data_catalog_policy_tag.sensitive_tags["dl_id"].id
-  })
-
+  schema = templatefile(local_file.schema_template_file.filename,{})
   lifecycle {
     ignore_changes = [
       encryption_configuration # managed by the confidential dataset default_encryption_configuration.

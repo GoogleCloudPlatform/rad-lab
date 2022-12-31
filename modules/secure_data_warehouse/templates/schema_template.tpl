@@ -5,17 +5,17 @@
 		"type": "${value.type}"%{ for k, v in confidential_tags }%{ if "${key}"=="${k}" },
 		"policyTags": {
 			"names": [
-				"$${pt_confidential}"
+				"${lookup("${pt_confidential}", "${key}")}"
 			]
 		}%{ endif }%{ endfor }%{ for k, v in private_tags }%{ if "${key}"=="${k}" },
 		"policyTags": {
 			"names": [
-				"$${pt_private}"
+				"${lookup("${pt_private}", "${key}")}"
 			]
 		}%{ endif }%{ endfor }%{ for k, v in sensitive_tags }%{ if "${key}"=="${k}" },
 		"policyTags": {
 			"names": [
-				"$${pt_sensitive}"
+				"${lookup("${pt_sensitive}", "${key}")}"
 			]
 		}%{ endif }%{ endfor }
 	}%{ if "${index(keys(fields), key)}"<"${length(fields)}"-1 },%{ endif }%{ endfor }

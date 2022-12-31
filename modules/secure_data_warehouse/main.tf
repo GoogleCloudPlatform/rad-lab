@@ -146,7 +146,7 @@ module "regional_deid_pipeline" {
   staging_location        = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/staging/"
 
   parameters = {
-    query                          = "SELECT ${join(", ",[ for key, value in var.sample_data_fields : "${key}" ])} FROM [${module.project_radlab_sdw_data_ingest.project_id}:${module.sdw_data_ingest_bq_dataset.bigquery_dataset.dataset_id}.${module.sdw_data_ingest_bq_dataset.external_table_ids[0]}] LIMIT 10000"
+    query                          = "SELECT ${join(", ",[ for key, value in var.sample_data_fields : "${key}" ])} FROM [${module.project_radlab_sdw_data_ingest.project_id}:${module.sdw_data_ingest_bq_dataset.bigquery_dataset.dataset_id}.${module.sdw_data_ingest_bq_dataset.external_table_ids[0]}] "
     deidentification_template_name = module.de_identification_template.template_full_path
     window_interval_sec            = 30
     batch_size                     = 1000
