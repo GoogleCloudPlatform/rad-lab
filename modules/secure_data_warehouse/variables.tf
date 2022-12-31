@@ -224,6 +224,12 @@ variable "subnet_ip" {
   default = "10.0.0.0/16"
 }
 
+variable "source_uris" {
+  description = "List of GCS URIs of the CSV data files. Example Format - 'gs://ci-bq-external-data/hive_partition_example/year=2012/foo.csv' "
+  type        = list
+  default     = []
+}
+
 variable "sample_data_fields" {
   description = "Sample data fields"
   type        = map(object({

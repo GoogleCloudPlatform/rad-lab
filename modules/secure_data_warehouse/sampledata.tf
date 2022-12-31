@@ -50,7 +50,7 @@ module "sdw_data_ingest_bq_dataset" {
 
       labels = {
       }
-      source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/sample_data/*.csv"]
+      source_uris = length(var.source_uris) != 0 ? var.source_uris : ["${data.google_storage_bucket.sdw-data-ingest.url}/sample_data/*.csv"]
       csv_options = {
         quote                 = ""
         allow_jagged_rows     = false
