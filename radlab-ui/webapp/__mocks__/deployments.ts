@@ -1,6 +1,6 @@
-import { DEPLOYMENT_STATUS } from "@/utils/types"
+import { DEPLOYMENT_STATUS, IDeployment } from "@/utils/types"
 
-export const deploymentMockData = {
+export const deploymentMockData: IDeployment = {
   id: "",
   createdAt: { _seconds: 1664378694, _nanoseconds: 972000000 },
   variables: {},

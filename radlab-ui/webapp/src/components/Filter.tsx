@@ -1,12 +1,12 @@
 import Search, { ISearchResults } from "@/components/Search"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "next-i18next"
-import { DEPLOYMENT_STATUS, FirestoreTimestamp, IModule } from "@/utils/types"
+import { DEPLOYMENT_STATUS, IModule } from "@/utils/types"
 import { deploymentStore } from "@/store"
 
 type IFilterType = "module" | "createdAt" | "status"
 type IModuleName = string | ""
-type IDate = typeof FirestoreTimestamp
+type IDate = string | ""
 
 export default function Filter({
   filters,
@@ -23,7 +23,7 @@ export default function Filter({
   const [search, setSearch] = useState<ISearchResults | null>(null)
   const [status, setStatus] = useState(defaultStatus || "")
   const [moduleName, setModuleName] = useState<IModuleName>("")
-  // const [createdAt, setCreatedAt] = useState<IDate | null>(null)
+  const [createdAt, setCreatedAt] = useState<IDate>("")
 
   const { t } = useTranslation()
 
@@ -33,7 +33,7 @@ export default function Filter({
   const deployments = deploymentStore((state) => state.deployments)
 
   // TODO. Likely change this to the firebase.uid for the record
-  const refField = "module"
+  const refField = "deploymentId"
   const handleQuery = (search: ISearchResults) => setSearch(search)
 
   // Owner Filter list
@@ -41,6 +41,7 @@ export default function Filter({
   // const OWNERS = ["Google", loginPartnerName]
 
   // Filter based on Selects and Search
+
   useEffect(() => {
     if (!deployments) {
       setFilteredDeployments(null)
@@ -48,7 +49,12 @@ export default function Filter({
     }
 
     //No active filtering happening
-    if (!search?.query && status === "" && moduleName === "") {
+    if (
+      !search?.query &&
+      status === "" &&
+      moduleName === "" &&
+      createdAt === ""
+    ) {
       setFilteredDeployments(null)
       return
     }
@@ -56,26 +62,18 @@ export default function Filter({
     let filtered = deployments
 
     if (search?.query) {
-      filtered = filtered.filter(
-        (e) =>
-          e.module.toLowerCase().startsWith(search.query.toLowerCase()) ||
-          (e.status.toLowerCase().startsWith(search.query.toLowerCase()) &&
-            !e.deletedAt),
-      )
       // @ts-ignore TS is wrong about possible type (can't be udefined[] because of filter(Boolean) step)
-      // filtered = search.result
-      //   // .sort((a, b) => b.score - a.score)
-      //   // .map((result) => result.ref)
-      //   // .map((ref) =>
-      //   //   // @ts-ignore
-      //   //   deployments.find((deployment) => deployment[refField] === ref),
-      //   // )
-
-      //   .filter(Boolean)
+      filtered = search.result
+        .sort((a, b) => b.score - a.score)
+        .map((result) => result.ref)
+        .map((ref) => {
+          // @ts-ignore
+          return deployments.find((deployment) => deployment[refField] === ref)
+        })
+        .filter(Boolean)
     }
 
     if (status !== "") {
-      // @ts-ignore
       status !== "DELETED"
         ? (filtered = filtered.filter(
             (deployment) =>
@@ -88,17 +86,19 @@ export default function Filter({
       filtered = filtered.filter(
         (deployments) => deployments.module === moduleName,
       )
-    // if (!createdAt)
-    //   filtered = filtered.filter(
-    //     (deployment) => deployment.createdAt === createdAt,
-    //   )
-    // if (owner === "Google")
-    //   filtered = filtered.filter((demo) => !demo.hasOwnProperty("partnerId"))
-    // if (owner !== "" && owner !== "Google")
-    //   filtered = filtered.filter((demo) => demo.hasOwnProperty("partnerId"))
+
+    if (createdAt !== "") {
+      filtered = filtered.filter(
+        (deployment) =>
+          new Date(
+            deployment.createdAt._seconds * 1000 +
+              deployment.createdAt._nanoseconds / 1000000,
+          ).toLocaleDateString() === createdAt,
+      )
+    }
 
     setFilteredDeployments(filtered)
-  }, [moduleName, deployments, search, status])
+  }, [moduleName, deployments, search, status, createdAt])
 
   const clearAllFilters = () => {
     // @ts-ignore
@@ -106,6 +106,7 @@ export default function Filter({
     setSearch(null)
     setModuleName("")
     setStatus("")
+    setCreatedAt("")
   }
 
   return (
@@ -151,6 +152,9 @@ export default function Filter({
             className="rounded-md border-base-300"
             type="date"
             placeholder="Start Date"
+            onChange={(e) =>
+              setCreatedAt(new Date(e.target.value).toLocaleDateString())
+            }
           />
         )}
         {filters.includes("createdAt") && (
@@ -158,6 +162,9 @@ export default function Filter({
             className="rounded-md  border-base-300"
             type="date"
             placeholder="End date"
+            onChange={(e) =>
+              setCreatedAt(new Date(e.target.value).toLocaleDateString())
+            }
           />
         )}
 

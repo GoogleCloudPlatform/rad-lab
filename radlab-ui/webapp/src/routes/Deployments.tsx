@@ -160,7 +160,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
     <RouteContainer>
       <div className="flex mb-6">
         <div className="w-full">
-          <div className="tabs tabs-boxed">
+          <div className="tabs tabs-boxed" data-testid="tabs">
             {renderMyTab()}
             {isAdmin && renderAllTab()}
           </div>
