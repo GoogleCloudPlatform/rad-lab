@@ -19,7 +19,7 @@ This RAD Lab module is intended for data engineers and security administrators w
 
 Below Architechture Diagram is the base representation of what will be created as a part of [RAD Lab Launcher](../../radlab-launcher/radlab.py).
 
-![](../../docs/images/V10_Secure_Datawarehouse.png)
+![](./images/architecture.png)
 
 ## API Prerequisites
 
