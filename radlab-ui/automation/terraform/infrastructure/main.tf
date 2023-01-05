@@ -47,8 +47,7 @@ module "project" {
     "container.googleapis.com",
     "admin.googleapis.com",
     "artifactregistry.googleapis.com",
-    "billingbudgets.googleapis.com",
-    "storagetransfer.googleapis.com"
+    "billingbudgets.googleapis.com"
   ]
 
   org_policy_bool = local.bool_org_policy
