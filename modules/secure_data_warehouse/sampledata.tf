@@ -20,10 +20,24 @@ data "google_storage_bucket" "sdw-data-ingest" {
     time_sleep.wait_120_seconds
   ]
 }
-resource "google_storage_bucket_object" "upload" {
-  for_each = fileset("${path.module}/scripts/build/", "sample_data/*.csv")
+
+resource "google_storage_bucket_object" "upload_sample_data" {
+  for_each = length(var.source_uris) == 0 ? fileset("${path.module}/scripts/build/", "sample_data/*.csv") : toset([])
   name     = each.value
   source   = join("/", ["${path.module}/scripts/build/", each.value])
+  bucket   = data.google_storage_bucket.sdw-data-ingest.name
+}
+
+data "google_storage_bucket_object_content" "external_data" {
+  for_each  = length(var.source_uris) == 0 ? toset([]) : toset(var.source_uris)
+  name      = replace(each.key, format("gs://%s/", split("/", trimprefix(each.key, "gs://"))[0]), "")
+  bucket    = split("/", trimprefix(each.key, "gs://"))[0]
+}
+
+resource "google_storage_bucket_object" "upload_external_data" {
+  for_each = length(var.source_uris) == 0 ? toset([]) : toset(var.source_uris)
+  name     = join("/", ["sample_data", reverse(split("/", each.key))[0]]) 
+  content  = data.google_storage_bucket_object_content.external_data[each.key].content
   bucket   = data.google_storage_bucket.sdw-data-ingest.name
 }
 
@@ -50,7 +64,7 @@ module "sdw_data_ingest_bq_dataset" {
 
       labels = {
       }
-      source_uris = length(var.source_uris) != 0 ? var.source_uris : ["${data.google_storage_bucket.sdw-data-ingest.url}/sample_data/*.csv"]
+      source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/sample_data/*.csv"]
       csv_options = {
         quote                 = ""
         allow_jagged_rows     = false
@@ -64,6 +78,7 @@ module "sdw_data_ingest_bq_dataset" {
     },
   ]
   depends_on = [
-    google_storage_bucket_object.upload
+    google_storage_bucket_object.upload_sample_data,
+    google_storage_bucket_object.upload_external_data
   ]
 }

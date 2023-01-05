@@ -86,6 +86,7 @@ variable "billing_budget_pubsub_topic" {
   type        = bool
   default     = false
 }
+
 variable "confidential_tags" {
   description = "Provide list of confidential tags. {{UIMeta group=3 order=6 updatesafe}}"
   type        = map(object({
@@ -111,6 +112,7 @@ variable "dataset_location" {
   type        = string
   default     = "US"
 }
+
 variable "data_analyst_group" {
   description = "Google Cloud IAM group that analyzes the data in the warehouse. {{UIMeta group=1 order=10 updatesafe }}"
   type        = string
@@ -120,40 +122,48 @@ variable "data_engineer_group" {
   description = "Google Cloud IAM group that sets up and maintains the data pipeline and warehouse. {{UIMeta group=1 order=11 updatesafe }}"
   type        = string
 }
+
 variable "deidentified_fields" {
   description = "Provide list of fields / columns need to get de-identified. {{UIMeta group=3 order=5 updatesafe}}"
   type        = list
   default     = ["email", "dl_id"]
 }
+
 variable "deployment_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`."
   type        = string
   default     = null
 }
+
 variable "delete_contents_on_destroy" {
   description = "(Optional) If set to true, delete all the tables in the dataset when destroying the resource; otherwise, destroying the resource will fail if tables are present. {{UIMeta group=0 order=18 }}"
   type        = bool
   default     = false
 }
+
 variable "docker_repository_id" {
   description = "ID of the docker flex template repository. {{UIMeta group=3 order=2 }}"
   type        = string
   default     = "flex-templates"
 }
+
 variable "folder_id" {
   description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. {{UIMeta group=0 order=2 updatesafe }}"
   type        = string
   default     = ""
 }
+
 variable "network_administrator_group" {
   description = "Google Cloud IAM group that reviews network configuration. Typically, this includes members of the networking team. {{UIMeta group=1 order=8 updatesafe }}"
   type        = string
 }
+
 variable "organization_id" {
   description = "Organization ID where GCP Resources need to get spin up. It can be skipped if already setting folder_id. {{UIMeta group=0 order=1 }}"
   type        = string
   default     = ""
 }
+
 variable "owner_users" {
   description = "List of users that should be added as owner to the created project. {{UIMeta group=1 order=5 updatesafe }}"
   type        = list(string)
@@ -165,10 +175,12 @@ variable "owner_groups" {
   type        = list(string)
   default     = []
 }
+
 variable "perimeter_additional_members" {
   description = "The list of all members (users or service accounts) to be added on perimeter access, except the service accounts created by this module. {{UIMeta group=1 order=9 updatesafe }}"
   type        = list(string)
 }
+
 variable "private_tags" {
   description = "Provide list of private tags. {{UIMeta group=3 order=7 updatesafe}}"
   type        = map(object({
@@ -182,25 +194,30 @@ variable "private_tags" {
     }
   }
 }
+
 variable "project_id_prefix" {
   description = "This will be the prefix of the Project ID & name created. {{UIMeta group=1 order=1 }}"
   type        = string
   default     = "radlab-sdw"
 }
+
 variable "python_repository_id" {
   description = "ID of the Python repository. {{UIMeta group=3 order=1 }}"
   type        = string
   default     = "python-modules"
 }
+
 variable "region" {
   description = "The default region where the resources will be deployed. {{UIMeta group=2 order=2 }}"
   type        = string
   default     = "us-east4"
 }
+
 variable "resource_creator_identity" {
   description = "Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module. {{UIMeta group=0 order=4 updatesafe }}"
   type        = string
 }
+
 variable "sample_data_fields" {
   description = "Sample data fields. {{UIMeta group=3 order=4 updatesafe }}"
   type        = map(object({
@@ -247,24 +264,29 @@ variable "sample_data_fields" {
     }
   }
 }
+
 variable "set_domain_restricted_sharing_policy" {
   description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=15 updatesafe }}"
   type        = bool
   default     = false
 }
+
 variable "set_shielded_vm_policy" {
   description = "Apply org policy to disable shielded VMs. {{UIMeta group=0 order=16 updatesafe }}"
   type        = bool
   default     = true
 }
+
 variable "security_administrator_group" {
   description = "Google Cloud IAM group that administers security configurations in the organization(org policies, KMS, VPC service perimeter). {{UIMeta group=1 order=6 updatesafe }}"
   type        = string
 }
+
 variable "security_analyst_group" {
   description = "Google Cloud IAM group that monitors and responds to security incidents. {{UIMeta group=1 order=7 updatesafe }}"
   type        = string
 }
+
 variable "sensitive_tags" {
   description = "Provide list of sensitive tags. {{UIMeta group=3 order=8 updatesafe}}"
   type        = map(object({
@@ -278,33 +300,27 @@ variable "sensitive_tags" {
     }
   }
 }
+
 variable "source_uris" {
   description = "List of GCS URIs of the CSV data files. Example Format - 'gs://ci-bq-external-data/hive_partition_example/year=2012/foo.csv'. {{UIMeta group=3 order=3 updatesafe }} "
   type        = list
   default     = []
 }
+
 variable "subnet_ip" {
   description = "The CDIR IP range of the subnetwork. {{UIMeta group=2 order=1 }}"
   type        = string
   default = "10.0.0.0/16"
 }
+
 variable "trusted_groups" {
   description = "The list of trusted groups (e.g. `myteam@abc.com`). {{UIMeta group=1 order=2 updatesafe }}"
   type        = set(string)
   default     = []
 }
+
 variable "trusted_users" {
   description = "The list of trusted users (e.g. `username@abc.com`). {{UIMeta group=1 order=3 updatesafe }}"
   type        = set(string)
   default     = []
 }
-
-
-
-
-
-
-
-
-
-
