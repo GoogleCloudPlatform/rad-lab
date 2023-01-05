@@ -274,7 +274,7 @@ variable "set_domain_restricted_sharing_policy" {
 variable "set_shielded_vm_policy" {
   description = "Apply org policy to disable shielded VMs. {{UIMeta group=0 order=16 updatesafe }}"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "security_administrator_group" {
