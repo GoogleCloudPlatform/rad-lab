@@ -40,6 +40,14 @@ OPTIONAL `roles/billing.costsManager` role on Parent is only required when spinn
 
 NOTE: Billing budgets can only be created if you are using a Service Account to deploy the module via Terraform, User account cannot be used.
 
+## Access Context Manager 
+
+Before deploying the module create the [Create a scoped access policy](https://cloud.google.com/access-context-manager/docs/create-access-policy#scoped-access-policy) on Folder level where the Secure Data Warehouse is supose to be deployed.
+
+```
+gcloud access-context-manager policies create --organization ORGANIZATION_ID --scopes="folders/FOLDER_ID" --title secure-data-warehouse
+```
+
 ### Deployments via Service Account
 
 1. Create a Terraform Service Account in RAD Lab Management Project to execute / deploy the RAD Lab module. Ensure that the Service Account has the above mentioned IAM permissions.
