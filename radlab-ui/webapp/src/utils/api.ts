@@ -120,7 +120,7 @@ export const mergeVariables = async (body: IDeployment) => {
   })
   const userVars = { ...body.variables }
   const billingId = adminVars?.billing_account_id
-  const variables = mergeAll([userVars, moduleVars, adminVars])
+  const variables = mergeAll([adminVars, moduleVars, userVars])
   delete variables.email
   delete variables.id
   return { billingId, variables }
