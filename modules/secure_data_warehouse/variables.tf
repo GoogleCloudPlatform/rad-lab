@@ -303,7 +303,7 @@ variable "sensitive_tags" {
 
 variable "source_uris" {
   description = "List of GCS URIs of the CSV data files. Example Format - 'gs://ci-bq-external-data/hive_partition_example/year=2012/foo.csv'. {{UIMeta group=3 order=3 updatesafe }} "
-  type        = list
+  type        = list(string)
   default     = []
 }
 
