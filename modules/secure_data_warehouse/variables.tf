@@ -125,7 +125,7 @@ variable "data_engineer_group" {
 
 variable "deidentified_fields" {
   description = "Provide list of fields / columns need to get de-identified. {{UIMeta group=3 order=5 updatesafe}}"
-  type        = list
+  type        = list(string)
   default     = ["email", "dl_id"]
 }
 
@@ -310,7 +310,7 @@ variable "source_uris" {
 variable "subnet_ip" {
   description = "The CDIR IP range of the subnetwork. {{UIMeta group=2 order=1 }}"
   type        = string
-  default = "10.0.0.0/16"
+  default     = "10.0.0.0/16"
 }
 
 variable "trusted_groups" {
