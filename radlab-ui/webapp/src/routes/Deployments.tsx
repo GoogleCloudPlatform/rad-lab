@@ -7,8 +7,8 @@ import {
   SORT_FIELD,
   Deployments as DeploymentsParser,
   IDeployment,
-  DEPLOYMENT_STATUS,
   IModule,
+  DEPLOY_STATUS,
 } from "@/utils/types"
 import { useTranslation } from "next-i18next"
 import { classNames } from "@/utils/dom"
@@ -46,21 +46,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
   const setDeployments = deploymentStore((state) => state.setDeployments)
   const [modules, setModules] = useState<IModule[] | null>(null)
 
-  const deletedAt = "DELETED"
-
-  const activeStatuses = [
-    DEPLOYMENT_STATUS.SUCCESS,
-    DEPLOYMENT_STATUS.PENDING,
-    DEPLOYMENT_STATUS.QUEUED,
-    DEPLOYMENT_STATUS.FAILURE,
-    DEPLOYMENT_STATUS.EXPIRE,
-    DEPLOYMENT_STATUS.CANCELLED,
-    DEPLOYMENT_STATUS.INTERNAL_ERROR,
-    DEPLOYMENT_STATUS.STATUS_UNKNOWN,
-    DEPLOYMENT_STATUS.TIMEOUT,
-    DEPLOYMENT_STATUS.WORKING,
-    deletedAt,
-  ]
+  const activeStatuses = [DEPLOY_STATUS, "DELETED"]
 
   const fetchModules = async () => {
     await axios
@@ -68,7 +54,14 @@ const Deployments: React.FC<DeploymentsProps> = () => {
       .then((res) => {
         setModules(res.data)
       })
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        console.error(error)
+        setAlert({
+          message: t("error"),
+          durationMs: 10000,
+          type: ALERT_TYPE.ERROR,
+        })
+      })
       .finally(() => {
         setLoading(false)
       })
@@ -114,8 +107,8 @@ const Deployments: React.FC<DeploymentsProps> = () => {
         )}
         data-testid="all-deployments"
         onClick={() => {
-          setDeploymentTab(DEPLOYMENT_TAB.ALL),
-            setDeployments(listAllDeployments || null)
+          setDeploymentTab(DEPLOYMENT_TAB.ALL)
+          setDeployments(listAllDeployments || null)
         }}
       >
         {t("all-deployments")}
@@ -132,8 +125,8 @@ const Deployments: React.FC<DeploymentsProps> = () => {
         )}
         data-testid="my-deployments"
         onClick={() => {
-          setDeploymentTab(DEPLOYMENT_TAB.MINE),
-            setDeployments(listMyDeployments || null)
+          setDeploymentTab(DEPLOYMENT_TAB.MINE)
+          setDeployments(listMyDeployments || null)
         }}
       >
         {t("my-deployments")}

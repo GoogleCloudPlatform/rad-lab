@@ -54,7 +54,7 @@ const ListField: React.FC<ListField> = ({ variable }) => {
                   className="badge badge-info gap-1 mt-2 w-auto h-auto py-1 px-2 md:py-1 md:px-4"
                 >
                   <span
-                    className="text-xs w-11/12"
+                    className="text-xs"
                     style={{ overflowWrap: "anywhere" }}
                   >
                     {setvalue}

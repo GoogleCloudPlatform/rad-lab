@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "next-i18next"
 import { DEPLOYMENT_STATUS, IModule } from "@/utils/types"
 import { deploymentStore } from "@/store"
+import { DatasetJsonLd } from "next-seo"
 
 type IFilterType = "module" | "createdAt" | "status"
 type IModuleName = string | ""
@@ -16,7 +17,7 @@ export default function Filter({
 }: {
   filters: IFilterType[]
   statuses: typeof DEPLOYMENT_STATUS[]
-  defaultStatus?: typeof DEPLOYMENT_STATUS
+  defaultStatus?: typeof DEPLOYMENT_STATUS | string
   modules: IModule[] | null
 }) {
   const inputRef = useRef(null)
@@ -24,6 +25,7 @@ export default function Filter({
   const [status, setStatus] = useState(defaultStatus || "")
   const [moduleName, setModuleName] = useState<IModuleName>("")
   const [createdAt, setCreatedAt] = useState<IDate>("")
+  const [range, setRange] = useState<IDate>("")
 
   const { t } = useTranslation()
 
@@ -32,15 +34,8 @@ export default function Filter({
   )
   const deployments = deploymentStore((state) => state.deployments)
 
-  // TODO. Likely change this to the firebase.uid for the record
   const refField = "deploymentId"
   const handleQuery = (search: ISearchResults) => setSearch(search)
-
-  // Owner Filter list
-  // const loginPartnerName = partner?.name
-  // const OWNERS = ["Google", loginPartnerName]
-
-  // Filter based on Selects and Search
 
   useEffect(() => {
     if (!deployments) {
@@ -88,17 +83,30 @@ export default function Filter({
       )
 
     if (createdAt !== "") {
-      filtered = filtered.filter(
-        (deployment) =>
-          new Date(
-            deployment.createdAt._seconds * 1000 +
-              deployment.createdAt._nanoseconds / 1000000,
-          ).toLocaleDateString() === createdAt,
-      )
+      filtered = filtered.filter((deployment) => {
+        var date = new Date(
+          deployment.createdAt._seconds * 1000 +
+            deployment.createdAt._nanoseconds / 1000000,
+        ).toLocaleDateString()
+        return createdAt === date
+      })
+    }
+
+    if (range !== "") {
+      console.log("CREATED", createdAt, range)
+      filtered = filtered.filter((deployment) => {
+        var date = new Date(
+          deployment.createdAt._seconds * 1000 +
+            deployment.createdAt._nanoseconds / 1000000,
+        ).toLocaleDateString()
+        return range >= date
+      })
+
+      console.log("filtered", filtered)
     }
 
     setFilteredDeployments(filtered)
-  }, [moduleName, deployments, search, status, createdAt])
+  }, [moduleName, deployments, search, status, createdAt, range])
 
   const clearAllFilters = () => {
     // @ts-ignore
@@ -134,7 +142,7 @@ export default function Filter({
             ))}
           </select>
         )}
-        {filters.includes("status") && (
+        {/* {filters.includes("status") && (
           <select
             onChange={(e) => setStatus(e.target.value)}
             // @ts-ignore
@@ -142,11 +150,11 @@ export default function Filter({
             className="select select-bordered w-full max-w-xs"
           >
             <option value="">{t("status")}</option>
-            {statuses.map((status, index) => (
-              <option key={index}>{status}</option>
+            {statuses?.map((deployStatus, index) => (
+              <option key={index}>{deployStatus}</option>
             ))}
           </select>
-        )}
+        )} */}
         {filters.includes("createdAt") && (
           <input
             className="rounded-md border-base-300"
@@ -159,11 +167,11 @@ export default function Filter({
         )}
         {filters.includes("createdAt") && (
           <input
-            className="rounded-md  border-base-300"
+            className="rounded-md border-base-300"
             type="date"
             placeholder="End date"
             onChange={(e) =>
-              setCreatedAt(new Date(e.target.value).toLocaleDateString())
+              setRange(new Date(e.target.value).toLocaleDateString())
             }
           />
         )}

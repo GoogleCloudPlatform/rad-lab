@@ -243,3 +243,18 @@ export type TF_OUTPUT = zod.infer<typeof TF_OUTPUT>
 export interface Dictionary<T> {
   [index: string]: T
 }
+
+export const DEPLOY_STATUS = zod.enum([
+  "STATUS_UNKNOWN",
+  "PENDING",
+  "QUEUED",
+  "WORKING",
+  "SUCCESS",
+  "FAILURE",
+  "INTERNAL_ERROR",
+  "TIMEOUT",
+  "CANCELLED",
+  "EXPIRE",
+])
+
+export type IDEPLOYSTATUS = zod.infer<typeof DEPLOY_STATUS>
