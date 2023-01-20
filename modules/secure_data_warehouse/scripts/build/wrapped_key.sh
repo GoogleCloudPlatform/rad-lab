@@ -45,11 +45,11 @@ generate_wrapped_key() {
       gcloud kms keys add-iam-policy-binding ${key_name} --keyring=${key_ring} --location=${key_location} --member=serviceAccount:${terraform_service_account} --role=roles/cloudkms.cryptoOperator --project=${project_id} ${gcloud_impersonate_flag}
     fi
 
-    python3 -m pip install --user --upgrade pip
+    python -m pip install --user --upgrade pip
 
-    python3 -m pip install --user virtualenv
+    python -m pip install --user virtualenv
 
-    python3 -m venv kms_helper_venv
+    python -m venv kms_helper_venv
 
     # shellcheck source=/dev/null
     source kms_helper_venv/bin/activate
