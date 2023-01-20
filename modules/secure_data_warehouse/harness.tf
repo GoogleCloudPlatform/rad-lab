@@ -227,7 +227,7 @@ module "iam_projects" {
   non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
   data_governance_project_id       = module.project_radlab_sdw_data_govern.project_id
   confidential_data_project_id     = module.project_radlab_sdw_conf_data.project_id
-  service_account_email            = var.sdw_sa
+  service_account_email            = var.resource_creator_identity
   
   depends_on = [
     time_sleep.wait_120_seconds
@@ -261,7 +261,7 @@ module "template_project" {
   folder_id             = var.folder_id
   billing_account       = var.billing_account_id
   location              = var.region
-  service_account_email = var.sdw_sa
+  service_account_email = var.resource_creator_identity
 }
 
 module "kek" {
@@ -310,7 +310,7 @@ resource "null_resource" "wrapped_key" {
   provisioner "local-exec" {
     command = <<EOF
         ${path.module}/scripts/build/wrapped_key.sh \
-        ${var.sdw_sa} \
+        ${var.resource_creator_identity} \
         ${module.kek.keys[local.kek_key_name]} \
         ${google_secret_manager_secret.wrapped_key_secret.name} \
         ${module.project_radlab_sdw_data_govern.project_id} \

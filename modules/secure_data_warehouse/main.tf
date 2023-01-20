@@ -38,7 +38,7 @@ module "secured_data_warehouse" {
   non_confidential_data_project_id = module.project_radlab_sdw_non_conf_data.project_id
   data_ingestion_project_id        = module.project_radlab_sdw_data_ingest.project_id
   sdx_project_number               = module.template_project.sdx_project_number
-  terraform_service_account        = var.sdw_sa
+  terraform_service_account        = var.resource_creator_identity
   access_context_manager_policy_id = var.access_context_manager_policy_id
   bucket_name                      = format("radlab-bucket-%s", local.random_id)
   dataset_id                       = local.non_confidential_dataset_id
@@ -78,7 +78,7 @@ module "de_identification_template" {
   source = "GoogleCloudPlatform/secured-data-warehouse/google//modules/de-identification-template"
 
   project_id                = module.project_radlab_sdw_data_govern.project_id
-  terraform_service_account = var.sdw_sa
+  terraform_service_account = var.resource_creator_identity
   crypto_key                = module.kek.keys[local.kek_key_name]
   wrapped_key               = local.wrapped_key_secret_data
   dlp_location              = var.region
