@@ -219,7 +219,7 @@ variable "resource_creator_identity" {
   default     = ""
 }
 
-variable "sdw_sa" {
+variable "secure_datawarehouse_service_acccount" {
   description = "Terraform Service Account for Secure Data Warehouse module. {{UIMeta group=1 order=12 updatesafe }}"
   type        = string
 }
