@@ -56,6 +56,8 @@ NOTE: Make sure to set the `resource_creator_identity` variable to the Service A
 resource_creator_identity = <sa>@<projectID>.iam.gserviceaccount.com 
 ```
 
+NOTE: Make sure that the `secure_datawarehouse_service_acccount` is same as `resource_creator_identity` when trying to deploying the module via RAD Lab Launcher.
+
 2. The User, Group, or Service Account who will be deploying the module should have access to impersonate and grant it the roles, `roles/iam.serviceAccountTokenCreator` on the **Terraform Service Account’s IAM Policy**.
 NOTE: This is not a Project IAM Binding; this is a **Service Account** IAM Binding.
 
