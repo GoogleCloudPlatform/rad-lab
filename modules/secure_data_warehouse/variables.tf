@@ -218,6 +218,11 @@ variable "resource_creator_identity" {
   type        = string
 }
 
+variable "sdw_sa" {
+  description = "Terraform Service Account for Secure Data Warehouse module. {{UIMeta group=1 order=12 updatesafe }}"
+  type        = string
+}
+
 variable "sample_data_fields" {
   description = "Sample data fields. {{UIMeta group=3 order=4 updatesafe }}"
   type        = map(object({

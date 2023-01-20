@@ -61,7 +61,7 @@ resource "google_project_iam_member" "dfc_sa_sdw_non_conf_data_roles" {
 resource "google_service_account_iam_member" "terraform_sa_service_account_user" {
   service_account_id = "projects/${module.project_radlab_sdw_data_ingest.project_id}/serviceAccounts/${module.secured_data_warehouse.dataflow_controller_service_account_email}"
   role               = "roles/iam.serviceAccountUser"
-  member             = "serviceAccount:${var.resource_creator_identity}"
+  member             = "serviceAccount:${var.sdw_sa}"
 }
 
 resource "google_storage_bucket_iam_member" "dfc_sa_sdw_data_ingest_objectAdmin" {
