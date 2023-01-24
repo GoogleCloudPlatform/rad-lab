@@ -230,8 +230,8 @@ export const URLData = zod.object({
 
 export const TF_OUTPUT_VARIABLE = zod.object({
   sensitive: zod.boolean(),
-  type: zod.any(),
-  value: zod.any(),
+  type: zod.unknown(),
+  value: zod.unknown(),
 })
 
 export type TF_OUTPUT_VARIABLE = zod.infer<typeof TF_OUTPUT_VARIABLE>
