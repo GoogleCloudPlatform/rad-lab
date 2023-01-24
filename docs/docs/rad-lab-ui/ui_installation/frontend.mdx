@@ -61,9 +61,9 @@ Add your Project ID here to have the documentation be be customized to your Goog
 # Add Firebase
 
 :::warning
-If you've never used Firebase in your Google Cloud organization before, please execute [First Time Use](#first-time-use).  If you already have Firebase projects running in your Google Cloud organization or you have in the past, please execute [Returning Firebase User](#returning-firebase-user).
+If you've never used Firebase in your Google Cloud organization before, please follow [First Time Use](#first-time-use).  If you already have Firebase projects running in your Google Cloud organization or you have in the past, please execute [Returning Firebase User](#returning-firebase-user).
 
-If you're not sure, simply execute the steps as described in [First Time Use](#first-time-use).
+If you're not sure, simply follow the steps as described in [First Time Use](#first-time-use).
 :::
 
 ## First Time Use
@@ -81,7 +81,7 @@ export RLUI_PROJECT_ID=$(terraform show -json | jq -r .values.outputs.project_id
 # Install Firebase Tools
 npm install -g firebase-tools
 
-# Switch to the webapp directory
+# Switch to the webapp directory (rad-lab/radlab-ui/webapp)
 cd ../../../webapp
 
 # Login to Firebase. If you are already logged in with the correct user, feel free to continue. If not, run firebase login:add and firebase login:use to select the correct user.
@@ -100,7 +100,7 @@ firebase deploy --only firestore:indexes
 ## Returning Firebase User
 
 :::warning first time
-Only execute these steps if you already have one or more Firebase applications in your Google Cloud organization.  If that is not the case, or you are not sure, please run the steps in the previous section, titled **First time Firebase use**.
+Only execute these steps if you already have one or more Firebase applications in your Google Cloud organization.  If that is not the case, or you are not sure, please run the steps in the previous section, titled [First time Firebase use](#first-time-use).
 :::
 
 Run the following commands in a terminal or command window:
