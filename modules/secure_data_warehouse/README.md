@@ -28,7 +28,7 @@ NOTE: This is only required if spinning up Billing Budget for the module.
 
 ## IAM Permissions Prerequisites
 
-Ensure that the identity executing this module has the following IAM permissions, when **creating the project** (create_project = true): 
+Ensure that the identity (Service Account) executing this module has the following IAM permissions, when **creating the project** (create_project = true): 
 
 - Parent: `roles/accesscontextmanager.policyAdmin`
 - Parent: `roles/billing.user`
@@ -50,7 +50,7 @@ gcloud access-context-manager policies create --organization ORGANIZATION_ID --s
 
 ### Deployments via Service Account
 
-1. Create a Terraform Service Account in RAD Lab Management Project to execute / deploy the RAD Lab module. Ensure that the Service Account has the above mentioned IAM permissions.
+1. When deploying the module via RAD Lab Launcher, create a Terraform Service Account in RAD Lab Management Project to execute / deploy the RAD Lab module. Ensure that the Service Account has the above mentioned IAM permissions.
 NOTE: Make sure to set the `resource_creator_identity` variable to the Service Account ID in terraform.tfvars file and pass it in module deployment. Example content of terraform.tfvars: 
 ```
 resource_creator_identity = <sa>@<projectID>.iam.gserviceaccount.com 
