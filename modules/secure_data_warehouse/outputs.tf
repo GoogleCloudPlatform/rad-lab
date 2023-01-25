@@ -25,29 +25,34 @@ output "deployment_id" {
   value       = local.random_id
 }
 
-output "project_id_data_ingestion" {
-  description = "Data Ingestion Project ID"
-  value       = module.project_radlab_sdw_data_ingest.project_id
+output "project_data_ingestion" {
+  description = "Data Ingestion Project"
+  value       = { "id"    =  "${module.project_radlab_sdw_data_ingest.project_id}"
+                  "link"  = "https://console.cloud.google.com/welcome?project=${module.project_radlab_sdw_data_ingest.project_id}" }
 }
 
-output "project_id_data_governance" {
-  description = "Data Governance Project ID"
-  value       = module.project_radlab_sdw_data_govern.project_id
+output "project_data_governance" {
+  description = "Data Governance Project"
+  value       = { "id"    =  "${module.project_radlab_sdw_data_govern.project_id}"
+                  "link"  = "https://console.cloud.google.com/welcome?project=${module.project_radlab_sdw_data_govern.project_id}" }
 }
 
-output "project_id_confedential_data" {
-  description = "Confedential Data Project ID"
-  value       = module.project_radlab_sdw_conf_data.project_id
+output "project_confedential_data" {
+  description = "Confedential Data Project"
+  value       = { "id"    =  "${module.project_radlab_sdw_conf_data.project_id}"
+                  "link"  = "https://console.cloud.google.com/welcome?project=${module.project_radlab_sdw_conf_data.project_id}" }
 }
 
-output "project_id_non_confedential_data" {
-  description = "Non-Confedential Data Project ID"
-  value       = module.project_radlab_sdw_non_conf_data.project_id
+output "project_non_confedential_data" {
+  description = "Non-Confedential Data Project"
+  value       = { "id"    =  "${module.project_radlab_sdw_non_conf_data.project_id}"
+                  "link"  = "https://console.cloud.google.com/welcome?project=${module.project_radlab_sdw_non_conf_data.project_id}" }
 }
 
-output "project_id_template" {
-  description = "Template Project ID"
-  value       = module.template_project.project_id
+output "project_template" {
+  description = "Template Project"
+  value       = { "id"    =  "${module.template_project.project_id}"
+                  "link"  = "https://console.cloud.google.com/welcome?project=${module.template_project.project_id}" }
 }
 
 output "dataflow_controller_service_account_email" {
