@@ -6,7 +6,7 @@ The RAD Lab UI codebase contains the necessary Terraform and frontend code to de
 
 ## Architecture
 
-![](../../../radlab-ui/images/architecture.png)
+![](../static/img/architecture.png)
 
 To install the UI, a combination of Terraform and shell scripts is used to create the necessary Google Cloud components and configure the web application. Once this step is completed, users will be able to create RAD Lab modules via the user interface (once they've been given access). The components that are part of the purple (left) box are the services used to run the user interface. The components in the blue (right) box are RAD Lab modules that are created by the user and where the lifecycle is managed via the UI.
 
@@ -39,17 +39,3 @@ Invoking Firebase APIs via Infrastructure as Code from a terminal requires the u
 - Create the Firebase application
 - Enable authentication mechanisms
 
-## Deploying a RAD Lab Module
-
-![](../../../radlab-ui/images/flow.png)
-
-The diagram depicts the flow to deploy a RAD Lab module, as a RAD Lab user, via the UI.  The steps to update and delete a module follow a similar pattern, so they are not repeated here. 
-
-### Steps
-
-When users create a RAD Lab module, the following steps are being executed by the underlying backend components:
-1. Users select a module from the UI and click Create, supplying the necessary values for the Terraform variables.
-1. The UI posts a message to a Pub/Sub topic, passing the values for the variables in `variables.tf` for that specific module and some [additional information](../../../radlab-ui/automation/terraform/infrastructure/function/create_deployment/index.js).
-1. The Cloud Function creates two files, `backend.tf` and `terraform.tfvars.json`.  `backend.tf` contains information regarding Terraform remote state for that specific module creation and `terraform.tfvars.json` contains the values for `variables.tf` for that specific module.
-1. Once the previous step is completed, the Cloud Function invokes the Cloud Build trigger to create the RAD Lab module and stores the unique build ID from Cloud Build in Firestore.
-1. The RAD Lab UI retrieves the build ID for that specific RAD Lab module and polls the Cloud Build APIs to display the build status and logs.
