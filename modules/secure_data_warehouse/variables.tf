@@ -225,9 +225,8 @@ variable "secure_datawarehouse_service_acccount" {
 }
 
 variable "sample_data_fields" {
-  description = "Sample data fields. {{UIMeta group=3 order=4 updatesafe }}"
+  description = "Data fields for schema of the data. List of `types` - https://cloud.google.com/bigquery/docs/schemas#standard_sql_data_types, List of mode - https://cloud.google.com/bigquery/docs/schemas#modes  . {{UIMeta group=3 order=4 updatesafe }}"
   type        = map(object({
-    # name  = string
     mode  = string
     type  = string
   }))
