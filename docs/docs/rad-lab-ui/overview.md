@@ -6,7 +6,7 @@ The RAD Lab UI codebase contains the necessary Terraform and frontend code to de
 
 ## Architecture
 
-![](../static/img/architecture.png)
+![](../../static/img/architecture.png)
 
 To install the UI, a combination of Terraform and shell scripts is used to create the necessary Google Cloud components and configure the web application. Once this step is completed, users will be able to create RAD Lab modules via the user interface (once they've been given access). The components that are part of the purple (left) box are the services used to run the user interface. The components in the blue (right) box are RAD Lab modules that are created by the user and where the lifecycle is managed via the UI.
 
