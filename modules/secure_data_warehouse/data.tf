@@ -22,20 +22,20 @@ data "google_storage_bucket" "sdw-data-ingest" {
 }
 
 resource "google_storage_bucket_object" "upload_sample_data" {
-  for_each = length(var.source_uris) == 0 ? fileset("${path.module}/scripts/build/", "sdw_data_ingest/*.csv") : toset([])
+  for_each = length(var.source_data_gcs_objects) == 0 ? fileset("${path.module}/scripts/build/", "sdw_data_ingest/*.csv") : toset([])
   name     = each.value
   source   = join("/", ["${path.module}/scripts/build/", each.value])
   bucket   = data.google_storage_bucket.sdw-data-ingest.name
 }
 
 data "google_storage_bucket_object_content" "external_data" {
-  for_each  = length(var.source_uris) == 0 ? toset([]) : toset(var.source_uris)
+  for_each  = length(var.source_data_gcs_objects) == 0 ? toset([]) : toset(var.source_data_gcs_objects)
   name      = replace(each.key, format("gs://%s/", split("/", trimprefix(each.key, "gs://"))[0]), "")
   bucket    = split("/", trimprefix(each.key, "gs://"))[0]
 }
 
 resource "google_storage_bucket_object" "upload_external_data" {
-  for_each = length(var.source_uris) == 0 ? toset([]) : toset(var.source_uris)
+  for_each = length(var.source_data_gcs_objects) == 0 ? toset([]) : toset(var.source_data_gcs_objects)
   name     = join("/", ["sdw_data_ingest", reverse(split("/", each.key))[0]]) 
   content  = data.google_storage_bucket_object_content.external_data[each.key].content
   bucket   = data.google_storage_bucket.sdw-data-ingest.name

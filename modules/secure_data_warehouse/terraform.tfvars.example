@@ -9,7 +9,7 @@ network_administrator_group         = "network_administrator_group@example.com"
 security_analyst_group              = "security_analyst_group@example.com"
 data_analyst_group                  = "data_analyst_group@example.com"
 data_engineer_group                 = "data_engineer_group@example.com"
-source_uris                         = ["gs://my-bucket/path_to_file1/my_file1.csv", "gs://my-bucket/path_to_file2/my_file2.csv"]
+source_data_gcs_objects                         = ["gs://my-bucket/path_to_file1/my_file1.csv", "gs://my-bucket/path_to_file2/my_file2.csv"]
 
 data_fields                  = {
     field1 = {

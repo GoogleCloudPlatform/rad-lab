@@ -294,7 +294,7 @@ variable "sensitive_tags" {
   }
 }
 
-variable "source_uris" {
+variable "source_data_gcs_objects" {
   description = "List of GCS URIs of the CSV data files. Example Format - 'gs://ci-bq-external-data/hive_partition_example/year=2012/foo.csv'. NOTE: Make sure that the RAD Lab UI module creator Service Account has read access to the GCS objects added to this list. {{UIMeta group=3 order=1 updatesafe }} "
   type        = list(string)
   default     = []
