@@ -22,7 +22,7 @@ locals {
   confidential_table_id           = "re_data"
   non_confidential_table_id       = "de_data"
   wrapped_key_secret_data         = chomp(data.google_secret_manager_secret_version.wrapped_key.secret_data)
-  bq_schema_dl                    = join(", ",[ for key, value in var.sample_data_fields : "${key}:${value.type}" ])
+  bq_schema_dl                    = join(", ",[ for key, value in var.data_fields : "${key}:${value.type}" ])
   bigquery_non_confidential_table = "${module.project_radlab_sdw_non_conf_data.project_id}:${local.non_confidential_dataset_id}.${local.non_confidential_table_id}"
   bigquery_confidential_table     = "${module.project_radlab_sdw_conf_data.project_id}:${local.confidential_dataset_id}.${local.confidential_table_id}"
 }
@@ -149,8 +149,6 @@ resource "google_artifact_registry_repository_iam_member" "confidential_python_r
   ]
 }
 
-
-// The sample data we are using is a Mock Drivers License data
 module "regional_deid_pipeline" {
   source = "GoogleCloudPlatform/secured-data-warehouse/google//modules/dataflow-flex-job"
 
@@ -166,7 +164,7 @@ module "regional_deid_pipeline" {
   staging_location        = "gs://${module.secured_data_warehouse.data_ingestion_bucket_name}/staging/"
 
   parameters = {
-    query                          = "SELECT ${join(", ",[ for key, value in var.sample_data_fields : "${key}" ])} FROM [${module.project_radlab_sdw_data_ingest.project_id}:${module.sdw_data_ingest_bq_dataset.bigquery_dataset.dataset_id}.${module.sdw_data_ingest_bq_dataset.external_table_ids[0]}] "
+    query                          = "SELECT ${join(", ",[ for key, value in var.data_fields : "${key}" ])} FROM [${module.project_radlab_sdw_data_ingest.project_id}:${module.sdw_data_ingest_bq_dataset.bigquery_dataset.dataset_id}.${module.sdw_data_ingest_bq_dataset.external_table_ids[0]}] "
     deidentification_template_name = module.de_identification_template.template_full_path
     window_interval_sec            = 30
     batch_size                     = 1000

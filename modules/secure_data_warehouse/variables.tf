@@ -88,7 +88,7 @@ variable "billing_budget_pubsub_topic" {
 }
 
 variable "confidential_tags" {
-  description = "Provide list of confidential tags. {{UIMeta group=3 order=6 updatesafe}}"
+  description = "Provide list of confidential tags. {{UIMeta group=3 order=4 updatesafe}}"
   type        = map(object({
     display_name  = string
     description   = string
@@ -124,7 +124,7 @@ variable "data_engineer_group" {
 }
 
 variable "deidentified_fields" {
-  description = "Provide list of fields / columns need to get de-identified. {{UIMeta group=3 order=5 updatesafe}}"
+  description = "Provide list of fields / columns need to get de-identified. {{UIMeta group=3 order=3 updatesafe}}"
   type        = list(string)
   default     = ["email", "dl_id"]
 }
@@ -139,12 +139,6 @@ variable "delete_contents_on_destroy" {
   description = "(Optional) If set to true, delete all the tables in the dataset when destroying the resource; otherwise, destroying the resource will fail if tables are present. {{UIMeta group=0 order=18 }}"
   type        = bool
   default     = true
-}
-
-variable "docker_repository_id" {
-  description = "ID of the docker flex template repository. {{UIMeta group=3 order=2 }}"
-  type        = string
-  default     = "flex-templates"
 }
 
 variable "folder_id" {
@@ -182,7 +176,7 @@ variable "perimeter_additional_members" {
 }
 
 variable "private_tags" {
-  description = "Provide list of private tags. {{UIMeta group=3 order=7 updatesafe}}"
+  description = "Provide list of private tags. {{UIMeta group=3 order=5 updatesafe}}"
   type        = map(object({
     display_name  = string
     description   = string
@@ -199,12 +193,6 @@ variable "project_id_prefix" {
   description = "This will be the prefix of the Project ID & name created. {{UIMeta group=1 order=1 }}"
   type        = string
   default     = "radlab-sdw"
-}
-
-variable "python_repository_id" {
-  description = "ID of the Python repository. {{UIMeta group=3 order=1 }}"
-  type        = string
-  default     = "python-modules"
 }
 
 variable "region" {
@@ -224,8 +212,8 @@ variable "secure_datawarehouse_service_acccount" {
   type        = string
 }
 
-variable "sample_data_fields" {
-  description = "Data fields for schema of the data. List of `types` - https://cloud.google.com/bigquery/docs/schemas#standard_sql_data_types, List of mode - https://cloud.google.com/bigquery/docs/schemas#modes  . {{UIMeta group=3 order=4 updatesafe }}"
+variable "data_fields" {
+  description = "Data fields for schema of the data. List of `types` - https://cloud.google.com/bigquery/docs/schemas#standard_sql_data_types, List of mode - https://cloud.google.com/bigquery/docs/schemas#modes  . {{UIMeta group=3 order=2 updatesafe }}"
   type        = map(object({
     mode  = string
     type  = string
@@ -293,7 +281,7 @@ variable "security_analyst_group" {
 }
 
 variable "sensitive_tags" {
-  description = "Provide list of sensitive tags. {{UIMeta group=3 order=8 updatesafe}}"
+  description = "Provide list of sensitive tags. {{UIMeta group=3 order=6 updatesafe}}"
   type        = map(object({
     display_name  = string
     description   = string
@@ -307,7 +295,7 @@ variable "sensitive_tags" {
 }
 
 variable "source_uris" {
-  description = "List of GCS URIs of the CSV data files. Example Format - 'gs://ci-bq-external-data/hive_partition_example/year=2012/foo.csv'. NOTE: Make sure that the RAD Lab UI module creator Service Account has read access to the GCS objects added to this list. {{UIMeta group=3 order=3 updatesafe }} "
+  description = "List of GCS URIs of the CSV data files. Example Format - 'gs://ci-bq-external-data/hive_partition_example/year=2012/foo.csv'. NOTE: Make sure that the RAD Lab UI module creator Service Account has read access to the GCS objects added to this list. {{UIMeta group=3 order=1 updatesafe }} "
   type        = list(string)
   default     = []
 }

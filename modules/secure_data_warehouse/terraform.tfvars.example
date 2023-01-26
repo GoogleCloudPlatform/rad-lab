@@ -11,7 +11,7 @@ data_analyst_group                  = "data_analyst_group@example.com"
 data_engineer_group                 = "data_engineer_group@example.com"
 source_uris                         = ["gs://my-bucket/path_to_file1/my_file1.csv", "gs://my-bucket/path_to_file2/my_file2.csv"]
 
-sample_data_fields                  = {
+data_fields                  = {
     field1 = {
         mode  = "NULLABLE"
         type  = "STRING"

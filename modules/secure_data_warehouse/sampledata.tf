@@ -22,7 +22,7 @@ data "google_storage_bucket" "sdw-data-ingest" {
 }
 
 resource "google_storage_bucket_object" "upload_sample_data" {
-  for_each = length(var.source_uris) == 0 ? fileset("${path.module}/scripts/build/", "sample_data/*.csv") : toset([])
+  for_each = length(var.source_uris) == 0 ? fileset("${path.module}/scripts/build/", "sdw_data_ingest/*.csv") : toset([])
   name     = each.value
   source   = join("/", ["${path.module}/scripts/build/", each.value])
   bucket   = data.google_storage_bucket.sdw-data-ingest.name
@@ -36,7 +36,7 @@ data "google_storage_bucket_object_content" "external_data" {
 
 resource "google_storage_bucket_object" "upload_external_data" {
   for_each = length(var.source_uris) == 0 ? toset([]) : toset(var.source_uris)
-  name     = join("/", ["sample_data", reverse(split("/", each.key))[0]]) 
+  name     = join("/", ["sdw_data_ingest", reverse(split("/", each.key))[0]]) 
   content  = data.google_storage_bucket_object_content.external_data[each.key].content
   bucket   = data.google_storage_bucket.sdw-data-ingest.name
 }
@@ -46,14 +46,14 @@ module "sdw_data_ingest_bq_dataset" {
   version = "~> 5.2.0"
 
   project_id                  = module.project_radlab_sdw_data_ingest.project_id
-  dataset_id                  = "sample_dataset"
-  dataset_name                = "sample_dataset"
-  description                 = "Sample Data"
+  dataset_id                  = "sdw_data_ingest_dataset"
+  dataset_name                = "sdw_data_ingest_dataset"
+  description                 = "Ingested Data"
   location                    = var.region
   delete_contents_on_destroy  = var.delete_contents_on_destroy
   external_tables = [
     {
-      table_id              = "sample_data"
+      table_id              = "sdw_data_ingest_table"
       autodetect            = true
       compression           = null
       ignore_unknown_values = true
@@ -64,7 +64,7 @@ module "sdw_data_ingest_bq_dataset" {
 
       labels = {
       }
-      source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/sample_data/*.csv"]
+      source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/sdw_data_ingest/*.csv"]
       csv_options = {
         quote                 = ""
         allow_jagged_rows     = false

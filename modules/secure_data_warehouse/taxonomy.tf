@@ -25,7 +25,7 @@ resource "google_data_catalog_taxonomy" "secure_taxonomy" {
   project                   = module.project_radlab_sdw_data_govern.project_id
   region                    = var.region
   display_name              = local.taxonomy_display_name
-  description               = "Taxonomy created for Sample Sensitive Data"
+  description               = "Taxonomy created for Sensitive Data"
   activated_policy_types    = ["FINE_GRAINED_ACCESS_CONTROL"]
 
   depends_on = [
@@ -96,7 +96,7 @@ resource "local_file" "schema_template_file" {
   filename  = format("${path.module}/templates/schema.tpl")
   content   = templatefile("${path.module}/templates/schema_template.tpl",
   {
-    fields            = var.sample_data_fields
+    fields            = var.data_fields
     confidential_tags = var.confidential_tags
     private_tags      = var.private_tags
     sensitive_tags    = var.sensitive_tags
