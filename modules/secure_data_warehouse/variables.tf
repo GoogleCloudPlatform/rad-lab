@@ -138,7 +138,7 @@ variable "deployment_id" {
 variable "delete_contents_on_destroy" {
   description = "(Optional) If set to true, delete all the tables in the dataset when destroying the resource; otherwise, destroying the resource will fail if tables are present. {{UIMeta group=0 order=18 }}"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "docker_repository_id" {
@@ -220,7 +220,7 @@ variable "resource_creator_identity" {
 }
 
 variable "secure_datawarehouse_service_acccount" {
-  description = "Terraform Service Account for Secure Data Warehouse module. {{UIMeta group=1 order=12 updatesafe }}"
+  description = "Terraform Service Account for Secure Data Warehouse module. NOTE: This should be same as RAD Lab UI Module creator Service Account. {{UIMeta group=1 order=12 updatesafe }}"
   type        = string
 }
 
@@ -307,7 +307,7 @@ variable "sensitive_tags" {
 }
 
 variable "source_uris" {
-  description = "List of GCS URIs of the CSV data files. Example Format - 'gs://ci-bq-external-data/hive_partition_example/year=2012/foo.csv'. NOTE: Make sure that the RAD Lab UI module creator Service Account has access to the GS objects added to this list. {{UIMeta group=3 order=3 updatesafe }} "
+  description = "List of GCS URIs of the CSV data files. Example Format - 'gs://ci-bq-external-data/hive_partition_example/year=2012/foo.csv'. NOTE: Make sure that the RAD Lab UI module creator Service Account has read access to the GCS objects added to this list. {{UIMeta group=3 order=3 updatesafe }} "
   type        = list(string)
   default     = []
 }
