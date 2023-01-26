@@ -97,6 +97,11 @@ resource "google_artifact_registry_repository_iam_member" "docker_reader" {
   repository = "flex-templates"
   role       = "roles/artifactregistry.reader"
   member     = "serviceAccount:${module.secured_data_warehouse.dataflow_controller_service_account_email}"
+
+  depends_on = [
+    module.template_project,
+    module.secured_data_warehouse
+  ]
 }
 
 resource "google_artifact_registry_repository_iam_member" "confidential_docker_reader" {
@@ -107,6 +112,11 @@ resource "google_artifact_registry_repository_iam_member" "confidential_docker_r
   repository = "flex-templates"
   role       = "roles/artifactregistry.reader"
   member     = "serviceAccount:${module.secured_data_warehouse.confidential_dataflow_controller_service_account_email}"
+
+  depends_on = [
+    module.template_project,
+    module.secured_data_warehouse
+  ]
 }
 
 resource "google_artifact_registry_repository_iam_member" "python_reader" {
@@ -117,6 +127,11 @@ resource "google_artifact_registry_repository_iam_member" "python_reader" {
   repository = "python-modules"
   role       = "roles/artifactregistry.reader"
   member     = "serviceAccount:${module.secured_data_warehouse.dataflow_controller_service_account_email}"
+
+  depends_on = [
+    module.template_project,
+    module.secured_data_warehouse
+  ]
 }
 
 resource "google_artifact_registry_repository_iam_member" "confidential_python_reader" {
@@ -127,6 +142,11 @@ resource "google_artifact_registry_repository_iam_member" "confidential_python_r
   repository = "python-modules"
   role       = "roles/artifactregistry.reader"
   member     = "serviceAccount:${module.secured_data_warehouse.confidential_dataflow_controller_service_account_email}"
+
+  depends_on = [
+    module.template_project,
+    module.secured_data_warehouse
+  ]
 }
 
 
