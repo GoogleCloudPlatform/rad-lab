@@ -160,7 +160,9 @@ module "regional_deid_pipeline" {
 
 resource "time_sleep" "wait_de_identify_job_execution" {
   create_duration = "600s"
-
+  triggers = {
+    time = timestamp()
+  }
   depends_on = [
     module.regional_deid_pipeline
   ]
