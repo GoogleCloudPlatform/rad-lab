@@ -29,10 +29,7 @@ variable "ah_data_exchange_location" {
 variable "ah_listing_dataset_map" {
   description = "Analytics Hub : Listing ID and Linked Dataset display name key value pair. {{UIMeta group=4 order=4 }}"
   type        = map(string)
-  default = {
-    "neon_chemical_properties_of_surface_water" = "neon_chemical_properties_of_surface_water",
-    "neon_continuous_discharge"                 = "neon_continuous_discharge"
-  }
+  default = {"neon_chemical_properties_of_surface_water" = "neon_chemical_properties_of_surface_water", "neon_continuous_discharge" = "neon_continuous_discharge"}
 }
 
 variable "ah_project_id" {

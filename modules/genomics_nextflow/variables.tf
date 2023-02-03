@@ -138,17 +138,7 @@ variable "nextflow_api_location" {
 variable "nextflow_sa_roles" {
   description = "List of roles granted to the nextflow service account. This server account will be used to run both the nextflow server and workers as well. {{UIMeta group=3 order=5 updatesafe }}"
   type        = list(any)
-  default = [
-    "roles/lifesciences.workflowsRunner",
-    "roles/serviceusage.serviceUsageConsumer",
-    "roles/storage.objectAdmin",
-    "roles/batch.jobsAdmin",
-    "roles/batch.agentReporter",
-    "roles/batch.serviceAgent",
-    "roles/iam.serviceAccountUser",
-    "roles/browser",
-    "roles/logging.viewer"
-  ]
+  default = ["roles/lifesciences.workflowsRunner", "roles/serviceusage.serviceUsageConsumer", "roles/storage.objectAdmin", "roles/batch.jobsAdmin", "roles/batch.agentReporter", "roles/batch.serviceAgent", "roles/iam.serviceAccountUser", "roles/browser", "roles/logging.viewer"]
 }
 
 variable "nextflow_server_instance_name" {
