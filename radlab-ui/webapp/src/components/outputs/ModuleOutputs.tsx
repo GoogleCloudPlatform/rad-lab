@@ -62,8 +62,7 @@ const ModuleOutputs: React.FC<ModuleOutputsProps> = ({
   )
 
   const shouldShowOutputs = () =>
-    status === DEPLOYMENT_STATUS.SUCCESS ||
-    (status === DEPLOYMENT_STATUS.FAILURE && !deployment.deletedAt)
+    status !== DEPLOYMENT_STATUS.WORKING && !deployment.deletedAt
 
   const fetchOutputs = async () => {
     await axios
