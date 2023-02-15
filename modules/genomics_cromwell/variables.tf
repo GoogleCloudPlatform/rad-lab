@@ -133,13 +133,7 @@ variable "cromwell_port" {
 variable "cromwell_sa_roles" {
   description = "List of roles granted to the cromwell service account. This server account will be used to run both the Cromwell server and workers as well. {{UIMeta group=3 order=11 updatesafe }}"
   type        = list(any)
-  default = [
-    "roles/lifesciences.workflowsRunner",
-    "roles/serviceusage.serviceUsageConsumer",
-    "roles/storage.objectAdmin",
-    "roles/cloudsql.client",
-    "roles/browser"
-  ]
+  default = ["roles/lifesciences.workflowsRunner", "roles/serviceusage.serviceUsageConsumer", "roles/storage.objectAdmin", "roles/cloudsql.client", "roles/browser"]
 }
 
 variable "cromwell_server_instance_name" {
