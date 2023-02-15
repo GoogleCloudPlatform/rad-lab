@@ -15,6 +15,18 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [11.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v11.0.0) (2023-02-14)
+ 
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v10.0.0...v11.0.0) 
+
+### Added
+- _RAD Lab Module:_ Releasing RAD Lab Genomics Nextflow Module [(#93)](https://github.com/GoogleCloudPlatform/rad-lab/pull/93) [(#94)](https://github.com/GoogleCloudPlatform/rad-lab/pull/94)
+
+### Changed
+- _RAD Lab Module:_ Standardizing Module specific READMEs [(#120)](https://github.com/GoogleCloudPlatform/rad-lab/pull/120)
+- _Repo:_ Adding documentation on how to contribute to RAD Lab repo [(#106)](https://github.com/GoogleCloudPlatform/rad-lab/pull/106)
+- _RAD Lab Documentation:_ Updating Documentation and adding Videos [[#92]](https://github.com/GoogleCloudPlatform/rad-lab/pull/92) [[#98]](https://github.com/GoogleCloudPlatform/rad-lab/pull/98) [[#128]](https://github.com/GoogleCloudPlatform/rad-lab/pull/128) 
+
 ## [10.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v10.0.0) (2022-11-14)
  
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v9.1.1...v10.0.0) 
