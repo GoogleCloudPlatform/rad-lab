@@ -47,6 +47,9 @@ module "project" {
     "container.googleapis.com",
     "admin.googleapis.com",
     "artifactregistry.googleapis.com",
+    "cloudkms.googleapis.com",
+    "accesscontextmanager.googleapis.com",
+    "dataflow.googleapis.com",
     "billingbudgets.googleapis.com"
   ]
 

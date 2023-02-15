@@ -1,0 +1,59 @@
+organization_id                         = "123456789"
+folder_id                               = "987654321"
+billing_account_id                      = "ABCDEF-987654-GHIJKL"
+access_context_manager_policy_id        = "101010101010"
+resource_creator_identity               = "radlab-module-creator-sa@project-id.iam.gserviceaccount.com"
+secure_datawarehouse_service_acccount   = "radlab-module-creator-sa@project-id.iam.gserviceaccount.com"
+perimeter_additional_members            = ["demouser@example.com","demosa@service.gserviceaccount.com"]
+security_administrator_group            = "security_administrator_group@example.com"
+network_administrator_group             = "network_administrator_group@example.com"
+security_analyst_group                  = "security_analyst_group@example.com"
+data_analyst_group                      = "data_analyst_group@example.com"
+data_engineer_group                     = "data_engineer_group@example.com"
+source_data_gcs_objects                 = ["gs://my-bucket/path_to_file1/my_file1.csv", "gs://my-bucket/path_to_file2/my_file2.csv"]
+
+data_fields                  = {
+    field1 = {
+        mode  = "NULLABLE"
+        type  = "STRING"
+    },
+    field2 = {
+        mode  = "NULLABLE"
+        type  = "DATE"
+    },
+    field3 = {
+        mode  = "NULLABLE"
+        type  = "STRING"
+    },
+    field4 = {
+        mode  = "REQUIRED"
+        type  = "STRING"
+    },
+    field5 = {
+        mode  = "NULLABLE"
+        type  = "STRING"
+    }
+}
+
+sensitive_tags                          = {
+    field2 = {
+        display_name    = "FIELD2_POLICY_TAG_DISPLAY_NAME"
+        description     = "Field2 Policy Tag description."
+    }
+  }
+
+private_tags                            = {
+    field1 = {
+        display_name    = "FIELD1_POLICY_TAG_DISPLAY_NAME"
+        description     = "Field1 Policy Tag description."
+    }
+  }
+
+confidential_tags                       = {
+    field4 = {
+        display_name    = "FIELD4_POLICY_TAG_DISPLAY_NAME"
+        description     = "Field4 Policy Tag description."
+    }
+  }
+
+deidentified_fields                     = [ "field1", "field2" ]
