@@ -15,6 +15,11 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [12.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v12.0.0) (2023-02-17)
+ 
+### Added
+- _RAD Lab Module:_ Releasing RAD Lab Secure Datawarehouse Module [(#136)](https://github.com/GoogleCloudPlatform/rad-lab/pull/136)
+
 ## [11.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v11.0.0) (2023-02-14)
  
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v10.0.0...v11.0.0) 
