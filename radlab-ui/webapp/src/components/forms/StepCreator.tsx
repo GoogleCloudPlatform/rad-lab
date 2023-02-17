@@ -10,6 +10,7 @@ import StringField from "@/components/forms/fields/StringField"
 import SetField from "@/components/forms/fields/SetField"
 import ListField from "@/components/forms/fields/ListField"
 import MapField from "@/components/forms/fields/MapField"
+import MapNestedField from "@/components/forms/fields/MapNestedField"
 import { validators } from "@/utils/validation"
 
 interface StepCreator {
@@ -59,24 +60,35 @@ const StepCreator: React.FC<StepCreator> = ({ variableList, idx }) => {
     return error
   }
   const renderControls = (variable: IUIVariable) => {
-    switch (variable.type) {
-      case "string":
-        return <StringField variable={variable} validate={validate(variable)} />
-      case "bool":
-        return <BooleanField variable={variable} />
-      case "number":
-        return <NumberField variable={variable} validate={validate(variable)} />
-      case "set(string)":
-      case "set(number)":
-        return <SetField variable={variable} />
-      case "list(string)":
-      case "list(number)":
-        return <ListField variable={variable} />
-      case "map":
-      case "map(string)":
-        return <MapField variable={variable} validate={validate(variable)} />
-      default:
-        return <StringField variable={variable} validate={validateRequired} />
+    let checkMapObject = variable.type.slice(0, 10)
+    if (checkMapObject === "map(object") {
+      return (
+        <MapNestedField variable={variable} validate={validate(variable)} />
+      )
+    } else {
+      switch (variable.type) {
+        case "string":
+          return (
+            <StringField variable={variable} validate={validate(variable)} />
+          )
+        case "bool":
+          return <BooleanField variable={variable} />
+        case "number":
+          return (
+            <NumberField variable={variable} validate={validate(variable)} />
+          )
+        case "set(string)":
+        case "set(number)":
+          return <SetField variable={variable} />
+        case "list(string)":
+        case "list(number)":
+          return <ListField variable={variable} />
+        case "map":
+        case "map(string)":
+          return <MapField variable={variable} validate={validate(variable)} />
+        default:
+          return <StringField variable={variable} validate={validateRequired} />
+      }
     }
   }
 
