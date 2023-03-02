@@ -22,7 +22,7 @@ data "google_storage_bucket" "sdw-data-ingest" {
 }
 
 resource "google_storage_bucket_object" "upload_sample_data" {
-  for_each = length(var.source_data_gcs_objects) == 0 ? fileset("${path.module}/scripts/build/", "sdw_data_ingest/*.csv") : toset([])
+  for_each = length(var.source_data_gcs_objects) == 0 ? fileset("${path.module}/scripts/build/", "sample_data/*.csv") : toset([])
   name     = each.value
   source   = join("/", ["${path.module}/scripts/build/", each.value])
   bucket   = data.google_storage_bucket.sdw-data-ingest.name
@@ -64,7 +64,7 @@ module "sdw_data_ingest_bq_dataset" {
 
       labels = {
       }
-      source_uris = ["${data.google_storage_bucket.sdw-data-ingest.url}/sdw_data_ingest/*.csv"]
+      source_uris = length(var.source_data_gcs_objects) == 0 ? ["${data.google_storage_bucket.sdw-data-ingest.url}/sample_data/*.csv"] : ["${data.google_storage_bucket.sdw-data-ingest.url}/sdw_data_ingest/*.csv"]
       csv_options = {
         quote                 = ""
         allow_jagged_rows     = false

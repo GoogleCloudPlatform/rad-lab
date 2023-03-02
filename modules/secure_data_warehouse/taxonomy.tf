@@ -113,7 +113,8 @@ resource "google_bigquery_table" "re_id" {
   friendly_name       = local.confidential_table_id
   deletion_protection = !var.delete_contents_on_destroy
 
-  schema = templatefile(local_file.schema_template_file.filename,{})
+  schema = local_file.schema_template_file.content
+
   lifecycle {
     ignore_changes = [
       encryption_configuration # managed by the confidential dataset default_encryption_configuration.
