@@ -243,3 +243,10 @@ export type TF_OUTPUT = zod.infer<typeof TF_OUTPUT>
 export interface Dictionary<T> {
   [index: string]: T
 }
+
+export const BuildSteps = zod.object({
+  id: zod.string(),
+  status: zod.string()
+})
+
+export type IBuildSteps = zod.infer<typeof BuildSteps>
