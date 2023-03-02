@@ -42,6 +42,7 @@ The repository has the following structure:
 * [/docs](./docs): General documentation about the repository and how to use it.
 * [/modules](./modules): Customisable, reusable Terraform modules to create GCP infrastructure & supporting scripts.
 * [/radlab-launcher](./radlab-launcher): RAD Lab Launcher and associated scripts to support the modules.
+* [/radlab-ui](./radlab-ui): RAD UI and associated scripts to build the WebApp.
 * [/tools](./tools): Automation tools to generate the necessary documentation and license checks.
 
 ## Contributing
