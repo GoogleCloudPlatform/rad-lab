@@ -75,7 +75,7 @@ export const TEST_MODULES: IModule[] = [
     name: "alpha_fold",
     projectId: "test-rad-lab",
     id: "xyz",
-    variables: [],
+    variables: {},
     createdAt: {
       _seconds: 1658770787,
       _nanoseconds: 823000000,
@@ -89,7 +89,7 @@ export const TEST_MODULES: IModule[] = [
     name: "app_mod_elastic",
     projectId: "test-rad-lab",
     id: "xyz",
-    variables: [],
+    variables: {},
     createdAt: {
       _seconds: 1658770787,
       _nanoseconds: 823000000,
@@ -103,7 +103,7 @@ export const TEST_MODULES: IModule[] = [
     name: "data_science",
     projectId: "test-rad-lab",
     id: "xyz",
-    variables: [],
+    variables: {},
     createdAt: {
       _seconds: 1658770787,
       _nanoseconds: 823000000,
@@ -117,7 +117,7 @@ export const TEST_MODULES: IModule[] = [
     name: "genomics_cromwell",
     projectId: "test-rad-lab",
     id: "xyz",
-    variables: [],
+    variables: {},
     createdAt: {
       _seconds: 1658770787,
       _nanoseconds: 823000000,
@@ -131,7 +131,7 @@ export const TEST_MODULES: IModule[] = [
     name: "genomics_dsub",
     projectId: "test-rad-lab",
     id: "xyz",
-    variables: [],
+    variables: {},
     createdAt: {
       _seconds: 1658770787,
       _nanoseconds: 823000000,
@@ -145,7 +145,7 @@ export const TEST_MODULES: IModule[] = [
     name: "silicon_design",
     projectId: "test-rad-lab",
     id: "xyz",
-    variables: [],
+    variables: {},
     createdAt: {
       _seconds: 1658770787,
       _nanoseconds: 823000000,
