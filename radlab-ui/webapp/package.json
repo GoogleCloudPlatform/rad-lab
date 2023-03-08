@@ -89,6 +89,6 @@
     "presets": [
       "next/babel"
     ]
-  }
+  },
   "license": "ISC"
 }
