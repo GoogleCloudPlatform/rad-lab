@@ -22,9 +22,6 @@ const customJestConfig = {
   resolver: "jest-node-exports-resolver",
   testTimeout: 20000,
   setupFilesAfterEnv: ["<rootDir>/jest.env.js"],
-  transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": ["babel-jest", { presets: ["next/babel"] }],
-  },
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
