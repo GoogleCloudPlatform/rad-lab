@@ -41,7 +41,7 @@ const ModuleLogs: React.FC<IModuleLogs> = ({ deploymentId, tableHeaders }) => {
   return (
     <div className="w-full card card-actions bg-base-100 overflow-x-auto rounded-sm">
       <table className="w-full divide-y divide-base-200 border-2 border-base-300 rounded-lg block max-h-screen overflow-auto">
-        <thead className="bg-base-300 sticky top-0">
+        <thead className="bg-base-300 sticky top-0 z-10">
           <tr className="border-base-300">
             {tableHeaders.map((tableHeader) => (
               <th

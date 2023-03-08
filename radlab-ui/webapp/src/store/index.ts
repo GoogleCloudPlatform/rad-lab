@@ -1,4 +1,5 @@
 import alertStore from "./alert"
 import userStore from "./user"
+import deploymentStore from "./deployment"
 
-export { alertStore, userStore }
+export { alertStore, userStore, deploymentStore }

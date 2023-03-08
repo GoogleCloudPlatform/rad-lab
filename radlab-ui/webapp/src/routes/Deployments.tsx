@@ -7,17 +7,21 @@ import {
   SORT_FIELD,
   Deployments as DeploymentsParser,
   IDeployment,
+  IModule,
+  DEPLOY_STATUS,
 } from "@/utils/types"
 import { useTranslation } from "next-i18next"
 import { classNames } from "@/utils/dom"
 import axios from "axios"
-import { alertStore, userStore } from "@/store"
+import { alertStore, deploymentStore, userStore } from "@/store"
 import Loading from "@/navigation/Loading"
 import { ALERT_TYPE } from "@/utils/types"
 import AdminSettingsButton from "@/components/AdminSettingsButton"
 import NewDeploymentButton from "@/components/NewDeploymentButton"
 import EmptyAdminState from "@/components/EmptyAdminState"
 import EmptyState from "@/components/EmptyState"
+import EmptySearch from "@/components/EmptySearch"
+import Filter from "@/components/Filter"
 
 enum DEPLOYMENT_TAB {
   ALL,
@@ -36,6 +40,32 @@ const Deployments: React.FC<DeploymentsProps> = () => {
   const [deploymentTab, setDeploymentTab] = useState(
     isAdmin ? DEPLOYMENT_TAB.ALL : DEPLOYMENT_TAB.MINE,
   )
+  const filteredDeployments = deploymentStore(
+    (state) => state.filteredDeployments,
+  )
+  const setDeployments = deploymentStore((state) => state.setDeployments)
+  const [modules, setModules] = useState<IModule[] | null>(null)
+
+  const activeStatuses = [DEPLOY_STATUS, "DELETED"]
+
+  const fetchModules = async () => {
+    await axios
+      .get(`/api/github/modules`)
+      .then((res) => {
+        setModules(res.data)
+      })
+      .catch((error) => {
+        console.error(error)
+        setAlert({
+          message: t("error"),
+          durationMs: 10000,
+          type: ALERT_TYPE.ERROR,
+        })
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
 
   const fetchData = async () => {
     Promise.all([
@@ -51,6 +81,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
         )
         setAllList(allDeployData)
         setMyList(myDeployData)
+        setDeployments(allDeployData || null)
       })
       .catch((error) => {
         console.error(error)
@@ -60,13 +91,11 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           type: ALERT_TYPE.ERROR,
         })
       })
-      .finally(() => {
-        setLoading(false)
-      })
   }
 
   useEffect(() => {
     fetchData()
+    fetchModules()
   }, [])
 
   const renderAllTab = () => {
@@ -77,7 +106,10 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           deploymentTab === DEPLOYMENT_TAB.ALL ? "tab-active" : "",
         )}
         data-testid="all-deployments"
-        onClick={() => setDeploymentTab(DEPLOYMENT_TAB.ALL)}
+        onClick={() => {
+          setDeploymentTab(DEPLOYMENT_TAB.ALL)
+          setDeployments(listAllDeployments || null)
+        }}
       >
         {t("all-deployments")}
       </a>
@@ -92,7 +124,10 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           deploymentTab === DEPLOYMENT_TAB.MINE ? "tab-active" : "",
         )}
         data-testid="my-deployments"
-        onClick={() => setDeploymentTab(DEPLOYMENT_TAB.MINE)}
+        onClick={() => {
+          setDeploymentTab(DEPLOYMENT_TAB.MINE)
+          setDeployments(listMyDeployments || null)
+        }}
       >
         {t("my-deployments")}
       </a>
@@ -101,6 +136,10 @@ const Deployments: React.FC<DeploymentsProps> = () => {
 
   const renderEmptyState = () => {
     return isAdmin ? <EmptyAdminState /> : <EmptyState />
+  }
+
+  const renderEmptySearch = () => {
+    return <EmptySearch message={t("no-results")} />
   }
 
   if (isLoading)
@@ -114,7 +153,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
     <RouteContainer>
       <div className="flex mb-6">
         <div className="w-full">
-          <div className="tabs tabs-boxed">
+          <div className="tabs tabs-boxed" data-testid="tabs">
             {renderMyTab()}
             {isAdmin && renderAllTab()}
           </div>
@@ -134,28 +173,54 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           )}
         </div>
       </div>
-      {deploymentTab === DEPLOYMENT_TAB.ALL &&
-        (listAllDeployments?.length ? (
-          <ModuleDeployment
-            headers={DEPLOYMENT_HEADERS}
-            deployments={listAllDeployments}
-            defaultSortField={SORT_FIELD.CREATEDAT}
-            defaultSortDirection={SORT_DIRECTION.DESC}
-          />
-        ) : (
-          renderEmptyState()
-        ))}
-      {deploymentTab === DEPLOYMENT_TAB.MINE &&
-        (listMyDeployments?.length ? (
-          <ModuleDeployment
-            headers={DEPLOYMENT_HEADERS}
-            deployments={listMyDeployments}
-            defaultSortField={SORT_FIELD.CREATEDAT}
-            defaultSortDirection={SORT_DIRECTION.DESC}
-          />
-        ) : (
-          renderEmptyState()
-        ))}
+      <div className="bg-base-100 rounded-md shadow-md">
+        <div className="w-full p-4">
+          {!isLoading && (
+            <Filter
+              filters={["module", "createdAt", "status"]}
+              // @ts-ignore
+              statuses={activeStatuses}
+              modules={modules}
+            />
+          )}
+        </div>
+      </div>
+      {deploymentTab === DEPLOYMENT_TAB.ALL && (
+        <>
+          {listAllDeployments?.length ? (
+            (filteredDeployments || listAllDeployments)?.length ? (
+              <ModuleDeployment
+                headers={DEPLOYMENT_HEADERS}
+                deployments={filteredDeployments || listAllDeployments || []}
+                defaultSortField={SORT_FIELD.CREATEDAT}
+                defaultSortDirection={SORT_DIRECTION.DESC}
+              />
+            ) : (
+              renderEmptySearch()
+            )
+          ) : (
+            renderEmptyState()
+          )}
+        </>
+      )}
+      {deploymentTab === DEPLOYMENT_TAB.MINE && (
+        <>
+          {listMyDeployments?.length ? (
+            (filteredDeployments || listMyDeployments)?.length ? (
+              <ModuleDeployment
+                headers={DEPLOYMENT_HEADERS}
+                deployments={filteredDeployments || listMyDeployments || []}
+                defaultSortField={SORT_FIELD.CREATEDAT}
+                defaultSortDirection={SORT_DIRECTION.DESC}
+              />
+            ) : (
+              renderEmptySearch()
+            )
+          ) : (
+            renderEmptyState()
+          )}
+        </>
+      )}
     </RouteContainer>
   )
 }
