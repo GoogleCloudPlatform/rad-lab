@@ -122,7 +122,7 @@ describe("terraform util", () => {
 
     const billing_account_id = getByName("billing_account_id", parsed)
     expect(billing_account_id.default).toBeNull()
-    expect(billing_account_id.required).toBe(false)
+    expect(billing_account_id.required).toBe(true)
 
     const zone = getByName("zone", parsed)
     expect(zone.default).not.toBeNull()
