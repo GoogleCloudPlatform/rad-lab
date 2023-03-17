@@ -35,13 +35,13 @@ jobs:
       with:
         node-version: 18
         cache: npm
-        cache-dependency-path: ./radlab-ui/webapp/package-lock.json 
+        cache-dependency-path: ./radlab-ui/webapp/package-lock.json
     - name: Load .env file
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: radlab-ui/webapp
         mode: production
-    - name: "Install Node dependencies"
+    - name: Install Node dependencies
       run: npm ci
     - name: Test Cases
       run: npm test
