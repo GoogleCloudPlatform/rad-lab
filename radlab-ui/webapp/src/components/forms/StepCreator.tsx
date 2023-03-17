@@ -46,9 +46,7 @@ const StepCreator: React.FC<StepCreator> = ({ variableList, idx }) => {
     }
 
     // Required checks
-    if (!variable.required) return null
-    if (value || value === "0") return null
-    if (!variable.default) return null
+    if (!variable.required || value || value === "0") return null
     return `A value for ${startCase(variable.name)} is required`
   }
 

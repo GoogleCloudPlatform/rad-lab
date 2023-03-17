@@ -1,6 +1,5 @@
 import { useEffect } from "react"
 import startCase from "lodash/startCase"
-// @ts-expect-error // No @types/theme-change available
 import { themeChange } from "theme-change"
 interface ThemeChangerProps {
   themes: string[]
