@@ -124,6 +124,10 @@ describe("terraform util", () => {
     expect(billing_account_id.default).toBeNull()
     expect(billing_account_id.required).toBe(true)
 
+    const organization_id = getByName("organization_id", parsed)
+    expect(organization_id.default).toBe("")
+    expect(organization_id.required).toBe(false)
+
     const zone = getByName("zone", parsed)
     expect(zone.default).not.toBeNull()
     expect(zone.default).toStrictEqual("us-east4-c")
