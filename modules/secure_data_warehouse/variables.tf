@@ -95,7 +95,7 @@ variable "confidential_tags" {
   }))
   default     = {
     name = {
-        display_name    = "FULL_NAME"
+        display_name    = "FULL_NAME",
         description     = "A full person name, which can include first names, middle names or initials, and last names."
     }
   }
@@ -183,7 +183,7 @@ variable "private_tags" {
   }))
   default     = {
     dob = {
-        display_name    = "DOB"
+        display_name    = "DOB",
         description     = "Date of Birth of the person."
     }
   }
@@ -220,39 +220,39 @@ variable "data_fields" {
   }))
   default     = {
     email = {
-      mode  = "NULLABLE"
+      mode  = "NULLABLE",
       type  = "STRING"
     },
     name = {
-      mode  = "NULLABLE"
+      mode  = "NULLABLE",
       type  = "STRING"
     },
     street = {
-      mode  = "NULLABLE"
+      mode  = "NULLABLE",
       type  = "STRING"
     },
     city = {
-      mode  = "NULLABLE"
+      mode  = "NULLABLE",
       type  = "STRING"
     },
     state = {
-      mode  = "NULLABLE"
+      mode  = "NULLABLE",
       type  = "STRING"
     },
     zip = {
-      mode  = "NULLABLE"
+      mode  = "NULLABLE",
       type  = "INTEGER"
     },
     dob = {
-      mode  = "NULLABLE"
+      mode  = "NULLABLE",
       type  = "DATE"
     },
     dl_id = {
-      mode  = "NULLABLE"
+      mode  = "NULLABLE",
       type  = "STRING"
     },
     exp_date = {
-      mode  = "NULLABLE"
+      mode  = "NULLABLE",
       type  = "DATE"
     }
   }
@@ -288,7 +288,7 @@ variable "sensitive_tags" {
   }))
   default     = {
     dl_id = {
-        display_name    = "DRIVER_LICENSE_ID"
+        display_name    = "DRIVER_LICENSE_ID",
         description     = "Driver License document ID."
     }
   }
