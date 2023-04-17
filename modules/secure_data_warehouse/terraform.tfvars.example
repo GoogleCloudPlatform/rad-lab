@@ -14,44 +14,44 @@ source_data_gcs_objects                 = ["gs://my-bucket/path_to_file1/my_file
 
 data_fields                  = {
     field1 = {
-        mode  = "NULLABLE"
+        mode  = "NULLABLE",
         type  = "STRING"
     },
     field2 = {
-        mode  = "NULLABLE"
+        mode  = "NULLABLE",
         type  = "DATE"
     },
     field3 = {
-        mode  = "NULLABLE"
+        mode  = "NULLABLE",
         type  = "STRING"
     },
     field4 = {
-        mode  = "REQUIRED"
+        mode  = "REQUIRED",
         type  = "STRING"
     },
     field5 = {
-        mode  = "NULLABLE"
+        mode  = "NULLABLE",
         type  = "STRING"
     }
 }
 
 sensitive_tags                          = {
     field2 = {
-        display_name    = "FIELD2_POLICY_TAG_DISPLAY_NAME"
+        display_name    = "FIELD2_POLICY_TAG_DISPLAY_NAME",
         description     = "Field2 Policy Tag description."
     }
   }
 
 private_tags                            = {
     field1 = {
-        display_name    = "FIELD1_POLICY_TAG_DISPLAY_NAME"
+        display_name    = "FIELD1_POLICY_TAG_DISPLAY_NAME",
         description     = "Field1 Policy Tag description."
     }
   }
 
 confidential_tags                       = {
     field4 = {
-        display_name    = "FIELD4_POLICY_TAG_DISPLAY_NAME"
+        display_name    = "FIELD4_POLICY_TAG_DISPLAY_NAME",
         description     = "Field4 Policy Tag description."
     }
   }
