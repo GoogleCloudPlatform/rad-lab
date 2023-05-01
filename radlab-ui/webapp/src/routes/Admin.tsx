@@ -3,13 +3,14 @@ import { ArrowLeftIcon } from "@heroicons/react/outline"
 import { DATA_DEFAULT_VARS } from "@/utils/data"
 import RouteContainer from "@/components/RouteContainer"
 import DefaultCreateForm from "@/components/forms/DefaultCreateForm"
-import { parseVarsFile } from "@/utils/terraform"
+import { parseVarsFile, getRegionZoneList } from "@/utils/terraform"
 import { useTranslation } from "next-i18next"
 import axios from "axios"
 import { useEffect, useState } from "react"
 import Loading from "@/navigation/Loading"
 import SectionHeader from "@/components/SectionHeader"
 import LoadingRow from "@/components/LoadingRow"
+import { IRegion } from "@/utils/types"
 
 interface provisionDefaultInterface {}
 
@@ -20,6 +21,7 @@ const ProvisionDefault: React.FC<provisionDefaultInterface> = ({}) => {
   const [defaultSettingVarsData, setDefaultSettingVarsData] = useState({})
   const formVariableData = DATA_DEFAULT_VARS
   const [submitLoading, setSubmitLoading] = useState(false)
+  const [regionZoneListData, setRegionZoneListData] = useState<IRegion[]>([])
 
   const handleBackClick = () => {
     navigate("/deployments")
@@ -28,19 +30,35 @@ const ProvisionDefault: React.FC<provisionDefaultInterface> = ({}) => {
   // To check Admin settings updated if not thern redirect to default setting
   const fetchAdminSettingData = async () => {
     setLoading(true)
-    await axios
-      .get(`/api/settings`)
-      .then((res) => {
-        if (res.data.settings) {
-          setDefaultSettingVarsData(res.data.settings.variables)
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+    // fetch regions data
+    try {
+      await fetchListRegionZone()
+
+      await axios
+        .get(`/api/settings`)
+        .then((res) => {
+          if (res.data.settings) {
+            setDefaultSettingVarsData(res.data.settings.variables)
+          }
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchListRegionZone = async () => {
+    try {
+      const regionZoneData = await getRegionZoneList()
+      setRegionZoneListData(regionZoneData)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   useEffect(() => {
@@ -75,6 +93,7 @@ const ProvisionDefault: React.FC<provisionDefaultInterface> = ({}) => {
               formVariables={parseVarsFile(formVariableData)}
               defaultSettingVariables={defaultSettingVarsData}
               handleLoading={setSubmitLoading}
+              regionZoneListData={regionZoneListData}
             />
           </div>
         </div>

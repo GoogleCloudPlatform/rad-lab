@@ -243,3 +243,10 @@ export type TF_OUTPUT = zod.infer<typeof TF_OUTPUT>
 export interface Dictionary<T> {
   [index: string]: T
 }
+
+export const Region = zod.object({
+  id: zod.string(),
+  name: zod.string(),
+  zones: zod.string().array(),
+})
+export type IRegion = zod.infer<typeof Region>

@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next"
 import { useNavigate } from "react-router-dom"
 import { FormikStepper } from "@/components/forms/FormikStepper"
 import DefaultStepCreator from "@/components/forms/DefaultStepCreator"
-import { IUIVariable, ALERT_TYPE, IFormData, Dictionary } from "@/utils/types"
+import { IUIVariable, ALERT_TYPE, IFormData, Dictionary,IRegion } from "@/utils/types"
 import { groupVariables, initialFormikData } from "@/utils/terraform"
 import axios from "axios"
 import { alertStore, userStore } from "@/store"
@@ -13,12 +13,14 @@ interface IDefaultCreateFormProps {
   formVariables: IUIVariable[]
   defaultSettingVariables: Record<string, any>
   handleLoading: Function
+  regionZoneListData:IRegion[]
 }
 
 const DefaultCreateForm: React.FC<IDefaultCreateFormProps> = ({
   formVariables,
   defaultSettingVariables,
   handleLoading,
+  regionZoneListData
 }) => {
   const { t } = useTranslation()
   const [formData, setFormData] = useState<null | Dictionary<IUIVariable[]>>(
@@ -92,6 +94,7 @@ const DefaultCreateForm: React.FC<IDefaultCreateFormProps> = ({
                 variableList={group}
                 idx={index}
                 key={grpId}
+                regionZoneListData={regionZoneListData}
               />
             ) : (
               <></>
