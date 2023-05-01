@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next"
-
-import axios from "axios"
 import { generateAccessToken } from "@/utils/api"
+import { zoneFromGCPResource } from "@/utils/data"
 import { envOrFail } from "@/utils/env"
-import { IRegion } from "@/utils/types"
+import { GCPRegion, IRegion } from "@/utils/types"
+import axios from "axios"
+import { NextApiRequest, NextApiResponse } from "next"
 
 const projectId = envOrFail(
   "NEXT_PUBLIC_GCP_PROJECT_ID",
@@ -20,16 +20,12 @@ const getRegions = async (_: NextApiRequest, res: NextApiResponse) => {
         Authorization: `Bearer ${token}`,
       },
     })
-    const itemsPage = response.data.items
-    const regions: IRegion[] = itemsPage.map((element: any) => {
-      return {
-        id: element.id,
-        name: element.name,
-        zones: (element.zones || []).map((zone: string) =>
-          zone.split("/").pop(),
-        ),
-      }
-    })
+    const itemsPage = response.data.items as GCPRegion[]
+    const regions: IRegion[] = itemsPage.map((gcpRegion) => ({
+      id: gcpRegion.id,
+      name: gcpRegion.name,
+      zones: gcpRegion.zones.map(zoneFromGCPResource),
+    }))
 
     return res.status(200).json({ regions })
   } catch (error) {
@@ -42,7 +38,7 @@ const getRegions = async (_: NextApiRequest, res: NextApiResponse) => {
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
   try {
     if (_req.method === "GET") return await getRegions(_req, res)
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
     return res.status(500).json({
       result: error,

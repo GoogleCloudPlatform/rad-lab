@@ -45,11 +45,10 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
 
   const getZoneByRegion = (regionName: string) => {
     const selectedRegion = regionZoneListData.find(
-      (reginItems) => reginItems.name === regionName,
+      (regionItems) => regionItems.name === regionName,
     )
-    const zoneFilterData = selectedRegion?.zones || []
 
-    return zoneFilterData
+    return selectedRegion?.zones || []
   }
 
   const onChangeRegion = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -250,3 +250,22 @@ export const Region = zod.object({
   zones: zod.string().array(),
 })
 export type IRegion = zod.infer<typeof Region>
+
+export type GCPRegionQuota = {
+  metric: string
+  limit: number
+  usage: number
+}
+
+export type GCPRegion = {
+  kind: string
+  id: string
+  creationTimestamp: string
+  name: string
+  description: string
+  status: string
+  zones: string[]
+  quotas: GCPRegionQuota[]
+  selfLink: string
+  supportsPzs: boolean
+}

@@ -8,6 +8,19 @@ import {
   SORT_BUILD_FIELD,
 } from "@/utils/types"
 
+/**
+ * @param resource - GCP resource string
+ *   Ex: https://www.googleapis.com/compute/v1/projects/rad-lab-ui-fcb5/zones/us-east5-c
+ * Returns the final portion (Ex: us-east5-c)
+ **/
+export const zoneFromGCPResource = (resource: string) =>
+  resource.match(/[\w-]+$/)?.[0] ?? ""
+
+export const regionFromZone = (zone: string) => zone.replace(/-\w$/, "")
+
+export const getZonesByRegion = (zones: string[]) => (region: string) =>
+  zones.filter((zone) => regionFromZone(zone) === region)
+
 export const DEPLOYMENT_HEADERS: IHeader[] = [
   {
     label: "Module",
