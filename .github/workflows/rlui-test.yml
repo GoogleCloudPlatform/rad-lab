@@ -64,7 +64,7 @@ jobs:
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: radlab-ui/webapp
-        mode: production
+        mode: test
     - name: Install Node dependencies
       run: npm ci
     - name: Build
