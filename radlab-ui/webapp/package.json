@@ -61,7 +61,6 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
-    "autoprefixer": "^10.4.0",
     "cross-env": "^7.0.3",
     "cssnano": "^5.0.14",
     "dotenv": "^15.0.0",
@@ -87,5 +86,6 @@
     "tailwindcss": "^3.1.2",
     "typescript": "^4.5.4"
   },
+  "overrides": { "autoprefixer": "10.4.5"   },
   "license": "ISC"
 }
