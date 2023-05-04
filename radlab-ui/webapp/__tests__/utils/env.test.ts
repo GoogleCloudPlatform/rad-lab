@@ -7,6 +7,7 @@ describe("env util", () => {
       process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
     )
     expect(GCP_PROJECT_ID).not.toBeNull()
+    expect(GCP_PROJECT_ID).not.toEqual("")
   })
 
   it("fails when env var is not set", () => {
