@@ -1,5 +1,5 @@
 // https://github.com/pmndrs/zusta
-import create from "zustand"
+import { create } from "zustand"
 
 import { User } from "firebase/auth"
 

@@ -5,8 +5,6 @@ import { userStore } from "@/store"
 import Loading from "@/navigation/Loading"
 import Authenticated from "@/templates/Authenticated"
 import Unauthenticated from "@/templates/Unauthenticated"
-import axios from "axios"
-import { isAdminResponseParser } from "@/utils/types"
 
 type IMainProps = {
   meta: ReactNode
@@ -18,7 +16,7 @@ const Main = (props: IMainProps) => {
   const [isLoading, setLoading] = useState(true)
   const user = userStore((state) => state.user)
   const setUser = userStore((state) => state.setUser)
-  const setIsAdmin = userStore((state) => state.setIsAdmin)
+
   // Ensure only authenticated users can view items in the Main template
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
@@ -28,10 +26,6 @@ const Main = (props: IMainProps) => {
         router.push("/signin")
         return
       }
-      axios.get(`/api/user?email=${firebaseUser.email}`).then((res) => {
-        const data = isAdminResponseParser.parse(res.data)
-        setIsAdmin(data.isAdmin)
-      })
     })
     return unsubscribe
   }, [])
