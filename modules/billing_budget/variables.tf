@@ -94,6 +94,18 @@ variable "create_project" {
   default     = true
 }
 
+variable "create_network" {
+  description = "If the module has to be deployed in an existing network, set this variable to false. {{UIMeta group=2 order=1 }}"
+  type        = bool
+  default     = false
+}
+
+variable "create_vm" {
+  description = "Set to true if the module has to create a GCE VM.  If you want to deploy in an existing project, set this variable to true. {{UIMeta group=1 order=1 }}"
+  type        = bool
+  default     = false
+}
+
 variable "deployment_id" {
   description = "Adds a suffix of 4 random characters to the `project_id`."
   type        = string
@@ -110,6 +122,18 @@ variable "folder_id" {
   description = "Folder ID where the project should be created. It can be skipped if already setting organization_id. Leave blank if the project should be created directly underneath the Organization node. {{UIMeta group=0 order=2 updatesafe }}"
   type        = string
   default     = ""
+}
+
+variable "ip_cidr_range" {
+  description = "Unique IP CIDR Range for Vertex AI Workbench subnet. {{UIMeta group=2 order=5 }}"
+  type        = string
+  default     = "10.142.190.0/24"
+}
+
+variable "network_name" {
+  description = "Name of the network to be created. {{UIMeta group=2 order=2 }}"
+  type        = string
+  default     = "radlab-network"
 }
 
 variable "organization_id" {
@@ -136,6 +160,12 @@ variable "project_id_prefix" {
   default     = "radlab-billing-budget"
 }
 
+variable "region" {
+  description = "Primary region where Compute Instance and VPC subnet will be created. {{UIMeta group=2 order=2 }}"
+  type        = string
+  default     = "us-central1"
+}
+
 variable "resource_creator_identity" {
   description = "Terraform Service Account which will be creating the GCP resources. If not set, this module deployment will fail. {{UIMeta group=0 order=4 updatesafe }}"
   type        = string
@@ -146,6 +176,24 @@ variable "set_domain_restricted_sharing_policy" {
   description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=15 updatesafe }}"
   type        = bool
   default     = false
+}
+
+variable "set_external_ip_policy" {
+  description = "Enable org policy to allow External (Public) IP addresses on virtual machines. {{UIMeta group=0 order=16 updatesafe }}"
+  type        = bool
+  default     = false
+}
+
+variable "set_shielded_vm_policy" {
+  description = "Apply org policy to disable shielded VMs. {{UIMeta group=0 order=17 updatesafe }}"
+  type        = bool
+  default     = false
+}
+
+variable "subnet_name" {
+  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=2 order=4 }}"
+  type        = string
+  default     = "radlab-subnet"
 }
 
 variable "trusted_groups" {
