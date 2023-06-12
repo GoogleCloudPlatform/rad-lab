@@ -101,7 +101,7 @@ variable "create_network" {
 }
 
 variable "create_vm" {
-  description = "Set to true if the module has to create a GCE VM.  If you want to deploy in an existing project, set this variable to true. {{UIMeta group=1 order=1 }}"
+  description = "Set to true if the module has to create a GCE VM.  If you want to deploy in an existing project, set this variable to true. {{UIMeta group=3 order=1 }}"
   type        = bool
   default     = false
 }
@@ -125,7 +125,7 @@ variable "folder_id" {
 }
 
 variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for Vertex AI Workbench subnet. {{UIMeta group=2 order=5 }}"
+  description = "Unique IP CIDR Range for Vertex AI Workbench subnet. {{UIMeta group=2 order=4 }}"
   type        = string
   default     = "10.142.190.0/24"
 }
@@ -161,7 +161,7 @@ variable "project_id_prefix" {
 }
 
 variable "region" {
-  description = "Primary region where Compute Instance and VPC subnet will be created. {{UIMeta group=2 order=2 }}"
+  description = "Primary region where Compute Instance and VPC subnet will be created. {{UIMeta group=2 order=5 }}"
   type        = string
   default     = "us-central1"
 }
@@ -191,7 +191,7 @@ variable "set_shielded_vm_policy" {
 }
 
 variable "subnet_name" {
-  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=2 order=4 }}"
+  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=2 order=3 }}"
   type        = string
   default     = "radlab-subnet"
 }
