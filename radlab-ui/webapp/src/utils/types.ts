@@ -1,5 +1,8 @@
+import { NextApiRequest, NextApiResponse } from "next"
 import React from "react"
 import zod from "zod"
+
+import { User } from "firebase/auth"
 
 export type IAuthProvider = "google" | "password"
 
@@ -243,3 +246,11 @@ export type TF_OUTPUT = zod.infer<typeof TF_OUTPUT>
 export interface Dictionary<T> {
   [index: string]: T
 }
+
+export interface CustomNextApiRequest extends NextApiRequest {
+  user: User
+}
+export type CustomNextApiHandler = (
+  req: CustomNextApiRequest,
+  res: NextApiResponse,
+) => void
