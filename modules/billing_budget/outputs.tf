@@ -29,3 +29,9 @@ output "project_id" {
   description = "GCP Project ID"
   value       = local.project.project_id
 }
+
+output "vm" {
+  description = "GCE VM Link"
+  value       = var.create_vm ? "https://console.cloud.google.com/compute/instancesDetail/zones/${google_compute_instance.vm[0].zone}/instances/${google_compute_instance.vm[0].name}?project=${local.project.project_id}" : null
+
+}
