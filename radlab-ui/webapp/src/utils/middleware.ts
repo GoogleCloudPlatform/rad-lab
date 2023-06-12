@@ -45,15 +45,14 @@ export function withAuth(handler: CustomNextApiHandler) {
       if (isAdmin) {
         user.isAdmin = isAdmin
       } else {
-        const data = await axios({
+        const res = await axios({
           method: "GET",
           url: `https://admin.googleapis.com/admin/directory/v1/groups/${USER_GROUP}@${GCP_ORG}/hasMember/${email}`,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
-        const isUser = data.data.isMember
-        user.isUser = isUser
+        user.isUser = res.data.isMember
       }
 
       if (!user.isAdmin && !user.isUser) {
