@@ -91,6 +91,18 @@ module "vpc_network" {
         protocol = "tcp"
         ports    = ["22"]
       }]
+    },
+    {
+      name        = "fw-allow-http"
+      description = "Firewall rule to allow HTTP traffic on port 80."
+      priority    = 65534
+      ranges      = ["0.0.0.0/0"]
+      direction   = "INGRESS"
+
+      allow = [{
+        protocol = "tcp"
+        ports    = ["80"]
+      }]
     }
   ]
 

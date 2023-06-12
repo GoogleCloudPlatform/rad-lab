@@ -14,29 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-sudo apt-get upgrade
-sudo apt-get update
-sudo apt-get install -y postgresql-client
-sudo apt-get install -y python3-pip
-pip3 install Flask
-cat <<EOF > ./www_flask.py
-from flask import Flask
-import os
- 
-app = Flask(__name__)
-cmd = 'hostname'
-output = os.popen(cmd).read()
-hostname = output.split('\n')[0]
-@app.route('/')
-def hello_gcp():
-    return "Hello from instance:" + str(hostname)
+sudo apt update && sudo apt -y install apache2
 
-@app.route('/hc')
-def gcp_hc():
-    return "Hello from instance:" + str(hostname)
- 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
-EOF
-chmod 700 www_flask.py
-sudo python3 www_flask.py
+sudo systemctl status apache2
+
+echo '<!doctype html><html><body><h1>Hello World!</h1></body></html>' | sudo tee /var/www/html/index.html
