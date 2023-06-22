@@ -3,6 +3,7 @@ import { AppProps } from "next/app"
 import { appWithTranslation } from "next-i18next"
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check"
 import { app } from "@/utils/firebase"
+import { AuthProvider } from "@/context/auth"
 
 import "../styles/global.css"
 
@@ -23,7 +24,11 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 
   return (
     <div suppressHydrationWarning className="min-h-screen h-full">
-      {typeof window === "undefined" ? null : <Component {...pageProps} />}
+      {typeof window === "undefined" ? null : (
+        <AuthProvider>
+          <Component {...pageProps} />
+        </AuthProvider>
+      )}
     </div>
   )
 }

@@ -37,17 +37,12 @@ export const inAdminGroup = (email: string, token: string) =>
 export const inUserGroup = (email: string, token: string) =>
   getGroupMembership(USER_GROUP, email, token)
 
-export const verifyUser = async (req: NextApiRequest) => {
+const getToken = (req: NextApiRequest) => {
   let token = req.cookies.token
   if (!token && req.headers.authorization) {
     token = req.headers.authorization.split(/\s+/)[1]
   }
-
-  if (!token) {
-    throw new Error("No token found")
-  }
-
-  return await decodeToken(token)
+  return token ?? null
 }
 
 export const decodeToken = async (token: string) => {
@@ -62,7 +57,15 @@ export const decodeToken = async (token: string) => {
 export const withAuth = (handler: CustomNextApiHandler) => {
   return async (req: CustomNextApiRequest, res: NextApiResponse) => {
     try {
-      const user = await verifyUser(req)
+      const token = getToken(req)
+
+      if (!token) {
+        return res.status(401).json({
+          message: "Unauthorized",
+        })
+      }
+
+      const user = await decodeToken(token)
 
       if (!user || !user.email) {
         return res.status(401).json({
@@ -70,7 +73,7 @@ export const withAuth = (handler: CustomNextApiHandler) => {
         })
       }
 
-      const { email, token } = user
+      const { email } = user
 
       const [isAdmin, isUser] = await Promise.all([
         inAdminGroup(email, token),
@@ -84,7 +87,8 @@ export const withAuth = (handler: CustomNextApiHandler) => {
       }
 
       req.user = { ...user, isAdmin, isUser }
-    } catch (_) {
+    } catch (e) {
+      console.error(e)
       return res.status(401).json({
         message: "Unauthorized",
       })

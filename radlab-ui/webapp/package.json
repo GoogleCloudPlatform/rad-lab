@@ -35,6 +35,7 @@
     "next-i18next": "^10.2.0",
     "next-seo": "^4.29.0",
     "next-swagger-doc": "^0.3.4",
+    "nookies": "^2.5.2",
     "ramda": "^0.28.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -86,6 +87,8 @@
     "tailwindcss": "^3.1.2",
     "typescript": "^4.5.4"
   },
-  "overrides": { "autoprefixer": "10.4.5"   },
+  "overrides": {
+    "autoprefixer": "10.4.5"
+  },
   "license": "ISC"
 }
