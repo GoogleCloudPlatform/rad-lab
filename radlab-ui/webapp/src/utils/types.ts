@@ -1,9 +1,7 @@
+import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier"
 import { NextApiRequest, NextApiResponse } from "next"
 import React from "react"
 import zod from "zod"
-
-import { User } from "firebase/auth"
-import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier"
 
 export type IAuthProvider = "google" | "password"
 
