@@ -3,6 +3,7 @@ import React from "react"
 import zod from "zod"
 
 import { User } from "firebase/auth"
+import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier"
 
 export type IAuthProvider = "google" | "password"
 
@@ -248,8 +249,9 @@ export interface Dictionary<T> {
 }
 
 export interface CustomNextApiRequest extends NextApiRequest {
-  user: User
+  user: DecodedIdToken & { isAdmin: boolean; isUser: boolean }
 }
+
 export type CustomNextApiHandler = (
   req: CustomNextApiRequest,
   res: NextApiResponse,
