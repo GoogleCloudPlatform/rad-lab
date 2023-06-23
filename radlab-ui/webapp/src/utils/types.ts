@@ -248,11 +248,11 @@ export interface Dictionary<T> {
 
 export type AuthedUser = DecodedIdToken & { isAdmin: boolean; isUser: boolean }
 
-export interface CustomNextApiRequest extends NextApiRequest {
+export interface AuthedNextApiHandler extends NextApiRequest {
   user: AuthedUser
 }
 
 export type CustomNextApiHandler = (
-  req: CustomNextApiRequest,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
 ) => void

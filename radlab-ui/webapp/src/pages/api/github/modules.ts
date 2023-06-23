@@ -1,13 +1,15 @@
-import { NextApiRequest, NextApiResponse } from "next"
-
-import { getSecretKeyValue, getGitHubModules } from "@/utils/api"
+import { getGitHubModules, getSecretKeyValue } from "@/utils/api"
 import { envOrFail } from "@/utils/env"
+import { withAuth } from "@/utils/middleware"
+import { AuthedNextApiHandler } from "@/utils/types"
+import { NextApiResponse } from "next"
+
 const GIT_TOKEN_SECRET_KEY_NAME = envOrFail(
   "GIT_TOKEN_SECRET_KEY_NAME",
   process.env.GIT_TOKEN_SECRET_KEY_NAME,
 )
 const getModulesFromGitHub = async (
-  _: NextApiRequest,
+  _req: AuthedNextApiHandler,
   res: NextApiResponse,
 ) => {
   try {
@@ -22,7 +24,7 @@ const getModulesFromGitHub = async (
   }
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   try {
     if (req.method === "GET") return getModulesFromGitHub(req, res)
   } catch (error) {
@@ -32,4 +34,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default handler
+export default withAuth(handler)

@@ -1,42 +1,38 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import { getBuildStatus } from "@/utils/api"
 import {
   getDocsByField,
-  updateByField,
   updateBuildStatus,
+  updateByField,
 } from "@/utils/Api_SeverSideCon"
-import { IBuild, IDeployment } from "@/utils/types"
+import { getBuildStatus } from "@/utils/api"
+import { withAuth } from "@/utils/middleware"
+import { AuthedNextApiHandler, IBuild, IDeployment } from "@/utils/types"
+import { NextApiResponse } from "next"
 
 const getDeploymentStatus = async (
-  _: NextApiRequest,
+  _req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
   // @ts-ignore
-  const [deployment]: [IDeployment] = await getDocsByField(
+  const [deployment] = (await getDocsByField(
     "deployments",
     "deploymentId",
     id,
-  )
+  )) as IDeployment[] | undefined[]
 
   if (!deployment) {
     res.status(400).send("Deployment not found")
     return
   }
 
-  if (!deployment.builds || !deployment.builds.length) {
+  if (!deployment.builds?.length) {
     res.status(404).send("Build ID not found")
     return
   }
 
   const mostRecentBuild = deployment.builds.sort(
     (a: IBuild, b: IBuild) => b.createdAt._seconds - a.createdAt._seconds,
-  )[0]
-
-  if (!mostRecentBuild) {
-    res.status(404).send("Build ID not found")
-    return
-  }
+  )[0] as IBuild
 
   const cloudBuild = await getBuildStatus(
     mostRecentBuild.buildId,
@@ -70,7 +66,7 @@ const getDeploymentStatus = async (
   })
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   const { id } = req.query
   if (typeof id !== "string") throw new Error("Deployment ID must be a string")
 
@@ -83,4 +79,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default handler
+export default withAuth(handler)

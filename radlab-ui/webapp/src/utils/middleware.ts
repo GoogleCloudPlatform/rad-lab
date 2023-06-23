@@ -1,7 +1,7 @@
 import axios from "axios"
 import { envOrFail } from "@/utils/env"
 import { firebaseAdmin, getApp } from "@/utils/firebaseAdmin"
-import { CustomNextApiHandler, CustomNextApiRequest } from "@/utils/types"
+import { CustomNextApiHandler, AuthedNextApiHandler } from "@/utils/types"
 import { NextApiRequest, NextApiResponse } from "next"
 import { generateAccessToken } from "./api"
 
@@ -56,7 +56,7 @@ export const decodeToken = async (token: string) => {
 }
 
 export const withAuth = (handler: CustomNextApiHandler) => {
-  return async (req: CustomNextApiRequest, res: NextApiResponse) => {
+  return async (req: AuthedNextApiHandler, res: NextApiResponse) => {
     try {
       const userToken = getToken(req)
 

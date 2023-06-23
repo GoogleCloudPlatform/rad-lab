@@ -1,17 +1,23 @@
-import { NextApiRequest, NextApiResponse } from "next"
-
-import { mergeVariables, pushPubSubMsg } from "@/utils/api"
-import { IDeployment, DEPLOYMENT_ACTIONS, IPubSubMsg } from "@/utils/types"
-import { envOrFail } from "@/utils/env"
 import { getDocsByField, updateByField } from "@/utils/Api_SeverSideCon"
+import { mergeVariables, pushPubSubMsg } from "@/utils/api"
+import { envOrFail } from "@/utils/env"
+import { withAuth } from "@/utils/middleware"
+import {
+  AuthedNextApiHandler,
+  DEPLOYMENT_ACTIONS,
+  IDeployment,
+  IPubSubMsg,
+} from "@/utils/types"
 import { Timestamp } from "firebase-admin/firestore"
+import { NextApiResponse } from "next"
+
 const gcpProjectId = envOrFail(
   "NEXT_PUBLIC_GCP_PROJECT_ID",
   process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
 )
 
 const getDeployment = async (
-  _: NextApiRequest,
+  _req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
@@ -26,7 +32,7 @@ const getDeployment = async (
 }
 
 const deleteDeployment = async (
-  req: NextApiRequest,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
@@ -81,7 +87,7 @@ const deleteDeployment = async (
 }
 
 const updateDeployment = async (
-  req: NextApiRequest,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
@@ -124,7 +130,7 @@ const updateDeployment = async (
   res.status(200).json({ deployments })
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   const { id } = req.query
   if (typeof id !== "string") throw new Error("Deployment ID must be a string")
 
@@ -139,4 +145,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default handler
+export default withAuth(handler)

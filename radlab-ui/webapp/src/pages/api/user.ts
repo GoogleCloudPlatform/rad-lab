@@ -1,9 +1,8 @@
+import { withAuth } from "@/utils/middleware"
+import { AuthedNextApiHandler } from "@/utils/types"
 import { NextApiResponse } from "next"
 
-import { withAuth } from "@/utils/middleware"
-import { CustomNextApiRequest } from "@/utils/types"
-
-const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   const { email } = req.query
 
   if (req.method === "GET" && email) {

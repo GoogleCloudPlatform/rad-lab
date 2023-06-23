@@ -1,8 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next"
 import { getDocsByField } from "@/utils/Api_SeverSideCon"
 import { envOrFail } from "@/utils/env"
+import { withAuth } from "@/utils/middleware"
+import { AuthedNextApiHandler, IBuild, IDeployment } from "@/utils/types"
 import { GetSignedUrlConfig, Storage } from "@google-cloud/storage"
-import { IBuild, IDeployment } from "@/utils/types"
+import { NextApiResponse } from "next"
 
 const storage = new Storage()
 
@@ -12,10 +13,13 @@ const MODULE_DEPLOYMENT_BUCKET_NAME = envOrFail(
 )
 
 const getDeploymentLogs = async (
-  _: NextApiRequest,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
+  if (!req.user.isAdmin) {
+    return res.status(403).json({ message: "Forbidden" })
+  }
   // These options will allow temporary read access to the file
   const options: GetSignedUrlConfig = {
     version: "v4",
@@ -23,11 +27,11 @@ const getDeploymentLogs = async (
     expires: Date.now() + 180 * 60 * 1000, // 3 hr
   }
   // @ts-ignore
-  const [deployment]: [IDeployment] = await getDocsByField(
+  const [deployment] = (await getDocsByField(
     "deployments",
     "deploymentId",
     id,
-  )
+  )) as IDeployment[] | undefined[]
 
   if (!deployment) {
     res.status(400).json({
@@ -36,7 +40,7 @@ const getDeploymentLogs = async (
     return
   }
 
-  if (!deployment.builds || !deployment.builds.length) {
+  if (!deployment.builds?.length) {
     res.status(404).json({
       message: "Build ID not found",
     })
@@ -45,12 +49,7 @@ const getDeploymentLogs = async (
 
   const mostRecentBuild = deployment.builds.sort(
     (a: IBuild, b: IBuild) => b.createdAt._seconds - a.createdAt._seconds,
-  )[0]
-
-  if (!mostRecentBuild) {
-    res.status(404).send("Build ID not found")
-    return
-  }
+  )[0] as IBuild
 
   // Get a v4 signed URL for reading the file
   const bucketName = MODULE_DEPLOYMENT_BUCKET_NAME
@@ -63,7 +62,7 @@ const getDeploymentLogs = async (
   res.status(200).json({ url })
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   const { id } = req.query
   if (typeof id !== "string") throw new Error("Deployment ID must be a string")
 
@@ -76,4 +75,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default handler
+export default withAuth(handler)

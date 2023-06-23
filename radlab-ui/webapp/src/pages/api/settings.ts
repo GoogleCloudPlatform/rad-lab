@@ -1,13 +1,13 @@
-import { NextApiRequest, NextApiResponse } from "next"
-
 import { pushPubSubMsg } from "@/utils/api"
-import { DEPLOYMENT_ACTIONS } from "@/utils/types"
 import { envOrFail } from "@/utils/env"
+import { withAuth } from "@/utils/middleware"
+import { AuthedNextApiHandler, DEPLOYMENT_ACTIONS } from "@/utils/types"
+import { NextApiResponse } from "next"
 
 import {
+  deleteDocByFieldValue,
   getDocsByField,
   saveDocument,
-  deleteDocByFieldValue,
 } from "@/utils/Api_SeverSideCon"
 
 const gcpProjectId = envOrFail(
@@ -19,12 +19,22 @@ const serviceAccountEmail = envOrFail(
   process.env.NEXT_PUBLIC_GCP_SERVICE_ACCOUNT_EMAIL,
 )
 
-const getSettings = async (_: NextApiRequest, res: NextApiResponse) => {
+const getSettings = async (
+  _req: AuthedNextApiHandler,
+  res: NextApiResponse,
+) => {
   const settings = await getDocsByField("settings", "projectId", gcpProjectId)
   res.status(200).json({ settings: settings[0] ?? null })
 }
 
-const createSettings = async (req: NextApiRequest, res: NextApiResponse) => {
+const createSettings = async (
+  req: AuthedNextApiHandler,
+  res: NextApiResponse,
+) => {
+  if (!req.user.isAdmin) {
+    return res.status(403).json({ message: "Forbidden" })
+  }
+
   const email = req.body.email
   delete req.body.email
   const body = {
@@ -55,7 +65,7 @@ const createSettings = async (req: NextApiRequest, res: NextApiResponse) => {
   })
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   try {
     if (req.method === "GET") return getSettings(req, res)
     if (req.method === "POST") return createSettings(req, res)
@@ -67,4 +77,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default handler
+export default withAuth(handler)

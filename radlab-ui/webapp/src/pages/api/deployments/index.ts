@@ -1,28 +1,33 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import { v4 as uuidv4 } from "uuid"
-import { mergeVariables, pushPubSubMsg, getBuildStatus } from "@/utils/api"
-import {
-  DEPLOYMENT_ACTIONS,
-  IDeployment,
-  IPubSubMsg,
-  IBuild,
-  DEPLOYMENT_STATUS,
-} from "@/utils/types"
-import { envOrFail } from "@/utils/env"
-import { Timestamp } from "firebase-admin/firestore"
-const gcpProjectId = envOrFail(
-  "NEXT_PUBLIC_GCP_PROJECT_ID",
-  process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
-)
-
 import {
   getAllDocuments,
   getDocsByField,
   saveDocument,
   updateByField,
 } from "@/utils/Api_SeverSideCon"
+import { getBuildStatus, mergeVariables, pushPubSubMsg } from "@/utils/api"
+import { envOrFail } from "@/utils/env"
+import { withAuth } from "@/utils/middleware"
+import {
+  AuthedNextApiHandler,
+  DEPLOYMENT_ACTIONS,
+  DEPLOYMENT_STATUS,
+  IBuild,
+  IDeployment,
+  IPubSubMsg,
+} from "@/utils/types"
+import { Timestamp } from "firebase-admin/firestore"
+import { NextApiResponse } from "next"
+import { v4 as uuidv4 } from "uuid"
 
-const createDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
+const gcpProjectId = envOrFail(
+  "NEXT_PUBLIC_GCP_PROJECT_ID",
+  process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
+)
+
+const createDeployment = async (
+  req: AuthedNextApiHandler,
+  res: NextApiResponse,
+) => {
   const body = req.body
   const uuid = uuidv4()
   body.deploymentId = uuid.split("-")[0]?.substring(0, 4)
@@ -69,21 +74,27 @@ const createDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
   })
 }
 
-const getDeployments = async (_: NextApiRequest, res: NextApiResponse) => {
-  const deployments = await getAllDocuments("deployments")
-  const possiblyStaleDeployments = deployments.filter(
-    (deployment: IDeployment) => {
-      return (
-        deployment.status &&
-        deployment.builds?.length &&
-        [
-          DEPLOYMENT_STATUS.QUEUED,
-          DEPLOYMENT_STATUS.WORKING,
-          DEPLOYMENT_STATUS.PENDING,
-        ].includes(deployment.status)
-      )
-    },
-  )
+const getDeployments = async (
+  req: AuthedNextApiHandler,
+  res: NextApiResponse,
+) => {
+  if (![req.user.isAdmin, req.user.isUser].some(Boolean)) {
+    return res.status(403).json({ message: "Forbidden" })
+  }
+
+  const deployments = (await getAllDocuments("deployments")) as IDeployment[]
+  const possiblyStaleDeployments = deployments.filter((deployment) => {
+    return (
+      deployment.status &&
+      deployment.builds?.length &&
+      [
+        DEPLOYMENT_STATUS.QUEUED,
+        DEPLOYMENT_STATUS.WORKING,
+        DEPLOYMENT_STATUS.PENDING,
+      ].includes(deployment.status)
+    )
+  })
+
   if (!possiblyStaleDeployments.length) {
     res.status(200).json({ deployments })
     return
@@ -101,6 +112,7 @@ const getDeployments = async (_: NextApiRequest, res: NextApiResponse) => {
         getBuildStatus(mostRecentBuild.buildId, deployment.deploymentId),
       )
   })
+
   let updateDoc: Promise<any>[] = []
   await Promise.all(getBuilds).then((cloudBuildRes: any) => {
     cloudBuildRes.forEach((cloudBuild: any) => {
@@ -118,38 +130,44 @@ const getDeployments = async (_: NextApiRequest, res: NextApiResponse) => {
     })
   })
   await Promise.all(updateDoc)
-  const deploymentsList = await getAllDocuments("deployments")
+  const deploymentsList = (await getAllDocuments(
+    "deployments",
+  )) as IDeployment[]
   res.status(200).json({ deployments: deploymentsList })
 }
 
 const getDeploymentsByEmail = async (
-  _: NextApiRequest,
+  _req: AuthedNextApiHandler,
   res: NextApiResponse,
   deployedByEmail: string,
 ) => {
-  const deployments = await getDocsByField(
+  const deployments = (await getDocsByField(
     "deployments",
     "deployedByEmail",
     deployedByEmail,
-  )
+  )) as IDeployment[]
   res.status(200).json({ deployments })
 }
 
-const deleteDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
+const deleteDeployment = async (
+  req: AuthedNextApiHandler,
+  res: NextApiResponse,
+) => {
   const body = req.body
-  const deploymentIds = body.deploymentIds
+  const deploymentIds = body.deploymentIds as string[] | undefined
   if (!deploymentIds || !deploymentIds.length) {
     res.status(404).send("Missing deploymentIds from body")
     return
   }
-  for (let i = 0; i < deploymentIds.length; i++) {
-    const deploymentId = deploymentIds[i]
+
+  deploymentIds.forEach(async (deploymentId) => {
     // @ts-ignore
-    let [deployment]: IDeployment = await getDocsByField(
+    let [deployment] = (await getDocsByField(
       "deployments",
       "deploymentId",
       deploymentId,
-    )
+    )) as IDeployment[] | undefined[]
+
     if (!deployment) {
       res.status(400).json({
         message: `Deployment Not found for id ${deploymentId}`,
@@ -172,7 +190,11 @@ const deleteDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
     delete pubSubData.variables.resource_creator_identity
     try {
       await pushPubSubMsg(pubSubData)
-      deployment.deletedAt = Timestamp.now()
+      const now = Timestamp.now()
+      deployment.deletedAt = {
+        _seconds: now.seconds,
+        _nanoseconds: now.nanoseconds,
+      }
       await updateByField(
         "deployments",
         "deploymentId",
@@ -184,14 +206,15 @@ const deleteDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(500).send("Internal server error")
       return
     }
-  }
+  })
+
   res.status(200).json({
     deploymentIds,
     deleted: true,
   })
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   const { deployedByEmail } = req.query
 
   try {
@@ -208,4 +231,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default handler
+export default withAuth(handler)
