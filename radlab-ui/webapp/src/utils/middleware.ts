@@ -3,6 +3,7 @@ import { envOrFail } from "@/utils/env"
 import { firebaseAdmin, getApp } from "@/utils/firebaseAdmin"
 import { CustomNextApiHandler, CustomNextApiRequest } from "@/utils/types"
 import { NextApiRequest, NextApiResponse } from "next"
+import { generateAccessToken } from "./api"
 
 const ADMIN_GROUP = envOrFail(
   "NEXT_PUBLIC_RAD_LAB_ADMIN_GROUP",
@@ -57,15 +58,15 @@ export const decodeToken = async (token: string) => {
 export const withAuth = (handler: CustomNextApiHandler) => {
   return async (req: CustomNextApiRequest, res: NextApiResponse) => {
     try {
-      const token = getToken(req)
+      const userToken = getToken(req)
 
-      if (!token) {
+      if (!userToken) {
         return res.status(401).json({
           message: "Unauthorized",
         })
       }
 
-      const user = await decodeToken(token)
+      const user = await decodeToken(userToken)
 
       if (!user || !user.email) {
         return res.status(401).json({
@@ -74,10 +75,15 @@ export const withAuth = (handler: CustomNextApiHandler) => {
       }
 
       const { email } = user
+      const adminToken = await generateAccessToken()
+
+      if (!adminToken) {
+        throw new Error("Failed to generate adminToken")
+      }
 
       const [isAdmin, isUser] = await Promise.all([
-        inAdminGroup(email, token),
-        inUserGroup(email, token),
+        inAdminGroup(email, adminToken),
+        inUserGroup(email, adminToken),
       ])
 
       if (!isAdmin && !isUser) {
