@@ -1,4 +1,8 @@
-import { getDocsByField, updateByField } from "@/utils/Api_SeverSideCon"
+import {
+  getDocsByField,
+  isCreatorOfDeployment,
+  updateByField,
+} from "@/utils/Api_SeverSideCon"
 import { mergeVariables, pushPubSubMsg } from "@/utils/api"
 import { envOrFail } from "@/utils/env"
 import { withAuth } from "@/utils/middleware"
@@ -36,12 +40,27 @@ const deleteDeployment = async (
   res: NextApiResponse,
   id: string,
 ) => {
+  const { isAdmin, email } = req.user
+  if (!email) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    })
+  }
+  const isOwner = await isCreatorOfDeployment(id, email)
+
+  if (!isAdmin && !isOwner) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    })
+  }
+
   const body = req.body
   let [deployment]: [IDeployment] = await getDocsByField(
     "deployments",
     "deploymentId",
     id,
   )
+
   if (!deployment) {
     res.status(400).json({
       message: "Not found",
@@ -91,6 +110,20 @@ const updateDeployment = async (
   res: NextApiResponse,
   id: string,
 ) => {
+  const { isAdmin, email } = req.user
+  if (!email) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    })
+  }
+  const isOwner = await isCreatorOfDeployment(id, email)
+
+  if (!isAdmin && !isOwner) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    })
+  }
+
   const body = req.body
   const [deployment]: IDeployment[] = await getDocsByField(
     "deployments",

@@ -101,3 +101,17 @@ export const updateBuildStatus = async (
     return saveDocument("deployments", { ...doc, ...body }, doc.id)
   })
 }
+
+export const isCreatorOfDeployment = async (id: string, userEmail: string) => {
+  let [deployment]: [IDeployment] = await getDocsByField(
+    "deployments",
+    "deploymentId",
+    id,
+  )
+  console.log(deployment)
+  if (!deployment) {
+    return false
+  }
+  if (deployment.deployedByEmail === userEmail) return true
+  return false
+}
