@@ -102,16 +102,19 @@ export const updateBuildStatus = async (
   })
 }
 
-export const isCreatorOfDeployment = async (id: string, userEmail: string) => {
+export const isCreatorOfDeployment = async (
+  deployId: string,
+  userEmail: string,
+) => {
   let [deployment]: [IDeployment] = await getDocsByField(
     "deployments",
     "deploymentId",
-    id,
+    deployId,
   )
-  console.log(deployment)
+
   if (!deployment) {
     return false
   }
-  if (deployment.deployedByEmail === userEmail) return true
-  return false
+
+  return deployment.deployedByEmail === userEmail
 }
