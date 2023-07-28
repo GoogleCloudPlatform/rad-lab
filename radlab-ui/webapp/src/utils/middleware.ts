@@ -93,6 +93,7 @@ export const withAuth = (handler: CustomNextApiHandler) => {
         inUserGroup(email, adminToken),
       ])
 
+      // Must be in either of the Google groups to proceed
       if (!isAdmin && !isUser) {
         return res.status(401).json({
           message: "Unauthorized",

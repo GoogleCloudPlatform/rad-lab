@@ -102,7 +102,12 @@ export const updateBuildStatus = async (
   })
 }
 
-export const isCreatorOfDeployment = async (
+export const isCreatorOfDeployment = (
+  deployment: IDeployment,
+  userEmail: string,
+) => deployment.deployedByEmail === userEmail
+
+export const isCreatorOfDeploymentById = async (
   deployId: string,
   userEmail: string,
 ) => {
@@ -116,5 +121,5 @@ export const isCreatorOfDeployment = async (
     return false
   }
 
-  return deployment.deployedByEmail === userEmail
+  return isCreatorOfDeployment(deployment, userEmail)
 }

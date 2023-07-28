@@ -21,7 +21,7 @@ const gcpProjectId = envOrFail(
 )
 
 const getDeployment = async (
-  _req: AuthedNextApiHandler,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
@@ -30,9 +30,25 @@ const getDeployment = async (
     "deploymentId",
     id,
   )
-  res.status(200).json({
-    deployment: deployments[0] ?? null,
-  })
+  const deployment = deployments[0]
+
+  if (!deployment) {
+    res.status(400).json({
+      deployment: null,
+      message: "Not found",
+    })
+    return
+  }
+
+  // Users can only access their own deployments
+  if (!req.user.isAdmin && deployment.deployedByEmail !== req.user.email) {
+    res.status(403).json({
+      deployment: null,
+      message: "Forbidden",
+    })
+  }
+
+  res.status(200).json({ deployment })
 }
 
 const deleteDeployment = async (
@@ -41,20 +57,13 @@ const deleteDeployment = async (
   id: string,
 ) => {
   const { isAdmin, email } = req.user
+
   if (!email) {
     return res.status(401).json({
       message: "Unauthorized",
     })
   }
-  const isOwner = await isCreatorOfDeployment(id, email)
 
-  if (!isAdmin && !isOwner) {
-    return res.status(401).json({
-      message: "Unauthorized",
-    })
-  }
-
-  const body = req.body
   let [deployment]: [IDeployment] = await getDocsByField(
     "deployments",
     "deploymentId",
@@ -68,6 +77,13 @@ const deleteDeployment = async (
     return
   }
 
+  if (!isAdmin && !isCreatorOfDeployment(deployment, email)) {
+    return res.status(403).json({
+      message: "Forbidden",
+    })
+  }
+
+  const body = req.body
   const pubSubData: IPubSubMsg = {
     module: deployment.module,
     deploymentId: id,
@@ -95,9 +111,7 @@ const deleteDeployment = async (
     deletedAt: Timestamp.now(),
   }
 
-  if (deployment) {
-    await updateByField("deployments", "deploymentId", id, deployment)
-  }
+  await updateByField("deployments", "deploymentId", id, deployment)
 
   res.status(200).json({
     id,
@@ -111,25 +125,33 @@ const updateDeployment = async (
   id: string,
 ) => {
   const { isAdmin, email } = req.user
+
   if (!email) {
     return res.status(401).json({
       message: "Unauthorized",
     })
   }
-  const isOwner = await isCreatorOfDeployment(id, email)
 
-  if (!isAdmin && !isOwner) {
+  const [deployment]: IDeployment[] = await getDocsByField(
+    "deployments",
+    "deploymentId",
+    id,
+  )
+
+  if (!deployment) {
+    res.status(400).json({
+      message: "Not found",
+    })
+    return
+  }
+
+  if (!isAdmin && !isCreatorOfDeployment(deployment, email)) {
     return res.status(401).json({
       message: "Unauthorized",
     })
   }
 
   const body = req.body
-  const [deployment]: IDeployment[] = await getDocsByField(
-    "deployments",
-    "deploymentId",
-    id,
-  )
   if (!deployment) {
     res.status(400).send("Deployment not found")
     return
