@@ -55,6 +55,13 @@ export const decodeToken = async (token: string) => {
   }
 }
 
+/**
+ * Middleware that checks for a valid JWT token from either
+ * the cookie or Bearer token. Attaches the user and their
+ * authorization levels to the request.
+ * @param NextJS handler
+ * @returns Modified NextJS handler
+ */
 export const withAuth = (handler: CustomNextApiHandler) => {
   return async (req: AuthedNextApiHandler, res: NextApiResponse) => {
     try {
@@ -68,7 +75,7 @@ export const withAuth = (handler: CustomNextApiHandler) => {
 
       const user = await decodeToken(userToken)
 
-      if (!user || !user.email) {
+      if (!user?.email) {
         return res.status(401).json({
           message: "Unauthorized",
         })
