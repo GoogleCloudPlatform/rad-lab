@@ -1,4 +1,5 @@
 import {
+  canAccessDeployment,
   getAllDocuments,
   getDocsByField,
   saveDocument,
@@ -42,10 +43,7 @@ const createDeployment = async (
   // @ts-ignore
   const response: IDeployment = await saveDocument("deployments", body)
   if (!response) {
-    res.status(500).json({
-      message: "Failed to return document",
-    })
-    return
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 
   const pubSubData: IPubSubMsg = {
@@ -69,38 +67,39 @@ const createDeployment = async (
     console.error(error)
   }
 
-  res.status(200).json({
-    response,
-  })
+  return res.status(200).json({ response })
 }
 
 const getDeployments = async (
   req: AuthedNextApiHandler,
   res: NextApiResponse,
 ) => {
-  if (![req.user.isAdmin, req.user.isUser].some(Boolean)) {
-    return res.status(403).json({ message: "Forbidden" })
+  const { isAdmin, email } = req.user
+
+  if (!email) {
+    return res.status(401).json({ message: "Unauthorized" })
   }
 
   const deployments = (await getAllDocuments("deployments")) as IDeployment[]
-  const possiblyStaleDeployments = deployments.filter((deployment) => {
-    return (
-      deployment.status &&
-      deployment.builds?.length &&
-      [
-        DEPLOYMENT_STATUS.QUEUED,
-        DEPLOYMENT_STATUS.WORKING,
-        DEPLOYMENT_STATUS.PENDING,
-      ].includes(deployment.status)
-    )
-  })
+  const possiblyStaleDeployments = deployments
+    .filter((deployment) => {
+      return (
+        deployment.status &&
+        deployment.builds?.length &&
+        [
+          DEPLOYMENT_STATUS.QUEUED,
+          DEPLOYMENT_STATUS.WORKING,
+          DEPLOYMENT_STATUS.PENDING,
+        ].includes(deployment.status)
+      )
+    })
+    .filter((deployment) => canAccessDeployment(deployment, email, isAdmin))
 
   if (!possiblyStaleDeployments.length) {
-    res.status(200).json({ deployments })
-    return
+    return res.status(200).json({ deployments })
   }
 
-  let getBuilds: Promise<any>[] = []
+  const getBuilds: Promise<any>[] = []
   possiblyStaleDeployments.forEach((deployment: IDeployment) => {
     const mostRecentBuild =
       deployment.builds &&
@@ -129,24 +128,38 @@ const getDeployments = async (
       )
     })
   })
+
   await Promise.all(updateDoc)
+
   const deploymentsList = (await getAllDocuments(
     "deployments",
   )) as IDeployment[]
-  res.status(200).json({ deployments: deploymentsList })
+
+  return res.status(200).json({
+    deployments: deploymentsList.filter((deployment) =>
+      canAccessDeployment(deployment, email, isAdmin),
+    ),
+  })
 }
 
 const getDeploymentsByEmail = async (
-  _req: AuthedNextApiHandler,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
   deployedByEmail: string,
 ) => {
+  const { isAdmin, email } = req.user
+
+  if (!isAdmin && email !== deployedByEmail) {
+    return res.status(403).json({ message: "Forbidden" })
+  }
+
   const deployments = (await getDocsByField(
     "deployments",
     "deployedByEmail",
     deployedByEmail,
   )) as IDeployment[]
-  res.status(200).json({ deployments })
+
+  return res.status(200).json({ deployments })
 }
 
 const deleteDeployment = async (
@@ -155,24 +168,21 @@ const deleteDeployment = async (
 ) => {
   const body = req.body
   const deploymentIds = body.deploymentIds as string[] | undefined
+
   if (!deploymentIds || !deploymentIds.length) {
-    res.status(404).send("Missing deploymentIds from body")
-    return
+    return res.status(400).send("Missing deploymentIds from body")
   }
 
   deploymentIds.forEach(async (deploymentId) => {
     // @ts-ignore
-    let [deployment] = (await getDocsByField(
+    const [deployment] = (await getDocsByField(
       "deployments",
       "deploymentId",
       deploymentId,
-    )) as IDeployment[] | undefined[]
+    )) as IDeployment[]
 
     if (!deployment) {
-      res.status(400).json({
-        message: `Deployment Not found for id ${deploymentId}`,
-      })
-      return
+      return res.status(400).json({ message: "Not found" })
     }
 
     const pubSubData: IPubSubMsg = {
@@ -202,13 +212,11 @@ const deleteDeployment = async (
         deployment,
       )
     } catch (error) {
-      console.error(error)
-      res.status(500).send("Internal server error")
-      return
+      return res.status(500).json({ message: "Internal Server Error" })
     }
   })
 
-  res.status(200).json({
+  return res.status(200).json({
     deploymentIds,
     deleted: true,
   })
@@ -224,10 +232,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
     if (req.method === "POST") return createDeployment(req, res)
     if (req.method === "DELETE") return deleteDeployment(req, res)
   } catch (error) {
-    console.error("Deployments error", error)
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 

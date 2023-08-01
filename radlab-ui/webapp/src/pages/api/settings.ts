@@ -24,18 +24,19 @@ const getSettings = async (
   res: NextApiResponse,
 ) => {
   const settings = await getDocsByField("settings", "projectId", gcpProjectId)
-  res.status(200).json({ settings: settings[0] ?? null })
+  return res.status(200).json({ settings: settings[0] ?? null })
 }
 
 const createSettings = async (
   req: AuthedNextApiHandler,
   res: NextApiResponse,
 ) => {
-  if (!req.user.isAdmin) {
+  const { isAdmin, email } = req.user
+
+  if (!isAdmin) {
     return res.status(403).json({ message: "Forbidden" })
   }
 
-  const email = req.body.email
   delete req.body.email
   const body = {
     projectId: gcpProjectId,
@@ -60,9 +61,7 @@ const createSettings = async (
     console.error(error)
   }
 
-  res.status(200).json({
-    data,
-  })
+  return res.status(200).json({ data })
 }
 
 const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {

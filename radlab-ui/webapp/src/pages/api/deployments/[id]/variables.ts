@@ -26,10 +26,7 @@ const getDeploymentVariables = async (
     )) as IDeployment[] | undefined[]
 
     if (!deployment) {
-      res.status(400).json({
-        message: "Not found",
-      })
-      return
+      return res.status(400).json({ message: "Not found" })
     }
     const fileName = `deployments/${deployment.module}_${deployment.deploymentId}/files/terraform.tfvars.json`
     const token = await generateAccessToken()
@@ -46,10 +43,9 @@ const getDeploymentVariables = async (
       },
     })
 
-    res.status(200).json(response.data)
+    return res.status(200).json(response.data)
   } catch (error: any) {
-    console.error(error)
-    res.status(error?.response?.status || 500).json({
+    return res.status(error?.response?.status || 500).json({
       message: error?.response?.statusText || "Internal server error",
     })
   }
@@ -62,9 +58,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   try {
     if (req.method === "GET") return getDeploymentVariables(req, res, id)
   } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 

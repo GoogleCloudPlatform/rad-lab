@@ -17,12 +17,9 @@ const getVariablesFromGitHub = async (
   try {
     const secret = await getSecretKeyValue(GIT_TOKEN_SECRET_KEY_NAME)
     const variables = await getGitHubVariables(moduleName, secret)
-    res.status(200).json({ variables })
-    return
+    return res.status(200).json({ variables })
   } catch (error: any) {
-    res.status(500).send(error)
-    console.error(error)
-    return
+    return res.status(500).send(error)
   }
 }
 
@@ -34,9 +31,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
     if (req.method === "GET")
       return getVariablesFromGitHub(req, res, moduleName)
   } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 

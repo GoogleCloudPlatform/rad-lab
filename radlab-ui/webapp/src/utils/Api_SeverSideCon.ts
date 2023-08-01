@@ -102,6 +102,12 @@ export const updateBuildStatus = async (
   })
 }
 
+export const canAccessDeployment = (
+  deployment: IDeployment,
+  userEmail: string,
+  isAdmin: boolean,
+) => isAdmin || isCreatorOfDeployment(deployment, userEmail)
+
 export const isCreatorOfDeployment = (
   deployment: IDeployment,
   userEmail: string,

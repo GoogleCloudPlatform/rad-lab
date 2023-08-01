@@ -1,6 +1,6 @@
 import {
+  canAccessDeployment,
   getDocsByField,
-  isCreatorOfDeployment,
   updateByField,
 } from "@/utils/Api_SeverSideCon"
 import { mergeVariables, pushPubSubMsg } from "@/utils/api"
@@ -25,6 +25,12 @@ const getDeployment = async (
   res: NextApiResponse,
   id: string,
 ) => {
+  const { isAdmin, email } = req.user
+
+  if (!email) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+
   const deployments: IDeployment[] = await getDocsByField(
     "deployments",
     "deploymentId",
@@ -33,19 +39,11 @@ const getDeployment = async (
   const deployment = deployments[0]
 
   if (!deployment) {
-    res.status(400).json({
-      deployment: null,
-      message: "Not found",
-    })
-    return
+    return res.status(400).json({ message: "Not found" })
   }
 
-  // Users can only access their own deployments
-  if (!req.user.isAdmin && deployment.deployedByEmail !== req.user.email) {
-    res.status(403).json({
-      deployment: null,
-      message: "Forbidden",
-    })
+  if (!canAccessDeployment(deployment, email, isAdmin)) {
+    return res.status(403).json({ message: "Forbidden" })
   }
 
   res.status(200).json({ deployment })
@@ -59,9 +57,7 @@ const deleteDeployment = async (
   const { isAdmin, email } = req.user
 
   if (!email) {
-    return res.status(401).json({
-      message: "Unauthorized",
-    })
+    return res.status(401).json({ message: "Unauthorized" })
   }
 
   let [deployment]: [IDeployment] = await getDocsByField(
@@ -71,16 +67,11 @@ const deleteDeployment = async (
   )
 
   if (!deployment) {
-    res.status(400).json({
-      message: "Not found",
-    })
-    return
+    return res.status(400).json({ message: "Not found" })
   }
 
-  if (!isAdmin && !isCreatorOfDeployment(deployment, email)) {
-    return res.status(403).json({
-      message: "Forbidden",
-    })
+  if (!canAccessDeployment(deployment, email, isAdmin)) {
+    return res.status(403).json({ message: "Forbidden" })
   }
 
   const body = req.body
@@ -113,10 +104,7 @@ const deleteDeployment = async (
 
   await updateByField("deployments", "deploymentId", id, deployment)
 
-  res.status(200).json({
-    id,
-    deleted: true,
-  })
+  res.status(200).json({ id, deleted: true })
 }
 
 const updateDeployment = async (
@@ -127,9 +115,7 @@ const updateDeployment = async (
   const { isAdmin, email } = req.user
 
   if (!email) {
-    return res.status(401).json({
-      message: "Unauthorized",
-    })
+    return res.status(401).json({ message: "Unauthorized" })
   }
 
   const [deployment]: IDeployment[] = await getDocsByField(
@@ -139,22 +125,16 @@ const updateDeployment = async (
   )
 
   if (!deployment) {
-    res.status(400).json({
-      message: "Not found",
-    })
-    return
+    return res.status(400).json({ message: "Not found" })
   }
 
-  if (!isAdmin && !isCreatorOfDeployment(deployment, email)) {
-    return res.status(401).json({
-      message: "Unauthorized",
-    })
+  if (!canAccessDeployment(deployment, email, isAdmin)) {
+    return res.status(401).json({ message: "Unauthorized" })
   }
 
   const body = req.body
   if (!deployment) {
-    res.status(400).send("Deployment not found")
-    return
+    return res.status(400).json({ message: "Not found" })
   }
 
   const { billingId, variables } = await mergeVariables(body)
@@ -194,9 +174,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
     if (req.method === "PUT") return updateDeployment(req, res, id)
     if (req.method === "DELETE") return deleteDeployment(req, res, id)
   } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    res.status(500).json({ message: "Internal Server Error" })
   }
 }
 

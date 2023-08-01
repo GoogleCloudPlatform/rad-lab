@@ -31,20 +31,10 @@ const getDeploymentLogs = async (
     "deployments",
     "deploymentId",
     id,
-  )) as IDeployment[] | undefined[]
+  )) as IDeployment[]
 
-  if (!deployment) {
-    res.status(400).json({
-      message: "Deployment not found",
-    })
-    return
-  }
-
-  if (!deployment.builds?.length) {
-    res.status(404).json({
-      message: "Build ID not found",
-    })
-    return
+  if (!deployment || !deployment.builds?.length) {
+    return res.status(400).json({ message: "Not found" })
   }
 
   const mostRecentBuild = deployment.builds.sort(

@@ -17,17 +17,19 @@ const getModules = async (_req: AuthedNextApiHandler, res: NextApiResponse) => {
   const modules = await getDocsByField("modules", "projectId", gcpProjectId)
 
   if (modules) {
-    res.status(200).json({ modules })
-  } else {
-    res.status(404)
+    return res.status(200).json({ modules })
   }
+
+  return res.status(404)
 }
 
 const createModule = async (
   req: AuthedNextApiHandler,
   res: NextApiResponse,
 ) => {
-  if (!req.user.isAdmin) {
+  const { isAdmin } = req.user
+
+  if (!isAdmin) {
     return res.status(403).json({ message: "Forbidden" })
   }
 
@@ -63,7 +65,7 @@ const createModule = async (
     gcpProjectId,
   )
 
-  res.status(200).json({ modules })
+  return res.status(200).json({ modules })
 }
 
 const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
@@ -71,10 +73,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
     if (req.method === "POST") return createModule(req, res)
     if (req.method === "GET") return getModules(req, res)
   } catch (error) {
-    console.error("Modules error", error)
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 

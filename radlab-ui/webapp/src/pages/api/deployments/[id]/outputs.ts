@@ -21,13 +21,10 @@ const getOutputs = async (
     "deployments",
     "deploymentId",
     id,
-  )) as IDeployment[] | undefined[]
+  )) as IDeployment[]
 
   if (!deployment) {
-    res.status(400).json({
-      message: "Deployment not found",
-    })
-    return
+    return res.status(400).json({ message: "Not found" })
   }
 
   try {
@@ -47,8 +44,7 @@ const getOutputs = async (
     res.status(200).json({ outputs })
     return
   } catch (error) {
-    res.status(500)
-    return
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 
@@ -59,9 +55,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   try {
     if (req.method === "GET") return getOutputs(req, res, id)
   } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 

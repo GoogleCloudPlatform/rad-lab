@@ -18,16 +18,10 @@ const getDeploymentStatus = async (
     "deployments",
     "deploymentId",
     id,
-  )) as IDeployment[] | undefined[]
+  )) as IDeployment[]
 
-  if (!deployment) {
-    res.status(400).send("Deployment not found")
-    return
-  }
-
-  if (!deployment.builds?.length) {
-    res.status(404).send("Build ID not found")
-    return
+  if (!deployment || !deployment.builds?.length) {
+    return res.status(400).json({ message: "Not found" })
   }
 
   const mostRecentBuild = deployment.builds.sort(
@@ -40,8 +34,7 @@ const getDeploymentStatus = async (
   )
 
   if (!cloudBuild) {
-    res.status(404)
-    return
+    return res.status(400).json({ message: "Not found" })
   }
 
   let tfState = ""
