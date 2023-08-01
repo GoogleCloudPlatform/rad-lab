@@ -244,13 +244,13 @@ const Publish: React.FC<IPublishProps> = ({}) => {
               </button>
             </div>
             <div className="card-body w-full text-left">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
                 {renderAllModules()}
               </div>
               <div className="flex flex-row justify-center">
                 {checkButtonStatus === PUBLISH_BUTTON.PUBLISH && (
                   <button
-                    className="btn mt-4 btn-primary"
+                    className="btn mt-10 btn-primary"
                     aria-label="publish-button"
                     data-testid="publish-button"
                     disabled={arrayModules.length === 0 || isSubmitLoading}
@@ -265,7 +265,7 @@ const Publish: React.FC<IPublishProps> = ({}) => {
                 )}
                 {checkButtonStatus === PUBLISH_BUTTON.UPDATE && (
                   <button
-                    className={classNames("btn mt-4", `btn-${buttonState}`)}
+                    className={classNames("btn mt-10", `btn-${buttonState}`)}
                     aria-label="update-button"
                     data-testid="update-button"
                     disabled={buttonState !== "primary"}
