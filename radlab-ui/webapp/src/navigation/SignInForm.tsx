@@ -71,10 +71,10 @@ const SignInForm: React.FC<SignInFormProps> = ({ authOptions }) => {
         axios.get(`/api/user?email=${user.email}`),
         axios.get(`/api/settings`),
       ])
-        .then(([adminCheck, adminSettings]) => {
-          const admin = isAdminResponseParser.parse(adminCheck.data)
-          const settings = Settings.parse(adminSettings.data.settings)
-          if (admin.isAdmin === false) {
+        .then(([userResponse, settingsResponse]) => {
+          const serverUser = isAdminResponseParser.parse(userResponse.data)
+          const settings = Settings.parse(settingsResponse.data.settings)
+          if (serverUser.isAdmin === false) {
             router.push("/")
           } else {
             if (!settings) router.push("/admin")

@@ -1,10 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import { TF_OUTPUT } from "@/utils/types"
-
 import { getDocsByField } from "@/utils/Api_SeverSideCon"
 import { envOrFail } from "@/utils/env"
+import { withAuth } from "@/utils/middleware"
+import { AuthedNextApiHandler, IDeployment, TF_OUTPUT } from "@/utils/types"
 import { Storage } from "@google-cloud/storage"
-import { IDeployment } from "@/utils/types"
+import { NextApiResponse } from "next"
 
 const storage = new Storage()
 
@@ -14,21 +13,18 @@ const MODULE_DEPLOYMENT_BUCKET_NAME = envOrFail(
 )
 
 const getOutputs = async (
-  _: NextApiRequest,
+  _req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
-  const [deployment]: [IDeployment] = await getDocsByField(
+  const [deployment] = (await getDocsByField(
     "deployments",
     "deploymentId",
     id,
-  )
+  )) as IDeployment[]
 
   if (!deployment) {
-    res.status(400).json({
-      message: "Deployment not found",
-    })
-    return
+    return res.status(400).json({ message: "Not found" })
   }
 
   try {
@@ -38,32 +34,29 @@ const getOutputs = async (
       .file(fileName)
       .download()
 
-    const _outputs: TF_OUTPUT = JSON.parse(file.toString("utf-8"))
+    const allOutputs: TF_OUTPUT = JSON.parse(file.toString("utf-8"))
 
     // Remove entries where sensitive == true
     const outputs = Object.fromEntries(
-      Object.entries(_outputs).filter(([_, output]) => !output.sensitive),
+      Object.entries(allOutputs).filter(([_, output]) => !output.sensitive),
     )
 
     res.status(200).json({ outputs })
     return
   } catch (error) {
-    res.status(500)
-    return
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   const { id } = req.query
   if (typeof id !== "string") throw new Error("Deployment ID must be a string")
 
   try {
     if (req.method === "GET") return getOutputs(req, res, id)
   } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 
-export default handler
+export default withAuth(handler)
