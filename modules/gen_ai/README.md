@@ -27,14 +27,14 @@ NOTE: This is only required if spinning up Billing Budget for the module.
 
 ## IAM Permissions Prerequisites
 
-Ensure that the identity executing this module has the following IAM permissions, when **creating the project** (create_project = true): 
+Ensure that the identity executing this module has the following IAM permissions, when **creating the project** (`create_project = true`):
 
 - Parent: `roles/billing.user`
 - Parent: `roles/billing.costsManager` (OPTIONAL - Only when spinning up Billing Budget for the module)
 - Parent: `roles/resourcemanager.projectCreator`
-- Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only required if setting any Org policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
+- Parent: `roles/orgpolicy.policyAdmin` (OPTIONAL - Only required if setting any Organization Policy in `modules/[MODULE_NAME]/orgpolicy.tf` as part of RAD Lab module)
 
-NOTE: Billing budgets can only be created if you are using a Service Account to deploy the module via Terraform, User account cannot be used.
+NOTE: Billing Budgets can only be created if you are using a Service Account to deploy the module via Terraform, User account cannot be used.
 
 When deploying in an existing project, ensure the identity has the following permissions on the project:
 
