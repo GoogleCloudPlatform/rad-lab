@@ -48,7 +48,7 @@ When deploying in an existing project, ensure the identity has the following per
 ### Deployments via Service Account
 
 1. Create a Terraform Service Account in RAD Lab Management Project to execute / deploy the RAD Lab module. Ensure that the Service Account has the above mentioned IAM permissions.
-NOTE: Make sure to set the `resource_creator_identity` variable to the Service Account ID in terraform.tfvars file and pass it in module deployment. Example content of terraform.tfvars: 
+NOTE: Make sure to set the `resource_creator_identity` variable to the Service Account ID in `terraform.tfvars` file and pass it in module deployment. Example content of `terraform.tfvars`:
 ```
 resource_creator_identity = <sa>@<projectID>.iam.gserviceaccount.com 
 ```
