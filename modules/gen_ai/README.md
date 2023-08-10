@@ -2,9 +2,9 @@
 
 ## Module Overview
 
-This module allows users to setup complete GCP Environment including APIs, Networks including the Vertex AI Workbench which hosts the contents of the public Google Cloud [Generative AI](https://github.com/GoogleCloudPlatform/generative-ai) repository. This repository contains notebooks and content that demonstrate how to use, develop and manage generative AI workflows using Generative AI, powered by Vertex AI and Generative AI App Builder on Google Cloud.
+This module allows users to setup complete Google Cloud environment including APIs, networks including the Vertex AI Workbench which hosts the contents of the public Google Cloud [Generative AI](https://github.com/GoogleCloudPlatform/generative-ai) repository. This repository contains notebooks and content that demonstrate how to use, develop and manage generative AI workflows using generative AI, powered by Vertex AI and Generative AI App Builder on Google Cloud.
 
-With this module one do not need to worry about setting up the cloud environment (RAD Lab will do it for you) and can directly jump into playing arround with Google Cloud's Generative AI capabilites.
+With this module one does not need to worry about setting up the cloud environment (RAD Lab will do it for you) and can directly jump into playing around with Google Cloud's Generative AI capabilities.
 
 ## GCP Products/Services
 
