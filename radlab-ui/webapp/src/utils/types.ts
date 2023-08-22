@@ -256,3 +256,9 @@ export type CustomNextApiHandler = (
   req: AuthedNextApiHandler,
   res: NextApiResponse,
 ) => void
+export const Region = zod.object({
+  id: zod.string(),
+  name: zod.string(),
+  zones: zod.string().array(),
+})
+export type IRegion = zod.infer<typeof Region>
