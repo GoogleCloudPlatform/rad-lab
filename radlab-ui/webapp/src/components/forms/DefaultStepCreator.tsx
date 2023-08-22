@@ -17,6 +17,8 @@ interface IDefaultStepCreatorProps {
 
 type IFieldValidateValue = { value: string | number | boolean }
 
+const alphabetically = (a: string, b: string) => a.localeCompare(b)
+
 const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
   variableList,
   idx,
@@ -37,7 +39,9 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
   }
 
   const fetchRegionList = () => {
-    setRegionNames(regionZoneList.map((region) => region.name))
+    setRegionNames(
+      regionZoneList.map((region) => region.name).sort(alphabetically),
+    )
   }
 
   const getZonesByRegion = (regionName: string) => {
@@ -51,7 +55,7 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
   const onChangeRegion = (event: React.ChangeEvent<HTMLInputElement>) => {
     values[event.target.name] = event.target.value
     const zones = getZonesByRegion(event.target.value)
-    setZoneNames(zones)
+    setZoneNames(zones.sort(alphabetically))
 
     // set first value as default zone while region changed
     values["zone"] = zones[0]
@@ -84,7 +88,7 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
     fetchRegionList()
     // To dispaly default list of zone based on region
     const zones = getZonesByRegion(values.region)
-    setZoneNames(zones)
+    setZoneNames(zones.sort(alphabetically))
     // set first value as default zone while load
     if (!zones.includes(values["zone"])) {
       values["zone"] = zones[0]
