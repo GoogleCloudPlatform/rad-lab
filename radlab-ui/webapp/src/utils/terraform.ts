@@ -2,7 +2,7 @@
 import * as hclParse from "hcl2-parser"
 import groupBy from "lodash/groupBy"
 import startCase from "lodash/startCase"
-import { IUIVariable, IObjKeyPair, IFormData } from "@/utils/types"
+import { IUIVariable, IObjKeyPair, IFormData, IRegion } from "@/utils/types"
 import axios from "axios"
 
 type IHCLVariable = {
@@ -222,7 +222,7 @@ export const getRegionZoneList = () => {
   const regionZoneData = axios
     .get(`/api/regions`)
     .then((res) => {
-      return res.data.regions
+      return res.data.regions as IRegion[]
     })
     .catch((error) => {
       console.error(error)

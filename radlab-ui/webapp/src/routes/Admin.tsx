@@ -12,28 +12,26 @@ import SectionHeader from "@/components/SectionHeader"
 import LoadingRow from "@/components/LoadingRow"
 import { IRegion } from "@/utils/types"
 
-interface provisionDefaultInterface {}
+interface IProvisionDefaultProps {}
 
-const ProvisionDefault: React.FC<provisionDefaultInterface> = ({}) => {
+const ProvisionDefault: React.FC<IProvisionDefaultProps> = ({}) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [isLoading, setLoading] = useState(true)
   const [defaultSettingVarsData, setDefaultSettingVarsData] = useState({})
   const formVariableData = DATA_DEFAULT_VARS
   const [submitLoading, setSubmitLoading] = useState(false)
-  const [regionZoneListData, setRegionZoneListData] = useState<IRegion[]>([])
+  const [regionZoneList, setRegionZoneList] = useState<IRegion[]>([])
 
   const handleBackClick = () => {
     navigate("/deployments")
   }
 
   // To check Admin settings updated if not thern redirect to default setting
-  const fetchAdminSettingData = async () => {
+  const fetchAdminSettings = async () => {
     setLoading(true)
     // fetch regions data
     try {
-      await fetchListRegionZone()
-
       await axios
         .get(`/api/settings`)
         .then((res) => {
@@ -54,15 +52,15 @@ const ProvisionDefault: React.FC<provisionDefaultInterface> = ({}) => {
 
   const fetchListRegionZone = async () => {
     try {
-      const regionZoneData = await getRegionZoneList()
-      setRegionZoneListData(regionZoneData)
+      setRegionZoneList(await getRegionZoneList())
     } catch (error) {
       console.error(error)
     }
   }
 
   useEffect(() => {
-    fetchAdminSettingData()
+    fetchAdminSettings()
+    fetchListRegionZone()
   }, [])
 
   if (isLoading)
@@ -93,7 +91,7 @@ const ProvisionDefault: React.FC<provisionDefaultInterface> = ({}) => {
               formVariables={parseVarsFile(formVariableData)}
               defaultSettingVariables={defaultSettingVarsData}
               handleLoading={setSubmitLoading}
-              regionZoneListData={regionZoneListData}
+              regionZoneList={regionZoneList}
             />
           </div>
         </div>
