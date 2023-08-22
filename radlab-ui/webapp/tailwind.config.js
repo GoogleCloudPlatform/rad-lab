@@ -30,6 +30,7 @@ module.exports = {
     backgroundColor: ["active"],
   },
   daisyui: {
+    logs: false,
     // https://daisyui.com/docs/themes/
     themes: [
       ...themes,

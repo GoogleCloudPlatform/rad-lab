@@ -46,7 +46,7 @@ const StepCreator: React.FC<StepCreator> = ({ variableList, idx }) => {
     }
 
     // Required checks
-    if (!variable.required || value || value === "0") return null
+    if (!variable.required || value || value === 0) return null
     return `A value for ${startCase(variable.name)} is required`
   }
 
@@ -72,6 +72,7 @@ const StepCreator: React.FC<StepCreator> = ({ variableList, idx }) => {
         case "bool":
           return <BooleanField variable={variable} />
         case "number":
+          console.log({ variable })
           return (
             <NumberField variable={variable} validate={validate(variable)} />
           )

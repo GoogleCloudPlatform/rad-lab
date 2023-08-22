@@ -30,13 +30,15 @@ const Authenticated: React.FC<AuthenticatedProps> = ({
 }) => {
   const [userIdentity, setUserIdentity] = useState(false)
   const [loading, setLoading] = useState(true)
+  const setIsAdmin = userStore((state) => state.setIsAdmin)
   const isAdmin = userStore((state) => state.isAdmin)
 
   useEffect(() => {
     axios
       .get(`/api/user?email=${user.email}`)
       .then((res) => {
-        isAdminResponseParser.parse(res.data)
+        const data = isAdminResponseParser.parse(res.data)
+        setIsAdmin(data.isAdmin)
         setUserIdentity(true)
       })
       .catch(() => {

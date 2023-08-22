@@ -174,6 +174,13 @@ describe("terraform util", () => {
     const set_external_ip_policy = getByName("set_external_ip_policy", parsed)
     expect(set_external_ip_policy.default).not.toBeNull()
     expect(set_external_ip_policy.default).toBe(false)
+
+    const gpu_accelerator_core_count = getByName(
+      "gpu_accelerator_core_count",
+      parsed,
+    )
+    expect(gpu_accelerator_core_count.default).not.toBeNull()
+    expect(gpu_accelerator_core_count.default).toStrictEqual(0)
   })
 
   describe("updatesafe parsing", () => {

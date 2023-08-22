@@ -1,3 +1,5 @@
+import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier"
+import { NextApiRequest, NextApiResponse } from "next"
 import React from "react"
 import zod from "zod"
 
@@ -244,6 +246,7 @@ export interface Dictionary<T> {
   [index: string]: T
 }
 
+
 export const Region = zod.object({
   id: zod.string(),
   name: zod.string(),
@@ -269,3 +272,14 @@ export type GCPRegion = {
   selfLink: string
   supportsPzs: boolean
 }
+
+export type AuthedUser = DecodedIdToken & { isAdmin: boolean; isUser: boolean }
+
+export interface AuthedNextApiHandler extends NextApiRequest {
+  user: AuthedUser
+}
+
+export type CustomNextApiHandler = (
+  req: AuthedNextApiHandler,
+  res: NextApiResponse,
+) => void

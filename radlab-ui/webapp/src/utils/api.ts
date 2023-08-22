@@ -84,15 +84,22 @@ export const pushPubSubMsg = async function (data: Record<string, any>) {
 export const getBuildStatus = async (buildId: string, deploymentId: string) => {
   try {
     const token = await generateAccessToken()
-    let data = await axios({
+    const res = await axios({
       method: "GET",
       url: `https://cloudbuild.googleapis.com/v1/projects/${GCP_PROJECT_ID}/builds/${buildId}`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-    data.data.deploymentId = deploymentId
-    return data.data || null
+
+    if (!res.data) {
+      return null
+    }
+
+    return {
+      ...res.data,
+      deploymentId,
+    }
   } catch (error) {
     console.error(error)
     return null

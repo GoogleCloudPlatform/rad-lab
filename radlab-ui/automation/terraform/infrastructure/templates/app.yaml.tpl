@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-runtime: nodejs16
+runtime: nodejs18
 
 service_account: ${UI_IDENTITY}
 

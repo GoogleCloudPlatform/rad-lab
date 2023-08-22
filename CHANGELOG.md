@@ -15,6 +15,21 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [13.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v13.0.0) (2023-08-11)
+ 
+### Added
+- _RAD Lab Module:_ Releasing RAD Lab **GenAI Module** [(#159)](https://github.com/GoogleCloudPlatform/rad-lab/pull/159)
+
+## [12.1.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v12.1.1) (2023-08-07)
+ 
+### Fixed
+- _RAD Lab UI:_ Fixed Unprotected endpoints [(#153)](https://github.com/GoogleCloudPlatform/rad-lab/pull/153) : Add auth middleware and endpoint checks to API [(#158)](https://github.com/GoogleCloudPlatform/rad-lab/pull/158)
+
+## [12.1.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v12.1.0) (2023-06-12)
+ 
+### Changed
+- _RAD Lab Module:_ Including sample GCE VM in **Billing Budget** module [(#155)](https://github.com/GoogleCloudPlatform/rad-lab/pull/155)
+
 ## [12.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v12.0.0) (2023-02-17)
  
 ### Added
