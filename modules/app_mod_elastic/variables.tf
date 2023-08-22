@@ -185,7 +185,7 @@ variable "master_ipv4_cidr_block" {
 }
 
 variable "network_cidr_block" {
-  description = "CIDR block to be assigned to the network. {{UIMeta group=2 order=5 }}"
+  description = "CIDR block to be assigned to the network. {{UIMeta group=2 order=4 }}"
   type        = string
   default     = "10.0.0.0/16"
 }
@@ -263,7 +263,7 @@ variable "project_id_prefix" {
 }
 
 variable "region" {
-  description = "Region where the resources should be created. {{UIMeta group=2 order=3 }}"
+  description = "Region where the resources should be created. List of zones - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=18 }}"
   type        = string
   default     = "us-west1"
 }
@@ -311,7 +311,7 @@ variable "set_vpc_peering_policy" {
 }
 
 variable "subnet_name" {
-  description = "Name to be assigned to the subnet hosting the GKE cluster. {{UIMeta group=2 order=4 }}"
+  description = "Name to be assigned to the subnet hosting the GKE cluster. {{UIMeta group=2 order=3 }}"
   type        = string
   default     = "elastic-search-snw"
 }

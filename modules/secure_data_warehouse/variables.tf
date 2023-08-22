@@ -114,7 +114,7 @@ variable "create_budget" {
 }
 
 variable "dataset_location" {
-  description = "The regional location for the dataset only US and EU are allowed in module. {{UIMeta group=2 order=3 }}"
+  description = "The regional location for the dataset only US and EU are allowed in module. {{UIMeta group=2 order=2 }}"
   type        = string
   default     = "US"
 }
@@ -202,7 +202,7 @@ variable "project_id_prefix" {
 }
 
 variable "region" {
-  description = "The default region where the resources will be deployed. {{UIMeta group=2 order=2 }}"
+  description = "The default region where the resources will be deployed. List - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=20 }}"
   type        = string
   default     = "us-east4"
 }

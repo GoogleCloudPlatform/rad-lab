@@ -190,7 +190,7 @@ variable "image_project" {
 }
 
 variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for AI Notebooks subnet. {{UIMeta group=2 order=5 }}"
+  description = "Unique IP CIDR Range for AI Notebooks subnet. {{UIMeta group=2 order=4 }}"
   type        = string
   default     = "10.142.190.0/24"
 }
@@ -268,7 +268,7 @@ variable "set_trustedimage_project_policy" {
 }
 
 variable "subnet_name" {
-  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=2 order=4 }}"
+  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=2 order=3 }}"
   type        = string
   default     = "subnet-ai-notebook"
 }
@@ -286,7 +286,7 @@ variable "trusted_users" {
 }
 
 variable "zone" {
-  description = "Cloud Zone associated to the AI Notebooks. {{UIMeta group=2 order=3 options=us-central1-b,us-east1-a,us-west3-b,us-east4-c }}"
+  description = "Cloud Zone associated to the AI Notebooks. List of zones - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=20 }}"
   type        = string
   default     = "us-central1-c"
 }

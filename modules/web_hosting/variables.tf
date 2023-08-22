@@ -159,7 +159,7 @@ variable "folder_id" {
 }
 
 variable "ip_cidr_ranges" {
-  description = "Unique IP CIDR Range for Primary & Secondary subnet. {{UIMeta group=2 order=4 }}"
+  description = "Unique IP CIDR Range for Primary & Secondary subnet. {{UIMeta group=2 order=2 }}"
   type        = set(string)
   default     = ["10.200.20.0/24", "10.200.240.0/24"]
 }
@@ -195,13 +195,13 @@ variable "project_id_prefix" {
 }
 
 variable "region" {
-  description = "Primary region where the CloudSQL, Compute Instance and VPC subnet will be deployed. {{UIMeta group=2 order=2 }}"
+  description = "Primary region where the CloudSQL, Compute Instance and VPC subnet will be deployed. List - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=19 }}"
   type        = string
   default     = "us-central1"
 }
 
 variable "region_secondary" {
-  description = "Secondary region where the Compute Instance and VPC subnet will be deployed. {{UIMeta group=2 order=3 }}"
+  description = "Secondary region where the Compute Instance and VPC subnet will be deployed. List - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=20 }}"
   type        = string
   default     = "asia-south1"
 }

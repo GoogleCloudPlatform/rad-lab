@@ -76,7 +76,7 @@ _Usage:_
 | *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-billing-budget</code> |
-| *region* | Primary region where Compute Instance and VPC subnet will be created | <code title="">string</code> |  | <code title="">us-central1</code> |
+| *region* | Primary region where Compute Instance and VPC subnet will be created. List of zones - https://cloud.google.com/compute/docs/regions-zones#available | <code title="">string</code> |  | <code title="">us-central1</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, this module deployment will fail | <code title="">string</code> |  | <code title=""></code> |
 | *set_domain_restricted_sharing_policy* | Enable org policy to allow all principals to be added to IAM policies | <code title="">bool</code> |  | <code title="">false</code> |
 | *set_external_ip_policy* | Enable org policy to allow External (Public) IP addresses on virtual machines | <code title="">bool</code> |  | <code title="">false</code> |

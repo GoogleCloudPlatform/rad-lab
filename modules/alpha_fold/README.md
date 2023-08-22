@@ -125,7 +125,7 @@ _Usage:_
 | *subnet_name* | Name of the subnet where to deploy the Notebooks | <code title="">string</code> |  | <code title="">subnet-vertex-ai-workbench</code> |
 | *trusted_groups* | The list of trusted groups (e.g. `myteam@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *trusted_users* | The list of trusted users (e.g. `username@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
-| *zone* | Cloud Zone associated to the Vertex AI Workbench | <code title="">string</code> |  | <code title="">us-central1-b</code> |
+| *zone* | Cloud Zone associated to the Vertex AI Workbench. List of zones - https://cloud.google.com/compute/docs/regions-zones#available | <code title="">string</code> |  | <code title="">us-central1-b</code> |
 
 ## Outputs
 

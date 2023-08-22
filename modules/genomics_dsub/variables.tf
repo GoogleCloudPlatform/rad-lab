@@ -232,7 +232,7 @@ variable "trusted_users" {
 }
 
 variable "zone" {
-  description = "Cloud Zone associated to the project. {{UIMeta group=2 order=3 }}"
+  description = "Cloud Zone associated to the project. List - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=21 }}"
   type        = string
   default     = "europe-west2-c"
 }

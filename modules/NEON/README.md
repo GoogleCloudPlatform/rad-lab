@@ -117,7 +117,7 @@ _Usage:_
 | *subnet_name* | Name of the subnet where to deploy the Notebooks | <code title="">string</code> |  | <code title="">neon-subnet</code> |
 | *trusted_groups* | The list of trusted groups (e.g. `myteam@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *trusted_users* | The list of trusted users (e.g. `username@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
-| *zone* | Cloud Zone associated to the AI Notebooks | <code title="">string</code> |  | <code title="">us-central1-c</code> |
+| *zone* | Cloud Zone associated to the AI Notebooks. List - https://cloud.google.com/compute/docs/regions-zones#available | <code title="">string</code> |  | <code title="">us-central1-c</code> |
 
 ## Outputs
 

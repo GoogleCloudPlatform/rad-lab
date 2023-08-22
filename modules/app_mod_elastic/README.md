@@ -203,7 +203,7 @@ module "elastic_search_project" {
 | *pod_ip_range_name* | Range name for the pod IP addresses | <code title="">string</code> |  | <code title="">pod-ip-range</code> |
 | *preemptible_nodes* | Use preemptible VMs for the node pools | <code title="">bool</code> |  | <code title="">true</code> |
 | *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-app-mod-elastic</code> |
-| *region* | Region where the resources should be created | <code title="">string</code> |  | <code title="">us-west1</code> |
+| *region* | Region where the resources should be created. List of zones - https://cloud.google.com/compute/docs/regions-zones#available | <code title="">string</code> |  | <code title="">us-west1</code> |
 | *release_channel* | Enroll the GKE cluster in this release channel | <code title="">string</code> |  | <code title="">REGULAR</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
 | *service_cidr_block* | CIDR block to be assigned to services running in the GKE cluster | <code title="">string</code> |  | <code title="">10.150.0.0/16</code> |
