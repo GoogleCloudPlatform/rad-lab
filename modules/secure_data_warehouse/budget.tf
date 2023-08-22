@@ -15,13 +15,13 @@
  */
 
 locals {
-  emails = length(var.trusted_users) > 0 ? distinct(concat(tolist(var.billing_budget_notification_email_addresses), formatlist(tolist(var.trusted_users)[0]))) : tolist(var.billing_budget_notification_email_addresses)
+  emails = tolist(var.billing_budget_notification_email_addresses)
 }
 
 resource "google_monitoring_notification_channel" "email_notif" {
   count        = var.create_budget ? length(local.emails) : 0 
   display_name = "Billing Budget Notification Channel - ${element(local.emails, count.index)}"
-  project      = module.project_radlab_sdw_data_govern.project_id
+  project      = local.project.project_id
   type         = "email"
   labels       = {
     email_address = "${element(local.emails, count.index)}"
@@ -34,28 +34,29 @@ resource "google_monitoring_notification_channel" "email_notif" {
 
 resource "google_pubsub_topic" "budget_topic" {
   count   = var.billing_budget_pubsub_topic ? 1 : 0
-  name    = "budget-topic-${module.project_radlab_sdw_data_govern.project_id}"
-  project = module.project_radlab_sdw_data_govern.project_id
+  name    = "budget-topic-${local.project.project_id}"
+  project = local.project.project_id
 }
 
 resource "google_pubsub_subscription" "budget_topic_subscription" {
   count   = var.billing_budget_pubsub_topic ? 1 : 0
   name    = "${google_pubsub_topic.budget_topic[0].name}-subscription"
   topic   = google_pubsub_topic.budget_topic[0].name
-  project = module.project_radlab_sdw_data_govern.project_id
+  project = local.project.project_id
 }
 
 resource "google_billing_budget" "budget" {
   count = var.create_budget ? 1 : 0
 
   billing_account = var.billing_account_id
-  display_name    = format("Billing Budget - %s-*-%s", var.project_id_prefix, local.random_id)
+  display_name    = format("Billing Budget - %s", local.project.project_id)
 
   budget_filter {
-    projects               = toset(["projects/${module.project_radlab_sdw_data_ingest.project_id}", "projects/${module.project_radlab_sdw_data_govern.project_id}", "projects/${module.project_radlab_sdw_conf_data.project_id}", "projects/${module.project_radlab_sdw_non_conf_data.project_id}"])
+    projects               = toset(["projects/${local.project.project_id}"])
     credit_types_treatment = var.billing_budget_credit_types_treatment
     services               = var.billing_budget_services
     labels                 = var.billing_budget_labels
+    calendar_period        = var.billing_budget_calendar_period
   }
 
   amount {
@@ -80,7 +81,7 @@ resource "google_billing_budget" "budget" {
   }
 
   depends_on = [
-    # google_project_service.enabled_services,
+    google_project_service.enabled_services,
     time_sleep.wait_120_seconds
   ]
 }

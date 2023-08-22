@@ -15,7 +15,7 @@
  */
 
 variable "access_context_manager_policy_id" {
-  description = "The id of the default Access Context Manager policy. Can be obtained by running `gcloud access-context-manager policies list --organization YOUR-ORGANIZATION_ID --format=\"value(name)\"`. {{UIMeta group=0 order=17 }}"
+  description = "The id of the default Access Context Manager policy. Can be obtained by running `gcloud access-context-manager policies list --organization YOUR-ORGANIZATION_ID --format=\"value(name)\"`. {{UIMeta group=0 order=18 }}"
   type        = string
   default     = ""
 }
@@ -49,14 +49,20 @@ variable "billing_budget_amount_currency_code" {
   default     = "USD"
 }
 
+variable "billing_budget_calendar_period" {
+  description = "A CalendarPeriod represents the abstract concept of a recurring time period that has a canonical start. Possible values are: MONTH, QUARTER, YEAR, CALENDAR_PERIOD_UNSPECIFIED {{UIMeta group=0 order=10 updatesafe options=MONTH,QUARTER,YEAR,CALENDAR_PERIOD_UNSPECIFIED }}"
+  type        = string
+  default     = "MONTH"
+}
+
 variable "billing_budget_credit_types_treatment" {
-  description = "Specifies how credits should be treated when determining spend for threshold calculations. {{UIMeta group=0 order=10 updatesafe }}"
+  description = "Specifies how credits should be treated when determining spend for threshold calculations. {{UIMeta group=0 order=11 updatesafe }}"
   type        = string
   default     = "INCLUDE_ALL_CREDITS"
 }
 
 variable "billing_budget_labels" {
-  description = "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. {{UIMeta group=0 order=11 updatesafe }}"
+  description = "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. {{UIMeta group=0 order=12 updatesafe }}"
   type        = map(string)
   default     = {}
   validation {
@@ -66,23 +72,23 @@ variable "billing_budget_labels" {
 }
 
 variable "billing_budget_services" {
-  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe }}"
+  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=13 updatesafe }}"
   type        = list(string)
   default     = null
 }
 
 variable "billing_budget_notification_email_addresses" {
-  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 4 channels are allowed as the first element of `trusted_users` is automatically added as one of the channel. {{UIMeta group=0 order=13 updatesafe }}"
+  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 5 channels are allowed. {{UIMeta group=0 order=14 updatesafe }}"
   type        = set(string)
   default     = []
   validation {
-    condition     = length(var.billing_budget_notification_email_addresses) <= 4
-    error_message = "Maximum of 4 email addresses are allowed for the budget monitoring channel."
+    condition     = length(var.billing_budget_notification_email_addresses) <= 5
+    error_message = "Maximum of 5 email addresses are allowed for the budget monitoring channel."
   }
 }
 
 variable "billing_budget_pubsub_topic" {
-  description = "If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false. {{UIMeta group=0 order=14 updatesafe }}"
+  description = "If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false. {{UIMeta group=0 order=15 updatesafe }}"
   type        = bool
   default     = false
 }
@@ -136,7 +142,7 @@ variable "deployment_id" {
 }
 
 variable "delete_contents_on_destroy" {
-  description = "(Optional) If set to true, delete all the tables in the dataset when destroying the resource; otherwise, destroying the resource will fail if tables are present. {{UIMeta group=0 order=18 }}"
+  description = "(Optional) If set to true, delete all the tables in the dataset when destroying the resource; otherwise, destroying the resource will fail if tables are present. {{UIMeta group=0 order=19 }}"
   type        = bool
   default     = true
 }
@@ -259,13 +265,13 @@ variable "data_fields" {
 }
 
 variable "set_domain_restricted_sharing_policy" {
-  description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=15 updatesafe }}"
+  description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=16 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_shielded_vm_policy" {
-  description = "Apply org policy to disable shielded VMs. {{UIMeta group=0 order=16 updatesafe }}"
+  description = "Apply org policy to disable shielded VMs. {{UIMeta group=0 order=17 updatesafe }}"
   type        = bool
   default     = false
 }
