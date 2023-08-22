@@ -26,7 +26,7 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
   const { values } = useFormikContext<FormikValues>()
   const [regionListData, setRegionListData] = useState<string[]>([])
 
-  let sortedList = sortBy(variableList, "order")
+  const sortedList = sortBy(variableList, "order")
 
   const validateRequired = (value: IFieldValidateValue) => {
     let error
