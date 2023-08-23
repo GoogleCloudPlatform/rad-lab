@@ -867,7 +867,7 @@ resource "google_storage_bucket_iam_binding" "binding" {
 }
 `
 
-export const DATA_DEFAULT_VARS = `
+export const DEFAULT_ADMIN_VARS = `
 
 variable "billing_account_id" {
   description = "Billing Account associated to the GCP Resources. {{UIMeta group=1 order=1 }}"
@@ -884,16 +884,4 @@ variable "folder_id" {
   description = "Folder ID where the project should be created. {{UIMeta group=3 order=1 }}"
   type        = string
   default     = ""
-}
-
-variable "region" {
-  description = "Region where the resources should be created. {{UIMeta group=4 order=1 options=[us-central1] }}"
-  type        = string
-  default     = "us-central1"
-}
-
-variable "zone" {
-  description = "Cloud Zone associated to the Vertex AI Workbench. {{UIMeta group=4 order=2 options=[us-central1-a, us-central1-b, us-central1-c, us-central1-f] }}"
-  type        = string
-  default     = "us-central1-a"
 }`

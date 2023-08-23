@@ -8,7 +8,7 @@ import {
   ALERT_TYPE,
   IFormData,
   Dictionary,
-  IRegion,
+  IVariables,
 } from "@/utils/types"
 import { groupVariables, initialFormikData } from "@/utils/terraform"
 import axios from "axios"
@@ -17,16 +17,14 @@ import { mergeAll } from "ramda"
 
 interface IDefaultCreateFormProps {
   formVariables: IUIVariable[]
-  defaultSettingVariables: Record<string, any>
+  defaultSettingVariables: IVariables
   handleLoading: Function
-  regionZoneList: IRegion[]
 }
 
 const DefaultCreateForm: React.FC<IDefaultCreateFormProps> = ({
   formVariables,
   defaultSettingVariables,
   handleLoading,
-  regionZoneList,
 }) => {
   const { t } = useTranslation()
   const [formData, setFormData] = useState<null | Dictionary<IUIVariable[]>>(
@@ -100,7 +98,6 @@ const DefaultCreateForm: React.FC<IDefaultCreateFormProps> = ({
                 variableList={group}
                 idx={index}
                 key={grpId}
-                regionZoneList={regionZoneList}
               />
             ) : (
               <></>

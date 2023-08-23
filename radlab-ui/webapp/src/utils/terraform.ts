@@ -2,7 +2,7 @@
 import * as hclParse from "hcl2-parser"
 import groupBy from "lodash/groupBy"
 import startCase from "lodash/startCase"
-import { IUIVariable, IObjKeyPair, IFormData, IRegion } from "@/utils/types"
+import { IUIVariable, IObjKeyPair, IFormData } from "@/utils/types"
 import axios from "axios"
 
 type IHCLVariable = {
@@ -209,24 +209,17 @@ const checkModuleVariablesZero = async (moduleName: string) => {
         "base64",
       ).toString()
       const parseData = parseVarsFile(decodeToString)
-      const zeroGroupData = parseData.filter((v) => v.group === 0)
+      const newParsed = parseData.map((d) => {
+        if (d.name === "zone") return { ...d, group: 0 }
+        return d
+      })
+      // console.log({ parseData })
+      // const zeroGroupData = parseData.filter((v) => v.group === 0)
+      const zeroGroupData = newParsed.filter((v) => v.group === 0)
       return zeroGroupData
     })
     .catch((error) => {
       console.error(error)
     })
   return returnModuleVariableData
-}
-
-export const getRegionZoneList = () => {
-  const regionZoneData = axios
-    .get(`/api/regions`)
-    .then((res) => {
-      return res.data.regions as IRegion[]
-    })
-    .catch((error) => {
-      console.error(error)
-      return []
-    })
-  return regionZoneData
 }

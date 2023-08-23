@@ -1,44 +1,56 @@
-import { Field, ErrorMessage } from "formik"
+import { Field, ErrorMessage, useField } from "formik"
 import { IUIVariable } from "@/utils/types"
+import { useEffect, useState } from "react"
+import { cloudLocationStore } from "@/store"
 
 interface IZoneStringFieldProps {
   variable: IUIVariable
-  validateRequired: Function
-  zoneListByRegion: string[]
+  validate: Function
+  userZones?: string[]
 }
+
+const DEFAULT_ZONE = "us-central1-a"
 
 const ZoneStringField: React.FC<IZoneStringFieldProps> = ({
   variable,
-  validateRequired,
-  zoneListByRegion,
+  validate,
+  userZones,
 }) => {
+  const [zones, setZones] = useState<string[]>([])
+  const [_, fieldMeta] = useField(variable.name)
+  const cloudLocation = cloudLocationStore((state) => state.cloudLocation)
+
+  useEffect(() => {
+    if (userZones?.length) {
+      setZones(userZones)
+      return
+    }
+    const defaultZone = (fieldMeta.value ??
+      variable.default ??
+      DEFAULT_ZONE) as string
+    const defaultRegion = defaultZone.replace(/-[a-z]$/, "")
+
+    cloudLocation.zonesByRegion(defaultRegion).then(setZones)
+  }, [])
+
   return (
     <div className="form-control" key={variable.name}>
       <label htmlFor={variable.name}>{variable.display}</label>
-      {variable.options ? (
-        <Field
-          as="select"
-          id={variable.name}
-          name={variable.name}
-          className="input"
-          validate={validateRequired}
-        >
-          {zoneListByRegion.map((option) => {
-            return (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            )
-          })}
-        </Field>
-      ) : (
-        <Field
-          id={variable.name}
-          name={variable.name}
-          className="input"
-          validate={validateRequired}
-        />
-      )}
+      <Field
+        as="select"
+        id={variable.name}
+        name={variable.name}
+        className="input"
+        validate={validate}
+      >
+        {zones.map((zone) => {
+          return (
+            <option key={zone} value={zone}>
+              {zone}
+            </option>
+          )
+        })}
+      </Field>
       <div className="text-error text-xs mt-1">
         <ErrorMessage name={variable.name} />
       </div>

@@ -121,6 +121,7 @@ export interface IModuleCard {
 }
 
 const Variables = z.object({}).passthrough()
+export type IVariables = z.infer<typeof Variables>
 
 export const FirestoreTimestamp = z.object({
   _nanoseconds: z.number(),
@@ -204,6 +205,8 @@ export const Settings = z
     variables: Variables,
   })
   .nullable()
+
+export type ISettings = z.infer<typeof Settings>
 
 export const Region = z.object({
   id: z.string(),
