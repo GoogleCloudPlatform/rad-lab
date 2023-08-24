@@ -1,4 +1,4 @@
-import { Field, ErrorMessage, useField } from "formik"
+import { Field, ErrorMessage } from "formik"
 import { IUIVariable } from "@/utils/types"
 import { useEffect, useState } from "react"
 import { cloudLocationStore } from "@/store"
@@ -6,32 +6,24 @@ import { cloudLocationStore } from "@/store"
 interface IZoneStringFieldProps {
   variable: IUIVariable
   validate: Function
-  userZones?: string[]
+  region?: string
 }
-
-const DEFAULT_ZONE = "us-central1-a"
 
 const ZoneStringField: React.FC<IZoneStringFieldProps> = ({
   variable,
   validate,
-  userZones,
+  region,
 }) => {
   const [zones, setZones] = useState<string[]>([])
-  const [_, fieldMeta] = useField(variable.name)
   const cloudLocation = cloudLocationStore((state) => state.cloudLocation)
 
   useEffect(() => {
-    if (userZones?.length) {
-      setZones(userZones)
-      return
-    }
-    const defaultZone = (fieldMeta.value ??
-      variable.default ??
-      DEFAULT_ZONE) as string
-    const defaultRegion = defaultZone.replace(/-[a-z]$/, "")
-
-    cloudLocation.zonesByRegion(defaultRegion).then(setZones)
-  }, [])
+    ;(region ? cloudLocation.zonesByRegion(region) : cloudLocation.zones).then(
+      (z) => {
+        setZones(["", ...z])
+      },
+    )
+  }, [region])
 
   return (
     <div className="form-control" key={variable.name}>

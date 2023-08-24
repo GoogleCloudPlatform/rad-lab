@@ -210,7 +210,9 @@ const checkModuleVariablesZero = async (moduleName: string) => {
       ).toString()
       const parseData = parseVarsFile(decodeToString)
       const newParsed = parseData.map((d) => {
-        if (d.name === "zone") return { ...d, group: 0 }
+        if (d.name.startsWith("zone") || d.name.startsWith("region")) {
+          return { ...d, group: 0 }
+        }
         return d
       })
       // console.log({ parseData })

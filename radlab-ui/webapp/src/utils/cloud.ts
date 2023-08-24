@@ -22,7 +22,14 @@ export class CloudLocation {
   }
 
   get regions() {
-    return this._regions ? Promise.resolve(this._regions) : getRegionZoneList()
+    if (this._regions) {
+      return Promise.resolve(this._regions)
+    }
+
+    return getRegionZoneList().then((regions) => {
+      this._regions = regions
+      return regions
+    })
   }
 
   get regionNames() {
