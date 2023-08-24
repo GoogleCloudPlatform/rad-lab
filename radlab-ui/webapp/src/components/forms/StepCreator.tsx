@@ -83,7 +83,6 @@ const StepCreator: React.FC<StepCreator> = ({ variableList, idx }) => {
       let region = undefined
       if (prevVariable?.name.startsWith("region")) {
         const [_, fieldMeta] = useField(prevVariable.name)
-        console.log({ fieldMeta })
         region = fieldMeta.value ?? prevVariable.default
       }
 

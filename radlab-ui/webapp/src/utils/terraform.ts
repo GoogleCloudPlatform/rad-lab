@@ -209,15 +209,7 @@ const checkModuleVariablesZero = async (moduleName: string) => {
         "base64",
       ).toString()
       const parseData = parseVarsFile(decodeToString)
-      const newParsed = parseData.map((d) => {
-        if (d.name.startsWith("zone") || d.name.startsWith("region")) {
-          return { ...d, group: 0 }
-        }
-        return d
-      })
-      // console.log({ parseData })
-      // const zeroGroupData = parseData.filter((v) => v.group === 0)
-      const zeroGroupData = newParsed.filter((v) => v.group === 0)
+      const zeroGroupData = parseData.filter((v) => v.group === 0)
       return zeroGroupData
     })
     .catch((error) => {

@@ -146,7 +146,6 @@ const PublishCreateForm: React.FC<IPublishCreateFormProps> = ({
     const initialFormVariable = setDefaultSettingVariables()
     setInitialData(initialFormVariable)
     setFormData([currentVarsData.variables])
-    console.log({ initialFormVariable, formData: [currentVarsData.variables] })
   }, [currentVarsData.variables])
 
   return (
