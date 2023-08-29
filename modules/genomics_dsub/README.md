@@ -112,7 +112,7 @@ _Usage:_
 | *subnet* | Subnet associated with the Network | <code title="">string</code> |  | <code title="">subnet-ngs-network</code> |
 | *trusted_groups* | The list of trusted groups (e.g. `myteam@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *trusted_users* | The list of trusted users (e.g. `username@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
-| *zone* | Cloud Zone associated to the project | <code title="">string</code> |  | <code title="">europe-west2-c</code> |
+| *zone* | Cloud Zone associated to the project. List - https://cloud.google.com/compute/docs/regions-zones#available | <code title="">string</code> |  | <code title="">europe-west2-c</code> |
 
 ## Outputs
 

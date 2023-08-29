@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { ArrowLeftIcon } from "@heroicons/react/outline"
-import { DATA_DEFAULT_VARS } from "@/utils/data"
+import { DEFAULT_ADMIN_VARS } from "@/utils/data"
 import RouteContainer from "@/components/RouteContainer"
 import DefaultCreateForm from "@/components/forms/DefaultCreateForm"
 import { parseVarsFile } from "@/utils/terraform"
@@ -10,15 +10,17 @@ import { useEffect, useState } from "react"
 import Loading from "@/navigation/Loading"
 import SectionHeader from "@/components/SectionHeader"
 import LoadingRow from "@/components/LoadingRow"
+import { ISettings, IVariables } from "@/utils/types"
 
-interface provisionDefaultInterface {}
+interface IProvisionDefaultProps {}
 
-const ProvisionDefault: React.FC<provisionDefaultInterface> = ({}) => {
+const ProvisionDefault: React.FC<IProvisionDefaultProps> = ({}) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [isLoading, setLoading] = useState(true)
-  const [defaultSettingVarsData, setDefaultSettingVarsData] = useState({})
-  const formVariableData = DATA_DEFAULT_VARS
+  const [defaultSettingVarsData, setDefaultSettingVarsData] =
+    useState<IVariables>({})
+  const formVariableData = DEFAULT_ADMIN_VARS
   const [submitLoading, setSubmitLoading] = useState(false)
 
   const handleBackClick = () => {
@@ -26,25 +28,31 @@ const ProvisionDefault: React.FC<provisionDefaultInterface> = ({}) => {
   }
 
   // To check Admin settings updated if not thern redirect to default setting
-  const fetchAdminSettingData = async () => {
+  const fetchAdminSettings = async () => {
     setLoading(true)
-    await axios
-      .get(`/api/settings`)
-      .then((res) => {
-        if (res.data.settings) {
-          setDefaultSettingVarsData(res.data.settings.variables)
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+    // fetch regions data
+    try {
+      await axios
+        .get(`/api/settings`)
+        .then((res) => {
+          const settings = res.data.settings as ISettings | null
+          if (settings) {
+            setDefaultSettingVarsData(settings.variables)
+          }
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   useEffect(() => {
-    fetchAdminSettingData()
+    fetchAdminSettings()
   }, [])
 
   if (isLoading)
@@ -71,6 +79,8 @@ const ProvisionDefault: React.FC<provisionDefaultInterface> = ({}) => {
         {submitLoading && <LoadingRow title={t("global-settings")} />}
         <div className="justify-center w-full mb-8">
           <div className="flex w-full sm:w-2/5 mx-auto">
+            {console.log("formVariables", parseVarsFile(formVariableData))}
+            {console.log("defaultSettingVariables", defaultSettingVarsData)}
             <DefaultCreateForm
               formVariables={parseVarsFile(formVariableData)}
               defaultSettingVariables={defaultSettingVarsData}

@@ -167,7 +167,7 @@ variable "project_id_prefix" {
 }
 
 variable "region" {
-  description = "Primary region where Compute Instance and VPC subnet will be created. {{UIMeta group=2 order=5 }}"
+  description = "Primary region where Compute Instance and VPC subnet will be created. List of zones - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=19 }}"
   type        = string
   default     = "us-central1"
 }

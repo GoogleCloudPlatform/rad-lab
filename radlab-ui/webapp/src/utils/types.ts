@@ -1,7 +1,7 @@
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier"
 import { NextApiRequest, NextApiResponse } from "next"
 import React from "react"
-import zod from "zod"
+import { z } from "zod"
 
 export type IAuthProvider = "google" | "password"
 
@@ -53,8 +53,8 @@ export enum DEPLOYMENT_STATUS {
   EXPIRE = "EXPIRE",
 }
 
-export const DEPLOYMENT_STATUS_ENUM = zod.nativeEnum(DEPLOYMENT_STATUS)
-export type DEPLOYMENT_STATUS_ENUM = zod.infer<typeof DEPLOYMENT_STATUS_ENUM>
+export const DEPLOYMENT_STATUS_ENUM = z.nativeEnum(DEPLOYMENT_STATUS)
+export type DEPLOYMENT_STATUS_ENUM = z.infer<typeof DEPLOYMENT_STATUS_ENUM>
 
 export interface IHeader {
   label: string
@@ -120,71 +120,72 @@ export interface IModuleCard {
   body: JSX.Element
 }
 
-const Variables = zod.object({}).passthrough()
+const Variables = z.object({}).passthrough()
+export type IVariables = z.infer<typeof Variables>
 
-export const FirestoreTimestamp = zod.object({
-  _nanoseconds: zod.number(),
-  _seconds: zod.number(),
+export const FirestoreTimestamp = z.object({
+  _nanoseconds: z.number(),
+  _seconds: z.number(),
 })
 
-export type FirestoreTimestamp = zod.infer<typeof FirestoreTimestamp>
+export type FirestoreTimestamp = z.infer<typeof FirestoreTimestamp>
 
-export const isAdminResponseParser = zod.object({
-  isAdmin: zod.boolean(),
+export const isAdminResponseParser = z.object({
+  isAdmin: z.boolean(),
 })
 
-export const EmailSchema = zod.object({
-  email: zod.string(),
+export const EmailSchema = z.object({
+  email: z.string(),
 })
 
-export const Build = zod.object({
-  action: zod.string(),
+export const Build = z.object({
+  action: z.string(),
   createdAt: FirestoreTimestamp,
-  buildId: zod.string(),
-  user: zod.string(),
-  status: zod.string(),
+  buildId: z.string(),
+  user: z.string(),
+  status: z.string(),
 })
 
-export const Builds = zod.array(Build)
-export type IBuild = zod.infer<typeof Build>
+export const Builds = z.array(Build)
+export type IBuild = z.infer<typeof Build>
 
-export const Deployment = zod.object({
-  buildId: zod.string().optional(),
+export const Deployment = z.object({
+  buildId: z.string().optional(),
   createdAt: FirestoreTimestamp,
   deletedAt: FirestoreTimestamp.optional(),
-  deployedByEmail: zod.string(),
-  deploymentId: zod.string(),
-  id: zod.string(),
-  module: zod.string(),
-  projectId: zod.string(),
+  deployedByEmail: z.string(),
+  deploymentId: z.string(),
+  id: z.string(),
+  module: z.string(),
+  projectId: z.string(),
   status: DEPLOYMENT_STATUS_ENUM,
   updatedAt: FirestoreTimestamp.optional(),
   variables: Variables,
   builds: Builds.optional(),
 })
 
-export const Deployments = zod.array(Deployment)
+export const Deployments = z.array(Deployment)
 
-export type IDeployment = zod.infer<typeof Deployment>
+export type IDeployment = z.infer<typeof Deployment>
 
-export const TFStatus = zod.object({
+export const TFStatus = z.object({
   buildStatus: DEPLOYMENT_STATUS_ENUM,
-  tfApplyState: zod.string().optional(),
+  tfApplyState: z.string().optional(),
 })
 
-export const Module = zod.object({
-  name: zod.string(),
-  projectId: zod.string(),
-  id: zod.string(),
-  publishedByEmail: zod.string().optional(),
+export const Module = z.object({
+  name: z.string(),
+  projectId: z.string(),
+  id: z.string(),
+  publishedByEmail: z.string().optional(),
   variables: Variables,
   createdAt: FirestoreTimestamp,
   updatedAt: FirestoreTimestamp.optional(),
 })
 
-export const Modules = zod.array(Module)
+export const Modules = z.array(Module)
 
-export type IModule = zod.infer<typeof Module>
+export type IModule = z.infer<typeof Module>
 
 export type IPubSubMsg = {
   projectId: string
@@ -195,15 +196,42 @@ export type IPubSubMsg = {
   user: string
 }
 
-export const Settings = zod
+export const Settings = z
   .object({
     createdAt: FirestoreTimestamp,
-    createdBy: zod.string(),
-    id: zod.string(),
-    projectId: zod.string(),
+    createdBy: z.string(),
+    id: z.string(),
+    projectId: z.string(),
     variables: Variables,
   })
   .nullable()
+
+export type ISettings = z.infer<typeof Settings>
+
+export const Region = z.object({
+  id: z.string(),
+  name: z.string(),
+  zones: z.array(z.string()),
+})
+
+export type IRegion = z.infer<typeof Region>
+
+export type IGoogleCloudRegion = {
+  kind: string
+  id: string
+  creationTimestamp: string
+  name: string
+  description: string
+  status: string
+  zones: string[]
+  quotas: {
+    metric: string
+    limit: number
+    usage: number
+  }[]
+  selfLink: string
+  supportsPzs: boolean
+}
 
 export type IFormData = {
   [key: string]: any
@@ -222,25 +250,25 @@ export type IModuleFormData = {
   variables: { [key: string]: any }
 }
 
-export const URL = zod.object({
-  url: zod.string(),
+export const URL = z.object({
+  url: z.string(),
 })
 
-export const URLData = zod.object({
-  data: zod.string(),
+export const URLData = z.object({
+  data: z.string(),
 })
 
-export const TF_OUTPUT_VARIABLE = zod.object({
-  sensitive: zod.boolean(),
-  type: zod.unknown(),
-  value: zod.unknown(),
+export const TF_OUTPUT_VARIABLE = z.object({
+  sensitive: z.boolean(),
+  type: z.unknown(),
+  value: z.unknown(),
 })
 
-export type TF_OUTPUT_VARIABLE = zod.infer<typeof TF_OUTPUT_VARIABLE>
+export type TF_OUTPUT_VARIABLE = z.infer<typeof TF_OUTPUT_VARIABLE>
 
-export const TF_OUTPUT = zod.record(zod.string(), TF_OUTPUT_VARIABLE)
+export const TF_OUTPUT = z.record(z.string(), TF_OUTPUT_VARIABLE)
 
-export type TF_OUTPUT = zod.infer<typeof TF_OUTPUT>
+export type TF_OUTPUT = z.infer<typeof TF_OUTPUT>
 
 export interface Dictionary<T> {
   [index: string]: T

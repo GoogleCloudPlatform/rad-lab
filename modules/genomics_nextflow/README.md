@@ -84,7 +84,7 @@ NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prere
 | *owner_groups* | List of groups that should be added as the owner of the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *owner_users* | List of users that should be added as owner to the created project | <code title="list&#40;string&#41;">list(string)</code> |  | <code title="">[]</code> |
 | *project_id_prefix* | If `create_project` is true, this will be the prefix of the Project ID & name created. If `create_project` is false this will be the actual Project ID, of the existing project where you want to deploy the module | <code title="">string</code> |  | <code title="">radlab-genomics-nextflow</code> |
-| *region* | The default region where the Compute Instance and VPCs will be deployed | <code title="">string</code> |  | <code title="">us-central1</code> |
+| *region* | The default region where the Compute Instance and VPCs will be deployed. List - https://cloud.google.com/compute/docs/regions-zones#available | <code title="">string</code> |  | <code title="">us-central1</code> |
 | *resource_creator_identity* | Terraform Service Account which will be creating the GCP resources. If not set, it will use user credentials spinning up the module | <code title="">string</code> |  | <code title=""></code> |
 | *set_domain_restricted_sharing_policy* | Enable org policy to allow all principals to be added to IAM policies | <code title="">bool</code> |  | <code title="">false</code> |
 | *set_shielded_vm_policy* | If true shielded VM Policy will be set to disabled | <code title="">bool</code> |  | <code title="">false</code> |
@@ -92,7 +92,7 @@ NOTE: Additional [permissions](./radlab-launcher/README.md#iam-permissions-prere
 | *subnet_name* | This name will be used for subnet created | <code title="">string</code> |  | <code title="">nextflow-vpc</code> |
 | *trusted_groups* | The list of trusted groups (e.g. `myteam@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
 | *trusted_users* | The list of trusted users (e.g. `username@abc.com`) | <code title="set&#40;string&#41;">set(string)</code> |  | <code title="">[]</code> |
-| *zone* | The default zone where the Compute Instance be deployed | <code title="">string</code> |  | <code title="">us-central1-a</code> |
+| *zone* | The default zone where the Compute Instance be deployed. List - https://cloud.google.com/compute/docs/regions-zones#available | <code title="">string</code> |  | <code title="">us-central1-a</code> |
 
 ## Outputs
 

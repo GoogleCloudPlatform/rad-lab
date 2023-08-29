@@ -123,17 +123,23 @@ const PublishCreateForm: React.FC<IPublishCreateFormProps> = ({
 
   // To set matching deafult setting variables as default
   const setDefaultSettingVariables = () => {
+    console.log("setDefaultSettingVariables")
     const initialFormVarData = initialFormikData(currentVarsData.variables)
     const indexPublishedModuleVars = payloadVariables.findIndex(
       (item) => item.name === currentVarsData.moduleName,
     )
     const updateFormData = payloadVariables[indexPublishedModuleVars]!.variables
-    const initialUpdateFormData = Object.assign(
-      {},
+    // const initialUpdateFormData = Object.assign(
+    //   {},
+    //   initialFormVarData,
+    //   updateFormData,
+    // )
+    // return mergeAll([defaultSettingVariables, initialUpdateFormData])
+    return mergeAll([
+      defaultSettingVariables,
       initialFormVarData,
       updateFormData,
-    )
-    return mergeAll([initialUpdateFormData, defaultSettingVariables])
+    ])
   }
 
   useEffect(() => {

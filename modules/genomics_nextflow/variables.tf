@@ -124,7 +124,7 @@ variable "folder_id" {
 }
 
 variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for nextflow subnet. {{UIMeta group=2 order=6 }}"
+  description = "Unique IP CIDR Range for nextflow subnet. {{UIMeta group=2 order=4 }}"
   type        = string
   default     = "10.142.190.0/24"
 }
@@ -190,7 +190,7 @@ variable "project_id_prefix" {
 }
 
 variable "region" {
-  description = "The default region where the Compute Instance and VPCs will be deployed. {{UIMeta group=2 order=4 }}"
+  description = "The default region where the Compute Instance and VPCs will be deployed. List - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=19 }}"
   type        = string
   default     = "us-central1"
 }
@@ -238,7 +238,7 @@ variable "trusted_users" {
 }
 
 variable "zone" {
-  description = "The default zone where the Compute Instance be deployed. {{UIMeta group=2 order=5 }}"
+  description = "The default zone where the Compute Instance be deployed. List - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=20 }}"
   type        = string
   default     = "us-central1-a"
 }

@@ -3,7 +3,13 @@ import { useTranslation } from "next-i18next"
 import { useNavigate } from "react-router-dom"
 import { FormikStepper } from "@/components/forms/FormikStepper"
 import DefaultStepCreator from "@/components/forms/DefaultStepCreator"
-import { IUIVariable, ALERT_TYPE, IFormData, Dictionary } from "@/utils/types"
+import {
+  IUIVariable,
+  ALERT_TYPE,
+  IFormData,
+  Dictionary,
+  IVariables,
+} from "@/utils/types"
 import { groupVariables, initialFormikData } from "@/utils/terraform"
 import axios from "axios"
 import { alertStore, userStore } from "@/store"
@@ -11,7 +17,7 @@ import { mergeAll } from "ramda"
 
 interface IDefaultCreateFormProps {
   formVariables: IUIVariable[]
-  defaultSettingVariables: Record<string, any>
+  defaultSettingVariables: IVariables
   handleLoading: Function
 }
 
