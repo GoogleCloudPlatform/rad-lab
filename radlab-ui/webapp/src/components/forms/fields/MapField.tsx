@@ -62,6 +62,13 @@ const MapField: React.FC<MapField> = ({ variable, validate }) => {
         {(FieldArrayProps) => {
           const { form } = FieldArrayProps
           const { values } = form
+          if (
+            values[variable.name] === undefined ||
+            values[variable.name] === null ||
+            values[variable.name] === ""
+          ) {
+            values[variable.name] = {}
+          }
           return (
             <div>
               {Object.keys(values[variable.name]).map(
