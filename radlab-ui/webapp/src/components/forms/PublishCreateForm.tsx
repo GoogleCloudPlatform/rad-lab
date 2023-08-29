@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react"
-import { useTranslation } from "next-i18next"
-import { useNavigate } from "react-router-dom"
 import StepCreator from "@/components/forms/StepCreator"
+import { alertStore } from "@/store"
+import { classNames } from "@/utils/dom"
+import { initialFormikData } from "@/utils/terraform"
 import {
-  IUIVariable,
   ALERT_TYPE,
   IFormData,
-  IPayloadPublishData,
   IModuleFormData,
+  IPayloadPublishData,
+  IUIVariable,
 } from "@/utils/types"
-import startCase from "lodash/startCase"
-import { classNames } from "@/utils/dom"
-import { Formik, Form } from "formik"
+import { mergeAllSafe } from "@/utils/variables"
 import axios from "axios"
-import { alertStore } from "@/store"
-import { initialFormikData } from "@/utils/terraform"
-import { mergeAll } from "ramda"
+import { Form, Formik } from "formik"
+import startCase from "lodash/startCase"
+import { useTranslation } from "next-i18next"
+import React, { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 interface IPublishCreateFormProps {
   formVariables: IModuleFormData[]
@@ -123,19 +123,14 @@ const PublishCreateForm: React.FC<IPublishCreateFormProps> = ({
 
   // To set matching deafult setting variables as default
   const setDefaultSettingVariables = () => {
-    console.log("setDefaultSettingVariables")
     const initialFormVarData = initialFormikData(currentVarsData.variables)
     const indexPublishedModuleVars = payloadVariables.findIndex(
       (item) => item.name === currentVarsData.moduleName,
     )
     const updateFormData = payloadVariables[indexPublishedModuleVars]!.variables
-    // const initialUpdateFormData = Object.assign(
-    //   {},
-    //   initialFormVarData,
-    //   updateFormData,
-    // )
-    // return mergeAll([defaultSettingVariables, initialUpdateFormData])
-    return mergeAll([
+
+    // Remove emptry strings as values so merging works
+    return mergeAllSafe([
       defaultSettingVariables,
       initialFormVarData,
       updateFormData,

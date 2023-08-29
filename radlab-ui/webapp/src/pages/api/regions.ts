@@ -38,7 +38,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
   try {
     if (_req.method === "GET") return await getRegions(_req, res)
   } catch (error: any) {
-    console.log(error)
+    console.error(error)
     return res.status(500).json({
       result: error,
     })
