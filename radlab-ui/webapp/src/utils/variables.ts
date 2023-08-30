@@ -1,6 +1,5 @@
 import { IVariables, Settings } from "@/utils/types"
 import axios from "axios"
-import { mergeAll } from "ramda"
 
 /**
  * Fetch the admin settings for a given GCP project
@@ -18,23 +17,46 @@ export const fetchAdminSettings = async (gcpProjectId: string) => {
 }
 
 /**
- * Merge all objects in the array, removing any keys with empty string values
+ * Merge all objects, empty strings and arrays won't overwrite earlier full ones
  * @param {IVariables[]} args
  * @returns {IVariables}
  */
-export const mergeAllSafe = (args: IVariables[]) =>
-  mergeAll(args.map(removeEmptyStrings))
+export const mergeAllSafe = (args: IVariables[]) => {
+  const output = Object({})
 
-/**
- * Remove any keys with empty string values from the object
- * @param {IVariables} obj
- * @returns {IVariables}
- */
-export const removeEmptyStrings = (obj: IVariables) => {
-  return Object.keys(obj).reduce((o, key) => {
-    if (o[key] === "") {
-      delete o[key]
-    }
-    return o
-  }, obj)
+  args.filter(Boolean).forEach((source) => {
+    Object.keys(source).forEach((key) => {
+      const curVal = output[key]
+      const nextVal = source[key]
+
+      if (typeof nextVal === "string") {
+        if (!nextVal.length && curVal?.length) {
+          // Empty string does not replace existing val
+          return
+        }
+      }
+
+      // Check if nextVal is Array
+      if (Array.isArray(nextVal) && Array.isArray(curVal)) {
+        // Don't replace a full array with an empty one
+        if (!nextVal.length) return
+      }
+
+      if (
+        typeof nextVal === "object" &&
+        !Array.isArray(nextVal) &&
+        typeof curVal === "object" &&
+        !Array.isArray(curVal)
+      ) {
+        // Deeply merge objects
+        output[key] = mergeAllSafe([curVal, nextVal])
+        return
+      }
+
+      // Assign value
+      output[key] = nextVal
+    })
+  })
+
+  return output
 }
