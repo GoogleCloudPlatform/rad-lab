@@ -118,13 +118,12 @@ export const mergeVariables = async (body: IDeployment) => {
     "projectId",
     GCP_PROJECT_ID,
   )
-  let moduleVars = {}
-  modules.forEach((module: IModule) => {
-    if (module.name === body.module) {
-      moduleVars = module.variables
-    }
-  })
-  const userVars = { ...body.variables }
+  const module = modules.find((module: IModule) => module.name === body.module)
+  if (!module) {
+    throw new Error("Module not found")
+  }
+  const moduleVars = module.variables
+  const userVars = body.variables
   const billingId = adminVars?.billing_account_id
   const variables = mergeAllSafe([adminVars, moduleVars, userVars])
   delete variables.email
