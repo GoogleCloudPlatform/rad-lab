@@ -198,22 +198,13 @@ const deleteDeployment = async (
     }
 
     delete pubSubData.variables.resource_creator_identity
-    try {
-      await pushPubSubMsg(pubSubData)
-      const now = Timestamp.now()
-      deployment.deletedAt = {
-        _seconds: now.seconds,
-        _nanoseconds: now.nanoseconds,
-      }
-      await updateByField(
-        "deployments",
-        "deploymentId",
-        deploymentId,
-        deployment,
-      )
-    } catch (error) {
-      return res.status(500).json({ message: "Internal Server Error" })
+    await pushPubSubMsg(pubSubData)
+    const now = Timestamp.now()
+    deployment.deletedAt = {
+      _seconds: now.seconds,
+      _nanoseconds: now.nanoseconds,
     }
+    await updateByField("deployments", "deploymentId", deploymentId, deployment)
   })
 
   return res.status(200).json({
@@ -232,6 +223,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
     if (req.method === "POST") return createDeployment(req, res)
     if (req.method === "DELETE") return deleteDeployment(req, res)
   } catch (error) {
+    console.error(error)
     return res.status(500).json({ message: "Internal Server Error" })
   }
 }

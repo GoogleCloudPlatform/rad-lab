@@ -88,13 +88,7 @@ const deleteDeployment = async (
   }
   delete pubSubData.variables.resource_creator_identity
 
-  try {
-    await pushPubSubMsg(pubSubData)
-  } catch (error) {
-    console.error(error)
-    res.status(500)
-    return
-  }
+  await pushPubSubMsg(pubSubData)
 
   deployment = {
     ...deployment,
@@ -174,7 +168,8 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
     if (req.method === "PUT") return updateDeployment(req, res, id)
     if (req.method === "DELETE") return deleteDeployment(req, res, id)
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" })
+    console.error(error)
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 

@@ -12,19 +12,16 @@ const getModulesFromGitHub = async (
   _req: AuthedNextApiHandler,
   res: NextApiResponse,
 ) => {
-  try {
-    const secret = await getSecretKeyValue(GIT_TOKEN_SECRET_KEY_NAME)
-    const modules = await getGitHubModules(secret)
-    return res.status(200).json(modules)
-  } catch (error) {
-    return res.status(500).send(error)
-  }
+  const secret = await getSecretKeyValue(GIT_TOKEN_SECRET_KEY_NAME)
+  const modules = await getGitHubModules(secret)
+  return res.status(200).json(modules)
 }
 
 const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   try {
     if (req.method === "GET") return getModulesFromGitHub(req, res)
   } catch (error) {
+    console.error(error)
     return res.status(500).json({ message: "Internal Server Error" })
   }
 }

@@ -27,25 +27,20 @@ const getOutputs = async (
     return res.status(400).json({ message: "Not found" })
   }
 
-  try {
-    const fileName = `deployments/${deployment.module}_${deployment.deploymentId}/output/output.json`
-    const [file] = await storage
-      .bucket(MODULE_DEPLOYMENT_BUCKET_NAME)
-      .file(fileName)
-      .download()
+  const fileName = `deployments/${deployment.module}_${deployment.deploymentId}/output/output.json`
+  const [file] = await storage
+    .bucket(MODULE_DEPLOYMENT_BUCKET_NAME)
+    .file(fileName)
+    .download()
 
-    const allOutputs: TF_OUTPUT = JSON.parse(file.toString("utf-8"))
+  const allOutputs: TF_OUTPUT = JSON.parse(file.toString("utf-8"))
 
-    // Remove entries where sensitive == true
-    const outputs = Object.fromEntries(
-      Object.entries(allOutputs).filter(([_, output]) => !output.sensitive),
-    )
+  // Remove entries where sensitive == true
+  const outputs = Object.fromEntries(
+    Object.entries(allOutputs).filter(([_, output]) => !output.sensitive),
+  )
 
-    res.status(200).json({ outputs })
-    return
-  } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" })
-  }
+  return res.status(200).json({ outputs })
 }
 
 const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
@@ -55,6 +50,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   try {
     if (req.method === "GET") return getOutputs(req, res, id)
   } catch (error) {
+    console.error(error)
     return res.status(500).json({ message: "Internal Server Error" })
   }
 }

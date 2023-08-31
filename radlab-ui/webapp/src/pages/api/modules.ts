@@ -73,6 +73,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
     if (req.method === "POST") return createModule(req, res)
     if (req.method === "GET") return getModules(req, res)
   } catch (error) {
+    console.error(error)
     return res.status(500).json({ message: "Internal Server Error" })
   }
 }

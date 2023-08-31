@@ -34,14 +34,12 @@ const getRegions = async (_req: NextApiRequest, res: NextApiResponse) => {
   return res.status(200).json({ regions })
 }
 
-const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    if (_req.method === "GET") return await getRegions(_req, res)
+    if (req.method === "GET") return await getRegions(req, res)
   } catch (error: any) {
     console.error(error)
-    return res.status(500).json({
-      result: error,
-    })
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 

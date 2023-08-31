@@ -45,6 +45,7 @@ const getDeploymentVariables = async (
 
     return res.status(200).json(response.data)
   } catch (error: any) {
+    console.error(error)
     return res.status(error?.response?.status || 500).json({
       message: error?.response?.statusText || "Internal server error",
     })
@@ -58,6 +59,7 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   try {
     if (req.method === "GET") return getDeploymentVariables(req, res, id)
   } catch (error) {
+    console.error(error)
     return res.status(500).json({ message: "Internal Server Error" })
   }
 }

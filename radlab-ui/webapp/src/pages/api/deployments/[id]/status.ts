@@ -66,9 +66,8 @@ const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   try {
     if (req.method === "GET") return getDeploymentStatus(req, res, id)
   } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    console.error(error)
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 
