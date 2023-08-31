@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react"
-import { useTranslation } from "next-i18next"
-import { useNavigate } from "react-router-dom"
-import { FormikStepper } from "@/components/forms/FormikStepper"
 import DefaultStepCreator from "@/components/forms/DefaultStepCreator"
+import { FormikStepper } from "@/components/forms/FormikStepper"
+import { alertStore, userStore } from "@/store"
+import { groupVariables, initialFormikData } from "@/utils/terraform"
 import {
-  IUIVariable,
   ALERT_TYPE,
-  IFormData,
   Dictionary,
+  IFormData,
+  IUIVariable,
   IVariables,
 } from "@/utils/types"
-import { groupVariables, initialFormikData } from "@/utils/terraform"
+import { mergeAllSafe } from "@/utils/variables"
 import axios from "axios"
-import { alertStore, userStore } from "@/store"
-import { mergeAll } from "ramda"
+import { useTranslation } from "next-i18next"
+import React, { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 interface IDefaultCreateFormProps {
   formVariables: IUIVariable[]
@@ -72,7 +72,7 @@ const DefaultCreateForm: React.FC<IDefaultCreateFormProps> = ({
   // To set matching deafult setting variables as default
   const setDefaultSettingVariables = () => {
     const initialFormData = initialFormikData(formVariables)
-    return mergeAll([initialFormData, defaultSettingVariables])
+    return mergeAllSafe([initialFormData, defaultSettingVariables])
   }
 
   useEffect(() => {

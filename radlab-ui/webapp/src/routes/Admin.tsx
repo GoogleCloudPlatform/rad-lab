@@ -79,8 +79,6 @@ const ProvisionDefault: React.FC<IProvisionDefaultProps> = ({}) => {
         {submitLoading && <LoadingRow title={t("global-settings")} />}
         <div className="justify-center w-full mb-8">
           <div className="flex w-full sm:w-2/5 mx-auto">
-            {console.log("formVariables", parseVarsFile(formVariableData))}
-            {console.log("defaultSettingVariables", defaultSettingVarsData)}
             <DefaultCreateForm
               formVariables={parseVarsFile(formVariableData)}
               defaultSettingVariables={defaultSettingVarsData}

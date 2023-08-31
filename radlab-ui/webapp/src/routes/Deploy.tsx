@@ -66,17 +66,19 @@ const Deploy: React.FC<DeployProps> = () => {
   }, [])
 
   const renderAvailableModules = () => {
-    return listAvailableModules?.map((module) => {
-      return (
-        <ModuleCard
-          title={module.name}
-          content={module.name}
-          key={module.name}
-          handleCardClick={handleCardClick}
-          handleInfoClick={handleInfoClick}
-        />
-      )
-    })
+    return listAvailableModules
+      ?.sort((a, b) => a.name.localeCompare(b.name))
+      .map((module) => {
+        return (
+          <ModuleCard
+            title={module.name}
+            content={module.name}
+            key={module.name}
+            handleCardClick={handleCardClick}
+            handleInfoClick={handleInfoClick}
+          />
+        )
+      })
   }
 
   if (isLoading)

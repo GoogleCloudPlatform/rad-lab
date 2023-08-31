@@ -59,27 +59,28 @@ const ProvisionPublishModule: React.FC<
   // all selected module payload format
   const modulesPayloadDataFormat = async (arrayModules: string[]) => {
     const formatModulesPayload = await Promise.all(
-      arrayModules.sort().map(async (moduleName: string) => {
-        const indexPublishedModule = getPublishedModulesData.findIndex(
-          (item) => item.name === moduleName,
-        )
+      arrayModules
+        .sort((a, b) => a.localeCompare(b))
+        .map(async (moduleName: string) => {
+          const publishedModule = getPublishedModulesData.find(
+            (item) => item.name === moduleName,
+          )
 
-        return {
-          name: moduleName,
-          publishedByEmail: user?.email,
-          variables:
-            indexPublishedModule !== -1
-              ? getPublishedModulesData[indexPublishedModule]!.variables
-              : {},
-        }
-      }),
+          return {
+            name: moduleName,
+            publishedByEmail: user?.email,
+            variables: publishedModule?.variables ?? {},
+          }
+        }),
     )
     setPayloadModuleData(formatModulesPayload)
   }
 
   const modulesVarDataFormat = async (arrayModules: string[]) => {
     // only pass to form zero group varuiables modules
-    let onlyZeroGroupModules = await modulesHasZeroData(arrayModules.sort())
+    const onlyZeroGroupModules = await modulesHasZeroData(
+      arrayModules.sort((a, b) => a.localeCompare(b)),
+    )
     setModuleData(onlyZeroGroupModules)
 
     onlyZeroGroupModules.length ? setLoading(false) : setLoading(true)
