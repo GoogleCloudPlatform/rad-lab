@@ -15,6 +15,15 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [13.2.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v13.2.1) (2023-09-05)
+
+### Changed
+- _RAD Lab Module:_ Variablizing Billing budget time rage (Calendar period) [(#168)](https://github.com/GoogleCloudPlatform/rad-lab/pull/168) [(#167)](https://github.com/GoogleCloudPlatform/rad-lab/issues/167)
+- _RAD Lab UI:_ Changed manual Region/Zone inputs to Dynamic picker in Module Publish Settings. [(#170)](https://github.com/GoogleCloudPlatform/rad-lab/pull/170)
+
+### Fixed
+- _RAD Lab UI:_ Default region/zone in Rad Lab UI not taken into account [(#170)](https://github.com/GoogleCloudPlatform/rad-lab/pull/170) [(#171)](https://github.com/GoogleCloudPlatform/rad-lab/pull/171) [(#96)](https://github.com/GoogleCloudPlatform/rad-lab/issues/96) [(#97)](https://github.com/GoogleCloudPlatform/rad-lab/issues/97) [(#130)](https://github.com/GoogleCloudPlatform/rad-lab/issues/130)
+
 ## [13.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v13.0.0) (2023-08-11)
  
 ### Added
