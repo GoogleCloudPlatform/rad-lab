@@ -173,7 +173,11 @@ def tf(dir):
   tr = Terraform(working_dir=dir)
 
   return_code_init, stdout_init, stderr_init = tr.init_cmd(capture_output=False)
-  return_code_plan, stdout_plan, stderr_plan = tr.plan_cmd(capture_output=False,var={'billing_account_id':'ABCD-EFGH-IJKL-MNOP', 'organization_id':'1234567890', 'random_id': '1234'})
+
+  if "secure_data_warehouse" in dir:
+    return_code_plan, stdout_plan, stderr_plan = tr.plan_cmd(capture_output=False,var={'billing_account_id':'ABCD-EFGH-IJKL-MNOP', 'organization_id':'1234567890', 'random_id': '1234', 'data_analyst_group': 'data_analyst_group@example.com', 'data_engineer_group': 'data_engineer_group@example.com', 'security_administrator_group': 'security_administrator_group@example.com', 'network_administrator_group': 'network_administrator_group@example.com', 'security_analyst_group': 'security_analyst_group@example.com', 'perimeter_additional_members': ['demouser@example.com','demosa@service.gserviceaccount.com'], 'secure_datawarehouse_service_acccount': 'radlab-module-creator-sa@project-id.iam.gserviceaccount.com'})
+  else:
+    return_code_plan, stdout_plan, stderr_plan = tr.plan_cmd(capture_output=False,var={'billing_account_id':'ABCD-EFGH-IJKL-MNOP', 'organization_id':'1234567890', 'random_id': '1234'})
   
   path = os.getcwd()+'/temp/'
   if(return_code_init == 1):
