@@ -1,4 +1,5 @@
 {
     "type": "service_account",
-    "project_id": "test-only"
+    "project_id": "test-only",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEogIBAAKCAQEAq\n-----END PRIVATE KEY-----\n"
 }
