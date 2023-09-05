@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-output "billing_budget_budget_id" {
-  sensitive   = true
-  description = "Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}`"
-  value       = var.create_budget ? google_billing_budget.budget[0].name : ""
-}
+# output "billing_budget_budget_id" {
+#   sensitive   = true
+#   description = "Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}`"
+#   value       = var.create_budget ? google_billing_budget.budget[0].name : ""
+# }
 
-output "deployment_id" {
-  description = "RADLab Module Deployment ID"
-  value       = local.random_id
-}
+# output "deployment_id" {
+#   description = "RADLab Module Deployment ID"
+#   value       = local.random_id
+# }
 
-output "project_id" {
-  description = "GCP Project ID"
-  value       = local.project.project_id
-}
+# output "project_id" {
+#   description = "GCP Project ID"
+#   value       = local.project.project_id
+# }
 
-output "vm" {
-  description = "GCE VM Link"
-  value       = var.create_vm ? "https://console.cloud.google.com/compute/instancesDetail/zones/${google_compute_instance.vm[0].zone}/instances/${google_compute_instance.vm[0].name}?project=${local.project.project_id}" : null
+# output "vm" {
+#   description = "GCE VM Link"
+#   value       = var.create_vm ? "https://console.cloud.google.com/compute/instancesDetail/zones/${google_compute_instance.vm[0].zone}/instances/${google_compute_instance.vm[0].name}?project=${local.project.project_id}" : null
 
-}
+# }
 
-output "vm_external_access" {
-  description = "GCE VM External IP"
-  value       = var.create_vm ? "http://${google_compute_instance.vm[0].network_interface.0.access_config.0.nat_ip}" : null
+# output "vm_external_access" {
+#   description = "GCE VM External IP"
+#   value       = var.create_vm ? "http://${google_compute_instance.vm[0].network_interface.0.access_config.0.nat_ip}" : null
 
-}
+# }

@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-output "billing_budget_budget_id" {
-  sensitive   = true
-  description = "Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}`"
-  value       = var.create_budget ? google_billing_budget.budget[0].name : ""
-}
+# output "billing_budget_budget_id" {
+#   sensitive   = true
+#   description = "Resource name of the budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}`"
+#   value       = var.create_budget ? google_billing_budget.budget[0].name : ""
+# }
 
-output "deployment_id" {
-  description = "RADLab Module Deployment ID"
-  value       = var.deployment_id
-}
+# output "deployment_id" {
+#   description = "RADLab Module Deployment ID"
+#   value       = var.deployment_id
+# }
 
-output "project_id" {
-  description = "Genomics Project ID"
-  value       = local.project.project_id
-}
+# output "project_id" {
+#   description = "Genomics Project ID"
+#   value       = local.project.project_id
+# }

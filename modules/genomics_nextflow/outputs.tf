@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-output "project_id" {
-  description = "Project ID where resources where created"
-  value       = local.project.project_id
-}
+# output "project_id" {
+#   description = "Project ID where resources where created"
+#   value       = local.project.project_id
+# }
 
-output "nextflow_server_instance_id" {
-  description = "VM instance name running the nextflow server"
-  value       = google_compute_instance.nextflow_server.name
-}
+# output "nextflow_server_instance_id" {
+#   description = "VM instance name running the nextflow server"
+#   value       = google_compute_instance.nextflow_server.name
+# }
 
-output "nextflow_server_zone" {
-  description = "Google Cloud zone in which the server was provisioned"
-  value       = var.zone
-}
+# output "nextflow_server_zone" {
+#   description = "Google Cloud zone in which the server was provisioned"
+#   value       = var.zone
+# }
 
-output "nextflow_service_account_email" {
-  description = "Email address of service account running the server and worker nodes"
-  value       = module.nextflow_service_account.email
-}
+# output "nextflow_service_account_email" {
+#   description = "Email address of service account running the server and worker nodes"
+#   value       = module.nextflow_service_account.email
+# }
 
-output "gcs_bucket_url" {
-  description = "Google Cloud Storage Bucket configured for workflow execution"
-  value       = google_storage_bucket.nextflow_workflow_bucket.url
-}
+# output "gcs_bucket_url" {
+#   description = "Google Cloud Storage Bucket configured for workflow execution"
+#   value       = google_storage_bucket.nextflow_workflow_bucket.url
+# }
 
-output "gcloud_ssh_command" {
-  description = "To connect to the Nextflow instance using Identity Aware Proxy, run the following command"
-  value       = "gcloud compute ssh ${google_compute_instance.nextflow_server.name} --zone=${var.zone} --project ${local.project.project_id}"
-}
+# output "gcloud_ssh_command" {
+#   description = "To connect to the Nextflow instance using Identity Aware Proxy, run the following command"
+#   value       = "gcloud compute ssh ${google_compute_instance.nextflow_server.name} --zone=${var.zone} --project ${local.project.project_id}"
+# }
 
