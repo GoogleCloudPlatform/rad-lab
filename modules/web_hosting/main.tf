@@ -106,10 +106,10 @@ resource "google_service_account" "sa_p_cloud_sql" {
 # Creating GCE VMs in vpc-xlb
 #########################################################################
 
-data "google_compute_image" "debian_11_bullseye" {
-  family  = "debian-11"
-  project = "debian-cloud"
-}
+# data "google_compute_image" "debian_11_bullseye" {
+#   family  = "debian-11"
+#   project = "debian-cloud"
+# }
 
 resource "google_compute_instance" "web1_vpc_xlb" {
   project                   = local.project.project_id
@@ -123,7 +123,9 @@ resource "google_compute_instance" "web1_vpc_xlb" {
   }
   boot_disk {
     initialize_params {
-      image = data.google_compute_image.debian_11_bullseye.self_link
+      # image = data.google_compute_image.debian_11_bullseye.self_link
+      image = "debian-cloud/debian-11"
+
     }
   }
 
@@ -156,7 +158,8 @@ resource "google_compute_instance" "web2_vpc_xlb" {
   }
   boot_disk {
     initialize_params {
-      image = data.google_compute_image.debian_11_bullseye.self_link
+      # image = data.google_compute_image.debian_11_bullseye.self_link
+      image = "debian-cloud/debian-11"
     }
   }
 
@@ -191,7 +194,8 @@ resource "google_compute_instance" "web3_vpc_xlb" {
 
   boot_disk {
     initialize_params {
-      image = data.google_compute_image.debian_11_bullseye.self_link
+      # image = data.google_compute_image.debian_11_bullseye.self_link
+      image = "debian-cloud/debian-11"
     }
   }
 
@@ -227,7 +231,8 @@ resource "google_compute_instance" "web4_vpc_xlb" {
 
   boot_disk {
     initialize_params {
-      image = data.google_compute_image.debian_11_bullseye.self_link
+      # image = data.google_compute_image.debian_11_bullseye.self_link
+      image = "debian-cloud/debian-11"
     }
   }
 
