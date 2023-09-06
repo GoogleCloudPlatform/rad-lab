@@ -73,9 +73,9 @@ def main(PR):
 
             # Download added/modified files
             for file in modified_files:
-                print("File: " + file)
         
                 if dir in file:
+                    print("File: " + file)
                     for raw in modified_files_raw:
 
                         if file in raw:
