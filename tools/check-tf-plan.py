@@ -77,8 +77,9 @@ def main(PR):
                 if dir in file:
                     print("File: " + file)
                     for raw in modified_files_raw:
-
+                        
                         if file in raw:
+                            print("Raw: " + raw)
                             print("Downloading file: " + raw)
                             downloadprfiles(raw, file, os.getcwd()+'/temp/'+os.path.dirname(file))
                             break
