@@ -78,8 +78,8 @@ def main(PR):
                 if dir in file:
                     print("File: " + file)
                     for raw in modified_files_raw:
-                        print("Raw: " + raw)
-                        print("Raw Decoded" + unquote(raw))
+                        # print("Raw: " + raw)
+                        # print("Raw Decoded: " + unquote(raw))
                               
                         if file in unquote(raw):
                             
