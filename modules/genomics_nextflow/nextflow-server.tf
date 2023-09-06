@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-data "google_compute_image" "debian" {
-  project = "debian-cloud"
-  family  = "debian-10"
-}
+ 
+# data "google_compute_image" "debian" {
+#   project = "debian-cloud"
+#   family  = "debian-10"
+# }
+
 //Create nextflow service account and assign required roles
 module "nextflow_service_account" {
   source       = "terraform-google-modules/service-accounts/google"
@@ -50,7 +52,9 @@ resource "google_compute_instance" "nextflow_server" {
 
   boot_disk {
     initialize_params {
-      image = data.google_compute_image.debian.self_link
+      # image = data.google_compute_image.debian.self_link
+      image = "debian-cloud/debian-10"
+
       size  = 50
     }
   }
@@ -76,5 +80,4 @@ resource "google_compute_instance" "nextflow_server" {
     time_sleep.wait_120_seconds
   ]
 }
-
 
