@@ -55,8 +55,18 @@ variable "billing_budget_credit_types_treatment" {
   default     = "INCLUDE_ALL_CREDITS"
 }
 
+variable "billing_budget_labels" {
+  description = "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. {{UIMeta group=0 order=12 updatesafe }}"
+  type        = map(string)
+  default     = {}
+  validation {
+    condition     = length(var.billing_budget_labels) <= 1
+    error_message = "Only 0 or 1 labels may be supplied for the budget filter."
+  }
+}
+
 variable "billing_budget_notification_email_addresses" {
-  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 5 channels are allowed. {{UIMeta group=0 order=12 updatesafe }}"
+  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 5 channels are allowed. {{UIMeta group=0 order=13 updatesafe }}"
   type        = set(string)
   default     = []
   validation {
@@ -66,20 +76,11 @@ variable "billing_budget_notification_email_addresses" {
 }
 
 variable "billing_budget_services" {
-  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=13 updatesafe }}"
+  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=14 updatesafe }}"
   type        = list(string)
   default     = null
 }
 
-variable "billing_budget_notification_email_addresses" {
-  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 4 channels are allowed as the first element of `trusted_users` is automatically added as one of the channel. {{UIMeta group=0 order=14 updatesafe }}"
-  type        = set(string)
-  default     = []
-  validation {
-    condition     = length(var.billing_budget_notification_email_addresses) <= 4
-    error_message = "Maximum of 4 email addresses are allowed for the budget monitoring channel."
-  }
-}
 
 variable "billing_budget_pubsub_topic" {
   description = "If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false. {{UIMeta group=0 order=15 updatesafe }}"

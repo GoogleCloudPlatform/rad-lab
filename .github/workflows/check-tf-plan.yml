@@ -17,10 +17,10 @@
 name: 'CHECK - Terraform Plan'
 
 on:
-  # pull_request:
-  #   types: [opened, reopened]
-  #   paths:
-  #     - 'modules/**/*.tf'
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - 'modules/**/*.tf'
   workflow_dispatch:
     inputs:
       PRNumber:

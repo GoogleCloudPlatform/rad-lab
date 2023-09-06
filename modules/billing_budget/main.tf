@@ -71,10 +71,10 @@ resource "google_project_service" "enabled_services" {
 # Creating GCE VMs in vpc-xlb
 #########################################################################
 
-data "google_compute_image" "debian_11_bullseye" {
-  family  = "debian-11"
-  project = "debian-cloud"
-}
+# data "google_compute_image" "debian_11_bullseye" {
+#   family  = "debian-11"
+#   project = "debian-cloud"
+# }
 
 data "google_compute_zones" "available_zones" {
   project = local.project.project_id
@@ -95,7 +95,9 @@ resource "google_compute_instance" "vm" {
   }
   boot_disk {
     initialize_params {
-      image = data.google_compute_image.debian_11_bullseye.self_link
+      # image = data.google_compute_image.debian_11_bullseye.self_link
+      image = "debian-cloud/debian-11"
+
     }
   }
 
