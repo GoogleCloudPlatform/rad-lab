@@ -83,8 +83,8 @@ def main(PR):
                               
                         if file in unquote(raw):
                             
-                            print("Downloading file: " + raw)
-                            downloadprfiles(raw, file, os.getcwd()+'/temp/'+os.path.dirname(file))
+                            print("Downloading file: " + unquote(raw))
+                            downloadprfiles(unquote(raw), file, os.getcwd()+'/temp/'+os.path.dirname(file))
                             break
 
     except requests.exceptions.RequestException as e: 
