@@ -81,7 +81,10 @@ resource "google_billing_budget" "budget" {
   }
 
   depends_on = [
-    google_project_service.enabled_services,
+    google_project_service.enabled_services_data_ingest,
+    google_project_service.enabled_services_data_govern,
+    google_project_service.enabled_services_conf_data,
+    google_project_service.enabled_services_non_conf_data,
     time_sleep.wait_120_seconds
   ]
 }
