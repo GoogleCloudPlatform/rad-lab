@@ -56,7 +56,6 @@ resource "google_billing_budget" "budget" {
     credit_types_treatment = var.billing_budget_credit_types_treatment
     services               = var.billing_budget_services
     labels                 = var.billing_budget_labels
-    calendar_period        = var.billing_budget_calendar_period
   }
 
   amount {
