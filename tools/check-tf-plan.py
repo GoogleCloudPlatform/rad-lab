@@ -67,10 +67,13 @@ def main(PR):
     # Loop through all the identified working directories
     # Download added/modified files
     try:
+      
         for dir in working_directories:
+            print("Module: " + dir)
 
             # Download added/modified files
             for file in modified_files:
+                print("File: " + file)
         
                 if dir in file:
                     for raw in modified_files_raw:
