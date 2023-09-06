@@ -21,6 +21,7 @@ import glob
 import shutil
 import requests
 from python_terraform import Terraform
+from urllib.parse import unquote
 
 def main(PR):
 
@@ -78,7 +79,9 @@ def main(PR):
                     print("File: " + file)
                     for raw in modified_files_raw:
                         print("Raw: " + raw)
-                        if file in raw:
+                        print("Raw Decoded" + unquote(raw))
+                              
+                        if file in unquote(raw):
                             
                             print("Downloading file: " + raw)
                             downloadprfiles(raw, file, os.getcwd()+'/temp/'+os.path.dirname(file))
