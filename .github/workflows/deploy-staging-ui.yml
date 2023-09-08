@@ -20,7 +20,6 @@ on:
   push:
     branches:
       - staging
-      - staging-auto-deploy
     paths:
       - 'radlab-ui/webapp/**'
   workflow_dispatch:
