@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { textColorFromDeployStatus } from "@/utils/deployments"
 import { userStore } from "@/store"
 import { classNames } from "@/utils/dom"
+import { EXAMPLE_CLOUD_BUILD_LOGS } from "@/utils/data"
 
 interface IModuleLogs {
   deploymentId: string
@@ -17,8 +18,14 @@ const ModuleLogs: React.FC<IModuleLogs> = ({ deploymentId }) => {
   const [buildSteps, setBuildSteps] = useState<IBuildStep[] | null>(null)
   const { isAdmin } = userStore((state) => state)
 
-  const fetchData = async () => {
-    return await axios
+  const fetchData = () => {
+    if (process.env.NEXT_PUBLIC_DEBUG_BUILD_LOGS) {
+      return Promise.resolve(EXAMPLE_CLOUD_BUILD_LOGS).then((logs) =>
+        logs.split("\n"),
+      )
+    }
+
+    return axios
       .get(`/api/deployments/${deploymentId}/logs`)
       .then((res) => {
         const urlPath = URL.parse(res.data)
@@ -43,15 +50,13 @@ const ModuleLogs: React.FC<IModuleLogs> = ({ deploymentId }) => {
       const { buildSteps } = statusCheck.data
       const linesData = isAdmin ? await fetchData() : []
 
-      const logStepDetails = buildSteps.map(
-        (steps: IBuildStep, index: Number) => {
-          let filterVar = `Step #${index}`
-          const logResult = linesData?.filter((line) => {
-            return line.includes(filterVar)
-          })
-          return { ...steps, logsContent: logResult }
-        },
-      )
+      const logStepDetails = buildSteps.map((step: IBuildStep, i: number) => {
+        let filterVar = `Step #${i}`
+        const logResult = linesData?.filter((line) => {
+          return line.includes(filterVar)
+        })
+        return { ...step, logsContent: logResult }
+      })
 
       setBuildSteps(logStepDetails)
       setLoading(false)
@@ -71,7 +76,7 @@ const ModuleLogs: React.FC<IModuleLogs> = ({ deploymentId }) => {
       {buildSteps?.map((step: IBuildStep, i) => (
         <div
           key={step.id}
-          tabIndex={i}
+          tabIndex={i + 1}
           className={classNames(
             "border border-base-300 bg-base-100 rounded-box w-full",
             isAdmin
@@ -79,8 +84,8 @@ const ModuleLogs: React.FC<IModuleLogs> = ({ deploymentId }) => {
               : "cursor-not-allowed pointer-events-none bg-base-300",
           )}
         >
-          <div className="collapse-title text-sm text-dim font-medium">
-            {step.id}:
+          <div className="collapse-title text-sm text-dim font-medium flex justify-between items-center">
+            <span>{step.id}</span>
             <span
               className={`text-${textColorFromDeployStatus(
                 step.status,
@@ -92,17 +97,19 @@ const ModuleLogs: React.FC<IModuleLogs> = ({ deploymentId }) => {
           <div className="collapse-content">
             <div className="max-h-80 overflow-auto">
               {isAdmin && (
-                <table className="table w-full divide-y divide-base-200 border-2 border-base-300 rounded-lg block">
-                  <tbody className="bg-base-100 divide-y-2 divide-base-300 w-full">
-                    {step.logsContent?.map((line, index) => (
-                      <tr key={line + index}>
-                        <td className="border border-base-300 px-1 py-2 text-xs font-semibold text-faint">
-                          {line}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className=" w-full border-2 border-base-300 rounded-lg block">
+                  {step.logsContent?.map((line, i) => (
+                    <div
+                      key={line + i}
+                      className={classNames(
+                        "p-2 text-xs font-semibold text-faint break-words",
+                        i % 2 === 0 ? "bg-base-100" : "bg-base-200",
+                      )}
+                    >
+                      {line}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
