@@ -81,7 +81,7 @@ const ModuleLogs: React.FC<IModuleLogs> = ({ deploymentId }) => {
             "border border-base-300 bg-base-100 rounded-box w-full",
             isAdmin
               ? "collapse collapse-arrow"
-              : "cursor-not-allowed pointer-events-none bg-base-300",
+              : "cursor-not-allowed pointer-events-none",
           )}
         >
           <div className="collapse-title text-sm text-dim font-medium flex justify-between items-center">
