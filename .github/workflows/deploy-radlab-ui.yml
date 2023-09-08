@@ -1,0 +1,111 @@
+# .github/workflows/deploy-radlab-ui.yml
+
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 'DEPLOY - RAD Lab UI'
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - 'radlab-ui/webapp/**'
+  workflow_dispatch:
+    inputs:
+      BRname:
+        description: 'Branch name'     
+        required: true
+jobs:
+  deploy:
+    name: Deploy RAD Lab UI
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./radlab-ui/webapp
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+          cache-dependency-path: ./radlab-ui/webapp/package-lock.json
+
+      - name: Create app.yaml and .env.development.local files
+        id: setup
+        run: |
+          if [[ "${{ github.event.inputs.BRname }}" == "staging" || "${{ github.event.ref }}" == *"staging"* ]]
+          then
+            echo "::set-output name=branch::staging"
+            echo "${{ secrets.STAGING_APP_YAML }}" > app.yaml
+            echo "${{ secrets.STAGING_ENV }}" > .env.production.local
+          elif [[ "${{ github.event.inputs.BRname }}" == "main" || "${{ github.event.ref }}" == *"main"* ]]
+          then
+            echo "::set-output name=branch::main"
+            echo "${{ secrets.PROD_APP_YAML }}" > app.yaml
+            echo "${{ secrets.PROD_ENV }}" > .env.production.local
+          else
+            echo "Auto RAD Lab UI deployment is only avaialble for main and staging branches."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build Webapp
+        run: npm run build
+
+      - name: Setup Google Cloud SDK for staging
+        if: steps.setup.outputs.branch == 'staging'
+        uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          project_id: ${{ secrets.STAGING_GCP_PROJECT }}
+          service_account_key: ${{ secrets.STAGING_GCP_SA_KEY }}
+
+      - name: Deploy to App Engine for staging
+        id: deploy-staging
+        if: steps.setup.outputs.branch == 'staging'
+        uses: google-github-actions/deploy-appengine@v0.2.0
+        with:
+          deliverables: ./radlab-ui/webapp/app.yaml
+          version: github-action-auto-deploy
+          project_id: ${{ secrets.STAGING_GCP_PROJECT }}
+          credentials: ${{ secrets.STAGING_GCP_SA_KEY }}
+
+      - name: Test Staging
+        run: curl "${{ steps.deploy-staging.outputs.url }}"
+        if: steps.setup.outputs.branch == 'staging'
+
+      - name: Setup Google Cloud SDK for main
+        if: steps.setup.outputs.branch == 'main'
+        uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          project_id: ${{ secrets.PROD_GCP_PROJECT }}
+          service_account_key: ${{ secrets.PROD_GCP_SA_KEY }}
+          
+      - name: Deploy to App Engine for main
+        id: deploy-main
+        if: steps.setup.outputs.branch == 'main'
+        uses: google-github-actions/deploy-appengine@v0.2.0
+        with:
+          deliverables: ./radlab-ui/webapp/app.yaml
+          version: github-action-auto-deploy
+          project_id: ${{ secrets.PROD_GCP_PROJECT }}
+          credentials: ${{ secrets.PROD_GCP_SA_KEY }}
+
+      - name: Test Main
+        if: steps.setup.outputs.branch == 'main'
+        run: curl "${{ steps.deploy-main.outputs.url }}"
