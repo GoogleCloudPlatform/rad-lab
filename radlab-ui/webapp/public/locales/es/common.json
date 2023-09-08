@@ -74,5 +74,7 @@
   "publish-module": "Los módulos se están preparando para ser publicados...",
   "refreshing": "Refrescante...",
   "loading": "Cargando",
-  "no-modules-message":"Si no ve el módulo que desea, pregúntele a su administrador"
+  "no-modules-message": "Si no ve el módulo que desea, pregúntele a su administrador",
+  "build-status": "Estado de construcción",
+  "history": "Historia"
 }

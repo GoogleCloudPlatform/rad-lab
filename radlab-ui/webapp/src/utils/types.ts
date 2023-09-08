@@ -274,6 +274,14 @@ export interface Dictionary<T> {
   [index: string]: T
 }
 
+export const BuildStep = z.object({
+  id: z.string(),
+  status: DEPLOYMENT_STATUS_ENUM,
+  logsContent: z.array(z.string()).optional(),
+})
+
+export type IBuildStep = z.infer<typeof BuildStep>
+
 export type AuthedUser = DecodedIdToken & { isAdmin: boolean; isUser: boolean }
 
 export interface AuthedNextApiHandler extends NextApiRequest {

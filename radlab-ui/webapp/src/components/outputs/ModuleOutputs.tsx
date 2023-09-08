@@ -87,7 +87,7 @@ const ModuleOutputs: React.FC<ModuleOutputsProps> = ({
   )
 
   const shouldShowOutputs = () =>
-    status === DEPLOYMENT_STATUS.SUCCESS && !deployment.deletedAt
+    status !== DEPLOYMENT_STATUS.WORKING && !deployment.deletedAt
 
   const fetchOutputs = async () => {
     await axios
@@ -114,7 +114,9 @@ const ModuleOutputs: React.FC<ModuleOutputsProps> = ({
       const { buildStatus } = TFStatus.parse(statusCheck.data)
       setStatus(buildStatus)
     } catch (error) {
+      setError("Failed to load Build Id. Did the deploy complete successfully?")
       console.error(error)
+      setLoading(false)
       const errorStatus: any = error
       if (errorStatus.response.status !== 404) {
         setAlert({
@@ -131,11 +133,11 @@ const ModuleOutputs: React.FC<ModuleOutputsProps> = ({
     fetchStatus()
   }, [deployment])
 
-  if (!shouldShowOutputs()) return <LoadingRow title={t("output-progress")} />
-
   if (loading) return <Loading />
 
   if (error) return <div className="text-center text-error">{error}</div>
+
+  if (!shouldShowOutputs()) return <LoadingRow title={t("output-progress")} />
 
   return (
     <div className="bg-base-100 -mt-4">
