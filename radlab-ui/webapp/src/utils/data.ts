@@ -885,3 +885,139 @@ variable "folder_id" {
   type        = string
   default     = ""
 }`
+
+export const EXAMPLE_CLOUD_BUILD_LOGS = `
+starting build "12345678-eeee-4c4c-a94f-abdf234223425"
+
+FETCHSOURCE
+Initialized empty Git repository in /workspace/.git/
+From https://github.com/[REPO]/rad-lab
+ * branch            [HASH] -> FETCH_HEAD
+HEAD is now at [HASH] Disallow scroll wheel to change number inputs
+BUILD
+Starting Step #0 - "Download TFVARS content"
+Step #0 - "Download TFVARS content": Already have image (with digest): gcr.io/cloud-builders/git
+Step #0 - "Download TFVARS content": Copying gs://rad-lab-deployments/deployments/data_science_####/files/terraform.tfvars.json...
+Step #0 - "Download TFVARS content": / [0 files][    0.0 B/  1.7 KiB]
+/ [1 files][  1.7 KiB/  1.7 KiB]
+Step #0 - "Download TFVARS content": Operation completed over 1 objects/1.7 KiB.
+Step #0 - "Download TFVARS content": Copying gs://rad-lab-deployments/deployments/data_science_####/files/backend.tf...
+Step #0 - "Download TFVARS content": / [0 files][    0.0 B/  147.0 B]
+/ [1 files][  147.0 B/  147.0 B]
+Step #0 - "Download TFVARS content": Operation completed over 1 objects/147.0 B.
+Finished Step #0 - "Download TFVARS content"
+Starting Step #1 - "Init"
+Step #1 - "Init": Pulling image: us-central1-docker.pkg.dev/PROJECT_ID/PROJECT_ID-registry/terraform
+Step #1 - "Init": Using default tag: latest
+Step #1 - "Init": latest: Pulling from PROJECT_ID/PROJECT_ID-registry/terraform
+Step #1 - "Init": Status: Downloaded newer image for us-central1-docker.pkg.dev/PROJECT_ID/PROJECT_ID-registry/terraform:latest
+Step #1 - "Init": us-central1-docker.pkg.dev/PROJECT_ID/PROJECT_ID-registry/terraform:latest
+Step #1 - "Init": Running terraform init -reconfigure -upgrade ...
+Step #1 - "Init": [0m[1mUpgrading modules...[0m
+Step #1 - "Init": Downloading registry.terraform.io/terraform-google-modules/network/google 5.2.0 for vpc_ai_notebook...
+Step #1 - "Init": - vpc_ai_notebook in .terraform/modules/vpc_ai_notebook
+Step #1 - "Init": - vpc_ai_notebook.firewall_rules in .terraform/modules/vpc_ai_notebook/modules/firewall-rules
+Step #1 - "Init": - vpc_ai_notebook.routes in .terraform/modules/vpc_ai_notebook/modules/routes
+Step #1 - "Init": - vpc_ai_notebook.subnets in .terraform/modules/vpc_ai_notebook/modules/subnets
+Step #1 - "Init": - vpc_ai_notebook.vpc in .terraform/modules/vpc_ai_notebook/modules/vpc
+Step #1 - "Init":
+Step #1 - "Init": [0m[1mInitializing the backend...[0m
+Step #1 - "Init": [0m[32m
+Step #1 - "Init": Successfully configured the backend "gcs"! Terraform will automatically
+Step #1 - "Init": use this backend unless the backend configuration changes.[0m
+Step #1 - "Init":
+Step #1 - "Init": [0m[1mInitializing provider plugins...[0m
+Step #1 - "Init": - Finding hashicorp/google-beta versions matching ">= 3.43.0, >= 3.45.0, >= 3.50.0, ~> 4.0, ~> 4.11, < 5.0.0"...
+Step #1 - "Init": - Finding hashicorp/google versions matching ">= 2.12.0, >= 3.43.0, >= 3.45.0, >= 3.50.0, >= 3.83.0, ~> 4.0, ~> 4.5, ~> 4.11, < 5.0.0"...
+Step #1 - "Init": - Finding latest version of hashicorp/time...
+Step #1 - "Init": - Finding hashicorp/null versions matching ">= 2.1.0"...
+Step #1 - "Init": - Finding hashicorp/random versions matching ">= 2.2.0"...
+Step #1 - "Init": - Installing hashicorp/time v0.9.1...
+Step #1 - "Init": - Installed hashicorp/time v0.9.1 (signed by HashiCorp)
+Step #1 - "Init": - Installing hashicorp/null v3.2.1...
+Step #1 - "Init": - Installed hashicorp/null v3.2.1 (signed by HashiCorp)
+Step #1 - "Init": - Installing hashicorp/random v3.5.1...
+Step #1 - "Init": - Installed hashicorp/random v3.5.1 (signed by HashiCorp)
+Step #1 - "Init": - Installing hashicorp/google-beta v4.80.0...
+Step #1 - "Init": - Installed hashicorp/google-beta v4.80.0 (signed by HashiCorp)
+Step #1 - "Init": - Installing hashicorp/google v4.80.0...
+Step #1 - "Init": - Installed hashicorp/google v4.80.0 (signed by HashiCorp)
+Step #1 - "Init":
+Step #1 - "Init": Terraform has created a lock file [1m.terraform.lock.hcl[0m to record the provider
+Step #1 - "Init": selections it made above. Include this file in your version control repository
+Step #1 - "Init": so that Terraform can guarantee to make the same selections by default when
+Step #1 - "Init": you run "terraform init" in the future.[0m
+Step #1 - "Init":
+Step #1 - "Init": [0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+Step #1 - "Init": [0m[32m
+Step #1 - "Init": You may now begin working with Terraform. Try running "terraform plan" to see
+Step #1 - "Init": any changes that are required for your infrastructure. All Terraform commands
+Step #1 - "Init": should now work.
+Step #1 - "Init":
+Step #1 - "Init": If you ever set or change modules or backend configuration for Terraform,
+Step #1 - "Init": rerun this command to reinitialize your working directory. If you forget, other
+Step #1 - "Init": commands will detect it and remind you to do so if necessary.[0m
+Finished Step #1 - "Init"
+Starting Step #2 - "Apply"
+Step #2 - "Apply": Already have image (with digest): us-central1-docker.pkg.dev/PROJECT_ID/PROJECT_ID-registry/terraform
+Step #2 - "Apply":
+Step #2 - "Apply": Terraform used the selected providers to generate the following execution
+Step #2 - "Apply": plan. Resource actions are indicated with the following symbols:
+Step #2 - "Apply":   [32m+[0m create
+Step #2 - "Apply":  [36m<=[0m read (data resources)
+Step #2 - "Apply": [0m
+Step #2 - "Apply": Terraform will perform the following actions:
+Step #2 - "Apply": Names of resources
+Step #2 - "Apply": .....
+Step #2 - "Apply": Apply complete! Resources: 30 added, 0 changed, 0 destroyed.
+Step #2 - "Apply": [0m[0m[1m[32m
+Step #2 - "Apply": Outputs:
+Step #2 - "Apply":
+Step #2 - "Apply": [0mbilling_budget_budget_id = <sensitive>
+Step #2 - "Apply": deployment_id = "####"
+Step #2 - "Apply": notebooks_googlemanaged_names = ""
+Step #2 - "Apply": notebooks_googlemanaged_urls = tolist([])
+Step #2 - "Apply": notebooks_usermanaged_names = [
+Step #2 - "Apply":   "usermanaged-notebooks-1",
+Step #2 - "Apply": ]
+Step #2 - "Apply": notebooks_usermanaged_urls = tolist([
+Step #2 - "Apply":   "https://",
+Step #2 - "Apply": ])
+Step #2 - "Apply": project_id = "$PROJECT_ID"
+Step #2 - "Apply": user_scripts_bucket_uri = "https://www.googleapis.com/storage/v1/b/bucket-here"
+Finished Step #2 - "Apply"
+Starting Step #3 - "Refresh"
+Step #3 - "Refresh": RuAlready have image (with digest): us-central1-docker.pkg.dev/PROJECT_ID/PROJECT_ID-registry/terraform
+Step #3 - "Refresh": Running terraform apply -refresh-only -auto-approve ...
+Step #3 - "Refresh": [0m[1mmodule.project_radlab_ds_analytics[0].module.project-factory.random_id.random_project_id_suffix: Refreshing state... [id=rtQ][0m
+Step #3 - "Refresh": [0m[1mmodule.project_radlab_ds_analytics[0].module.project-factory.google_project.main: Refreshing state... [id=projects/radlab-data-science][0m
+Step #3 - "Refresh": [0m[1mmodule.project_radlab_ds_analytics[0].module.project-factory.google_service_account.default_service_account[0]: Refreshing state... [id=projects/radlab-data-science/serviceAccounts/project-service-account@radlab-data-science.iam.gserviceaccount.com][0m
+Step #3 - "Refresh": [0m[1mmodule.project_radlab_ds_analytics[0].module.project-factory.google_project_default_service_accounts.default_service_accounts[0]: Refreshing state... [id=projects/radlab-data-science][0m
+Step #3 - "Refresh": [0m[1mmodule.project_radlab_ds_analytics[0].module.budget.data.google_project.project[0]: Reading...[0m[0m
+Step #3 - "Refresh": [0m[1mmodule.project_radlab_ds_analytics[0].module.budget.data.google_project.project[0]: Read complete after 0s [id=projects/radlab-data-science][0m
+Step #3 - "Refresh": [0m[1mgoogle_project_service.enabled_services["notebooks.googleapis.com"]: Refreshing state... [id=radlab-data-science/notebooks.googleapis.com][0m
+Step #3 - "Refresh": [0m[1mgoogle_project_service.enabled_services["compute.googleapis.com"]: Refreshing state... [id=radlab-data-science/compute.googleapis.com][0m
+Step #3 - "Refresh": [0m[1mgoogle_project_iam_member.role_notebooks_admin["user:user@example.com"]: Refreshing state... [id=radlab-data-science/roles/notebooks.admin/user:user@example.com][0m
+Step #3 - "Refresh": [0m[1mgoogle_service_account.sa_p_notebook: Refreshing state... [id=projects/radlab-data-science/serviceAccounts/sa-p-notebook@radlab-data-science.iam.gserviceaccount.com][0m
+Step #3 - "Refresh": [0m[1mgoogle_project_iam_member.role_viewer["user:user@example.com"]: Refreshing state... [id=radlab-data-science/roles/viewer/user:user@example.com][0m
+Step #3 - "Refresh": [0m[1mgoogle_project_service.enabled_services["bigquery.googleapis.com"]: Refreshing state... [id=radlab-data-science/bigquery.googleapis.com][0m
+Finished Step #3 - "Refresh"
+Starting Step #4 - "Output"
+Step #4 - "Output": Already have image (with digest): us-central1-docker.pkg.dev/PROJECT_ID/PROJECT_ID-registry/terraform
+Step #4 - "Output": Copying file://output.json [Content-Type=application/json]...
+Step #4 - "Output": / [0/1 files][    0.0 B/  1.1 KiB]   0% Done
+/ [1/1 files][  1.1 KiB/  1.1 KiB] 100% Done
+Step #4 - "Output": Operation completed over 1 objects/1.1 KiB.
+Finished Step #4 - "Output"
+Starting Step #5 - "Upload Files"
+Step #5 - "Upload Files": Already have image (with digest): gcr.io/cloud-builders/gsutil
+Step #5 - "Upload Files": Copying file://data_science.tar.gz [Content-Type=application/x-tar]...
+Step #5 - "Upload Files": / [0/1 files][    0.0 B/ 65.2 MiB]   0% Done
+-
+- [0/1 files][ 64.2 MiB/ 65.2 MiB]  98% Done
+- [1/1 files][ 65.2 MiB/ 65.2 MiB] 100% Done
+Step #5 - "Upload Files": Operation completed over 1 objects/65.2 MiB.
+Finished Step #5 - "Upload Files"
+PUSH
+DONE
+`

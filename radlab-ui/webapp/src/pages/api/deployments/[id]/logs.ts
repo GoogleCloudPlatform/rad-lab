@@ -24,7 +24,7 @@ const getDeploymentLogs = async (
   const options: GetSignedUrlConfig = {
     version: "v4",
     action: "read",
-    expires: Date.now() + 180 * 60 * 1000, // 3 hr
+    expires: Date.now() + 3 * 60 * 60 * 1000, // 3 hr
   }
   // @ts-ignore
   const [deployment] = (await getDocsByField(

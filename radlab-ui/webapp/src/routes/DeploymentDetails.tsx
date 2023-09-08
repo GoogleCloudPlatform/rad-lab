@@ -207,9 +207,11 @@ const DeploymentDetails: React.FC<IDeploymentDetails> = ({}) => {
           </div>
           <ModuleOverview deployment={deployment} />
           <div className="tabs mt-8 rounded-t-lg">
-            {renderTabHeader(TAB_DETAILS.OUTPUTS, t("outputs"), tabStatus)}
-            {renderTabHeader(TAB_DETAILS.LOG, t("logs"), tabStatus)}
-            {renderTabHeader(TAB_DETAILS.BUILDS, t("builds"), tabStatus)}
+            {deployment.status !== DEPLOYMENT_STATUS.WORKING &&
+              !deployment.deletedAt &&
+              renderTabHeader(TAB_DETAILS.OUTPUTS, t("outputs"), tabStatus)}
+            {renderTabHeader(TAB_DETAILS.LOG, t("build-status"), tabStatus)}
+            {renderTabHeader(TAB_DETAILS.BUILDS, t("history"), tabStatus)}
           </div>
           <div className="p-8 bg-base-100 rounded-b-lg rounded-tr-lg shadow-lg">
             {!isLoading ? (

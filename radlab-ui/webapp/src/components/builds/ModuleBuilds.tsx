@@ -1,9 +1,15 @@
 import Loading from "@/navigation/Loading"
 import { localDateFromSeconds } from "@/utils/deployments"
+import { envOrFail } from "@/utils/env"
 import { Builds, Deployment, IBuild, IBuildHeader } from "@/utils/types"
 import axios from "axios"
 import { useTranslation } from "next-i18next"
 import { useEffect, useState } from "react"
+
+const GCP_PROJECT_ID = envOrFail(
+  "NEXT_PUBLIC_GCP_PROJECT_ID",
+  process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
+)
 
 interface ModuleBuildsProps {
   deploymentId: string
@@ -67,7 +73,13 @@ const ModuleBuilds: React.FC<ModuleBuildsProps> = ({
                 className="border border-t-1 border-base-300 text-xs md:text-sm xl:text-base"
               >
                 <td className="pl-4 py-3 text-xs md:text-sm">
-                  {buildData.buildId}
+                  <a
+                    href={`https://console.cloud.google.com/cloud-build/builds;region=global/${buildData.buildId}?project=${GCP_PROJECT_ID}`}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {buildData.buildId}
+                  </a>
                 </td>
                 <td className="pl-4 py-3 text-xs md:text-sm">
                   {buildData.action}

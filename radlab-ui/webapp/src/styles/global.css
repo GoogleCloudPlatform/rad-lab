@@ -50,4 +50,10 @@
   .text-normal {
     @apply opacity-100;
   }
+  .collapse-arrow .collapse-title:after {
+    @apply -rotate-45 mt-0.5;
+  }
+  .collapse-arrow:focus:not(.collapse-close) .collapse-title:after {
+    @apply rotate-45 -mt-1;
+  }
 }
