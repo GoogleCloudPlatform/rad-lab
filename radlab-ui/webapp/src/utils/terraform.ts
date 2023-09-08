@@ -102,18 +102,20 @@ const mapHclToUIVar = (
     hclVar.type,
   )
 
+  let defaultValue =
+    typeof hclVar.default === "undefined" ? null : hclVar.default
+  if (formatType(hclVar.type) === "bool") {
+    defaultValue = !!hclVar.default
+  }
+
   return {
-    name: name,
+    name,
     display: startCase(name),
     description,
     type: formatType(hclVar.type),
-    default: hclVar.default
-      ? hclVar.default
-      : formatType(hclVar.type) === "bool"
-      ? false
-      : null,
-    // In TF, desription = "" is how we say it's optional
-    required: hclVar.default ? hclVar.default !== "" : false,
+    default: defaultValue,
+    // In TF, default = "" is how we say it's optional
+    required: typeof hclVar.default === "undefined" || hclVar.default !== "",
     group,
     order,
     options,

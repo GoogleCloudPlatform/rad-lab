@@ -122,7 +122,11 @@ describe("terraform util", () => {
 
     const billing_account_id = getByName("billing_account_id", parsed)
     expect(billing_account_id.default).toBeNull()
-    expect(billing_account_id.required).toBe(false)
+    expect(billing_account_id.required).toBe(true)
+
+    const organization_id = getByName("organization_id", parsed)
+    expect(organization_id.default).toBe("")
+    expect(organization_id.required).toBe(false)
 
     const zone = getByName("zone", parsed)
     expect(zone.default).not.toBeNull()
@@ -170,6 +174,13 @@ describe("terraform util", () => {
     const set_external_ip_policy = getByName("set_external_ip_policy", parsed)
     expect(set_external_ip_policy.default).not.toBeNull()
     expect(set_external_ip_policy.default).toBe(false)
+
+    const gpu_accelerator_core_count = getByName(
+      "gpu_accelerator_core_count",
+      parsed,
+    )
+    expect(gpu_accelerator_core_count.default).not.toBeNull()
+    expect(gpu_accelerator_core_count.default).toStrictEqual(0)
   })
 
   describe("updatesafe parsing", () => {

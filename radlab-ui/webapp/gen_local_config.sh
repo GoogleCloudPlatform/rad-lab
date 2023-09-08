@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,6 +80,7 @@ NEXT_PUBLIC_GCP_PROJECT_ID=${PROJECT_ID}
 NEXT_PUBLIC_GCP_ORGANIZATION=${GOOGLE_CLOUD_ORGANIZATION}
 NEXT_PUBLIC_PUBSUB_DEPLOYMENTS_TOPIC=${CREATE_DEPLOYMENT_TOPIC_NAME}
 NEXT_PUBLIC_PUBSUB_DEPLOYMENTS_DELETE_TOPIC=${DELETE_DEPLOYMENT_TOPIC_NAME}
+NEXT_PUBLIC_RAD_LAB_DOCS_SITE=https://googlecloudplatform.github.io/rad-lab/
 
 # User Configuration
 NEXT_PUBLIC_RAD_LAB_ADMIN_GROUP=${ADMIN_GROUP_NAME}

@@ -1,48 +1,80 @@
-import { NextApiRequest, NextApiResponse } from "next"
-
+import {
+  canAccessDeployment,
+  getDocsByField,
+  updateByField,
+} from "@/utils/Api_SeverSideCon"
 import { mergeVariables, pushPubSubMsg } from "@/utils/api"
-import { IDeployment, DEPLOYMENT_ACTIONS, IPubSubMsg } from "@/utils/types"
 import { envOrFail } from "@/utils/env"
-import { getDocsByField, updateByField } from "@/utils/Api_SeverSideCon"
+import { withAuth } from "@/utils/middleware"
+import {
+  AuthedNextApiHandler,
+  DEPLOYMENT_ACTIONS,
+  IDeployment,
+  IPubSubMsg,
+} from "@/utils/types"
 import { Timestamp } from "firebase-admin/firestore"
+import { NextApiResponse } from "next"
+
 const gcpProjectId = envOrFail(
   "NEXT_PUBLIC_GCP_PROJECT_ID",
   process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
 )
 
 const getDeployment = async (
-  _: NextApiRequest,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
+  const { isAdmin, email } = req.user
+
+  if (!email) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+
   const deployments: IDeployment[] = await getDocsByField(
     "deployments",
     "deploymentId",
     id,
   )
-  res.status(200).json({
-    deployment: deployments[0] ?? null,
-  })
+  const deployment = deployments[0]
+
+  if (!deployment) {
+    return res.status(400).json({ message: "Not found" })
+  }
+
+  if (!canAccessDeployment(deployment, email, isAdmin)) {
+    return res.status(403).json({ message: "Forbidden" })
+  }
+
+  res.status(200).json({ deployment })
 }
 
 const deleteDeployment = async (
-  req: NextApiRequest,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
-  const body = req.body
+  const { isAdmin, email } = req.user
+
+  if (!email) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+
   let [deployment]: [IDeployment] = await getDocsByField(
     "deployments",
     "deploymentId",
     id,
   )
+
   if (!deployment) {
-    res.status(400).json({
-      message: "Not found",
-    })
-    return
+    return res.status(400).json({ message: "Not found" })
   }
 
+  if (!canAccessDeployment(deployment, email, isAdmin)) {
+    return res.status(403).json({ message: "Forbidden" })
+  }
+
+  const body = req.body
   const pubSubData: IPubSubMsg = {
     module: deployment.module,
     deploymentId: id,
@@ -56,13 +88,7 @@ const deleteDeployment = async (
   }
   delete pubSubData.variables.resource_creator_identity
 
-  try {
-    await pushPubSubMsg(pubSubData)
-  } catch (error) {
-    console.error(error)
-    res.status(500)
-    return
-  }
+  await pushPubSubMsg(pubSubData)
 
   deployment = {
     ...deployment,
@@ -70,30 +96,39 @@ const deleteDeployment = async (
     deletedAt: Timestamp.now(),
   }
 
-  if (deployment) {
-    await updateByField("deployments", "deploymentId", id, deployment)
-  }
+  await updateByField("deployments", "deploymentId", id, deployment)
 
-  res.status(200).json({
-    id,
-    deleted: true,
-  })
+  res.status(200).json({ id, deleted: true })
 }
 
 const updateDeployment = async (
-  req: NextApiRequest,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
   id: string,
 ) => {
-  const body = req.body
+  const { isAdmin, email } = req.user
+
+  if (!email) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+
   const [deployment]: IDeployment[] = await getDocsByField(
     "deployments",
     "deploymentId",
     id,
   )
+
   if (!deployment) {
-    res.status(400).send("Deployment not found")
-    return
+    return res.status(400).json({ message: "Not found" })
+  }
+
+  if (!canAccessDeployment(deployment, email, isAdmin)) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+
+  const body = req.body
+  if (!deployment) {
+    return res.status(400).json({ message: "Not found" })
   }
 
   const { billingId, variables } = await mergeVariables(body)
@@ -124,7 +159,7 @@ const updateDeployment = async (
   res.status(200).json({ deployments })
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   const { id } = req.query
   if (typeof id !== "string") throw new Error("Deployment ID must be a string")
 
@@ -133,10 +168,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === "PUT") return updateDeployment(req, res, id)
     if (req.method === "DELETE") return deleteDeployment(req, res, id)
   } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    console.error(error)
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 
-export default handler
+export default withAuth(handler)

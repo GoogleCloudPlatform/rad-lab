@@ -1,6 +1,6 @@
 # .github/workflows/rlui-test.yml
 
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,13 +35,13 @@ jobs:
       with:
         node-version: 18
         cache: npm
-        cache-dependency-path: ./radlab-ui/webapp/package-lock.json 
+        cache-dependency-path: ./radlab-ui/webapp/package-lock.json
     - name: Load .env file
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: radlab-ui/webapp
-        mode: production
-    - name: "Install Node dependencies"
+        mode: test
+    - name: Install Node dependencies
       run: npm ci
     - name: Test Cases
       run: npm test
@@ -64,7 +64,7 @@ jobs:
       uses: xom9ikk/dotenv@v1.0.2
       with:
         path: radlab-ui/webapp
-        mode: production
+        mode: test
     - name: Install Node dependencies
       run: npm ci
     - name: Build

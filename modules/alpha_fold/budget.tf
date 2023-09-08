@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 locals {
-  emails = length(var.trusted_users) > 0 ? distinct(concat(tolist(var.billing_budget_notification_email_addresses), formatlist(tolist(var.trusted_users)[0]))) : tolist(var.billing_budget_notification_email_addresses)
+  emails = tolist(var.billing_budget_notification_email_addresses)
 }
 
 resource "google_monitoring_notification_channel" "email_notif" {
@@ -56,6 +56,7 @@ resource "google_billing_budget" "budget" {
     credit_types_treatment = var.billing_budget_credit_types_treatment
     services               = var.billing_budget_services
     labels                 = var.billing_budget_labels
+    calendar_period        = var.billing_budget_calendar_period
   }
 
   amount {

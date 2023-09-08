@@ -1,17 +1,18 @@
-import PublishModule from "@/components/modules/PublishModule"
 import RouteContainer from "@/components/RouteContainer"
-import { useTranslation } from "next-i18next"
-import { useNavigate } from "react-router-dom"
-import { ArrowLeftIcon } from "@heroicons/react/outline"
-import { useEffect, useState } from "react"
-import { classNames } from "@/utils/dom"
-import { userStore, alertStore } from "@/store"
-import axios from "axios"
-import { IModule, ALERT_TYPE } from "@/utils/types"
-import Loading from "@/navigation/Loading"
-import { modulesHasZeroData } from "@/utils/terraform"
-import { envOrFail } from "@/utils/env"
 import SectionHeader from "@/components/SectionHeader"
+import PublishModule from "@/components/modules/PublishModule"
+import Loading from "@/navigation/Loading"
+import { alertStore, userStore } from "@/store"
+import { classNames } from "@/utils/dom"
+import { envOrFail } from "@/utils/env"
+import { modulesHasZeroData } from "@/utils/terraform"
+import { ALERT_TYPE, IModule, IVariables } from "@/utils/types"
+import { fetchAdminSettings } from "@/utils/variables"
+import { ArrowLeftIcon } from "@heroicons/react/outline"
+import axios from "axios"
+import { useTranslation } from "next-i18next"
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 enum PUBLISH_BUTTON {
   PUBLISH,
@@ -46,7 +47,8 @@ const Publish: React.FC<IPublishProps> = ({}) => {
   const user = userStore((state) => state.user)
   const [isSubmitLoading, setSubmitLoading] = useState(false)
   const [isUpdated, setIsUpdated] = useState(false)
-  const [defaultSettingVarsData, setdefaultSettingVarsData] = useState({})
+  const [defaultSettingVarsData, setdefaultSettingVarsData] =
+    useState<IVariables>({})
   const [publishedModulesData, setPublishedModulesData] = useState<IModule[]>(
     [],
   )
@@ -179,24 +181,22 @@ const Publish: React.FC<IPublishProps> = ({}) => {
 
   // To check Admin settings updated if not thern redirect to default setting
   const fetchAdminSettingData = async () => {
-    await axios
-      .get(`/api/settings?projectId=${GCP_PROJECT_ID}`)
-      .then((res) => {
-        if (!res.data.settings) {
-          navigate("/admin")
-        } else {
-          setdefaultSettingVarsData(res.data.settings.variables)
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-      })
+    try {
+      const settings = await fetchAdminSettings(GCP_PROJECT_ID)
+      if (!settings) {
+        navigate("/admin")
+        return
+      }
+      setdefaultSettingVarsData(settings.variables)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const renderAllModules = () => {
     return listAvaialableModules
-      .sort()
-      ?.map((module) => (
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((module) => (
         <PublishModule
           title={module.name}
           key={module.name}
@@ -244,13 +244,13 @@ const Publish: React.FC<IPublishProps> = ({}) => {
               </button>
             </div>
             <div className="card-body w-full text-left">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
                 {renderAllModules()}
               </div>
               <div className="flex flex-row justify-center">
                 {checkButtonStatus === PUBLISH_BUTTON.PUBLISH && (
                   <button
-                    className="btn mt-4 btn-primary"
+                    className="btn mt-10 btn-primary"
                     aria-label="publish-button"
                     data-testid="publish-button"
                     disabled={arrayModules.length === 0 || isSubmitLoading}
@@ -265,7 +265,7 @@ const Publish: React.FC<IPublishProps> = ({}) => {
                 )}
                 {checkButtonStatus === PUBLISH_BUTTON.UPDATE && (
                   <button
-                    className={classNames("btn mt-4", `btn-${buttonState}`)}
+                    className={classNames("btn mt-10", `btn-${buttonState}`)}
                     aria-label="update-button"
                     data-testid="update-button"
                     disabled={buttonState !== "primary"}

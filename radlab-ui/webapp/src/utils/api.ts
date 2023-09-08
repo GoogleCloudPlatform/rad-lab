@@ -1,11 +1,10 @@
-import { envOrFail } from "@/utils/env"
-import { IAMCredentialsClient } from "@google-cloud/iam-credentials"
 import { getDocsByField } from "@/utils/Api_SeverSideCon"
-import { mergeAll } from "ramda"
+import { envOrFail } from "@/utils/env"
+import { IDeployment, IModule } from "@/utils/types"
+import { mergeAllSafe } from "@/utils/variables"
+import { IAMCredentialsClient } from "@google-cloud/iam-credentials"
 import { PubSub } from "@google-cloud/pubsub"
 import axios from "axios"
-
-import { IDeployment, IModule } from "@/utils/types"
 
 const { SecretManagerServiceClient } = require("@google-cloud/secret-manager")
 const client = new SecretManagerServiceClient()
@@ -84,15 +83,22 @@ export const pushPubSubMsg = async function (data: Record<string, any>) {
 export const getBuildStatus = async (buildId: string, deploymentId: string) => {
   try {
     const token = await generateAccessToken()
-    let data = await axios({
+    const res = await axios({
       method: "GET",
       url: `https://cloudbuild.googleapis.com/v1/projects/${GCP_PROJECT_ID}/builds/${buildId}`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-    data.data.deploymentId = deploymentId
-    return data.data || null
+
+    if (!res.data) {
+      return null
+    }
+
+    return {
+      ...res.data,
+      deploymentId,
+    }
   } catch (error) {
     console.error(error)
     return null
@@ -112,15 +118,14 @@ export const mergeVariables = async (body: IDeployment) => {
     "projectId",
     GCP_PROJECT_ID,
   )
-  let moduleVars = {}
-  modules.forEach((module: IModule) => {
-    if (module.name === body.module) {
-      moduleVars = module.variables
-    }
-  })
-  const userVars = { ...body.variables }
+  const module = modules.find((module: IModule) => module.name === body.module)
+  if (!module) {
+    throw new Error("Module not found")
+  }
+  const moduleVars = module.variables
+  const userVars = body.variables
   const billingId = adminVars?.billing_account_id
-  const variables = mergeAll([userVars, moduleVars, adminVars])
+  const variables = mergeAllSafe([adminVars, moduleVars, userVars])
   delete variables.email
   delete variables.id
   return { billingId, variables }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ resource "google_service_account" "radlab_module_deployment_identity" {
 resource "google_project_iam_member" "rad_lab_runner_identity_project_permissions" {
   for_each = toset([
     "roles/logging.logWriter",
+    "roles/iam.serviceAccountTokenCreator"
   ])
   member  = "serviceAccount:${google_service_account.radlab_module_deployment_identity.email}"
   project = module.project.project_id

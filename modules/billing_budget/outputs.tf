@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,4 +28,16 @@ output "deployment_id" {
 output "project_id" {
   description = "GCP Project ID"
   value       = local.project.project_id
+}
+
+output "vm" {
+  description = "GCE VM Link"
+  value       = var.create_vm ? "https://console.cloud.google.com/compute/instancesDetail/zones/${google_compute_instance.vm[0].zone}/instances/${google_compute_instance.vm[0].name}?project=${local.project.project_id}" : null
+
+}
+
+output "vm_external_access" {
+  description = "GCE VM External IP"
+  value       = var.create_vm ? "http://${google_compute_instance.vm[0].network_interface.0.access_config.0.nat_ip}" : null
+
 }

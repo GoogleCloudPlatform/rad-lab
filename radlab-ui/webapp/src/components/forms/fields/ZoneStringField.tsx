@@ -1,44 +1,48 @@
 import { Field, ErrorMessage } from "formik"
 import { IUIVariable } from "@/utils/types"
+import { useEffect, useState } from "react"
+import { cloudLocationStore } from "@/store"
 
 interface IZoneStringFieldProps {
   variable: IUIVariable
-  validateRequired: Function
-  zoneListByRegion: string[]
+  validate: Function
+  region?: string
 }
 
 const ZoneStringField: React.FC<IZoneStringFieldProps> = ({
   variable,
-  validateRequired,
-  zoneListByRegion,
+  validate,
+  region,
 }) => {
+  const [zones, setZones] = useState<string[]>([])
+  const cloudLocation = cloudLocationStore((state) => state.cloudLocation)
+
+  useEffect(() => {
+    ;(region ? cloudLocation.zonesByRegion(region) : cloudLocation.zones).then(
+      (z) => {
+        setZones(["", ...z])
+      },
+    )
+  }, [region])
+
   return (
     <div className="form-control" key={variable.name}>
       <label htmlFor={variable.name}>{variable.display}</label>
-      {variable.options ? (
-        <Field
-          as="select"
-          id={variable.name}
-          name={variable.name}
-          className="input"
-          validate={validateRequired}
-        >
-          {zoneListByRegion.map((option) => {
-            return (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            )
-          })}
-        </Field>
-      ) : (
-        <Field
-          id={variable.name}
-          name={variable.name}
-          className="input"
-          validate={validateRequired}
-        />
-      )}
+      <Field
+        as="select"
+        id={variable.name}
+        name={variable.name}
+        className="input"
+        validate={validate}
+      >
+        {zones.map((zone) => {
+          return (
+            <option key={zone} value={zone}>
+              {zone}
+            </option>
+          )
+        })}
+      </Field>
       <div className="text-error text-xs mt-1">
         <ErrorMessage name={variable.name} />
       </div>

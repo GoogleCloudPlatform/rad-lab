@@ -15,6 +15,47 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [13.2.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v13.2.1) (2023-09-05)
+
+### Changed
+- _RAD Lab Module:_ Variablizing Billing budget time rage (Calendar period) [(#168)](https://github.com/GoogleCloudPlatform/rad-lab/pull/168) [(#167)](https://github.com/GoogleCloudPlatform/rad-lab/issues/167)
+- _RAD Lab UI:_ Changed manual Region/Zone inputs to Dynamic picker in Module Publish Settings. [(#170)](https://github.com/GoogleCloudPlatform/rad-lab/pull/170)
+
+### Fixed
+- _RAD Lab UI:_ Default region/zone in Rad Lab UI not taken into account [(#170)](https://github.com/GoogleCloudPlatform/rad-lab/pull/170) [(#171)](https://github.com/GoogleCloudPlatform/rad-lab/pull/171) [(#96)](https://github.com/GoogleCloudPlatform/rad-lab/issues/96) [(#97)](https://github.com/GoogleCloudPlatform/rad-lab/issues/97) [(#130)](https://github.com/GoogleCloudPlatform/rad-lab/issues/130)
+
+## [13.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v13.0.0) (2023-08-11)
+ 
+### Added
+- _RAD Lab Module:_ Releasing RAD Lab **GenAI Module** [(#159)](https://github.com/GoogleCloudPlatform/rad-lab/pull/159)
+
+## [12.1.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v12.1.1) (2023-08-07)
+ 
+### Fixed
+- _RAD Lab UI:_ Fixed Unprotected endpoints [(#153)](https://github.com/GoogleCloudPlatform/rad-lab/pull/153) : Add auth middleware and endpoint checks to API [(#158)](https://github.com/GoogleCloudPlatform/rad-lab/pull/158)
+
+## [12.1.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v12.1.0) (2023-06-12)
+ 
+### Changed
+- _RAD Lab Module:_ Including sample GCE VM in **Billing Budget** module [(#155)](https://github.com/GoogleCloudPlatform/rad-lab/pull/155)
+
+## [12.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v12.0.0) (2023-02-17)
+ 
+### Added
+- _RAD Lab Module:_ Releasing RAD Lab Secure Datawarehouse Module [(#136)](https://github.com/GoogleCloudPlatform/rad-lab/pull/136)
+
+## [11.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v11.0.0) (2023-02-14)
+ 
+[Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v10.0.0...v11.0.0) 
+
+### Added
+- _RAD Lab Module:_ Releasing RAD Lab Genomics Nextflow Module [(#93)](https://github.com/GoogleCloudPlatform/rad-lab/pull/93) [(#94)](https://github.com/GoogleCloudPlatform/rad-lab/pull/94)
+
+### Changed
+- _RAD Lab Module:_ Standardizing Module specific READMEs [(#120)](https://github.com/GoogleCloudPlatform/rad-lab/pull/120)
+- _Repo:_ Adding documentation on how to contribute to RAD Lab repo [(#106)](https://github.com/GoogleCloudPlatform/rad-lab/pull/106)
+- _RAD Lab Documentation:_ Updating Documentation and adding Videos [[#92]](https://github.com/GoogleCloudPlatform/rad-lab/pull/92) [[#98]](https://github.com/GoogleCloudPlatform/rad-lab/pull/98) [[#128]](https://github.com/GoogleCloudPlatform/rad-lab/pull/128) 
+
 ## [10.0.0](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v10.0.0) (2022-11-14)
  
 [Full Changelog](https://github.com/GoogleCloudPlatform/rad-lab/compare/v9.1.1...v10.0.0) 

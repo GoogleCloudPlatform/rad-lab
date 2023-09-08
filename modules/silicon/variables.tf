@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,14 +43,20 @@ variable "billing_budget_amount_currency_code" {
   default     = "USD"
 }
 
+variable "billing_budget_calendar_period" {
+  description = "A CalendarPeriod represents the abstract concept of a recurring time period that has a canonical start. Possible values are: MONTH, QUARTER, YEAR, CALENDAR_PERIOD_UNSPECIFIED {{UIMeta group=0 order=10 updatesafe options=MONTH,QUARTER,YEAR,CALENDAR_PERIOD_UNSPECIFIED }}"
+  type        = string
+  default     = "MONTH"
+}
+
 variable "billing_budget_credit_types_treatment" {
-  description = "Specifies how credits should be treated when determining spend for threshold calculations. {{UIMeta group=0 order=10 updatesafe }}"
+  description = "Specifies how credits should be treated when determining spend for threshold calculations. {{UIMeta group=0 order=11 updatesafe }}"
   type        = string
   default     = "INCLUDE_ALL_CREDITS"
 }
 
 variable "billing_budget_labels" {
-  description = "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. {{UIMeta group=0 order=11 updatesafe }}"
+  description = "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. {{UIMeta group=0 order=12 updatesafe }}"
   type        = map(string)
   default     = {}
   validation {
@@ -59,24 +65,25 @@ variable "billing_budget_labels" {
   }
 }
 
+variable "billing_budget_notification_email_addresses" {
+  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 5 channels are allowed. {{UIMeta group=0 order=13 updatesafe }}"
+  type        = set(string)
+  default     = []
+  validation {
+    condition     = length(var.billing_budget_notification_email_addresses) <= 5
+    error_message = "Maximum of 5 email addresses are allowed for the budget monitoring channel."
+  }
+}
+
 variable "billing_budget_services" {
-  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe }}"
+  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=14 updatesafe }}"
   type        = list(string)
   default     = null
 }
 
-variable "billing_budget_notification_email_addresses" {
-  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 4 channels are allowed as the first element of `trusted_users` is automatically added as one of the channel. {{UIMeta group=0 order=13 updatesafe }}"
-  type        = set(string)
-  default     = []
-  validation {
-    condition     = length(var.billing_budget_notification_email_addresses) <= 4
-    error_message = "Maximum of 4 email addresses are allowed for the budget monitoring channel."
-  }
-}
 
 variable "billing_budget_pubsub_topic" {
-  description = "If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false. {{UIMeta group=0 order=14 updatesafe }}"
+  description = "If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false. {{UIMeta group=0 order=15 updatesafe }}"
   type        = bool
   default     = false
 }
@@ -136,7 +143,7 @@ variable "image_name" {
 }
 
 variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for AI Notebooks subnet. {{UIMeta group=2 order=5 }}"
+  description = "Unique IP CIDR Range for AI Notebooks subnet. {{UIMeta group=2 order=4 }}"
   type        = string
   default     = "10.142.190.0/24"
 }
@@ -196,31 +203,31 @@ variable "resource_creator_identity" {
 }
 
 variable "set_domain_restricted_sharing_policy" {
-  description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=15 updatesafe }}"
+  description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=16 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_external_ip_policy" {
-  description = "Enable org policy to allow External (Public) IP addresses on virtual machines. {{UIMeta group=0 order=16 updatesafe }}"
+  description = "Enable org policy to allow External (Public) IP addresses on virtual machines. {{UIMeta group=0 order=17 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_shielded_vm_policy" {
-  description = "Apply org policy to disable shielded VMs. {{UIMeta group=0 order=17 updatesafe }}"
+  description = "Apply org policy to disable shielded VMs. {{UIMeta group=0 order=18 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_trustedimage_project_policy" {
-  description = "Apply org policy to set the trusted image projects. {{UIMeta group=0 order=18 updatesafe }}"
+  description = "Apply org policy to set the trusted image projects. {{UIMeta group=0 order=19 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "subnet_name" {
-  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=2 order=4 }}"
+  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=2 order=3 }}"
   type        = string
   default     = "subnet-ai-notebook"
 }
@@ -238,7 +245,7 @@ variable "trusted_users" {
 }
 
 variable "zone" {
-  description = "Cloud Zone associated to the AI Notebooks. {{UIMeta group=2 order=3 options=us-central1-b,us-east1-a,us-west3-b,us-east4-c }}"
+  description = "Cloud Zone associated to the AI Notebooks. List - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=20 }}"
   type        = string
   default     = "us-east4-c"
 }

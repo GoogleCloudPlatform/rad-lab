@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,4 +65,51 @@ resource "google_project_service" "enabled_services" {
   service                    = each.value
   disable_dependent_services = true
   disable_on_destroy         = true
+}
+
+#########################################################################
+# Creating GCE VMs in vpc-xlb
+#########################################################################
+
+# data "google_compute_image" "debian_11_bullseye" {
+#   family  = "debian-11"
+#   project = "debian-cloud"
+# }
+
+data "google_compute_zones" "available_zones" {
+  project = local.project.project_id
+  region  = var.region
+  status  = "UP"
+}
+
+resource "google_compute_instance" "vm" {
+  count                     = var.create_vm ? 1 : 0
+  project                   = local.project.project_id
+  zone                      = data.google_compute_zones.available_zones.names.0
+  name                      = "radlab-vm"
+  machine_type              = "f1-micro"
+  allow_stopping_for_update = true
+  metadata_startup_script   = templatefile("${path.module}/scripts/build/sample_startup_script.sh.tpl", {})
+  metadata = {
+    enable-oslogin = true
+  }
+  boot_disk {
+    initialize_params {
+      # image = data.google_compute_image.debian_11_bullseye.self_link
+      image = "debian-cloud/debian-11"
+
+    }
+  }
+
+  network_interface {
+    subnetwork         = local.subnet.self_link
+    subnetwork_project = local.project.project_id
+    access_config {
+      // Ephemeral public IP
+    }
+  }
+
+  depends_on = [
+    time_sleep.wait_120_seconds,
+  ]
 }

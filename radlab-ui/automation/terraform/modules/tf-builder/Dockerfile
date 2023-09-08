@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ FROM gcr.io/cloud-builders/gcloud
 
 RUN apt-get -y -qq update && \
     apt-get install -y -qq curl && \
+    apt-get install -y -qq python3-pip && \
+    apt-get install -y -qq python3-venv && \
     apt-get clean
 
 RUN curl -o /usr/local/bin/jq http://stedolan.github.io/jq/download/linux64/jq && \

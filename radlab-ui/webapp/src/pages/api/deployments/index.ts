@@ -1,28 +1,34 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import { v4 as uuidv4 } from "uuid"
-import { mergeVariables, pushPubSubMsg, getBuildStatus } from "@/utils/api"
 import {
-  DEPLOYMENT_ACTIONS,
-  IDeployment,
-  IPubSubMsg,
-  IBuild,
-  DEPLOYMENT_STATUS,
-} from "@/utils/types"
-import { envOrFail } from "@/utils/env"
-import { Timestamp } from "firebase-admin/firestore"
-const gcpProjectId = envOrFail(
-  "NEXT_PUBLIC_GCP_PROJECT_ID",
-  process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
-)
-
-import {
+  canAccessDeployment,
   getAllDocuments,
   getDocsByField,
   saveDocument,
   updateByField,
 } from "@/utils/Api_SeverSideCon"
+import { getBuildStatus, mergeVariables, pushPubSubMsg } from "@/utils/api"
+import { envOrFail } from "@/utils/env"
+import { withAuth } from "@/utils/middleware"
+import {
+  AuthedNextApiHandler,
+  DEPLOYMENT_ACTIONS,
+  DEPLOYMENT_STATUS,
+  IBuild,
+  IDeployment,
+  IPubSubMsg,
+} from "@/utils/types"
+import { Timestamp } from "firebase-admin/firestore"
+import { NextApiResponse } from "next"
+import { v4 as uuidv4 } from "uuid"
 
-const createDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
+const gcpProjectId = envOrFail(
+  "NEXT_PUBLIC_GCP_PROJECT_ID",
+  process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
+)
+
+const createDeployment = async (
+  req: AuthedNextApiHandler,
+  res: NextApiResponse,
+) => {
   const body = req.body
   const uuid = uuidv4()
   body.deploymentId = uuid.split("-")[0]?.substring(0, 4)
@@ -37,10 +43,7 @@ const createDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
   // @ts-ignore
   const response: IDeployment = await saveDocument("deployments", body)
   if (!response) {
-    res.status(500).json({
-      message: "Failed to return document",
-    })
-    return
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 
   const pubSubData: IPubSubMsg = {
@@ -64,15 +67,22 @@ const createDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
     console.error(error)
   }
 
-  res.status(200).json({
-    response,
-  })
+  return res.status(200).json({ response })
 }
 
-const getDeployments = async (_: NextApiRequest, res: NextApiResponse) => {
-  const deployments = await getAllDocuments("deployments")
-  const possiblyStaleDeployments = deployments.filter(
-    (deployment: IDeployment) => {
+const getDeployments = async (
+  req: AuthedNextApiHandler,
+  res: NextApiResponse,
+) => {
+  const { isAdmin, email } = req.user
+
+  if (!email) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+
+  const deployments = (await getAllDocuments("deployments")) as IDeployment[]
+  const possiblyStaleDeployments = deployments
+    .filter((deployment) => {
       return (
         deployment.status &&
         deployment.builds?.length &&
@@ -82,14 +92,14 @@ const getDeployments = async (_: NextApiRequest, res: NextApiResponse) => {
           DEPLOYMENT_STATUS.PENDING,
         ].includes(deployment.status)
       )
-    },
-  )
+    })
+    .filter((deployment) => canAccessDeployment(deployment, email, isAdmin))
+
   if (!possiblyStaleDeployments.length) {
-    res.status(200).json({ deployments })
-    return
+    return res.status(200).json({ deployments })
   }
 
-  let getBuilds: Promise<any>[] = []
+  const getBuilds: Promise<any>[] = []
   possiblyStaleDeployments.forEach((deployment: IDeployment) => {
     const mostRecentBuild =
       deployment.builds &&
@@ -101,6 +111,7 @@ const getDeployments = async (_: NextApiRequest, res: NextApiResponse) => {
         getBuildStatus(mostRecentBuild.buildId, deployment.deploymentId),
       )
   })
+
   let updateDoc: Promise<any>[] = []
   await Promise.all(getBuilds).then((cloudBuildRes: any) => {
     cloudBuildRes.forEach((cloudBuild: any) => {
@@ -117,44 +128,61 @@ const getDeployments = async (_: NextApiRequest, res: NextApiResponse) => {
       )
     })
   })
+
   await Promise.all(updateDoc)
-  const deploymentsList = await getAllDocuments("deployments")
-  res.status(200).json({ deployments: deploymentsList })
+
+  const deploymentsList = (await getAllDocuments(
+    "deployments",
+  )) as IDeployment[]
+
+  return res.status(200).json({
+    deployments: deploymentsList.filter((deployment) =>
+      canAccessDeployment(deployment, email, isAdmin),
+    ),
+  })
 }
 
 const getDeploymentsByEmail = async (
-  _: NextApiRequest,
+  req: AuthedNextApiHandler,
   res: NextApiResponse,
   deployedByEmail: string,
 ) => {
-  const deployments = await getDocsByField(
+  const { isAdmin, email } = req.user
+
+  if (!isAdmin && email !== deployedByEmail) {
+    return res.status(403).json({ message: "Forbidden" })
+  }
+
+  const deployments = (await getDocsByField(
     "deployments",
     "deployedByEmail",
     deployedByEmail,
-  )
-  res.status(200).json({ deployments })
+  )) as IDeployment[]
+
+  return res.status(200).json({ deployments })
 }
 
-const deleteDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
+const deleteDeployment = async (
+  req: AuthedNextApiHandler,
+  res: NextApiResponse,
+) => {
   const body = req.body
-  const deploymentIds = body.deploymentIds
+  const deploymentIds = body.deploymentIds as string[] | undefined
+
   if (!deploymentIds || !deploymentIds.length) {
-    res.status(404).send("Missing deploymentIds from body")
-    return
+    return res.status(400).send("Missing deploymentIds from body")
   }
-  for (let i = 0; i < deploymentIds.length; i++) {
-    const deploymentId = deploymentIds[i]
+
+  deploymentIds.forEach(async (deploymentId) => {
     // @ts-ignore
-    let [deployment]: IDeployment = await getDocsByField(
+    const [deployment] = (await getDocsByField(
       "deployments",
       "deploymentId",
       deploymentId,
-    )
+    )) as IDeployment[]
+
     if (!deployment) {
-      res.status(400).json({
-        message: `Deployment Not found for id ${deploymentId}`,
-      })
-      return
+      return res.status(400).json({ message: "Not found" })
     }
 
     const pubSubData: IPubSubMsg = {
@@ -170,28 +198,22 @@ const deleteDeployment = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     delete pubSubData.variables.resource_creator_identity
-    try {
-      await pushPubSubMsg(pubSubData)
-      deployment.deletedAt = Timestamp.now()
-      await updateByField(
-        "deployments",
-        "deploymentId",
-        deploymentId,
-        deployment,
-      )
-    } catch (error) {
-      console.error(error)
-      res.status(500).send("Internal server error")
-      return
+    await pushPubSubMsg(pubSubData)
+    const now = Timestamp.now()
+    deployment.deletedAt = {
+      _seconds: now.seconds,
+      _nanoseconds: now.nanoseconds,
     }
-  }
-  res.status(200).json({
+    await updateByField("deployments", "deploymentId", deploymentId, deployment)
+  })
+
+  return res.status(200).json({
     deploymentIds,
     deleted: true,
   })
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: AuthedNextApiHandler, res: NextApiResponse) => {
   const { deployedByEmail } = req.query
 
   try {
@@ -201,11 +223,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === "POST") return createDeployment(req, res)
     if (req.method === "DELETE") return deleteDeployment(req, res)
   } catch (error) {
-    console.error("Deployments error", error)
-    res.status(500).json({
-      message: "Internal Server Error",
-    })
+    console.error(error)
+    return res.status(500).json({ message: "Internal Server Error" })
   }
 }
 
-export default handler
+export default withAuth(handler)

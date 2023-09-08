@@ -29,6 +29,8 @@ const NumberField: React.FC<INumberField> = ({ variable, validate }) => {
           name={variable.name}
           className="input"
           validate={validate}
+          //@ts-ignore
+          onWheel={(e) => e.target.blur()}
         />
       )}
       <div className="text-error text-xs mt-1">

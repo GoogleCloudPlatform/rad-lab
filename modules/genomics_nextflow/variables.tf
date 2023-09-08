@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,14 +43,20 @@ variable "billing_budget_amount_currency_code" {
   default     = "USD"
 }
 
+variable "billing_budget_calendar_period" {
+  description = "A CalendarPeriod represents the abstract concept of a recurring time period that has a canonical start. Possible values are: MONTH, QUARTER, YEAR, CALENDAR_PERIOD_UNSPECIFIED {{UIMeta group=0 order=10 updatesafe options=MONTH,QUARTER,YEAR,CALENDAR_PERIOD_UNSPECIFIED }}"
+  type        = string
+  default     = "MONTH"
+}
+
 variable "billing_budget_credit_types_treatment" {
-  description = "Specifies how credits should be treated when determining spend for threshold calculations. {{UIMeta group=0 order=10 updatesafe }}"
+  description = "Specifies how credits should be treated when determining spend for threshold calculations. {{UIMeta group=0 order=11 updatesafe }}"
   type        = string
   default     = "INCLUDE_ALL_CREDITS"
 }
 
 variable "billing_budget_labels" {
-  description = "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. {{UIMeta group=0 order=11 updatesafe }}"
+  description = "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. {{UIMeta group=0 order=12 updatesafe }}"
   type        = map(string)
   default     = {}
   validation {
@@ -60,23 +66,23 @@ variable "billing_budget_labels" {
 }
 
 variable "billing_budget_services" {
-  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe }}"
+  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=13 updatesafe }}"
   type        = list(string)
   default     = null
 }
 
 variable "billing_budget_notification_email_addresses" {
-  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 4 channels are allowed as the first element of `trusted_users` is automatically added as one of the channel. {{UIMeta group=0 order=13 updatesafe }}"
+  description = "A list of email addresses which will be recieving billing budget notification alerts. A maximum of 5 channels are allowed. {{UIMeta group=0 order=14 updatesafe }}"
   type        = set(string)
   default     = []
   validation {
-    condition     = length(var.billing_budget_notification_email_addresses) <= 4
-    error_message = "Maximum of 4 email addresses are allowed for the budget monitoring channel."
+    condition     = length(var.billing_budget_notification_email_addresses) <= 5
+    error_message = "Maximum of 5 email addresses are allowed for the budget monitoring channel."
   }
 }
 
 variable "billing_budget_pubsub_topic" {
-  description = "If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false. {{UIMeta group=0 order=14 updatesafe }}"
+  description = "If true, creates a Cloud Pub/Sub topic where budget related messages will be published. Default is false. {{UIMeta group=0 order=15 updatesafe }}"
   type        = bool
   default     = false
 }
@@ -118,7 +124,7 @@ variable "folder_id" {
 }
 
 variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for nextflow subnet. {{UIMeta group=2 order=6 }}"
+  description = "Unique IP CIDR Range for nextflow subnet. {{UIMeta group=2 order=4 }}"
   type        = string
   default     = "10.142.190.0/24"
 }
@@ -138,17 +144,7 @@ variable "nextflow_api_location" {
 variable "nextflow_sa_roles" {
   description = "List of roles granted to the nextflow service account. This server account will be used to run both the nextflow server and workers as well. {{UIMeta group=3 order=5 updatesafe }}"
   type        = list(any)
-  default = [
-    "roles/lifesciences.workflowsRunner",
-    "roles/serviceusage.serviceUsageConsumer",
-    "roles/storage.objectAdmin",
-    "roles/batch.jobsAdmin",
-    "roles/batch.agentReporter",
-    "roles/batch.serviceAgent",
-    "roles/iam.serviceAccountUser",
-    "roles/browser",
-    "roles/logging.viewer"
-  ]
+  default = ["roles/lifesciences.workflowsRunner", "roles/serviceusage.serviceUsageConsumer", "roles/storage.objectAdmin", "roles/batch.jobsAdmin", "roles/batch.agentReporter", "roles/batch.serviceAgent", "roles/iam.serviceAccountUser", "roles/browser", "roles/logging.viewer"]
 }
 
 variable "nextflow_server_instance_name" {
@@ -194,7 +190,7 @@ variable "project_id_prefix" {
 }
 
 variable "region" {
-  description = "The default region where the Compute Instance and VPCs will be deployed. {{UIMeta group=2 order=4 }}"
+  description = "The default region where the Compute Instance and VPCs will be deployed. List - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=19 }}"
   type        = string
   default     = "us-central1"
 }
@@ -206,19 +202,19 @@ variable "resource_creator_identity" {
 }
 
 variable "set_domain_restricted_sharing_policy" {
-  description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=15 updatesafe }}"
+  description = "Enable org policy to allow all principals to be added to IAM policies. {{UIMeta group=0 order=16 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_shielded_vm_policy" {
-  description = "If true shielded VM Policy will be set to disabled. {{UIMeta group=0 order=16 updatesafe }}"
+  description = "If true shielded VM Policy will be set to disabled. {{UIMeta group=0 order=17 updatesafe }}"
   type        = bool
   default     = false
 }
 
 variable "set_trustedimage_project_policy" {
-  description = "If true trusted image projects will be set to allow all. {{UIMeta group=0 order=17 updatesafe }}"
+  description = "If true trusted image projects will be set to allow all. {{UIMeta group=0 order=18 updatesafe }}"
   type        = bool
   default     = false
 }
@@ -242,7 +238,7 @@ variable "trusted_users" {
 }
 
 variable "zone" {
-  description = "The default zone where the Compute Instance be deployed. {{UIMeta group=2 order=5 }}"
+  description = "The default zone where the Compute Instance be deployed. List - https://cloud.google.com/compute/docs/regions-zones#available. {{UIMeta group=0 order=20 }}"
   type        = string
   default     = "us-central1-a"
 }

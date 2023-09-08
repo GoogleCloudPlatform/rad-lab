@@ -18,14 +18,9 @@ proceeding
 
 The following prerequisites have to be met in order to proceed with the Terraform installation.
 
-### Resource Hierarchy
-
-We recommend creating a separate Google Cloud Folder to host all the RAD Lab projects, including the RAD Lab UI project.
-When creating the `terraform.tfvars` file, make sure that the variable `parent` points to this newly created Folder ID (incl. the prefix `folders/`).
-
 ### IAM Permissions
 
-The identity running the Terraform scripts requires the following permissions at Folder-level
+The identity running the Terraform scripts requires the following permissions at Folder-level, on the Folder where you will create the RAD Lab UI project.
 
 * Project
   Creator ([`roles/resourcemanager.projectCreator`](https://cloud.google.com/resource-manager/docs/access-control-proj#using_predefined_roles))
@@ -62,12 +57,12 @@ When installing the RAD Lab UI, a number of tools are required to complete all t
 ### Variable Values
 
 In the `radlab-ui/automation/terraform/infrastructure` folder, create a `terraform.tfvars` file with, at minimum, the
-following values:
+following values (replace the dummy values with the actual values for your organization):
 
 ```shell
 cd radlab-ui/automation/terraform/infrastructure
 
-cat <<EOT >> terraform.tfvars
+cat <<EOT > terraform.tfvars
 billing_account_id  = "ABCD12-ABCD12-ABCD12"
 parent              = "folders/123456789"
 organization_name   = "your-organization-domain"
@@ -90,8 +85,8 @@ file.
 Run the following commands in a terminal or command window. You can also run this via a CI/CD pipeline if necessary, as
 long as the Service Account has the required IAM permissions as described [here](#iam-permissions).
 
-:::info IMPORTANT
-If you receive an error while running `terraform apply` in the next section, run `terraform init -migrate-state` before running the `terraform apply` command again.
+:::warning IMPORTANT
+If you receive an error while running `terraform apply` in the next section, run `terraform init -migrate-state` before running `terraform apply -auto-approve`.
 :::
 
 ```shell
@@ -127,35 +122,7 @@ The reason why you need to run `terraform init` twice is that the Terraform code
 a `terraform {}` resource, that points to a newly created bucket in the RAD Lab UI project. This will allow you to store
 the state remotely and collaborate on any future changes with other developers.
 
-It's important to point out that `terraform.tfvars` contains sensitive information. It's up to you to decide whether or
-not you want to store this in Github. If that is not the case, simply don't add that file.
-
-:::danger Important
-This step should only be executed if you forked the repository, as you won't have permissions to push files to the
-official RAD Lab repository.  
-:::
-
-:::danger Important
-These files contain sensitive information. Only add these to a private repository, **NOT** a public one.
-:::
-
-```shell
-# Create a main branch
-git checkout main
-
-# Add the files to source control.  
-# If you don't want to add `terraform.tfvars`, replace it with `git add backend.tf`
-git add --all
-
-# Commit the changes
-git commit -m "Initial Terraform run."
-
-# Replace USER and ORGANIZATION/REPO_NAME with your actual values
-git remote add origin git@github.com:USER|ORGANIZATION/REPO_NAME.git
-
-# Push the changes
-git push --set-upstream origin main
-```
+It's important to point out that `terraform.tfvars` contains sensitive information. It's up to you to decide whether you want to store this in Github. If that is not the case, simply don't add that file.
 
 ### Github Personal Access Token
 
@@ -176,17 +143,11 @@ Personal Access Token) to fetch the RAD Lab modules from your repo.
 1. Click on **Generate token**
 1. Copy the value of the token.
 
-You can add a secret directly on the command line using below command (replace `${GIT_PERSONAL_ACCESS_TOKEN}` with the token copied from the Github UI) :
+You can add a secret directly on the command line using below command (replace `${GIT_PERSONAL_ACCESS_TOKEN}` with the token copied from the Github UI), where `${PROJECT_ID}` corresponds to the RAD Lab UI project ID. 
 
 ```bash
 echo -n "${GIT_PERSONAL_ACCESS_TOKEN}" | \
     gcloud secrets versions add $(terraform output -json | jq -r .git_personal_access_token_secret_id.value) --data-file=- --project ${PROJECT_ID}
-```
-
-To get `PROJECT_ID`, run below command. Copy output and replace `${PROJECT_ID}`
-
-```shell
-terraform output -json | jq -r.project_id.value
 ```
 
 ### Connect Repository
@@ -221,15 +182,9 @@ echo "$(terraform show -json | jq -r .values.outputs.webapp_identity_email.value
 
 1. Go to [https://admin.google.com](https://admin.google.com)
 2. Go to the section to manage [roles & permissions](https://admin.google.com/ac/roles)
-3. Go to Account > Admin Roles and click on **create new role**
-4. Give it a meaningful name and description and click on **continue**
-5. When selecting privileges, scroll all the way to the bottom, to the section **Admin API Privileges**. 
-6. **ONLY** select Groups > Read, as it only requires permissions to read group memberships.
-7. Click on **Continue**
-8. Click on **Create Role**
-
-Click on **Assign service accounts** and paste the value from the terminal at the start of this section.  
-
+3. Click on the role **Groups Reader**, which is currently in *BETA*.
+4. Click on **Assign Role**
+5. Click on **Assign service accounts** and paste the value from the terminal, copied at the start of this section.  
 
 ## Billing
 
