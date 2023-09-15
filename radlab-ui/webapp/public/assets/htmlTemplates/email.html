@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 40%;
+      }
+
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Hello!</h3>
+    <p>RAD Lab Module has been successfully deployed for you!</p>
+    <p>Please use below details to access the same.</p>
+
+    <table id="myTable">
+      <tr>
+        <th>Name</th>
+        <th>value</th>
+      </tr>
+      {{#outputs}}
+      <tr>
+        <td>{{name}}</td>
+        <td>{{value}}</td>
+      </tr>
+      {{/outputs}}
+    </table>
+
+    <br />
+    Thank you<br />
+    <b>GPSDemofactory</b> <br />
+    <p>P.S:- This is an auto generated email!</p>
+  </body>
+</html>

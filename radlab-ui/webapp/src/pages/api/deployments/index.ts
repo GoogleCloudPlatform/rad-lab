@@ -7,6 +7,11 @@ import {
 } from "@/utils/Api_SeverSideCon"
 import { getBuildStatus, mergeVariables, pushPubSubMsg } from "@/utils/api"
 import { envOrFail } from "@/utils/env"
+import {
+  configureEmailAndSend,
+  deleteMailHTML,
+  sendMail,
+} from "@/utils/mailHandler"
 import { withAuth } from "@/utils/middleware"
 import {
   AuthedNextApiHandler,
@@ -14,7 +19,9 @@ import {
   DEPLOYMENT_STATUS,
   IBuild,
   IDeployment,
+  IEmailOptions,
   IPubSubMsg,
+  IVariables,
 } from "@/utils/types"
 import { Timestamp } from "firebase-admin/firestore"
 import { NextApiResponse } from "next"
@@ -40,6 +47,7 @@ const createDeployment = async (
 
   body.variables = variables
   body.builds = []
+
   // @ts-ignore
   const response: IDeployment = await saveDocument("deployments", body)
   if (!response) {
@@ -66,6 +74,8 @@ const createDeployment = async (
   } catch (error) {
     console.error(error)
   }
+
+  await configureEmailAndSend(response)
 
   return res.status(200).json({ response })
 }
@@ -205,6 +215,20 @@ const deleteDeployment = async (
       _nanoseconds: now.nanoseconds,
     }
     await updateByField("deployments", "deploymentId", deploymentId, deployment)
+
+    const variables = deployment.variables as IVariables
+    const recipients = [] as string[]
+    recipients.push(...variables.trusted_users)
+    recipients.push(...variables.trusted_groups)
+    recipients.push(...variables.owner_users)
+    recipients.push(...variables.owner_groups)
+
+    const mailOptions: IEmailOptions = {
+      recipients,
+      subject: "RAD Lab Module is Deleted!",
+      mailBody: deleteMailHTML(deploymentId),
+    }
+    await sendMail(mailOptions)
   })
 
   return res.status(200).json({
