@@ -1,5 +1,9 @@
 import React, { useState } from "react"
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/outline"
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  TrashIcon,
+} from "@heroicons/react/outline"
 import { textColorFromDeployStatus } from "@/utils/deployments"
 import { classNames } from "@/utils/dom"
 import {
@@ -12,6 +16,8 @@ import {
 import { useNavigate } from "react-router-dom"
 import startCase from "lodash/startCase"
 import ProjectLink from "../ProjectLink"
+import { useTranslation } from "next-i18next"
+import DeleteDeploymentModal from "../DeleteDeploymentModal"
 
 interface ModuleDeploymentProps {
   deployments: IDeployment[] | null
@@ -32,6 +38,11 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
   const [sortDirection, setSortDirection] = useState<SORT_DIRECTION>(
     defaultSortDirection || SORT_DIRECTION.DESC,
   )
+  // const [isMultipleSelect, setMultipleSelect] = useState<boolean>(false)
+  const [isAllSelect, setAllSelect] = useState<boolean>(false)
+  const [isModal, setModal] = useState<boolean>(false)
+  const { t } = useTranslation()
+
   const setSort = (header: IHeader) => () => {
     if (header.field === sortField) {
       setSortDirection(
@@ -86,116 +97,164 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
   }
   const navigate = useNavigate()
 
-  const handleClick =
+  const handleDeployment =
     (deployment: IDeployment) => (e: React.SyntheticEvent) => {
       const id = e.currentTarget.getAttribute("data-id")
       navigate(`/deployments/${id}`, { state: { deployment } })
     }
 
+  const handleAllCheckBox = () => setAllSelect(!isAllSelect)
+
+  const handleClick = (state: boolean) => setModal(state)
+
+  const renderModal = () => {
+    return <DeleteDeploymentModal handleClick={handleClick} />
+  }
+
   return (
-    <div className="overflow-x-auto bg-base-100 border border-base-300 p-0">
-      <table className="w-full divide-y divide-base-200 border border-base-200 rounded-md">
-        <thead className="bg-base-200">
-          <tr>
-            {headers.map((header) => (
-              <th
-                key={header.label}
-                scope="col"
-                className="px-4 py-3 text-xs md:text-sm font-medium text-left text-base-content tracking-wider"
-              >
-                <div className="relative">
-                  <div className="absolute -left-4 top-1">
-                    <ChevronUpIcon
-                      className={classNames(
-                        sortField === header.field &&
-                          sortDirection === SORT_DIRECTION.ASC
-                          ? "text-normal"
-                          : "hidden",
-                        "h-3",
+    <>
+      <div className="flex jutify-start mb-2">
+        <div
+          className="tooltip tooltip-primary"
+          data-tip="Select the modules to delete"
+        >
+          <button
+            className="btn btn-link btn-xs no-underline bg-base-200 hover:bg-base-300 flex gap-1 hover:no-underline"
+            disabled={!isAllSelect}
+            onClick={() => setModal(true)}
+          >
+            <TrashIcon className="w-3 h-3" />
+            {t("delete")}
+          </button>
+        </div>
+      </div>
+      <div className="overflow-x-auto bg-base-100 border border-base-300 p-0">
+        <table className="w-full divide-y divide-base-200 border border-base-200 rounded-md">
+          <thead className="bg-base-200">
+            <tr>
+              {headers.map((header) => (
+                <th
+                  key={header.label}
+                  scope="col"
+                  className="px-4 py-3 text-xs md:text-sm font-medium text-left text-base-content tracking-wider"
+                >
+                  <div className="relative">
+                    <div className="absolute -left-4 top-1">
+                      <ChevronUpIcon
+                        className={classNames(
+                          sortField === header.field &&
+                            sortDirection === SORT_DIRECTION.ASC
+                            ? "text-normal"
+                            : "hidden",
+                          "h-3",
+                        )}
+                      />
+                      <ChevronDownIcon
+                        className={classNames(
+                          sortField === header.field &&
+                            sortDirection === SORT_DIRECTION.DESC
+                            ? "text-normal"
+                            : "hidden",
+                          "h-3",
+                        )}
+                      />
+                    </div>
+                    <div className="flex gap-1">
+                      {header.label === "Module" && (
+                        <span className="flex gap-2">
+                          <input
+                            type="checkbox"
+                            //@ts-ignore
+                            checked={isAllSelect && "checked"}
+                            className="checkbox checkbox-xs checkbox-primary mt-1"
+                            onChange={() => handleAllCheckBox()}
+                          />
+                        </span>
                       )}
-                    />
-
-                    <ChevronDownIcon
-                      className={classNames(
-                        sortField === header.field &&
-                          sortDirection === SORT_DIRECTION.DESC
-                          ? "text-normal"
-                          : "hidden",
-                        "h-3",
-                      )}
-                    />
+                      <div
+                        className={classNames(
+                          sortField === header.field
+                            ? "text-normal font-semibold"
+                            : "text-normal",
+                          "cursor-pointer hover:text-normal transition",
+                        )}
+                        onClick={setSort(header)}
+                      >
+                        {header.label}
+                      </div>
+                    </div>
                   </div>
-                  <div
-                    className={classNames(
-                      sortField === header.field
-                        ? "text-normal font-semibold"
-                        : "text-normal",
-                      "cursor-pointer hover:text-normal transition",
-                    )}
-                    onClick={setSort(header)}
-                  >
-                    {header.label}
-                  </div>
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-base-100 divide-y-2 divide-base-200">
+            {deployments?.sort(tableSort).map((deployment, index) => {
+              const statusColor = textColorFromDeployStatus(deployment.status)
 
-        <tbody className="bg-base-100 divide-y-2 divide-base-200">
-          {deployments?.sort(tableSort).map((deployment, index) => {
-            const statusColor = textColorFromDeployStatus(deployment.status)
+              let time: FirestoreTimestamp =
+                deployment.createdAt as FirestoreTimestamp
+              const fireBaseTime = new Date(
+                time._seconds * 1000 + time._nanoseconds / 1000000,
+              )
+              const date = fireBaseTime.toLocaleDateString()
 
-            let time: FirestoreTimestamp =
-              deployment.createdAt as FirestoreTimestamp
-            const fireBaseTime = new Date(
-              time._seconds * 1000 + time._nanoseconds / 1000000,
-            )
-            const date = fireBaseTime.toLocaleDateString()
-
-            return (
-              <tr
-                key={index}
-                className="border border-t-1 border-base-300 text-xs md:text-sm xl:text-base"
-              >
-                <td className="pl-4 py-3">{startCase(deployment.module)}</td>
-                <td className="pl-4 py-3">
-                  <a
-                    className="link link-primary link-hover"
-                    onClick={handleClick(deployment)}
-                    data-id={deployment.deploymentId}
-                  >
-                    {deployment.deploymentId}
-                  </a>
-                </td>
-                <td className="pl-4 py-3 text-xs md:text-sm">
-                  <ProjectLink deployment={deployment} />
-                </td>
-                <td className="pl-4 py-3 text-xs md:text-sm text-faint">
-                  {deployment.deployedByEmail}
-                </td>
-                <td className="pl-4 py-3 text-xs md:text-sm text-faint">
-                  {date}
-                </td>
-                <td className="pl-4 py-3 text-xs xl:text-sm pr-2 text-dim">
-                  {deployment.deletedAt ? (
-                    <span className="text-error text-dim font-semibold">
-                      DELETED
+              return (
+                <tr
+                  key={index}
+                  className="border border-t-1 border-base-300 text-xs md:text-sm xl:text-base"
+                >
+                  <td className="pl-4 py-3">
+                    <span className="flex gap-2 text-sm font-semibold text-dim">
+                      <input
+                        type="checkbox"
+                        //@ts-ignore
+                        checked={isAllSelect && "checked"}
+                        className="checkbox checkbox-xs checkbox-primary mt-1"
+                        onChange={() => setAllSelect(false)}
+                      />
+                      {startCase(deployment.module)}
                     </span>
-                  ) : (
-                    <span
-                      className={`text-${statusColor} text-dim font-semibold`}
+                  </td>
+                  <td className="pl-4 py-3">
+                    <a
+                      className="link link-primary link-hover"
+                      onClick={handleDeployment(deployment)}
+                      data-id={deployment.deploymentId}
                     >
-                      {deployment.status}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
+                      {deployment.deploymentId}
+                    </a>
+                  </td>
+                  <td className="pl-4 py-3 text-xs md:text-sm">
+                    <ProjectLink deployment={deployment} />
+                  </td>
+                  <td className="pl-4 py-3 text-xs md:text-sm text-faint">
+                    {deployment.deployedByEmail}
+                  </td>
+                  <td className="pl-4 py-3 text-xs md:text-sm text-faint">
+                    {date}
+                  </td>
+                  <td className="pl-4 py-3 text-xs xl:text-sm pr-2 text-dim">
+                    {deployment.deletedAt ? (
+                      <span className="text-error text-dim font-semibold">
+                        DELETED
+                      </span>
+                    ) : (
+                      <span
+                        className={`text-${statusColor} text-dim font-semibold`}
+                      >
+                        {deployment.status}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+        {isModal && renderModal()}
+      </div>
+    </>
   )
 }
 
