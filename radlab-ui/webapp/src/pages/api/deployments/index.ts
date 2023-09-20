@@ -7,11 +7,7 @@ import {
 } from "@/utils/Api_SeverSideCon"
 import { getBuildStatus, mergeVariables, pushPubSubMsg } from "@/utils/api"
 import { envOrFail } from "@/utils/env"
-import {
-  configureEmailAndSend,
-  deleteMailHTML,
-  sendMail,
-} from "@/utils/mailHandler"
+import { configureEmailAndSend } from "@/utils/mailHandler"
 import { withAuth } from "@/utils/middleware"
 import {
   AuthedNextApiHandler,
@@ -19,9 +15,7 @@ import {
   DEPLOYMENT_STATUS,
   IBuild,
   IDeployment,
-  IEmailOptions,
   IPubSubMsg,
-  IVariables,
 } from "@/utils/types"
 import { Timestamp } from "firebase-admin/firestore"
 import { NextApiResponse } from "next"
@@ -75,7 +69,10 @@ const createDeployment = async (
     console.error(error)
   }
 
-  await configureEmailAndSend(response)
+  await configureEmailAndSend(
+    "RAD Lab Module has been created for you!",
+    response,
+  )
 
   return res.status(200).json({ response })
 }
@@ -216,19 +213,10 @@ const deleteDeployment = async (
     }
     await updateByField("deployments", "deploymentId", deploymentId, deployment)
 
-    const variables = deployment.variables as IVariables
-    const recipients = [] as string[]
-    recipients.push(...variables.trusted_users)
-    recipients.push(...variables.trusted_groups)
-    recipients.push(...variables.owner_users)
-    recipients.push(...variables.owner_groups)
-
-    const mailOptions: IEmailOptions = {
-      recipients,
-      subject: "RAD Lab Module is Deleted!",
-      mailBody: deleteMailHTML(deploymentId),
-    }
-    await sendMail(mailOptions)
+    await configureEmailAndSend(
+      "RAD Lab Module has been deleted for you!",
+      deployment,
+    )
   })
 
   return res.status(200).json({

@@ -15,8 +15,18 @@ const MAIL_SERVER_PASS = envOrFail(
   process.env.MAIL_SERVER_PASS,
 )
 
-export const configureEmailAndSend = async (deployment: IDeployment) => {
-  const { variables, projectId, module, deploymentId } = deployment
+const GCP_PROJECT_ID = envOrFail(
+  "NEXT_PUBLIC_GCP_PROJECT_ID",
+  process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
+)
+
+export const configureEmailAndSend = async (
+  mailSubject: string,
+  deployment: IDeployment,
+) => {
+  const { variables, projectId, module, deploymentId, deployedByEmail } =
+    deployment
+
   const recipients = [
     ...variables.trusted_users,
     ...variables.trusted_groups,
@@ -24,49 +34,97 @@ export const configureEmailAndSend = async (deployment: IDeployment) => {
     ...variables.owner_groups,
   ] as string[]
 
+  recipients.push(deployedByEmail)
+
   const configDirectory = path.resolve(process.cwd(), "public")
+  const server = `https://${GCP_PROJECT_ID}.uc.r.appspot.com`
 
-  let html = await readFileSync(
-    path.join(configDirectory + "/assets/htmlTemplates/email.html"),
-    "utf8",
-  )
-  let template = await handlebars.compile(html)
+  if (mailSubject === "RAD Lab Module has been deleted for you!") {
+    const html = await readFileSync(
+      path.join(configDirectory + "/assets/htmlTemplates/deleteEmail.html"),
+      "utf8",
+    )
+    const template = await handlebars.compile(html)
 
-  const outputs = [
-    {
-      name: "projectId",
-      value: projectId,
-    },
-    {
-      name: "module",
-      value: module,
-    },
-    {
-      name: "deploymentId",
-      value: deploymentId,
-    },
-    {
-      name: "billing_account_id",
-      value: variables.billing_account_id,
-    },
-    {
-      name: "zone",
-      value: variables.zone,
-    },
-  ]
+    const data = {
+      deploymentId,
+      deploymentLink: `${server}/deployments/${deploymentId}`,
+    }
 
-  let data = {
-    outputs,
+    handlebars.registerHelper("deployment_link", () => {
+      return new handlebars.SafeString(
+        handlebars.Utils.escapeExpression(data.deploymentLink),
+      )
+    })
+
+    const htmlToSend = template(data)
+
+    const mailOptions: IEmailOptions = {
+      recipients,
+      subject: mailSubject,
+      mailBody: htmlToSend,
+    }
+
+    await sendMail(mailOptions)
+  } else {
+    const html = await readFileSync(
+      path.join(configDirectory + "/assets/htmlTemplates/email.html"),
+      "utf8",
+    )
+
+    const template = await handlebars.compile(html)
+
+    const billingId = variables.billing_account_id as string
+
+    const maskedBillingId =
+      billingId.substring(0, billingId.length - 6).replace(/[a-z\d]/gi, "*") +
+      billingId.substring(billingId.length - 6, billingId.length)
+
+    const outputs = [
+      {
+        name: "module",
+        value: module,
+      },
+      {
+        name: "billing_account_id",
+        value: maskedBillingId,
+      },
+      {
+        name: "zone",
+        value: variables.zone,
+      },
+    ]
+
+    const data = {
+      outputs,
+      mailBodyTitle: mailSubject,
+      projectId,
+      projectLink: `https://console.cloud.google.com/welcome?project=${projectId}`,
+      deploymentId,
+      deploymentLink: `${server}/deployments/${deploymentId}`,
+    }
+    handlebars.registerHelper("gcp_project_link", () => {
+      return new handlebars.SafeString(
+        handlebars.Utils.escapeExpression(data.projectLink),
+      )
+    })
+
+    handlebars.registerHelper("deployment_link", () => {
+      return new handlebars.SafeString(
+        handlebars.Utils.escapeExpression(data.deploymentLink),
+      )
+    })
+
+    const htmlToSend = template(data)
+
+    const mailOptions: IEmailOptions = {
+      recipients,
+      subject: mailSubject,
+      mailBody: htmlToSend,
+    }
+
+    await sendMail(mailOptions)
   }
-  let htmlToSend = template(data)
-
-  const mailOptions: IEmailOptions = {
-    recipients,
-    subject: "RAD Lab Module is Ready!",
-    mailBody: htmlToSend,
-  }
-
-  await sendMail(mailOptions)
 }
 
 export const sendMail = async (emailOptions: IEmailOptions) => {
@@ -104,6 +162,3 @@ export const sendMail = async (emailOptions: IEmailOptions) => {
       console.error("Error", error)
     })
 }
-
-export const deleteMailHTML = (deploymentId: string) =>
-  `<h3>Hello! </h3> <p>RAD Lab Module with deployment ID - ${deploymentId} has been successfully deleted!</p> Thank you<br /> <b>GPSDemofactory</b> <br/> <p>P.S:- This is an auto generated email!</p>`

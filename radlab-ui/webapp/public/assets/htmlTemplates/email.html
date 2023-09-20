@@ -17,13 +17,29 @@
   </head>
   <body>
     <h3>Hello!</h3>
-    <p>RAD Lab Module has been successfully deployed for you!</p>
+    <p>{{mailBodyTitle}}</p>
     <p>Please use below details to access the same.</p>
 
     <table id="myTable">
       <tr>
         <th>Name</th>
         <th>value</th>
+      </tr>
+      <tr>
+        <td>Project Id</td>
+        <td>
+          <a href="{{{gcp_project_link}}}" style="border: 0" target="_blank"
+            >{{projectId}}</a
+          >
+        </td>
+      </tr>
+      <tr>
+        <td>Deployment Id</td>
+        <td>
+          <a href="{{{deployment_link}}}" style="border: 0" target="_blank"
+            >{{deploymentId}}</a
+          >
+        </td>
       </tr>
       {{#outputs}}
       <tr>
@@ -35,7 +51,7 @@
 
     <br />
     Thank you<br />
-    <b>GPSDemofactory</b> <br />
-    <p>P.S:- This is an auto generated email!</p>
+    <b>RAD Lab Admins</b> <br />
+    <p>P.S:- This is an auto generated email. Please do not reply!</p>
   </body>
 </html>
