@@ -168,6 +168,7 @@ export const DEPLOYMENT_STATUSES = [
   "TIMEOUT",
   "CANCELLED",
   "EXPIRE",
+  "DELETED",
 ]
 
 export const DATA_SCIENCE_VARS = `

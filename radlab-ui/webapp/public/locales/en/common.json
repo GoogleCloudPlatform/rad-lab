@@ -77,5 +77,6 @@
   "loading": "Loading",
   "no-modules-message": "If you are not seeing the module you want, reach out to your RAD Lab Admin",
   "build-status": "Build Status",
-  "history": "History"
+  "history": "History",
+  "modules": "Modules"
 }

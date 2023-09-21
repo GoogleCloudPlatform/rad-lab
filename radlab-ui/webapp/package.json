@@ -29,6 +29,7 @@
     "firebase-admin": "^11.0.1",
     "formik": "^2.2.9",
     "hcl2-parser": "^1.0.3",
+    "heroicons": "^2.0.18",
     "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
     "lunr": "^2.3.9",

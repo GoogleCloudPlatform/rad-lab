@@ -113,7 +113,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
 
   return (
     <>
-      <div className="flex jutify-start mb-2">
+      <div className="flex justify-end mb-2">
         <div
           className="tooltip tooltip-primary"
           data-tip="Select the modules to delete"

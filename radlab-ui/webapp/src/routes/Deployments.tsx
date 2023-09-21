@@ -7,11 +7,17 @@ import {
   SORT_FIELD,
   Deployments as DeploymentsParser,
   IDeployment,
+  Modules,
 } from "@/utils/types"
 import { useTranslation } from "next-i18next"
 import { classNames } from "@/utils/dom"
 import axios from "axios"
-import { alertStore, deploymentStore, userStore } from "@/store"
+import {
+  alertStore,
+  deploymentStore,
+  moduleNamesStore,
+  userStore,
+} from "@/store"
 import Loading from "@/navigation/Loading"
 import { ALERT_TYPE } from "@/utils/types"
 import AdminSettingsButton from "@/components/AdminSettingsButton"
@@ -44,6 +50,9 @@ const Deployments: React.FC<DeploymentsProps> = () => {
   const setFilteredDeployments = deploymentStore(
     (state) => state.setFilteredDeployments,
   )
+  const setModuleNames = moduleNamesStore((state) => state.setModuleNames)
+
+  const [clearFilter, setClearFilter] = useState(false)
 
   const fetchData = async () => {
     Promise.all([
@@ -59,8 +68,12 @@ const Deployments: React.FC<DeploymentsProps> = () => {
         )
         setAllList(allDeployData)
         setMyList(myDeployData)
-        setDeployments(allDeployData || myDeployData)
-        setFilteredDeployments(allDeployData || myDeployData)
+        deploymentTab === DEPLOYMENT_TAB.ALL
+          ? setDeployments(allDeployData)
+          : setDeployments(myDeployData)
+        deploymentTab === DEPLOYMENT_TAB.ALL
+          ? setFilteredDeployments(allDeployData)
+          : setFilteredDeployments(myDeployData)
       })
       .catch((error) => {
         console.error(error)
@@ -75,9 +88,26 @@ const Deployments: React.FC<DeploymentsProps> = () => {
       })
   }
 
+  const fetchModules = async () => {
+    setLoading(true)
+    await axios
+      .get("/api/modules")
+      .then((res) => {
+        const modules = Modules.parse(res.data.modules)
+        setModuleNames(modules)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
+
   useEffect(() => {
     fetchData()
-  }, [])
+    fetchModules()
+  }, [deploymentTab])
 
   const renderAllTab = () => {
     return (
@@ -87,7 +117,11 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           deploymentTab === DEPLOYMENT_TAB.ALL ? "tab-active" : "",
         )}
         data-testid="all-deployments"
-        onClick={() => setDeploymentTab(DEPLOYMENT_TAB.ALL)}
+        onClick={() => {
+          setDeploymentTab(DEPLOYMENT_TAB.ALL),
+            setFilteredDeployments(null),
+            setClearFilter(true)
+        }}
       >
         {t("all-deployments")}
       </a>
@@ -102,7 +136,11 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           deploymentTab === DEPLOYMENT_TAB.MINE ? "tab-active" : "",
         )}
         data-testid="my-deployments"
-        onClick={() => setDeploymentTab(DEPLOYMENT_TAB.MINE)}
+        onClick={() => {
+          setDeploymentTab(DEPLOYMENT_TAB.MINE),
+            setFilteredDeployments(null),
+            setClearFilter(true)
+        }}
       >
         {t("my-deployments")}
       </a>
@@ -122,12 +160,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
 
   return (
     <RouteContainer>
-      <Filter
-        filters={["status", "module"]}
-        // statuses={
-        //   demoTab === DEMO_TAB.GOOGLE ? googleDemoStatuses : partnerDemoStatuses
-        // }
-      />
+      <Filter filters={["status", "module"]} clearFilter={clearFilter} />
 
       <div className="flex mb-2 mt-4">
         <div className="w-full">

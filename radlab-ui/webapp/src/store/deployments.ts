@@ -1,5 +1,5 @@
 import { IDeployment } from "@/utils/types"
-import create from "zustand"
+import { create } from "zustand"
 
 interface IDeploymentState {
   deployments: null | IDeployment[]
