@@ -887,7 +887,7 @@ variable "folder_id" {
 }
 
 variable "email_notifications" {
-  description = "Email notifications toggle for enabling email notifications for users. {{UIMeta group=4 order=1 }}"
+  description = "Enable Email notifications to Trusted and Owner Users / Groups for RAD Lab module updates. {{UIMeta group=4 order=1 }}"
   type        = bool
   default     = false
 }
