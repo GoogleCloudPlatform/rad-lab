@@ -122,10 +122,10 @@ export interface IModuleCard {
 
 const Variables = z
   .object({
-    trusted_users: z.array(z.string()).optional().default([]),
-    trusted_groups: z.array(z.string()).optional().default([]),
-    owner_users: z.array(z.string()).optional().default([]),
-    owner_groups: z.array(z.string()).optional().default([]),
+    trusted_users: z.array(z.string()).optional(),
+    trusted_groups: z.array(z.string()).optional(),
+    owner_users: z.array(z.string()).optional(),
+    owner_groups: z.array(z.string()).optional(),
   })
   .passthrough()
 export type IVariables = z.infer<typeof Variables>
@@ -304,5 +304,16 @@ const emailOptions = z.object({
   recipients: z.array(z.string()),
   subject: z.string(),
   mailBody: z.string(),
+  credentials: z.object({
+    email: z.string(),
+    password: z.string(),
+  }),
 })
 export type IEmailOptions = z.infer<typeof emailOptions>
+
+const secretManagerRequest = z.object({
+  key: z.string(),
+  value: z.string(),
+})
+
+export type ISecretManagerReq = z.infer<typeof secretManagerRequest>

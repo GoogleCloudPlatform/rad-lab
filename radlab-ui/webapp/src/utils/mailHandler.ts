@@ -1,19 +1,12 @@
-import { IDeployment, IEmailOptions } from "@/utils/types"
-import { envOrFail } from "@/utils/env"
 import nodemailer from "nodemailer"
 import { readFileSync } from "fs"
 import handlebars from "handlebars"
 import path from "path"
 
-const MAIL_SERVER_USERNAME = envOrFail(
-  "MAIL_SERVER_USERNAME",
-  process.env.MAIL_SERVER_USERNAME,
-)
-
-const MAIL_SERVER_PASS = envOrFail(
-  "MAIL_SERVER_PASS",
-  process.env.MAIL_SERVER_PASS,
-)
+import { getDocsByField } from "@/utils/Api_SeverSideCon"
+import { IDeployment, IEmailOptions } from "@/utils/types"
+import { envOrFail } from "@/utils/env"
+import { getSecretKeyValue } from "@/pages/api/secret"
 
 const GCP_PROJECT_ID = envOrFail(
   "NEXT_PUBLIC_GCP_PROJECT_ID",
@@ -26,18 +19,41 @@ export const configureEmailAndSend = async (
 ) => {
   const { variables, projectId, module, deploymentId, deployedByEmail } =
     deployment
+  const recipients = [] as string[]
+  const server = `https://${GCP_PROJECT_ID}.uc.r.appspot.com`
 
-  const recipients = [
-    ...variables.trusted_users,
-    ...variables.trusted_groups,
-    ...variables.owner_users,
-    ...variables.owner_groups,
-  ] as string[]
+  const [settings] = await getDocsByField(
+    "settings",
+    "projectId",
+    GCP_PROJECT_ID,
+  )
+  // verifying email_notifications enabled by admin
+  if (!settings.variables.email_notifications) {
+    return
+  }
+  //fetch mailbox password from secret manager
+  const password = await getSecretKeyValue("mailBoxCred")
+  if (!password) {
+    return
+  }
 
+  // adding module creator/deployer to recipients list
   recipients.push(deployedByEmail)
 
+  if (variables.trusted_users) {
+    recipients.push(...variables.trusted_users)
+  }
+  if (variables.trusted_groups) {
+    recipients.push(...variables.trusted_groups)
+  }
+  if (variables.owner_users) {
+    recipients.push(...variables.owner_users)
+  }
+  if (variables.owner_groups) {
+    recipients.push(...variables.owner_groups)
+  }
+
   const configDirectory = path.resolve(process.cwd(), "public")
-  const server = `https://${GCP_PROJECT_ID}.uc.r.appspot.com`
 
   if (mailSubject === "RAD Lab Module has been deleted for you!") {
     const html = await readFileSync(
@@ -63,6 +79,10 @@ export const configureEmailAndSend = async (
       recipients,
       subject: mailSubject,
       mailBody: htmlToSend,
+      credentials: {
+        email: settings.variables.mail_box_email,
+        password,
+      },
     }
 
     await sendMail(mailOptions)
@@ -75,7 +95,6 @@ export const configureEmailAndSend = async (
     const template = await handlebars.compile(html)
 
     const billingId = variables.billing_account_id as string
-
     const maskedBillingId =
       billingId.substring(0, billingId.length - 6).replace(/[a-z\d]/gi, "*") +
       billingId.substring(billingId.length - 6, billingId.length)
@@ -121,6 +140,10 @@ export const configureEmailAndSend = async (
       recipients,
       subject: mailSubject,
       mailBody: htmlToSend,
+      credentials: {
+        email: settings.variables.mail_box_email,
+        password,
+      },
     }
 
     await sendMail(mailOptions)
@@ -128,7 +151,7 @@ export const configureEmailAndSend = async (
 }
 
 export const sendMail = async (emailOptions: IEmailOptions) => {
-  const recipients = emailOptions.recipients
+  const { recipients, credentials } = emailOptions
   if (!recipients.length) {
     return
   }
@@ -140,15 +163,15 @@ export const sendMail = async (emailOptions: IEmailOptions) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: MAIL_SERVER_USERNAME,
-      pass: MAIL_SERVER_PASS,
+      user: credentials.email,
+      pass: credentials.password,
     },
   })
 
   transporter.verify().then(console.log).catch(console.error)
 
   const mailConfiguration = {
-    from: MAIL_SERVER_USERNAME,
+    from: credentials.email,
     to: uniqueRecipients.toString(),
     subject: emailOptions.subject,
     html: emailOptions.mailBody,

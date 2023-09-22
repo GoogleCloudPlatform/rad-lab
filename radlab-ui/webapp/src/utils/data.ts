@@ -884,7 +884,24 @@ variable "folder_id" {
   description = "Folder ID where the project should be created. {{UIMeta group=3 order=1 }}"
   type        = string
   default     = ""
-}`
+}
+
+variable "email_notifications" {
+  description = "Email notifications toggle for enabling email notifications for users. {{UIMeta group=4 order=1 }}"
+  type        = bool
+  default     = false
+}
+variable "mail_box_email" {
+  description = "Mail Box Email Id. {{UIMeta group=4 order=2 }}"
+  type        = string
+  default     = ""
+}
+variable "mail_box_password" {
+  description = "Mail Box Password. {{UIMeta group=4 order=3 }}"
+  type        = string
+  default     = ""
+}
+`
 
 export const EXAMPLE_CLOUD_BUILD_LOGS = `
 starting build "12345678-eeee-4c4c-a94f-abdf234223425"
