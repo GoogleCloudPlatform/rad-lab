@@ -26,13 +26,21 @@ const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
   const user = userStore((state) => state.user)
 
   const handleDelete = async () => {
-    const config = {
+    const config1 = {
+      data: { deployedByEmail: user?.email, deploymentIds: deploymentIds },
+    }
+
+    const config2 = {
       data: { deployedByEmail: user?.email },
     }
 
     setLoading(true)
-    await axios
-      .delete(`/api/deployments/${deployId}`, config)
+
+    const request = deploymentIds?.length
+      ? axios.delete(`/api/deployments`, config1)
+      : axios.delete(`/api/deployments/${deployId}`, config2)
+
+    request
       .then((res) => {
         if (res.status === 200) {
           setAlert({
@@ -61,6 +69,8 @@ const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
       })
       .finally(() => {
         setLoading(false)
+        setModal(false)
+        handleClick(false)
       })
   }
 
@@ -86,16 +96,27 @@ const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
           <p className="p-1 bg-error bg-opacity-10 text-sm rounded-md mt-4 text-center text-error font-semibold">
             {t("delete-deployment-message")}
           </p>
+          <div className="flex justify-center mt-2">
+            {loading && <Loading />}
+          </div>
           {deploymentIds?.length ? (
-            <p className="text-sm font-normal mt-6 text-center">
-              {`${t("deployment-id")} ${deployId}`}
-            </p>
+            <>
+              {deploymentIds.map((deploymentId) => {
+                return (
+                  <p
+                    className="text-sm font-normal mt-6 text-center font-semibold"
+                    key={deploymentId}
+                  >
+                    {`${t("deployment-id")} ${deploymentId}`}
+                  </p>
+                )
+              })}
+            </>
           ) : (
-            <p className="text-sm font-normal mt-6 text-center">
+            <p className="text-sm font-normal mt-6 text-center font-semibold">
               {`${t("deployment-id")} ${deployId}`}
             </p>
           )}
-
           <div className="modal-action">
             <button
               className="btn btn-outline btn-sm"
@@ -105,13 +126,14 @@ const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
             >
               {t("close")}
             </button>
-            {loading ? (
-              <Loading />
-            ) : (
-              <button className="btn btn-error btn-sm" onClick={handleDelete}>
-                {t("delete")}
-              </button>
-            )}
+            <button
+              className="btn btn-error btn-sm"
+              onClick={() => {
+                handleDelete()
+              }}
+            >
+              {t("delete")}
+            </button>
           </div>
         </div>
       </div>

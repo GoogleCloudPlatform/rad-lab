@@ -109,9 +109,12 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
     setAllSelect(select)
     select
       ? deployments
-          .filter((item) => !item.hasOwnProperty("deletedAt"))
+          .filter((item) => item.status === DEPLOYMENT_STATUS.SUCCESS)
           .map((deployment) => {
-            setDeploymentId((oldArray) => [...oldArray, deployment.id])
+            setDeploymentId((oldArray) => [
+              ...oldArray,
+              deployment.deploymentId,
+            ])
           })
       : setDeploymentId([])
   }
@@ -119,7 +122,12 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
   const handleClick = (state: boolean) => setModal(state)
 
   const renderModal = () => {
-    return <DeleteDeploymentModal handleClick={handleClick} />
+    return (
+      <DeleteDeploymentModal
+        handleClick={handleClick}
+        deploymentIds={deploymentId}
+      />
+    )
   }
 
   const handleCheckID = (id: string) => {
@@ -183,7 +191,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
                       />
                     </div>
                     <div className="flex gap-1">
-                      {header.label === "Module" && (
+                      {header.label === "Module" && deploymentId.length > 0 && (
                         <span className="flex gap-2">
                           <input
                             type="checkbox"
@@ -243,12 +251,16 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
                             type="checkbox"
                             //@ts-ignore
                             checked={
-                              deploymentId.find((ID) => ID === deployment.id)
+                              deploymentId.find(
+                                (ID) => ID === deployment.deploymentId,
+                              )
                                 ? "checked"
                                 : ""
                             }
                             className="checkbox checkbox-xs checkbox-primary mt-1"
-                            onChange={() => handleCheckID(deployment.id)}
+                            onChange={() =>
+                              handleCheckID(deployment.deploymentId)
+                            }
                           />
                           {startCase(deployment.module)}
                         </span>
