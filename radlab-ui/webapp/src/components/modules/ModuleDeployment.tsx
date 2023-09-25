@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -12,12 +12,13 @@ import {
   IHeader,
   FirestoreTimestamp,
   IDeployment,
+  DEPLOYMENT_STATUS,
 } from "@/utils/types"
 import { useNavigate } from "react-router-dom"
 import startCase from "lodash/startCase"
-import ProjectLink from "../ProjectLink"
+import ProjectLink from "@/components/ProjectLink"
 import { useTranslation } from "next-i18next"
-import DeleteDeploymentModal from "../DeleteDeploymentModal"
+import DeleteDeploymentModal from "@/components/DeleteDeploymentModal"
 
 interface ModuleDeploymentProps {
   deployments: IDeployment[] | null
@@ -42,6 +43,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
   const [isAllSelect, setAllSelect] = useState<boolean>(false)
   const [isModal, setModal] = useState<boolean>(false)
   const { t } = useTranslation()
+  const [deploymentId, setDeploymentId] = useState<string[]>([])
 
   const setSort = (header: IHeader) => () => {
     if (header.field === sortField) {
@@ -103,13 +105,34 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
       navigate(`/deployments/${id}`, { state: { deployment } })
     }
 
-  const handleAllCheckBox = () => setAllSelect(!isAllSelect)
+  const handleAllCheckBox = (deployments: IDeployment[], select: boolean) => {
+    setAllSelect(select)
+    select
+      ? deployments
+          .filter((item) => !item.hasOwnProperty("deletedAt"))
+          .map((deployment) => {
+            setDeploymentId((oldArray) => [...oldArray, deployment.id])
+          })
+      : setDeploymentId([])
+  }
 
   const handleClick = (state: boolean) => setModal(state)
 
   const renderModal = () => {
     return <DeleteDeploymentModal handleClick={handleClick} />
   }
+
+  const handleCheckID = (id: string) => {
+    setAllSelect(false)
+    if (deploymentId.find((deployment_id) => deployment_id === id)) {
+      const value = deploymentId.filter((item) => item !== id)
+      setDeploymentId(value)
+    } else {
+      setDeploymentId((prev) => [...prev, id])
+    }
+  }
+
+  useEffect(() => {}, [deploymentId])
 
   return (
     <>
@@ -120,7 +143,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
         >
           <button
             className="btn btn-link btn-xs no-underline bg-base-200 hover:bg-base-300 flex gap-1 hover:no-underline"
-            disabled={!isAllSelect}
+            disabled={!deploymentId.length}
             onClick={() => setModal(true)}
           >
             <TrashIcon className="w-3 h-3" />
@@ -165,9 +188,15 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
                           <input
                             type="checkbox"
                             //@ts-ignore
-                            checked={isAllSelect && "checked"}
+                            checked={
+                              isAllSelect && deploymentId.length && "checked"
+                            }
                             className="checkbox checkbox-xs checkbox-primary mt-1"
-                            onChange={() => handleAllCheckBox()}
+                            onChange={() =>
+                              deployments &&
+                              deployments.length &&
+                              handleAllCheckBox(deployments, !isAllSelect)
+                            }
                           />
                         </span>
                       )}
@@ -189,67 +218,80 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
             </tr>
           </thead>
           <tbody className="bg-base-100 divide-y-2 divide-base-200">
-            {deployments?.sort(tableSort).map((deployment, index) => {
-              const statusColor = textColorFromDeployStatus(deployment.status)
+            {deployments
+              ?.filter((item) => !item.hasOwnProperty("deletedAt"))
+              ?.sort(tableSort)
+              .map((deployment, index) => {
+                const statusColor = textColorFromDeployStatus(deployment.status)
 
-              let time: FirestoreTimestamp =
-                deployment.createdAt as FirestoreTimestamp
-              const fireBaseTime = new Date(
-                time._seconds * 1000 + time._nanoseconds / 1000000,
-              )
-              const date = fireBaseTime.toLocaleDateString()
+                let time: FirestoreTimestamp =
+                  deployment.createdAt as FirestoreTimestamp
+                const fireBaseTime = new Date(
+                  time._seconds * 1000 + time._nanoseconds / 1000000,
+                )
+                const date = fireBaseTime.toLocaleDateString()
 
-              return (
-                <tr
-                  key={index}
-                  className="border border-t-1 border-base-300 text-xs md:text-sm xl:text-base"
-                >
-                  <td className="pl-4 py-3">
-                    <span className="flex gap-2 text-sm font-semibold text-dim">
-                      <input
-                        type="checkbox"
-                        //@ts-ignore
-                        checked={isAllSelect && "checked"}
-                        className="checkbox checkbox-xs checkbox-primary mt-1"
-                        onChange={() => setAllSelect(false)}
-                      />
-                      {startCase(deployment.module)}
-                    </span>
-                  </td>
-                  <td className="pl-4 py-3">
-                    <a
-                      className="link link-primary link-hover"
-                      onClick={handleDeployment(deployment)}
-                      data-id={deployment.deploymentId}
-                    >
-                      {deployment.deploymentId}
-                    </a>
-                  </td>
-                  <td className="pl-4 py-3 text-xs md:text-sm">
-                    <ProjectLink deployment={deployment} />
-                  </td>
-                  <td className="pl-4 py-3 text-xs md:text-sm text-faint">
-                    {deployment.deployedByEmail}
-                  </td>
-                  <td className="pl-4 py-3 text-xs md:text-sm text-faint">
-                    {date}
-                  </td>
-                  <td className="pl-4 py-3 text-xs xl:text-sm pr-2 text-dim">
-                    {deployment.deletedAt ? (
-                      <span className="text-error text-dim font-semibold">
-                        DELETED
-                      </span>
-                    ) : (
-                      <span
-                        className={`text-${statusColor} text-dim font-semibold`}
+                return (
+                  <tr
+                    key={index}
+                    className="border border-t-1 border-base-300 text-xs md:text-sm xl:text-base"
+                  >
+                    <td className="pl-4 py-3">
+                      {deployment.status === DEPLOYMENT_STATUS.SUCCESS ? (
+                        <span className="flex gap-2 text-sm font-semibold text-dim">
+                          <input
+                            type="checkbox"
+                            //@ts-ignore
+                            checked={
+                              deploymentId.find((ID) => ID === deployment.id)
+                                ? "checked"
+                                : ""
+                            }
+                            className="checkbox checkbox-xs checkbox-primary mt-1"
+                            onChange={() => handleCheckID(deployment.id)}
+                          />
+                          {startCase(deployment.module)}
+                        </span>
+                      ) : (
+                        <span className="flex gap-2 text-sm font-semibold text-dim">
+                          {startCase(deployment.module)}
+                        </span>
+                      )}
+                    </td>
+                    <td className="pl-4 py-3">
+                      <a
+                        className="link link-primary link-hover"
+                        onClick={handleDeployment(deployment)}
+                        data-id={deployment.deploymentId}
                       >
-                        {deployment.status}
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
+                        {deployment.deploymentId}
+                      </a>
+                    </td>
+                    <td className="pl-4 py-3 text-xs md:text-sm">
+                      <ProjectLink deployment={deployment} />
+                    </td>
+                    <td className="pl-4 py-3 text-xs md:text-sm text-faint">
+                      {deployment.deployedByEmail}
+                    </td>
+                    <td className="pl-4 py-3 text-xs md:text-sm text-faint">
+                      {date}
+                    </td>
+                    <td className="pl-4 py-3 text-xs xl:text-sm pr-2 text-dim">
+                      {deployment.deletedAt ? (
+                        <span className="text-error text-dim font-semibold">
+                          DELETED
+                        </span>
+                      ) : (
+                        <span
+                          className={`text-${statusColor} text-dim font-semibold`}
+                        >
+                          {deployment.status}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
           </tbody>
         </table>
         {isModal && renderModal()}

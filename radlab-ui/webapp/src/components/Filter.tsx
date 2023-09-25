@@ -128,13 +128,21 @@ export default function Filter({
             value={status}
             className="select select-bordered w-full max-w-xs col-span-4"
           >
-            <option disabled selected className="text-xs">
+            <option disabled selected>
               {t("status")}
             </option>
             {statuses.map((status) => (
-              <option key={status} value={status} className="text-xs">
-                {status}
-              </option>
+              <>
+                <input
+                  type="checkbox"
+                  //@ts-ignore
+                  checked="checked"
+                  className="checkbox checkbox-sm"
+                />
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              </>
             ))}
           </select>
         )}

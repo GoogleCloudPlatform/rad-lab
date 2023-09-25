@@ -9,11 +9,13 @@ import { XCircleIcon } from "@heroicons/react/outline"
 
 interface IDeleteDeploymentModal {
   deployId?: string
+  deploymentIds?: string[]
   handleClick: Function
 }
 
 const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
   deployId,
+  deploymentIds,
   handleClick,
 }) => {
   const [modal, setModal] = useState(true)
@@ -84,9 +86,16 @@ const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
           <p className="p-1 bg-error bg-opacity-10 text-sm rounded-md mt-4 text-center text-error font-semibold">
             {t("delete-deployment-message")}
           </p>
-          <p className="text-sm font-normal mt-6 text-center">
-            {`${t("deployment-id")} ${deployId}`}
-          </p>
+          {deploymentIds?.length ? (
+            <p className="text-sm font-normal mt-6 text-center">
+              {`${t("deployment-id")} ${deployId}`}
+            </p>
+          ) : (
+            <p className="text-sm font-normal mt-6 text-center">
+              {`${t("deployment-id")} ${deployId}`}
+            </p>
+          )}
+
           <div className="modal-action">
             <button
               className="btn btn-outline btn-sm"
