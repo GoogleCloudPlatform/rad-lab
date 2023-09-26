@@ -37,8 +37,6 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
 
   const renderControls = (variable: IUIVariable) => {
     switch (variable.type) {
-      case "string":
-        return <StringField variable={variable} validate={validateRequired} />
       case "bool":
         return <BooleanField variable={variable} />
       default:
