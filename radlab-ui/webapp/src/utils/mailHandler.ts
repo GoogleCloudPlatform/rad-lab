@@ -167,7 +167,7 @@ export const sendMail = async (emailOptions: IEmailOptions) => {
     },
   })
 
-  transporter.verify().then(console.log).catch(console.error)
+  await transporter.verify().catch(console.error)
 
   const mailConfiguration = {
     from: credentials.email,
@@ -175,9 +175,7 @@ export const sendMail = async (emailOptions: IEmailOptions) => {
     subject: emailOptions.subject,
     html: emailOptions.mailBody,
   }
-  return transporter
-    .sendMail(mailConfiguration)
-    .catch((error) => {
-      console.error("Error", error)
-    })
+  return transporter.sendMail(mailConfiguration).catch((error) => {
+    console.error("Error", error)
+  })
 }
