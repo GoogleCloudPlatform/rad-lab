@@ -34,6 +34,7 @@ export const configureEmailAndSend = async (
   //fetch mailbox password from secret manager
   const password = await getSecretKeyValue("mailBoxCred")
   if (!password) {
+    console.error("No email password found")
     return
   }
 
