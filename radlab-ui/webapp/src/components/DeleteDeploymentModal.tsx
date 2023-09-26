@@ -10,7 +10,7 @@ interface IDeleteDeploymentModal {
   deployId?: string
   deploymentIds?: string[]
   handleClick: Function
-  handleRefresh: Function
+  handleRefresh?: Function
 }
 
 const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
@@ -48,7 +48,7 @@ const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
             durationMs: 10000,
             type: ALERT_TYPE.SUCCESS,
           })
-          handleRefresh(true)
+          handleRefresh && handleRefresh(true)
         } else {
           setAlert({
             message: t("delete-error"),
