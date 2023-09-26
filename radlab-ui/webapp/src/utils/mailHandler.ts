@@ -175,11 +175,8 @@ export const sendMail = async (emailOptions: IEmailOptions) => {
     subject: emailOptions.subject,
     html: emailOptions.mailBody,
   }
-  transporter
+  return transporter
     .sendMail(mailConfiguration)
-    .then((res) => {
-      console.log("Mail sent", res)
-    })
     .catch((error) => {
       console.error("Error", error)
     })
