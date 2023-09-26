@@ -13,6 +13,7 @@ const gcpProjectId = envOrFail(
 const secretManagerLocation = envOrFail(
   "SECRET_MANAGER_LOCATION",
   process.env.SECRET_MANAGER_LOCATION,
+  "us-central1",
 )
 
 export const getSecretKeyValue = async (secretId: string) => {

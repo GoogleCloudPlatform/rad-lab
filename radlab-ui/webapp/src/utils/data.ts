@@ -887,17 +887,17 @@ variable "folder_id" {
 }
 
 variable "email_notifications" {
-  description = "Enable/Disable Email notifications to Trusted and Owner Users / Groups for RAD Lab module updates. {{UIMeta group=4 order=1 }}"
+  description = "Enable email notifications to Trusted and Owner Users/Groups for RAD Lab deployment events. {{UIMeta group=4 order=1 }}"
   type        = bool
   default     = false
 }
 variable "mail_server_email" {
-  description = "Mail Server Email Id for sending email notifications. {{UIMeta group=4 order=2 }}"
+  description = "Gmail address for sending email notifications. {{UIMeta group=4 order=2 }}"
   type        = string
   default     = ""
 }
 variable "mail_server_password" {
-  description = "Mail Server Password to authenticate your mail server(Password will be stored in Google Secret Manager). {{UIMeta group=4 order=3 }}"
+  description = "Gmail password (see more at https://googlecloudplatform.github.io/rad-lab/docs/rad-lab-ui/troubleshooting). {{UIMeta group=4 order=3 }}"
   type        = string
   default     = ""
 }
