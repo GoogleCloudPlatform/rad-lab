@@ -1,7 +1,6 @@
 import axios from "axios"
 import { useTranslation } from "next-i18next"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { alertStore, userStore } from "@/store"
 import { ALERT_TYPE } from "@/utils/types"
 import Loading from "@/navigation/Loading"
@@ -11,15 +10,16 @@ interface IDeleteDeploymentModal {
   deployId?: string
   deploymentIds?: string[]
   handleClick: Function
+  handleRefresh: Function
 }
 
 const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
   deployId,
   deploymentIds,
   handleClick,
+  handleRefresh,
 }) => {
   const [modal, setModal] = useState(true)
-  const navigate = useNavigate()
   const { t } = useTranslation()
   const setAlert = alertStore((state) => state.setAlert)
   const [loading, setLoading] = useState(false)
@@ -48,7 +48,7 @@ const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
             durationMs: 10000,
             type: ALERT_TYPE.SUCCESS,
           })
-          navigate("/deployments")
+          handleRefresh(true)
         } else {
           setAlert({
             message: t("delete-error"),

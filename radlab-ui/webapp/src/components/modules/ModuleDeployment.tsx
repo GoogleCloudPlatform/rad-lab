@@ -25,6 +25,7 @@ interface ModuleDeploymentProps {
   defaultSortField?: SORT_FIELD
   defaultSortDirection?: SORT_DIRECTION
   headers: IHeader[]
+  handleRefresh: Function
 }
 
 const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
@@ -32,6 +33,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
   defaultSortField,
   defaultSortDirection,
   headers,
+  handleRefresh,
 }) => {
   const [sortField, setSortField] = useState<SORT_FIELD>(
     defaultSortField || SORT_FIELD.MODULE,
@@ -44,6 +46,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
   const [isModal, setModal] = useState<boolean>(false)
   const { t } = useTranslation()
   const [deploymentId, setDeploymentId] = useState<string[]>([])
+  const [isCheckbox, setIsCheckbox] = useState<number>(0)
 
   const setSort = (header: IHeader) => () => {
     if (header.field === sortField) {
@@ -126,6 +129,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
       <DeleteDeploymentModal
         handleClick={handleClick}
         deploymentIds={deploymentId}
+        handleRefresh={handleRefresh}
       />
     )
   }
@@ -140,7 +144,19 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
     }
   }
 
-  useEffect(() => {}, [deploymentId])
+  useEffect(() => {
+    deployments &&
+      deployments.map((deployment) => {
+        if (deployment.hasOwnProperty("deletedAt")) {
+          //@ts-ignore
+          deployment["status"] = "DELETED"
+        }
+      })
+    const value = deployments?.filter(
+      (deployment) => deployment.status === DEPLOYMENT_STATUS.SUCCESS,
+    )
+    if (value && value.length) setIsCheckbox(value.length)
+  }, [deploymentId])
 
   return (
     <>
@@ -191,7 +207,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
                       />
                     </div>
                     <div className="flex gap-1">
-                      {header.label === "Module" && deploymentId.length > 0 && (
+                      {header.label === "Module" && (
                         <span className="flex gap-2">
                           <input
                             type="checkbox"
@@ -199,6 +215,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
                             checked={
                               isAllSelect && deploymentId.length && "checked"
                             }
+                            disabled={!isCheckbox && !deploymentId.length}
                             className="checkbox checkbox-xs checkbox-primary mt-1"
                             onChange={() =>
                               deployments &&

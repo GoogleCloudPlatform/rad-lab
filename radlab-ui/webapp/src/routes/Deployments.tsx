@@ -53,6 +53,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
   const setModuleNames = moduleNamesStore((state) => state.setModuleNames)
 
   const [clearFilter, setClearFilter] = useState(false)
+  const [refresh, setRefresh] = useState(false)
 
   const fetchData = async () => {
     Promise.all([
@@ -104,10 +105,12 @@ const Deployments: React.FC<DeploymentsProps> = () => {
       })
   }
 
+  const handleRefresh = (state: boolean) => setRefresh(state)
+
   useEffect(() => {
     fetchData()
     fetchModules()
-  }, [deploymentTab])
+  }, [deploymentTab, refresh])
 
   const renderAllTab = () => {
     return (
@@ -191,6 +194,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
             deployments={filteredDeployments || listAllDeployments}
             defaultSortField={SORT_FIELD.CREATEDAT}
             defaultSortDirection={SORT_DIRECTION.DESC}
+            handleRefresh={handleRefresh}
           />
         ) : (
           renderEmptyState()
@@ -202,6 +206,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
             deployments={filteredDeployments || listMyDeployments}
             defaultSortField={SORT_FIELD.CREATEDAT}
             defaultSortDirection={SORT_DIRECTION.DESC}
+            handleRefresh={handleRefresh}
           />
         ) : (
           renderEmptyState()
