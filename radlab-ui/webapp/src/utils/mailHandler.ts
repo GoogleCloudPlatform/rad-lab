@@ -157,9 +157,7 @@ export const sendMail = async (emailOptions: IEmailOptions) => {
     return
   }
 
-  const uniqueRecipients = recipients.filter(
-    (item, index) => recipients.indexOf(item) === index,
-  )
+  const uniqueRecipients = [...new Set(recipients)]
 
   let transporter = nodemailer.createTransport({
     service: "gmail",
