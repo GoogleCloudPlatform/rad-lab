@@ -81,7 +81,7 @@ export const configureEmailAndSend = async (
       subject: mailSubject,
       mailBody: htmlToSend,
       credentials: {
-        email: settings.variables.mail_box_email,
+        email: settings.variables.mail_server_email,
         password,
       },
     }
@@ -142,7 +142,7 @@ export const configureEmailAndSend = async (
       subject: mailSubject,
       mailBody: htmlToSend,
       credentials: {
-        email: settings.variables.mail_box_email,
+        email: settings.variables.mail_server_email,
         password,
       },
     }

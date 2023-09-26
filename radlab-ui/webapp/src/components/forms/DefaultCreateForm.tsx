@@ -44,12 +44,12 @@ const DefaultCreateForm: React.FC<IDefaultCreateFormProps> = ({
     if (values.email_notifications) {
       const secretManagerPayload: ISecretManagerReq = {
         key: "mailBoxCred",
-        value: values.mail_box_password,
+        value: values.mail_server_password,
       }
       await saveMailBoxCred(secretManagerPayload)
     }
 
-    delete values.mail_box_password
+    delete values.mail_server_password
     const payload = Object.assign(values, {
       email: user?.email,
     })
@@ -109,13 +109,13 @@ const DefaultCreateForm: React.FC<IDefaultCreateFormProps> = ({
   ) => {
     const allNonDependsVars = formVariablesData.filter(
       (formVariableData) =>
-        formVariableData.name !== "mail_box_email" &&
-        formVariableData.name !== "mail_box_password",
+        formVariableData.name !== "mail_server_email" &&
+        formVariableData.name !== "mail_server_password",
     )
     const allDependsVars = formVariablesData.filter(
       (formVariableData) =>
-        formVariableData.name === "mail_box_email" ||
-        formVariableData.name === "mail_box_password",
+        formVariableData.name === "mail_server_email" ||
+        formVariableData.name === "mail_server_password",
     )
 
     const notificationAnswer = currentAnswerValueData.email_notifications

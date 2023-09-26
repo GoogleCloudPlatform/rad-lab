@@ -35,6 +35,7 @@ Firebase environment variables can be found in project settings section of your 
 - `NEXT_PUBLIC_NOTIFICATION_TOPIC` - Topic created for notifications
 - `NEXT_PUBLIC_NOTIFICATION_SUB` - Subscription created for notifications
 - `NEXT_PUBLIC_GIT_API_URL` - Url of the public repo to pull the deployment modules
+- `SECRET_MANAGER_LOCATION` - Location of the Google secret manager to store the secrets(replica set)
 
 ## Git Hub repo envs
 

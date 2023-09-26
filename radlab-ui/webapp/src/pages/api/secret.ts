@@ -10,6 +10,11 @@ const gcpProjectId = envOrFail(
   process.env.NEXT_PUBLIC_GCP_PROJECT_ID,
 )
 
+const secretManagerLocation = envOrFail(
+  "SECRET_MANAGER_LOCATION",
+  process.env.SECRET_MANAGER_LOCATION,
+)
+
 export const getSecretKeyValue = async (secretId: string) => {
   try {
     const parent = `projects/${gcpProjectId}`
@@ -39,7 +44,7 @@ const createSecret = async (req: NextApiRequest, res: NextApiResponse) => {
         userManaged: {
           replicas: [
             {
-              location: "us-central1",
+              location: secretManagerLocation,
             },
           ],
         },
