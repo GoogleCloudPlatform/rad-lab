@@ -12,8 +12,6 @@ type IFilterType =
   | "deployedByEmail"
   | "createdAt"
   | "status"
-// type ICategory = (typeof DemoCategories)[number] | string |  ""
-// type IVerticals = (typeof DemoCategories)[number] | string | ""
 
 export default function Filter({
   filters,
