@@ -160,22 +160,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
 
   return (
     <>
-      <div className="flex justify-end mb-2">
-        <div
-          className="tooltip tooltip-primary"
-          data-tip="Select the modules to delete"
-        >
-          <button
-            className="btn btn-link btn-xs no-underline bg-base-200 hover:bg-base-300 flex gap-1 hover:no-underline"
-            disabled={!deploymentId.length}
-            onClick={() => setModal(true)}
-          >
-            <TrashIcon className="w-3 h-3" />
-            {t("delete")}
-          </button>
-        </div>
-      </div>
-      <div className="overflow-x-auto bg-base-100 border border-base-300 p-0">
+      <div className="overflow-x-auto bg-base-100 border border-base-300 p-0 mt-4 flex w-full">
         <table className="w-full divide-y divide-base-200 border border-base-200 rounded-md">
           <thead className="bg-base-200">
             <tr>
@@ -324,6 +309,25 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
           </tbody>
         </table>
         {isModal && renderModal()}
+      </div>
+      <div
+        className={classNames(
+          "flex justify-end mb-2 mt-2",
+          deploymentId.length ? "" : "hidden",
+        )}
+      >
+        <div
+          className="tooltip tooltip-primary"
+          data-tip="Select the modules to delete"
+        >
+          <button
+            className="btn btn-link btn-xs no-underline bg-error text-base-100 bg-opacity-80 hover:bg-error hover:bg-opacity-90 flex gap-1 hover:no-underline"
+            onClick={() => setModal(true)}
+          >
+            <TrashIcon className="w-3 h-3" />
+            {t("delete")}
+          </button>
+        </div>
       </div>
     </>
   )

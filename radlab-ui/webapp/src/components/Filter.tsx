@@ -32,8 +32,6 @@ export default function Filter({
 
   const moduleNames = moduleNamesStore((state) => state.moduleNames)
   const [isLoading, _] = useState<boolean>(false)
-  // const [category, setCategory] = useState<string>("")
-  // const [classification, setClassification] = useState("")
 
   // TODO. Likely change this to the firebase.uid for the record
   const refField = "id"
@@ -79,24 +77,6 @@ export default function Filter({
         .filter(Boolean)
     }
 
-    // if (status !== "")
-    //   // @ts-ignore
-    //   filtered = filtered.filter((demo) => demo.status === status)
-    // if (category !== "")
-    //   filtered = filtered.filter((demo) => demo.category === category)
-    // if (vertical !== "")
-    //   filtered = filtered.filter(
-    //     (demo) =>
-    //       demo.vertical === vertical || demo.vertical.includes("Security"),
-    //   )
-    // if (classification !== "")
-    //   // @ts-ignore
-    //   filtered = filtered.filter((demo) =>
-    //     classification === "demo"
-    //       ? demo.classification === "demo" || demo.classification === undefined
-    //       : demo.classification === "solution",
-    //   )
-
     setFilteredDeployments(filtered)
   }, [deployments, search, moduleName])
 
@@ -138,7 +118,7 @@ export default function Filter({
                   className="checkbox checkbox-sm"
                 />
                 <option key={status} value={status}>
-                  {status}
+                  {startCase(status)}
                 </option>
               </>
             ))}
@@ -148,7 +128,6 @@ export default function Filter({
         {filters.includes("module") && (
           <select
             onChange={(e) => setModuleName(e.target.value)}
-            // value={module}
             className="select select-bordered w-full max-w-xs col-span-4"
           >
             <option value="">{t("modules")}</option>
@@ -161,12 +140,12 @@ export default function Filter({
               })}
           </select>
         )}
-        <div className="flex justify-end mt-2 col-span-2">
+        <div className="flex justify-end col-span-2">
           <button
-            className="btn btn-link text-base-content no-underline hover:no-underline btn-sm bg-base-200 border border-base-300 hover:bg-base-300"
+            className="btn btn-link no-underline hover:no-underline btn-md bg-primary bg-opacity-80 text-base-100 hover:bg-opacity-90 hover:bg-primary"
             onClick={clearAllFilters}
           >
-            Clear
+            {t("clear")}
           </button>
         </div>
       </div>

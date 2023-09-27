@@ -163,9 +163,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
 
   return (
     <RouteContainer>
-      <Filter filters={["status", "module"]} clearFilter={clearFilter} />
-
-      <div className="flex mb-2 mt-4">
+      <div className="flex mb-2">
         <div className="w-full">
           <div className="tabs tabs-boxed">
             {renderMyTab()}
@@ -187,6 +185,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           )}
         </div>
       </div>
+      <Filter filters={["status", "module"]} clearFilter={clearFilter} />
       {deploymentTab === DEPLOYMENT_TAB.ALL &&
         (listAllDeployments?.length ? (
           <ModuleDeployment

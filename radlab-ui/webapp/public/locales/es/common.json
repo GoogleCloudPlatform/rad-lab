@@ -78,5 +78,6 @@
   "no-modules-message": "Si no ve el módulo que desea, comuníquese con su administrador de RAD Lab",
   "build-status": "Estado de construcción",
   "history": "Historia",
-  "modules": "Módulos"
+  "modules": "Módulos",
+  "clear": "claro"
 }
