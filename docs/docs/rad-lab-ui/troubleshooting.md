@@ -15,7 +15,9 @@ If enabled, the following users/groups (defined in the module's Terraform variab
 - `owner_users`
 - `owner_groups`
 
-Currently only sending via gmail is supported. It is recommended to [create a new gmail address](https://support.google.com/mail/answer/56256?hl=en) for this purpose only. Do **not** enable two factor authentication (2FA) on this account. You will then provide this email and its password to RAD Lab UI via the `Global Variables` setup.
+Currently only sending via gmail is supported. It is recommended to [create a new gmail address](https://support.google.com/mail/answer/56256?hl=en) for this purpose only and generate a `App Password` to authenticate it by followig [Sign in with app passwords](https://support.google.com/mail/answer/185833?hl=en)
+
+ You will then provide this email and its password to RAD Lab UI via the `Global Variables` setup.
 
 The email address will be store in Firestore, and email password will be securely stored in Google's [Secret Manager](https://cloud.google.com/secret-manager)
 
