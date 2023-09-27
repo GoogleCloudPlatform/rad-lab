@@ -90,7 +90,6 @@ const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
           </div>
           <h3 className="font-bold text-lg text-center">
             {t("delete-deployment-title")}
-            {"?"}
           </h3>
           <hr className="border border-base-200 mt-2" />
           <p className="p-1 bg-error bg-opacity-10 text-sm rounded-md mt-4 text-center text-error font-semibold">
