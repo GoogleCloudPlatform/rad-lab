@@ -321,7 +321,7 @@ const ModuleDeployment: React.FC<ModuleDeploymentProps> = ({
           data-tip="Select the modules to delete"
         >
           <button
-            className="btn btn-link btn-xs no-underline bg-error text-base-100 bg-opacity-80 hover:bg-error hover:bg-opacity-90 flex gap-1 hover:no-underline"
+            className="btn btn-link btn-xs no-underline bg-error text-base-100 bg-opacity-80 hover:bg-error hover:bg-opacity-90 flex gap-1 hover:no-underline fixed bottom-2 right-6"
             onClick={() => setModal(true)}
           >
             <TrashIcon className="w-3 h-3" />
