@@ -43,7 +43,7 @@
   "access-denied-message": "You are not authorized to use this part of the application",
   "gcp-admin": "Please check with your GCP admin to proceed further",
   "delete-deployment-title": "Delete Deployment",
-  "delete-deployment-message": "Are you sure you want to delete the deployment/deployments?",
+  "delete-deployment-message": "Are you sure you want to delete the deployment(s)?",
   "close": "Close",
   "deployment-id": "Deployment ID:",
   "available-modules": "Available Modules",
