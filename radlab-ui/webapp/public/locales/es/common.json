@@ -43,7 +43,7 @@
   "access-denied-message": "No está autorizado para usar esta aplicación.",
   "gcp-admin": "Consulte con su administrador de GCP para continuar",
   "delete-deployment": "Eliminar implementación",
-  "delete-deployment-message": "¿Está seguro de que desea eliminar la implementación/implementaciones?",
+  "delete-deployment-message": "¿Está seguro de que desea eliminar las implementaciones?",
   "close": "Cerca",
   "deployment-id": "Id. de implementación:",
   "available-modules": "Módulos disponibles",
