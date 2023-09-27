@@ -103,25 +103,27 @@ export default function Filter({
         {filters.includes("status") && (
           <select
             onChange={(e) => setStatus(e.target.value)}
-            value={status}
             className="select select-bordered w-full max-w-xs col-span-4"
           >
             <option disabled selected>
               {t("status")}
             </option>
-            {statuses.map((status) => (
-              <>
-                <input
-                  type="checkbox"
-                  //@ts-ignore
-                  checked="checked"
-                  className="checkbox checkbox-sm"
-                />
-                <option key={status} value={status}>
-                  {startCase(status)}
-                </option>
-              </>
-            ))}
+            {statuses.map((status) => {
+              const statusValue = status.toLowerCase()
+              return (
+                <>
+                  <input
+                    type="checkbox"
+                    //@ts-ignore
+                    checked="checked"
+                    className="checkbox checkbox-sm"
+                  />
+                  <option key={statusValue} value={statusValue}>
+                    {startCase(statusValue)}
+                  </option>
+                </>
+              )
+            })}
           </select>
         )}
 
