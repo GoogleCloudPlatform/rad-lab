@@ -26,19 +26,19 @@ const DeleteDeploymentModal: React.FC<IDeleteDeploymentModal> = ({
   const user = userStore((state) => state.user)
 
   const handleDelete = async () => {
-    const config1 = {
+    const multipleDeleteConfig = {
       data: { deployedByEmail: user?.email, deploymentIds: deploymentIds },
     }
 
-    const config2 = {
+    const singleDeleteConfig = {
       data: { deployedByEmail: user?.email },
     }
 
     setLoading(true)
 
     const request = deploymentIds?.length
-      ? axios.delete(`/api/deployments`, config1)
-      : axios.delete(`/api/deployments/${deployId}`, config2)
+      ? axios.delete(`/api/deployments`, multipleDeleteConfig)
+      : axios.delete(`/api/deployments/${deployId}`, singleDeleteConfig)
 
     request
       .then((res) => {
