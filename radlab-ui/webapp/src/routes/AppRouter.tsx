@@ -13,6 +13,7 @@ import { userStore } from "@/store"
 import AdminRoutes from "@/routes/AdminRoutes"
 import UpdateModule from "@/routes/UpdateModule"
 import ProvisionPublishModule from "@/routes/ProvisionPublishModule"
+import Architecture from "@/routes/Architecture"
 
 interface AppRouterProps {}
 
@@ -40,6 +41,7 @@ const AppRouter: React.FC<AppRouterProps> = ({}) => {
       <Route path="/deployments/:deployId/update" element={<UpdateModule />} />
 
       <Route path="/modules/provision" element={<ProvisionModule />} />
+      <Route path="/modules/architecture" element={<Architecture />} />
       <Route
         path="/modules"
         element={
