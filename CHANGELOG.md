@@ -15,6 +15,11 @@ Here we write upgrading notes for RAD Lab repo. It's a team effort to make them 
  
 ### Fixed
 
+## [13.3.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v13.3.1) (2023-09-29)
+ 
+### Added
+- _RAD Lab UI:_ Releasing Email notifications from RAD LAB UI to module requestor and trusted/owner users/groups of the module on creation/updation/deletion. [(#141)](https://github.com/GoogleCloudPlatform/rad-lab/issues/141) [(#182)](https://github.com/GoogleCloudPlatform/rad-lab/pull/182) 
+
 ## [13.2.1](https://github.com/GoogleCloudPlatform/rad-lab/releases/tag/v13.2.1) (2023-09-05)
 
 ### Changed
