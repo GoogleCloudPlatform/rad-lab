@@ -20,6 +20,12 @@ variable "admin_group_name" {
   default     = "rad-lab-admins"
 }
 
+variable "secret_manager_location" {
+  description = "The location where the secret is stored in the Secret Manager."
+  type        = string
+  default     = "us-central1"
+}
+
 variable "app_engine_location" {
   description = "The location where the App Engine project will be created."
   type        = string
