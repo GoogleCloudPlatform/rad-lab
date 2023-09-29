@@ -157,6 +157,20 @@ export const TEST_MODULES: IModule[] = [
   },
 ]
 
+export const DEPLOYMENT_STATUSES = [
+  "STATUS_UNKNOWN",
+  "PENDING",
+  "QUEUED",
+  "WORKING",
+  "SUCCESS",
+  "FAILURE",
+  "INTERNAL_ERROR",
+  "TIMEOUT",
+  "CANCELLED",
+  "EXPIRE",
+  "DELETED",
+]
+
 export const DATA_SCIENCE_VARS = `
 
 variable "billing_account_id" {

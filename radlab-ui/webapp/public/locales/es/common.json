@@ -42,7 +42,8 @@
   "access-denied": "Acceso denegado!",
   "access-denied-message": "No está autorizado para usar esta aplicación.",
   "gcp-admin": "Consulte con su administrador de GCP para continuar",
-  "delete-deployment": "¿Estás segura de que quieres eliminar el ID de despliegue?",
+  "delete-deployment": "Eliminar implementación",
+  "delete-deployment-message": "¿Está seguro de que desea eliminar las implementaciones?",
   "close": "Cerca",
   "deployment-id": "Id. de implementación:",
   "available-modules": "Módulos disponibles",
@@ -76,5 +77,7 @@
   "loading": "Cargando",
   "no-modules-message": "Si no ve el módulo que desea, comuníquese con su administrador de RAD Lab",
   "build-status": "Estado de construcción",
-  "history": "Historia"
+  "history": "Historia",
+  "modules": "Módulos",
+  "clear": "claro"
 }

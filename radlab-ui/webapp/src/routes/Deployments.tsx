@@ -7,17 +7,24 @@ import {
   SORT_FIELD,
   Deployments as DeploymentsParser,
   IDeployment,
+  Modules,
 } from "@/utils/types"
 import { useTranslation } from "next-i18next"
 import { classNames } from "@/utils/dom"
 import axios from "axios"
-import { alertStore, userStore } from "@/store"
+import {
+  alertStore,
+  deploymentStore,
+  moduleNamesStore,
+  userStore,
+} from "@/store"
 import Loading from "@/navigation/Loading"
 import { ALERT_TYPE } from "@/utils/types"
 import AdminSettingsButton from "@/components/AdminSettingsButton"
 import NewDeploymentButton from "@/components/NewDeploymentButton"
 import EmptyAdminState from "@/components/EmptyAdminState"
 import EmptyState from "@/components/EmptyState"
+import Filter from "@/components/Filter"
 
 enum DEPLOYMENT_TAB {
   ALL,
@@ -36,6 +43,17 @@ const Deployments: React.FC<DeploymentsProps> = () => {
   const [deploymentTab, setDeploymentTab] = useState(
     isAdmin ? DEPLOYMENT_TAB.ALL : DEPLOYMENT_TAB.MINE,
   )
+  const setDeployments = deploymentStore((state) => state.setDeployments)
+  const filteredDeployments = deploymentStore(
+    (state) => state.filteredDeployments,
+  )
+  const setFilteredDeployments = deploymentStore(
+    (state) => state.setFilteredDeployments,
+  )
+  const setModuleNames = moduleNamesStore((state) => state.setModuleNames)
+
+  const [clearFilter, setClearFilter] = useState(false)
+  const [refresh, setRefresh] = useState(false)
 
   const fetchData = async () => {
     Promise.all([
@@ -51,6 +69,12 @@ const Deployments: React.FC<DeploymentsProps> = () => {
         )
         setAllList(allDeployData)
         setMyList(myDeployData)
+        deploymentTab === DEPLOYMENT_TAB.ALL
+          ? setDeployments(allDeployData)
+          : setDeployments(myDeployData)
+        deploymentTab === DEPLOYMENT_TAB.ALL
+          ? setFilteredDeployments(allDeployData)
+          : setFilteredDeployments(myDeployData)
       })
       .catch((error) => {
         console.error(error)
@@ -65,9 +89,28 @@ const Deployments: React.FC<DeploymentsProps> = () => {
       })
   }
 
+  const fetchModules = async () => {
+    setLoading(true)
+    await axios
+      .get("/api/modules")
+      .then((res) => {
+        const modules = Modules.parse(res.data.modules)
+        setModuleNames(modules)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
+
+  const handleRefresh = (state: boolean) => setRefresh(state)
+
   useEffect(() => {
     fetchData()
-  }, [])
+    fetchModules()
+  }, [deploymentTab, refresh])
 
   const renderAllTab = () => {
     return (
@@ -77,7 +120,11 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           deploymentTab === DEPLOYMENT_TAB.ALL ? "tab-active" : "",
         )}
         data-testid="all-deployments"
-        onClick={() => setDeploymentTab(DEPLOYMENT_TAB.ALL)}
+        onClick={() => {
+          setDeploymentTab(DEPLOYMENT_TAB.ALL),
+            setFilteredDeployments(null),
+            setClearFilter(true)
+        }}
       >
         {t("all-deployments")}
       </a>
@@ -92,7 +139,11 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           deploymentTab === DEPLOYMENT_TAB.MINE ? "tab-active" : "",
         )}
         data-testid="my-deployments"
-        onClick={() => setDeploymentTab(DEPLOYMENT_TAB.MINE)}
+        onClick={() => {
+          setDeploymentTab(DEPLOYMENT_TAB.MINE),
+            setFilteredDeployments(null),
+            setClearFilter(true)
+        }}
       >
         {t("my-deployments")}
       </a>
@@ -112,7 +163,7 @@ const Deployments: React.FC<DeploymentsProps> = () => {
 
   return (
     <RouteContainer>
-      <div className="flex mb-6">
+      <div className="flex mb-2">
         <div className="w-full">
           <div className="tabs tabs-boxed">
             {renderMyTab()}
@@ -134,13 +185,15 @@ const Deployments: React.FC<DeploymentsProps> = () => {
           )}
         </div>
       </div>
+      <Filter filters={["status", "module"]} clearFilter={clearFilter} />
       {deploymentTab === DEPLOYMENT_TAB.ALL &&
         (listAllDeployments?.length ? (
           <ModuleDeployment
             headers={DEPLOYMENT_HEADERS}
-            deployments={listAllDeployments}
+            deployments={filteredDeployments || listAllDeployments}
             defaultSortField={SORT_FIELD.CREATEDAT}
             defaultSortDirection={SORT_DIRECTION.DESC}
+            handleRefresh={handleRefresh}
           />
         ) : (
           renderEmptyState()
@@ -149,9 +202,10 @@ const Deployments: React.FC<DeploymentsProps> = () => {
         (listMyDeployments?.length ? (
           <ModuleDeployment
             headers={DEPLOYMENT_HEADERS}
-            deployments={listMyDeployments}
+            deployments={filteredDeployments || listMyDeployments}
             defaultSortField={SORT_FIELD.CREATEDAT}
             defaultSortDirection={SORT_DIRECTION.DESC}
+            handleRefresh={handleRefresh}
           />
         ) : (
           renderEmptyState()
