@@ -4,6 +4,7 @@ import groupBy from "lodash/groupBy"
 import startCase from "lodash/startCase"
 import { IUIVariable, IObjKeyPair, IFormData } from "@/utils/types"
 import axios from "axios"
+import { FormikValues } from "formik"
 
 type IHCLVariable = {
   type: string
@@ -20,6 +21,8 @@ const GROUP_MATCHER = /group\=([\d]+)/gi
 const ORDER_MATCHER = /order\=([\d]+)/gi
 const OPTIONS_MATCHER = /options\=([^\s}]+)/gi
 const SAFE_UPDATE_MATCHER = /updatesafe/gi
+const MANDATORY_MATCHER = /mandatory/gi
+const DEPENDSON_MATCHER = /dependson\=\((.*)\)/gi
 
 const formatType = (type: string) => type.replace(/[${}]/g, "")
 
@@ -34,16 +37,34 @@ const parseUIMeta = (varDescription: string | null, type = "string") => {
   let order: number | null = null
   let options: any[] | null = null
   let updateSafe: boolean = false // Assume destructive
+  let mandatory: boolean = false
+  let dependsOn: string | null = null
 
   if (!varDescription) {
-    return { description, group, order, options, updateSafe }
+    return {
+      description,
+      group,
+      order,
+      options,
+      updateSafe,
+      mandatory,
+      dependsOn,
+    }
   }
 
   // Get the full meta tag
   const fullMeta: string =
     [...varDescription.matchAll(META_MATCHER)]?.[0]?.[0]?.trim() || ""
   if (!fullMeta) {
-    return { description, group, order, options, updateSafe }
+    return {
+      description,
+      group,
+      order,
+      options,
+      updateSafe,
+      mandatory,
+      dependsOn,
+    }
   }
 
   // Strip the meta tag from the description
@@ -54,10 +75,20 @@ const parseUIMeta = (varDescription: string | null, type = "string") => {
     [...varDescription.matchAll(META_MATCHER)]?.[0]?.[1]?.trim() || ""
   if (!meta) {
     // No UIMeta tag defined
-    return { description, group, order, options, updateSafe }
+    return {
+      description,
+      group,
+      order,
+      options,
+      updateSafe,
+      mandatory,
+      dependsOn,
+    }
   }
 
   updateSafe = !![...meta.matchAll(SAFE_UPDATE_MATCHER)].length
+
+  mandatory = !![...meta.matchAll(MANDATORY_MATCHER)].length
 
   const grp = [...meta.matchAll(GROUP_MATCHER)]?.[0]?.[1]?.trim()
   group = grp ? parseInt(grp) : null
@@ -81,7 +112,17 @@ const parseUIMeta = (varDescription: string | null, type = "string") => {
     })
   }
 
-  return { description, group, order, options, updateSafe }
+  dependsOn = [...meta.matchAll(DEPENDSON_MATCHER)]?.[0]?.[1]?.trim() ?? null
+
+  return {
+    description,
+    group,
+    order,
+    options,
+    updateSafe,
+    mandatory,
+    dependsOn,
+  }
 }
 
 /**
@@ -97,29 +138,35 @@ const mapHclToUIVar = (
   const [name, hclVars] = value
   const hclVar = hclVars[0]
 
-  const { description, group, order, options, updateSafe } = parseUIMeta(
-    hclVar.description ?? null,
-    hclVar.type,
-  )
-
-  let defaultValue =
-    typeof hclVar.default === "undefined" ? null : hclVar.default
-  if (formatType(hclVar.type) === "bool") {
-    defaultValue = !!hclVar.default
-  }
+  const {
+    description,
+    group,
+    order,
+    options,
+    updateSafe,
+    mandatory,
+    dependsOn,
+  } = parseUIMeta(hclVar.description ?? null, hclVar.type)
 
   return {
     name,
     display: startCase(name),
     description,
     type: formatType(hclVar.type),
-    default: defaultValue,
-    // In TF, default = "" is how we say it's optional
-    required: typeof hclVar.default === "undefined" || hclVar.default !== "",
+    default: hclVar.default
+      ? hclVar.default
+      : formatType(hclVar.type) === "bool"
+      ? false
+      : hclVar.default === ""
+      ? ""
+      : null,
+    required: mandatory,
     group,
     order,
     options,
     updateSafe,
+    mandatory,
+    dependsOn,
   }
 }
 
@@ -216,4 +263,79 @@ const checkModuleVariablesZero = async (moduleName: string) => {
       console.error(error)
     })
   return returnModuleVariableData
+}
+
+export const checkDependsOnValid = (
+  dependsOnVarData: string | null,
+  userAnswerData: FormikValues,
+) => {
+  if (dependsOnVarData) {
+    const dependsOnDataOperatorFormats = dependsOnVarData
+      .replaceAll("&&", " && ")
+      .replaceAll("||", " || ")
+
+    const dependsOnDataAnswerMatchRes = dependsOnDataOperatorFormats
+      .split(" ")
+      .map((dependsOnDataOperatorFormat) => {
+        const checkDependsNameVar = dependsOnDataOperatorFormat.split("==")
+        let getwithAnswerMatch
+        if (checkDependsNameVar.length === 2) {
+          //@ts-ignore
+          getwithAnswerMatch = `${userAnswerData[checkDependsNameVar[0]]} == ${
+            checkDependsNameVar[1]
+          }`
+        } else {
+          getwithAnswerMatch = checkDependsNameVar[0]
+        }
+
+        return getwithAnswerMatch
+      })
+      .join(" ")
+
+    const formatDependsOnDataAnswerMatchRes = `(${dependsOnDataAnswerMatchRes.replaceAll(
+      " && ",
+      ") && (",
+    )})`
+
+    const dependsOnDataAnswerMatchEvalute = eval(
+      formatDependsOnDataAnswerMatchRes,
+    )
+
+    return dependsOnDataAnswerMatchEvalute
+  } else {
+    return false
+  }
+}
+
+export const formatRelevantVariables = (
+  formVariablesData: IUIVariable[],
+  currentAnswerValueData: FormikValues,
+) => {
+  const allNonDependsVars = formVariablesData.filter(
+    (formVariableData) => !formVariableData.dependsOn,
+  )
+  const allDependsVars = formVariablesData.filter(
+    (formVariableData) => formVariableData.dependsOn,
+  )
+
+  const findDependentVars = allDependsVars.filter((dependsVars) => {
+    const isDependsOnValid = checkDependsOnValid(
+      dependsVars.dependsOn,
+      currentAnswerValueData,
+    )
+
+    if (isDependsOnValid) {
+      return dependsVars
+    } else {
+      return null
+    }
+  })
+
+  const allRelevantFormVariables = allNonDependsVars.concat(
+    findDependentVars !== undefined && findDependentVars.length
+      ? findDependentVars
+      : [],
+  )
+
+  return allRelevantFormVariables
 }

@@ -91,6 +91,8 @@ export type IUIVariable = {
   options: any[] | null
   type: string
   updateSafe: boolean
+  dependsOn: string | null
+  mandatory: boolean
 }
 
 export enum ALERT_TYPE {
