@@ -150,7 +150,6 @@ const PublishCreateForm: React.FC<IPublishCreateFormProps> = ({
       answerValueData,
     )
     const relevantFormVariablesFormat = Object.assign({}, relevantFormVariables)
-
     setInitialData(initialFormVariable)
     setFormData([relevantFormVariablesFormat])
   }, [currentVarsData.variables, answerValueData])
