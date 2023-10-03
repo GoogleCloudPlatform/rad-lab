@@ -156,10 +156,10 @@ const mapHclToUIVar = (
     default: hclVar.default
       ? hclVar.default
       : formatType(hclVar.type) === "bool"
-      ? false
-      : hclVar.default === ""
-      ? ""
-      : null,
+        ? false
+        : hclVar.default === ""
+          ? ""
+          : null,
     required: mandatory,
     group,
     order,
@@ -269,42 +269,40 @@ export const checkDependsOnValid = (
   dependsOnVarData: string | null,
   userAnswerData: FormikValues,
 ) => {
-  if (dependsOnVarData) {
-    const dependsOnDataOperatorFormats = dependsOnVarData
-      .replaceAll("&&", " && ")
-      .replaceAll("||", " || ")
-
-    const dependsOnDataAnswerMatchRes = dependsOnDataOperatorFormats
-      .split(" ")
-      .map((dependsOnDataOperatorFormat) => {
-        const checkDependsNameVar = dependsOnDataOperatorFormat.split("==")
-        let getwithAnswerMatch
-        if (checkDependsNameVar.length === 2) {
-          //@ts-ignore
-          getwithAnswerMatch = `${userAnswerData[checkDependsNameVar[0]]} == ${
-            checkDependsNameVar[1]
-          }`
-        } else {
-          getwithAnswerMatch = checkDependsNameVar[0]
-        }
-
-        return getwithAnswerMatch
-      })
-      .join(" ")
-
-    const formatDependsOnDataAnswerMatchRes = `(${dependsOnDataAnswerMatchRes.replaceAll(
-      " && ",
-      ") && (",
-    )})`
-
-    const dependsOnDataAnswerMatchEvalute = eval(
-      formatDependsOnDataAnswerMatchRes,
-    )
-
-    return dependsOnDataAnswerMatchEvalute
-  } else {
+  if (!dependsOnVarData) {
     return false
   }
+
+  const dependsOnDataOperatorFormats = dependsOnVarData
+    .replaceAll("&&", " && ")
+    .replaceAll("||", " || ")
+
+  const dependsOnDataAnswerMatchRes = dependsOnDataOperatorFormats
+    .split(" ")
+    .map((dependsOnDataOperatorFormat) => {
+      const checkDependsNameVar = dependsOnDataOperatorFormat.split("==")
+      let getwithAnswerMatch
+      if (checkDependsNameVar.length === 2) {
+        getwithAnswerMatch = `${userAnswerData[checkDependsNameVar[0]!]} == ${checkDependsNameVar[1]!
+          }`
+      } else {
+        getwithAnswerMatch = checkDependsNameVar[0]
+      }
+
+      return getwithAnswerMatch
+    })
+    .join(" ")
+
+  const formatDependsOnDataAnswerMatchRes = `(${dependsOnDataAnswerMatchRes.replaceAll(
+    " && ",
+    ") && (",
+  )})`
+
+  const dependsOnDataAnswerMatchEvalute = eval(
+    formatDependsOnDataAnswerMatchRes,
+  )
+
+  return dependsOnDataAnswerMatchEvalute
 }
 
 export const formatRelevantVariables = (
