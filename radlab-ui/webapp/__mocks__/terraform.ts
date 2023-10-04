@@ -37,13 +37,13 @@ variable "create_project" {
 }
 
 variable "create_usermanaged_notebook" {
-  description = "Set to true if you want to create user managed workbench notebooks. If you want to create google managed workbench notebook, set this variable to false. {{UIMeta group=2 order=1 }}"
+  description = "Set to true if you want to create a user managed workbench notebook. If you want to create a Google managed workbench notebook, set this variable to false. {{UIMeta group=2 order=1 }}"
   type        = bool
   default     = true
 }
 
 variable "container_image_repository" {
-  description = "Container Image Repo, only set if creating container image notebook instance by setting \`create_container_image\` variable to true. {{UIMeta group=2 order=4 dependson=(create_container_image==true) mandatory }}"
+  description = "Container Image Repo, only set if creating container image notebook instance by setting \`create_container_image\` variable to true. {{UIMeta group=2 order=4 dependson=create_container_image==true mandatory }}"
   type        = string
   default     = ""
 }
@@ -73,7 +73,7 @@ variable "folder_id" {
 }
 
 variable "gpu_accelerator_type" {
-  description = "Type of GPU you would like to spin up. {{UIMeta group=2 order=10 dependson=(enable_gpu_driver==true) mandatory }}"
+  description = "Type of GPU you would like to spin up. {{UIMeta group=2 order=10 dependson=enable_gpu_driver==true mandatory }}"
   type        = string
   default     = ""
 }
@@ -97,19 +97,19 @@ variable "image_project" {
 }
 
 variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for AI Notebooks subnet {{UIMeta group=3 order=5 dependson=(create_network==true&&create_usermanaged_notebook==true) mandatory}}"
+  description = "Unique IP CIDR Range for AI Notebooks subnet {{UIMeta group=3 order=5 dependson=create_network==true&&create_usermanaged_notebook==true mandatory}}"
   type        = string
   default     = "10.142.190.0/24"
 }
 
 variable "machine_type" {
-  description = "Type of VM you would like to spin up.{{UIMeta group=3 order=5 dependson=(create_network==true&&enable_gpu_driver==true)}}"
+  description = "Type of VM you would like to spin up.{{UIMeta group=3 order=5 dependson=create_network==true&&enable_gpu_driver==true}}"
   type        = string
   default     = "n1-standard-1"
 }
 
 variable "network_name" {
-  description = "Name of the network to be created. {{UIMeta group=3 order=2 dependson=(create_usermanaged_notebook==true||enable_gpu_driver==true) mandatory}}"
+  description = "Name of the network to be created. {{UIMeta group=3 order=2 dependson=create_usermanaged_notebook==true||enable_gpu_driver==true mandatory}}"
   type        = string
   default     = "ai-notebook"
 }
@@ -145,7 +145,7 @@ variable "set_external_ip_policy" {
 }
 
 variable "set_shielded_vm_policy" {
-  description = "Apply org policy to disable shielded VMs. {{UIMeta dependson=(set_external_ip_policy==true||enable_gpu_driver==true) updatesafe}}"
+  description = "Apply org policy to disable shielded VMs. {{UIMeta dependson=set_external_ip_policy==true||enable_gpu_driver==true updatesafe}}"
   type        = bool
   default     = true
 }
@@ -157,7 +157,7 @@ variable "set_trustedimage_project_policy" {
 }
 
 variable "subnet_name" {
-  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 dependson=((enable_gpu_driver==true||create_usermanaged_notebook==true)&&(create_network==true||set_external_ip_policy==true)) mandatory}}"
+  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 dependson=(enable_gpu_driver==true||create_usermanaged_notebook==true)&&(create_network==true||set_external_ip_policy==true) mandatory}}"
   type        = string
   default     = "subnet-ai-notebook"
 }
@@ -192,7 +192,7 @@ variable "billing_budget_alert_spent_percents" {
 }
 
 variable "billing_budget_services" {
-  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe dependson=((enable_gpu_driver==true||set_external_ip_policy==true)&&(create_network==true||create_usermanaged_notebook==true))}}"
+  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe dependson=(enable_gpu_driver==true||set_external_ip_policy==true)&&(create_network==true||create_usermanaged_notebook==true)}}"
   type        = list(string)
   default     = null
 }

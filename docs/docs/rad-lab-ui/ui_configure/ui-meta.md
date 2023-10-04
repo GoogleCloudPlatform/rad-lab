@@ -72,9 +72,9 @@ After a module has been deployed (the project created and resources created with
 
 Any time a user makes an update to an existing deployment, the `updatesafe` values are checked. If **ANY** of the changed variables do **NOT** have the `updatesafe` keyword, the user will be warned that they likely will lose data by applying the update. Put another way, only if **ALL** the changed variables are `updatesafe` will the prompt be skipped.
 
-## Mandatory
+## Required
 
-Some of the variables are required to have value for deployment, in order to make it mandatory of the variables is determined by the `mandatory` keyword. User must have to enter some values for it.
+Some of the variables are required to have value for deployment. If not `default` value works, ensure you set the `required` UIMeta keyword. Users will then be required to provide a value before deploying.
 
 **(Example)** `billing_account_id` will be shown as mandatory for users and User must have to provide the input.
 
@@ -93,25 +93,25 @@ Some of the variables are depends on other variables input, in order to make it 
 
 ```terraform
 variable "container_image_repository" {
-  description = "Container Image Repo, only set if creating container image notebook instance by setting \`create_container_image\` variable to true. {{UIMeta group=2 order=4 dependson=(create_container_image==true) mandatory }}"
+  description = "Container Image Repo, only set if creating container image notebook instance by setting \`create_container_image\` variable to true. {{UIMeta group=2 order=4 dependson=create_container_image==true mandatory }}"
   type        = string
   default     = ""
 }
 
 variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for AI Notebooks subnet {{UIMeta group=3 order=5 dependson=(create_network==true&&create_usermanaged_notebook==true) mandatory}}"
+  description = "Unique IP CIDR Range for AI Notebooks subnet {{UIMeta group=3 order=5 dependson=create_network==true&&create_usermanaged_notebook==true mandatory}}"
   type        = string
   default     = "10.142.190.0/24"
 }
 
 variable "network_name" {
-  description = "Name of the network to be created. {{UIMeta group=3 order=2 dependson=(create_usermanaged_notebook==true||enable_gpu_driver==true) mandatory}}"
+  description = "Name of the network to be created. {{UIMeta group=3 order=2 dependson=create_usermanaged_notebook==true||enable_gpu_driver==true mandatory}}"
   type        = string
   default     = "ai-notebook"
 }
 
 variable "subnet_name" {
-  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 dependson=((enable_gpu_driver==true||create_usermanaged_notebook==true)&&(create_network==true||set_external_ip_policy==true)) mandatory}}"
+  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 dependson=(enable_gpu_driver==true||create_usermanaged_notebook==true)&&(create_network==true||set_external_ip_policy==true) mandatory}}"
   type        = string
   default     = "subnet-ai-notebook"
 }
