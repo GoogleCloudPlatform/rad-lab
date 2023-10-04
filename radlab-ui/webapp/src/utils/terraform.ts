@@ -22,7 +22,7 @@ const ORDER_MATCHER = /order\=([\d]+)/gi
 const OPTIONS_MATCHER = /options\=([^\s}]+)/gi
 const SAFE_UPDATE_MATCHER = /updatesafe/gi
 const MANDATORY_MATCHER = /mandatory/gi
-const DEPENDSON_MATCHER = /dependson\=\((.*)\)/gi
+const DEPENDSON_MATCHER = /dependson\=([a-zA-Z0-9-_=&|()<>]*)/gi
 
 const formatType = (type: string) => type.replace(/[${}]/g, "")
 
@@ -156,10 +156,10 @@ const mapHclToUIVar = (
     default: hclVar.default
       ? hclVar.default
       : formatType(hclVar.type) === "bool"
-        ? false
-        : hclVar.default === ""
-          ? ""
-          : null,
+      ? false
+      : hclVar.default === ""
+      ? ""
+      : null,
     required: mandatory,
     group,
     order,
@@ -266,43 +266,40 @@ const checkModuleVariablesZero = async (moduleName: string) => {
 }
 
 export const checkDependsOnValid = (
-  dependsOnVarData: string | null,
-  userAnswerData: FormikValues,
+  dependsOn: string | null,
+  userAnswers: FormikValues,
 ) => {
-  if (!dependsOnVarData) {
+  if (!dependsOn) {
     return false
   }
 
-  const dependsOnDataOperatorFormats = dependsOnVarData
+  const dependsOnWithAnswers = dependsOn
     .replaceAll("&&", " && ")
     .replaceAll("||", " || ")
-
-  const dependsOnDataAnswerMatchRes = dependsOnDataOperatorFormats
     .split(" ")
     .map((dependsOnDataOperatorFormat) => {
       const checkDependsNameVar = dependsOnDataOperatorFormat.split("==")
-      let getwithAnswerMatch
+      let withAnswerMatch = checkDependsNameVar[0]
+
       if (checkDependsNameVar.length === 2) {
-        getwithAnswerMatch = `${userAnswerData[checkDependsNameVar[0]!]} == ${checkDependsNameVar[1]!
-          }`
-      } else {
-        getwithAnswerMatch = checkDependsNameVar[0]
+        const formatCheckDependsVarName = checkDependsNameVar[0]
+          ?.replaceAll("(", "( ")
+          .split(" ")
+
+        const dependsSpecialCharVar = formatCheckDependsVarName!
+          .splice(0, formatCheckDependsVarName!.length - 1)
+          .join("")
+        const dependsNameVar = formatCheckDependsVarName!.pop()
+        withAnswerMatch = `${dependsSpecialCharVar}${
+          userAnswers[dependsNameVar!]
+        } == ${checkDependsNameVar[1]!}`
       }
 
-      return getwithAnswerMatch
+      return withAnswerMatch
     })
     .join(" ")
 
-  const formatDependsOnDataAnswerMatchRes = `(${dependsOnDataAnswerMatchRes.replaceAll(
-    " && ",
-    ") && (",
-  )})`
-
-  const dependsOnDataAnswerMatchEvalute = eval(
-    formatDependsOnDataAnswerMatchRes,
-  )
-
-  return dependsOnDataAnswerMatchEvalute
+  return eval(dependsOnWithAnswers)
 }
 
 export const formatRelevantVariables = (

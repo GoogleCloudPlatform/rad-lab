@@ -157,7 +157,7 @@ variable "set_trustedimage_project_policy" {
 }
 
 variable "subnet_name" {
-  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 dependson=(enable_gpu_driver==true||create_usermanaged_notebook==true&&create_network==true||set_external_ip_policy==true) mandatory}}"
+  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 dependson=((enable_gpu_driver==true||create_usermanaged_notebook==true)&&(create_network==true||set_external_ip_policy==true)) mandatory}}"
   type        = string
   default     = "subnet-ai-notebook"
 }
@@ -192,7 +192,7 @@ variable "billing_budget_alert_spent_percents" {
 }
 
 variable "billing_budget_services" {
-  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe dependson=(enable_gpu_driver==true||set_external_ip_policy==true&&create_network==true||create_usermanaged_notebook==true)}}"
+  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe dependson=((enable_gpu_driver==true||set_external_ip_policy==true)&&(create_network==true||create_usermanaged_notebook==true))}}"
   type        = list(string)
   default     = null
 }
