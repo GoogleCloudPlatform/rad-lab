@@ -2,7 +2,7 @@ export const DATA_SCIENCE_VARS = `
 
 # {{UIMeta group=1 order=1 }}
 variable "billing_account_id" {
-  description = "Billing Account associated to the GCP Resources. {{UIMeta group=0 order=3 mandatory }}"
+  description = "Billing Account associated to the GCP Resources. {{UIMeta group=0 order=3 required }}"
   type        = string
 }
 
@@ -43,7 +43,7 @@ variable "create_usermanaged_notebook" {
 }
 
 variable "container_image_repository" {
-  description = "Container Image Repo, only set if creating container image notebook instance by setting \`create_container_image\` variable to true. {{UIMeta group=2 order=4 dependson=create_container_image==true mandatory }}"
+  description = "Container Image Repo, only set if creating container image notebook instance by setting \`create_container_image\` variable to true. {{UIMeta group=2 order=4 dependson=create_container_image==true required }}"
   type        = string
   default     = ""
 }
@@ -73,7 +73,7 @@ variable "folder_id" {
 }
 
 variable "gpu_accelerator_type" {
-  description = "Type of GPU you would like to spin up. {{UIMeta group=2 order=10 dependson=enable_gpu_driver==true mandatory }}"
+  description = "Type of GPU you would like to spin up. {{UIMeta group=2 order=10 dependson=enable_gpu_driver==true required }}"
   type        = string
   default     = ""
 }
@@ -97,7 +97,7 @@ variable "image_project" {
 }
 
 variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for AI Notebooks subnet {{UIMeta group=3 order=5 dependson=create_network==true&&create_usermanaged_notebook==true mandatory}}"
+  description = "Unique IP CIDR Range for AI Notebooks subnet {{UIMeta group=3 order=5 dependson=create_network==true&&create_usermanaged_notebook==true required}}"
   type        = string
   default     = "10.142.190.0/24"
 }
@@ -109,7 +109,7 @@ variable "machine_type" {
 }
 
 variable "network_name" {
-  description = "Name of the network to be created. {{UIMeta group=3 order=2 dependson=create_usermanaged_notebook==true||enable_gpu_driver==true mandatory}}"
+  description = "Name of the network to be created. {{UIMeta group=3 order=2 dependson=create_usermanaged_notebook==true||enable_gpu_driver==true required}}"
   type        = string
   default     = "ai-notebook"
 }
@@ -157,7 +157,7 @@ variable "set_trustedimage_project_policy" {
 }
 
 variable "subnet_name" {
-  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 dependson=(enable_gpu_driver==true||create_usermanaged_notebook==true)&&(create_network==true||set_external_ip_policy==true) mandatory}}"
+  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 dependson=(enable_gpu_driver==true||create_usermanaged_notebook==true)&&(create_network==true||set_external_ip_policy==true) required }}"
   type        = string
   default     = "subnet-ai-notebook"
 }
@@ -169,7 +169,7 @@ variable "trusted_users" {
 }
 
 variable "zone" {
-  description = "Cloud Zone associated to the AI Notebooks {{UIMeta group=1 order=1 options=us-central1-b,us-east1-a,us-west3-b,us-east4-c mandatory }}"
+  description = "Cloud Zone associated to the AI Notebooks {{UIMeta group=1 order=1 options=us-central1-b,us-east1-a,us-west3-b,us-east4-c required }}"
   type        = string
   default     = "us-east4-c"
   otherfield  = "bar"

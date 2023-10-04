@@ -21,7 +21,7 @@ const GROUP_MATCHER = /group\=([\d]+)/gi
 const ORDER_MATCHER = /order\=([\d]+)/gi
 const OPTIONS_MATCHER = /options\=([^\s}]+)/gi
 const SAFE_UPDATE_MATCHER = /updatesafe/gi
-const MANDATORY_MATCHER = /mandatory/gi
+const REQUIRED_MATCHER = /required/gi
 const DEPENDSON_MATCHER = /dependson\=([a-zA-Z0-9-_=&|()<>]*)/gi
 
 const formatType = (type: string) => type.replace(/[${}]/g, "")
@@ -37,7 +37,7 @@ const parseUIMeta = (varDescription: string | null, type = "string") => {
   let order: number | null = null
   let options: any[] | null = null
   let updateSafe: boolean = false // Assume destructive
-  let mandatory: boolean = false
+  let required: boolean = false
   let dependsOn: string | null = null
 
   if (!varDescription) {
@@ -47,7 +47,7 @@ const parseUIMeta = (varDescription: string | null, type = "string") => {
       order,
       options,
       updateSafe,
-      mandatory,
+      required,
       dependsOn,
     }
   }
@@ -62,7 +62,7 @@ const parseUIMeta = (varDescription: string | null, type = "string") => {
       order,
       options,
       updateSafe,
-      mandatory,
+      required,
       dependsOn,
     }
   }
@@ -81,14 +81,14 @@ const parseUIMeta = (varDescription: string | null, type = "string") => {
       order,
       options,
       updateSafe,
-      mandatory,
+      required,
       dependsOn,
     }
   }
 
   updateSafe = !![...meta.matchAll(SAFE_UPDATE_MATCHER)].length
 
-  mandatory = !![...meta.matchAll(MANDATORY_MATCHER)].length
+  required = !![...meta.matchAll(REQUIRED_MATCHER)].length
 
   const grp = [...meta.matchAll(GROUP_MATCHER)]?.[0]?.[1]?.trim()
   group = grp ? parseInt(grp) : null
@@ -120,7 +120,7 @@ const parseUIMeta = (varDescription: string | null, type = "string") => {
     order,
     options,
     updateSafe,
-    mandatory,
+    required,
     dependsOn,
   }
 }
@@ -144,7 +144,7 @@ const mapHclToUIVar = (
     order,
     options,
     updateSafe,
-    mandatory,
+    required,
     dependsOn,
   } = parseUIMeta(hclVar.description ?? null, hclVar.type)
 
@@ -160,12 +160,11 @@ const mapHclToUIVar = (
       : hclVar.default === ""
       ? ""
       : null,
-    required: mandatory,
+    required,
     group,
     order,
     options,
     updateSafe,
-    mandatory,
     dependsOn,
   }
 }

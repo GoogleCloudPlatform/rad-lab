@@ -126,17 +126,17 @@ describe("terraform util", () => {
     const parsed = parseVarsFile(DATA_SCIENCE_VARS)
 
     const billing_account_id = getByName("billing_account_id", parsed)
-    expect(billing_account_id.mandatory).toStrictEqual(true)
+    expect(billing_account_id.required).toStrictEqual(true)
     expect(billing_account_id.required).toBe(true)
 
     const organization_id = getByName("organization_id", parsed)
-    expect(organization_id.mandatory).toStrictEqual(false)
+    expect(organization_id.required).toStrictEqual(false)
     expect(organization_id.required).toBe(false)
 
     const zone = getByName("zone", parsed)
     expect(zone.default).not.toBeNull()
     expect(zone.default).toStrictEqual("us-east4-c")
-    expect(zone.mandatory).toStrictEqual(true)
+    expect(zone.required).toStrictEqual(true)
     expect(zone.required).toBe(true)
   })
 

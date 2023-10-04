@@ -92,7 +92,6 @@ export type IUIVariable = {
   type: string
   updateSafe: boolean
   dependsOn: string | null
-  mandatory: boolean
 }
 
 export enum ALERT_TYPE {
