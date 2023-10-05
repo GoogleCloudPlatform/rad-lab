@@ -39,6 +39,7 @@ MODULE_DEPLOYMENT_BUCKET_NAME=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outpu
 GITHUB_URL=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.git_repo_url.value)
 GITHUB_BRANCH=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.git_repo_branch.value)
 GIT_TOKEN_SECRET_KEY_NAME=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.git_personal_access_token_secret_id.value)
+SECRET_MANAGER_LOCATION=$(echo "${TERRAFORM_OUTPUT}" | jq -r .values.outputs.secret_manager_location.value)
 cd $WEBAPP_DIR
 
 FIREBASE_CONFIG_OUTPUT=$(firebase apps:sdkconfig web --project ${PROJECT_ID} --json)
@@ -90,5 +91,6 @@ NEXT_PUBLIC_RAD_LAB_USER_GROUP=${USER_GROUP_NAME}
 MODULE_DEPLOYMENT_BUCKET_NAME=${MODULE_DEPLOYMENT_BUCKET_NAME}
 
 GIT_TOKEN_SECRET_KEY_NAME=${GIT_TOKEN_SECRET_KEY_NAME}
+SECRET_MANAGER_LOCATION=${SECRET_MANAGER_LOCATION}
 EOT
 done

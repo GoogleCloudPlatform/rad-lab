@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 40%;
+      }
+
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Hello!</h3>
+    <p>{{mailBodyTitle}}</p>
+    <p>Please use below details to access the same.</p>
+
+    <table id="myTable">
+      <tr>
+        <th>Name</th>
+        <th>value</th>
+      </tr>
+      <tr>
+        <td>Project Id</td>
+        <td>
+          <a href="{{{gcp_project_link}}}" style="border: 0" target="_blank"
+            >{{projectId}}</a
+          >
+        </td>
+      </tr>
+      <tr>
+        <td>Deployment Id</td>
+        <td>
+          <a href="{{{deployment_link}}}" style="border: 0" target="_blank"
+            >{{deploymentId}}</a
+          >
+        </td>
+      </tr>
+      {{#outputs}}
+      <tr>
+        <td>{{name}}</td>
+        <td>{{value}}</td>
+      </tr>
+      {{/outputs}}
+    </table>
+
+    <br />
+    <p>Thank you<br /></p>
+    <img
+      style="width: 8rem; height: 2rem"
+      src="https://github.com/GPS-Demos/rad-lab/blob/main/radlab-ui/webapp/public/assets/images/logo.png?raw=true"
+    />
+    <p>P.S:- This is an auto generated email. Please do not reply!</p>
+  </body>
+</html>
