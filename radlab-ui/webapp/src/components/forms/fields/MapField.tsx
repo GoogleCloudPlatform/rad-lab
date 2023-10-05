@@ -73,8 +73,14 @@ const MapField: React.FC<MapField> = ({ variable, validate }) => {
             <div>
               {Object.keys(values[variable.name]).map(
                 (map_data: string, index: number) => (
-                  <div key={index} className="badge badge-info gap-2 m-1">
-                    <span>
+                  <div
+                    key={index}
+                    className="badge badge-info gap-2 my-1 mr-1 w-auto h-auto py-1 px-2 md:px-4"
+                  >
+                    <span
+                      className="w-auto"
+                      style={{ overflowWrap: "anywhere" }}
+                    >
                       {map_data} = {values[variable.name][map_data]}
                     </span>
                     <button

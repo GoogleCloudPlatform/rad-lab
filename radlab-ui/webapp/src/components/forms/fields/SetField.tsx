@@ -48,8 +48,13 @@ const SetField: React.FC<SetField> = ({ variable }) => {
           return (
             <div>
               {values[variable.name].map((setvalue: string, index: number) => (
-                <div key={index} className="badge badge-info gap-2 m-1">
-                  <span>{setvalue}</span>
+                <div
+                  key={index}
+                  className="badge badge-info gap-2 my-1 mr-1 w-auto h-auto py-1 px-2 md:px-4"
+                >
+                  <span className="w-auto" style={{ overflowWrap: "anywhere" }}>
+                    {setvalue}
+                  </span>
                   <XIcon
                     onClick={() => remove(index)}
                     className="h-4 w-4 cursor-pointer"
