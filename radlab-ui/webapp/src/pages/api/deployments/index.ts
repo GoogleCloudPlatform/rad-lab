@@ -7,6 +7,7 @@ import {
 } from "@/utils/Api_SeverSideCon"
 import { getBuildStatus, mergeVariables, pushPubSubMsg } from "@/utils/api"
 import { envOrFail } from "@/utils/env"
+import { configureEmailAndSend } from "@/utils/mailHandler"
 import { withAuth } from "@/utils/middleware"
 import {
   AuthedNextApiHandler,
@@ -40,6 +41,7 @@ const createDeployment = async (
 
   body.variables = variables
   body.builds = []
+
   // @ts-ignore
   const response: IDeployment = await saveDocument("deployments", body)
   if (!response) {
@@ -66,6 +68,11 @@ const createDeployment = async (
   } catch (error) {
     console.error(error)
   }
+
+  await configureEmailAndSend(
+    "RAD Lab Module has been created for you!",
+    response,
+  )
 
   return res.status(200).json({ response })
 }
@@ -205,6 +212,11 @@ const deleteDeployment = async (
       _nanoseconds: now.nanoseconds,
     }
     await updateByField("deployments", "deploymentId", deploymentId, deployment)
+
+    await configureEmailAndSend(
+      "RAD Lab Module has been deleted for you!",
+      deployment,
+    )
   })
 
   return res.status(200).json({

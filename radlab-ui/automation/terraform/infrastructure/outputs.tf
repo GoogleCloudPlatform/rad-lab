@@ -18,6 +18,10 @@ output "admin_group_name" {
   value = var.admin_group_name
 }
 
+output "secret_manager_location" {
+  value = var.secret_manager_location
+}
+
 output "app_engine_url" {
   value = google_app_engine_application.radlab_ui.default_hostname
 }

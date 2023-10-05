@@ -2,10 +2,14 @@ import sortBy from "lodash/sortBy"
 import { FormikStep } from "@/components/forms/FormikStepper"
 import { IUIVariable } from "@/utils/types"
 import StringField from "@/components/forms/fields/StringField"
+import BooleanField from "@/components/forms/fields/BooleanField"
+import { useFormikContext } from "formik"
+import { useEffect } from "react"
 
 interface IDefaultStepCreatorProps {
   variableList: IUIVariable[]
   idx: number
+  handleChangeValues: Function
 }
 
 type IFieldValidateValue = { value: string | number | boolean }
@@ -13,6 +17,7 @@ type IFieldValidateValue = { value: string | number | boolean }
 const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
   variableList,
   idx,
+  handleChangeValues,
 }) => {
   const sortedList = sortBy(variableList, "order")
 
@@ -24,8 +29,19 @@ const DefaultStepCreator: React.FC<IDefaultStepCreatorProps> = ({
     return error
   }
 
+  const { values } = useFormikContext()
+
+  useEffect(() => {
+    handleChangeValues(values)
+  }, [values])
+
   const renderControls = (variable: IUIVariable) => {
-    return <StringField variable={variable} validate={validateRequired} />
+    switch (variable.type) {
+      case "bool":
+        return <BooleanField variable={variable} />
+      default:
+        return <StringField variable={variable} validate={validateRequired} />
+    }
   }
 
   return (

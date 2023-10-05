@@ -109,7 +109,7 @@ terraform apply "radlab-ui.out"
 terraform init -migrate-state
 
 # Remove the output of the `terraform plan` step
-rm -rf radlab-ui.out
+rm radlab-ui.out
 
 # Export PROJECT_ID as environment variable
 export PROJECT_ID=$(terraform output -json | jq -r .project_id.value)
