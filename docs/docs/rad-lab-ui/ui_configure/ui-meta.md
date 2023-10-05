@@ -74,7 +74,7 @@ Any time a user makes an update to an existing deployment, the `updatesafe` valu
 
 ## Required
 
-Some of the variables are required to have value for deployment. If not `default` value works, ensure you set the `required` UIMeta keyword. Users will then be required to provide a value before deploying.
+Some of the variables are required to have value for deployment. If no `default` value works, ensure you set the `required` UIMeta keyword. Users will then be required to provide a value before deploying.
 
 **(Example)** `billing_account_id` will be shown as required for users and User must have to provide the input.
 
