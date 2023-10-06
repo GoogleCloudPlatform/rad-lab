@@ -71,27 +71,22 @@ const MapField: React.FC<MapField> = ({ variable, validate }) => {
           }
           return (
             <div>
-              {Object.keys(values[variable.name]).map(
-                (map_data: string, index: number) => (
-                  <div
-                    key={index}
-                    className="badge badge-info gap-2 my-1 mr-1 w-auto h-auto py-1 px-2 md:px-4"
+              {Object.keys(values[variable.name]).map((map_data: string) => (
+                <div
+                  key={map_data}
+                  className="badge badge-info gap-2 my-1 mr-1 w-auto h-auto py-1 px-2 md:px-4"
+                >
+                  <span className="w-auto" style={{ overflowWrap: "anywhere" }}>
+                    {map_data} = {values[variable.name][map_data]}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleRemove(values[variable.name], map_data)}
                   >
-                    <span
-                      className="w-auto"
-                      style={{ overflowWrap: "anywhere" }}
-                    >
-                      {map_data} = {values[variable.name][map_data]}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleRemove(values[variable.name], map_data)}
-                    >
-                      <XIcon className="h-4 w-4 cursor-pointer" />
-                    </button>
-                  </div>
-                ),
-              )}
+                    <XIcon className="h-4 w-4 cursor-pointer" />
+                  </button>
+                </div>
+              ))}
               <div className="flex mt-1">
                 <input type="hidden" value={deleteItem} />
                 <Field

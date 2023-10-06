@@ -50,7 +50,7 @@ const ListField: React.FC<ListField> = ({ variable }) => {
             <div>
               {values[variable.name].map((setvalue: string, index: number) => (
                 <div
-                  key={index}
+                  key={setvalue}
                   className="badge badge-info gap-2 my-1 mr-1 w-auto h-auto py-1 px-2 md:px-4"
                 >
                   <span className="w-auto" style={{ overflowWrap: "anywhere" }}>
