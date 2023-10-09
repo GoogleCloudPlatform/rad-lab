@@ -5,6 +5,7 @@ import {
 } from "@/utils/Api_SeverSideCon"
 import { mergeVariables, pushPubSubMsg } from "@/utils/api"
 import { envOrFail } from "@/utils/env"
+import { configureEmailAndSend } from "@/utils/mailHandler"
 import { withAuth } from "@/utils/middleware"
 import {
   AuthedNextApiHandler,
@@ -98,6 +99,11 @@ const deleteDeployment = async (
 
   await updateByField("deployments", "deploymentId", id, deployment)
 
+  await configureEmailAndSend(
+    "RAD Lab Module has been deleted for you!",
+    deployment,
+  )
+
   res.status(200).json({ id, deleted: true })
 }
 
@@ -156,6 +162,13 @@ const updateDeployment = async (
   }
   await updateByField("deployments", "deploymentId", id, body)
   const deployments = await getDocsByField("deployments", "deploymentId", id)
+
+  const [upDatedDeployment] = deployments
+  await configureEmailAndSend(
+    "RAD Lab Module has been updated for you!",
+    upDatedDeployment,
+  )
+
   res.status(200).json({ deployments })
 }
 

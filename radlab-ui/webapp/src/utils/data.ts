@@ -884,7 +884,24 @@ variable "folder_id" {
   description = "Folder ID where the project should be created. {{UIMeta group=3 order=1 }}"
   type        = string
   default     = ""
-}`
+}
+
+variable "email_notifications" {
+  description = "Enable email notifications to Trusted and Owner Users/Groups for RAD Lab deployment events. {{UIMeta group=4 order=1 }}"
+  type        = bool
+  default     = false
+}
+variable "mail_server_email" {
+  description = "Gmail address for sending email notifications. {{UIMeta group=4 order=2 }}"
+  type        = string
+  default     = ""
+}
+variable "mail_server_password" {
+  description = "Gmail password (see more at https://googlecloudplatform.github.io/rad-lab/docs/rad-lab-ui/troubleshooting). {{UIMeta group=4 order=3 }}"
+  type        = string
+  default     = ""
+}
+`
 
 export const EXAMPLE_CLOUD_BUILD_LOGS = `
 starting build "12345678-eeee-4c4c-a94f-abdf234223425"
