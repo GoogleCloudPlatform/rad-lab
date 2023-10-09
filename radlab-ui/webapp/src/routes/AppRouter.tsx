@@ -14,10 +14,13 @@ import AdminRoutes from "@/routes/AdminRoutes"
 import UpdateModule from "@/routes/UpdateModule"
 import ProvisionPublishModule from "@/routes/ProvisionPublishModule"
 import Architecture from "@/routes/Architecture"
+import { User } from "firebase/auth"
 
-interface AppRouterProps {}
+interface AppRouterProps {
+  user: User
+}
 
-const AppRouter: React.FC<AppRouterProps> = ({}) => {
+const AppRouter: React.FC<AppRouterProps> = ({ user }) => {
   const isAdmin = userStore((state) => state.isAdmin)
 
   return (
@@ -41,7 +44,10 @@ const AppRouter: React.FC<AppRouterProps> = ({}) => {
       <Route path="/deployments/:deployId/update" element={<UpdateModule />} />
 
       <Route path="/modules/provision" element={<ProvisionModule />} />
-      <Route path="/modules/architecture" element={<Architecture />} />
+      <Route
+        path="/modules/architecture"
+        element={<Architecture user={user} />}
+      />
       <Route
         path="/modules"
         element={

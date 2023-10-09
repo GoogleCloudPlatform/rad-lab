@@ -1,12 +1,14 @@
-import { AppConfig } from "@/utils/AppConfig"
+interface ModuleArchitectureProps {
+  imageURL: string
+}
 
-interface ModuleArchitectureProps {}
-
-const ModuleArchitecture: React.FC<ModuleArchitectureProps> = () => {
+const ModuleArchitecture: React.FC<ModuleArchitectureProps> = ({
+  imageURL,
+}) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2">
       <div>
-        <img src={`${AppConfig.imagePath}/access.png`} />
+        <img src={imageURL} />
       </div>
       <div>
         <span>Content</span>
