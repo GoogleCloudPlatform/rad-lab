@@ -2,7 +2,7 @@ export const DATA_SCIENCE_VARS = `
 
 # {{UIMeta group=1 order=1 }}
 variable "billing_account_id" {
-  description = "Billing Account associated to the GCP Resources"
+  description = "Billing Account associated to the GCP Resources. {{UIMeta group=0 order=3 required }}"
   type        = string
 }
 
@@ -21,7 +21,7 @@ variable "boot_disk_type" {
 variable "create_container_image" {
   description = "If the notebook needs to have image type as Container set this variable to true, set it to false when using dafault image type i.e. VM."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "create_network" {
@@ -36,8 +36,14 @@ variable "create_project" {
   default     = true
 }
 
+variable "create_usermanaged_notebook" {
+  description = "Set to true if you want to create a user managed workbench notebook. If you want to create a Google managed workbench notebook, set this variable to false. {{UIMeta group=2 order=1 }}"
+  type        = bool
+  default     = true
+}
+
 variable "container_image_repository" {
-  description = "Container Image Repo, only set if creating container image notebook instance by setting \`create_container_image\` variable to true"
+  description = "Container Image Repo, only set if creating container image notebook instance by setting \`create_container_image\` variable to true. {{UIMeta group=2 order=4 dependson=create_container_image==true required }}"
   type        = string
   default     = ""
 }
@@ -67,13 +73,13 @@ variable "folder_id" {
 }
 
 variable "gpu_accelerator_type" {
-  description = "Type of GPU you would like to spin up"
+  description = "Type of GPU you would like to spin up. {{UIMeta group=2 order=10 dependson=enable_gpu_driver==true required }}"
   type        = string
   default     = ""
 }
 
 variable "gpu_accelerator_core_count" {
-  description = "Number of of GPU core count. {{UIMeta group=3 order=11 }}"
+  description = "Number of of GPU core count"
   type        = number
   default     = 0
 }
@@ -91,19 +97,19 @@ variable "image_project" {
 }
 
 variable "ip_cidr_range" {
-  description = "Unique IP CIDR Range for AI Notebooks subnet"
+  description = "Unique IP CIDR Range for AI Notebooks subnet {{UIMeta group=3 order=5 dependson=create_network==true&&create_usermanaged_notebook==true required}}"
   type        = string
   default     = "10.142.190.0/24"
 }
 
 variable "machine_type" {
-  description = "Type of VM you would like to spin up"
+  description = "Type of VM you would like to spin up.{{UIMeta group=3 order=5 dependson=create_network==true&&enable_gpu_driver==true}}"
   type        = string
   default     = "n1-standard-1"
 }
 
 variable "network_name" {
-  description = "Name of the network to be created."
+  description = "Name of the network to be created. {{UIMeta group=3 order=2 dependson=create_usermanaged_notebook==true||enable_gpu_driver==true required}}"
   type        = string
   default     = "ai-notebook"
 }
@@ -139,7 +145,7 @@ variable "set_external_ip_policy" {
 }
 
 variable "set_shielded_vm_policy" {
-  description = "Apply org policy to disable shielded VMs. {{UIMeta updatesafe}}"
+  description = "Apply org policy to disable shielded VMs. {{UIMeta dependson=set_external_ip_policy==true||enable_gpu_driver==true updatesafe}}"
   type        = bool
   default     = true
 }
@@ -151,7 +157,7 @@ variable "set_trustedimage_project_policy" {
 }
 
 variable "subnet_name" {
-  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 }}"
+  description = "Name of the subnet where to deploy the Notebooks. {{UIMeta group=3 dependson=(enable_gpu_driver==true||create_usermanaged_notebook==true)&&(create_network==true||set_external_ip_policy==true) required }}"
   type        = string
   default     = "subnet-ai-notebook"
 }
@@ -163,7 +169,7 @@ variable "trusted_users" {
 }
 
 variable "zone" {
-  description = "Cloud Zone associated to the AI Notebooks {{UIMeta group=1 order=1 options=us-central1-b,us-east1-a,us-west3-b,us-east4-c }}"
+  description = "Cloud Zone associated to the AI Notebooks {{UIMeta group=1 order=1 options=us-central1-b,us-east1-a,us-west3-b,us-east4-c required }}"
   type        = string
   default     = "us-east4-c"
   otherfield  = "bar"
@@ -186,7 +192,7 @@ variable "billing_budget_alert_spent_percents" {
 }
 
 variable "billing_budget_services" {
-  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe }}"
+  description = "A list of services ids to be included in the budget. If omitted, all services will be included in the budget. Service ids can be found at https://cloud.google.com/skus/. {{UIMeta group=0 order=12 updatesafe dependson=(enable_gpu_driver==true||set_external_ip_policy==true)&&(create_network==true||create_usermanaged_notebook==true)}}"
   type        = list(string)
   default     = null
 }

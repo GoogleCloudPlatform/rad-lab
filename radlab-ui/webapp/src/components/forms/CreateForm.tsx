@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react"
 import { FormikStepper } from "@/components/forms/FormikStepper"
 import StepCreator from "@/components/forms/StepCreator"
 import { IUIVariable, Deployment, DEPLOYMENT_STATUS } from "@/utils/types"
-import { groupVariables, initialFormikData } from "@/utils/terraform"
+import {
+  formatRelevantVariables,
+  groupVariables,
+  initialFormikData,
+} from "@/utils/terraform"
 import axios from "axios"
 import { useNavigate, useParams } from "react-router-dom"
 import { alertStore, userStore } from "@/store"
@@ -11,6 +15,7 @@ import { useTranslation } from "next-i18next"
 import Loading from "@/navigation/Loading"
 import UpdateSafeDeploymentModal from "@/components/UpdateSafeDeploymentModal"
 import { whereEq } from "ramda"
+import { FormikValues } from "formik"
 
 interface CreateForm {
   formVariables: IUIVariable[]
@@ -43,6 +48,7 @@ const CreateForm: React.FC<CreateForm> = ({
   const [loading, setLoading] = useState(true)
   const [modalUpdateSafe, setUpdateSafeModal] = useState(false)
   const [modalUpdateSafePayload, setUpdateSafePayload] = useState({})
+  const [answerValueData, setAnswerValueData] = useState<FormikValues>({})
 
   if (!user) throw new Error("No signed in user")
 
@@ -187,14 +193,44 @@ const CreateForm: React.FC<CreateForm> = ({
     }
   }
 
+  const handleChangeValues = (answerValues: FormikValues) => {
+    setAnswerValueData(answerValues)
+  }
+
   useEffect(() => {
     if (formVariables.length > 0) {
       const groupedVariableList = groupVariables(formVariables)
       const groupedVariableListFilter = removeAdminData(groupedVariableList)
-      setFormData(groupedVariableListFilter)
       initialFormikDefaultData(groupedVariableListFilter)
+      const currentVarDataFormat = Object.values(
+        groupedVariableListFilter,
+      ).reduce(
+        (groupedVariableListFilterPrev, groupedVariableListFilternext) =>
+          groupedVariableListFilterPrev.concat(groupedVariableListFilternext),
+        [],
+      )
+
+      const relevantFormVariables = formatRelevantVariables(
+        currentVarDataFormat,
+        answerValueData,
+      )
+      const groupedrelevantFormVariablesFormat = groupVariables(
+        relevantFormVariables,
+      )
+
+      const relevantFormVariablesFormat = Object.assign(
+        {},
+        groupedrelevantFormVariablesFormat,
+      )
+      setFormData(relevantFormVariablesFormat)
     }
-  }, formVariables)
+  }, [formVariables, answerValueData])
+
+  const initialFormDataRelavant = Object.assign(
+    {},
+    initialFormData,
+    answerValueData,
+  )
 
   if (loading) return <Loading />
 
@@ -203,13 +239,18 @@ const CreateForm: React.FC<CreateForm> = ({
       <div className="w-full">
         {formData && (
           <FormikStepper
-            initialValues={initialFormData}
+            initialValues={initialFormDataRelavant}
             onSubmit={(values) => handleSubmit(values)}
           >
             {Object.keys(formData).map((grpId, index) => {
               const group: undefined | IUIVariable[] = formData[grpId]
               return group ? (
-                <StepCreator variableList={group} idx={index} key={index} />
+                <StepCreator
+                  variableList={group}
+                  idx={index}
+                  key={index}
+                  handleChangeValues={handleChangeValues}
+                />
               ) : (
                 <></>
               )
