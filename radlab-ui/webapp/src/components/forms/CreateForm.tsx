@@ -199,16 +199,38 @@ const CreateForm: React.FC<CreateForm> = ({
 
   useEffect(() => {
     if (formVariables.length > 0) {
+      const groupedVariableList = groupVariables(formVariables)
+      const groupedVariableListFilter = removeAdminData(groupedVariableList)
+      initialFormikDefaultData(groupedVariableListFilter)
+      const currentVarDataFormat = Object.values(
+        groupedVariableListFilter,
+      ).reduce(
+        (groupedVariableListFilterPrev, groupedVariableListFilternext) =>
+          groupedVariableListFilterPrev.concat(groupedVariableListFilternext),
+        [],
+      )
+
       const relevantFormVariables = formatRelevantVariables(
-        formVariables,
+        currentVarDataFormat,
         answerValueData,
       )
-      const groupedVariableList = groupVariables(relevantFormVariables)
-      const groupedVariableListFilter = removeAdminData(groupedVariableList)
-      setFormData(groupedVariableListFilter)
-      initialFormikDefaultData(groupedVariableListFilter)
+      const groupedrelevantFormVariablesFormat = groupVariables(
+        relevantFormVariables,
+      )
+
+      const relevantFormVariablesFormat = Object.assign(
+        {},
+        groupedrelevantFormVariablesFormat,
+      )
+      setFormData(relevantFormVariablesFormat)
     }
   }, [formVariables, answerValueData])
+
+  const initialFormDataRelavant = Object.assign(
+    {},
+    initialFormData,
+    answerValueData,
+  )
 
   if (loading) return <Loading />
 
@@ -217,7 +239,7 @@ const CreateForm: React.FC<CreateForm> = ({
       <div className="w-full">
         {formData && (
           <FormikStepper
-            initialValues={initialFormData}
+            initialValues={initialFormDataRelavant}
             onSubmit={(values) => handleSubmit(values)}
           >
             {Object.keys(formData).map((grpId, index) => {

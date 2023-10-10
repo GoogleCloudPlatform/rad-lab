@@ -91,6 +91,8 @@ Some of the variables are depends on other variables input, in order to make it 
 
 **(Example)** `container_image_repository` will be shown once `create_container_image` value will be true, similarly `ip_cidr_range` will be shown once `create_network` and `create_usermanaged_notebook` value will be true , similarly for other variables it will work based on `dependson` conditions with `||` and `&&` operands.
 
+It is recommended to put dependent variables immediately (or soon) after their parent variable by using the UIMeta `group` and `order` variables. This helps make a more logical, consistent flow for users.
+
 ```terraform
 variable "container_image_repository" {
   description = "Container Image Repo, only set if creating container image notebook instance by setting \`create_container_image\` variable to true. {{UIMeta group=2 order=4 dependson=create_container_image==true required }}"
