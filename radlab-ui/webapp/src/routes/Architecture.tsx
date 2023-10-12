@@ -1,5 +1,6 @@
 import RouteContainer from "@/components/RouteContainer"
 import ModuleArchitecture from "@/components/modules/ModuleArchitecture"
+import Loading from "@/navigation/Loading"
 import { alertStore } from "@/store"
 import { ALERT_TYPE } from "@/utils/types"
 import axios from "axios"
@@ -22,10 +23,12 @@ const Architecture: React.FC<ArchitectureProps> = ({ user }) => {
   const navigate = useNavigate()
   const [imageURL, setImageURL] = useState<string>("")
   const setAlert = alertStore((state) => state.setAlert)
+  const [isLoading, setLoading] = useState(false)
 
   let selectedModuleName = ""
 
   const fetchArchitectureDetails = async (moduleName: string) => {
+    // setLoading(true)
     const apiUrl = `/api/github`
     const reqBody = {
       path: `/modules/${moduleName}/images/architecture.png`,
@@ -37,7 +40,7 @@ const Architecture: React.FC<ArchitectureProps> = ({ user }) => {
       })
       .then((res) => {
         console.log("res", res)
-        setImageURL(res.data._links.self)
+        setImageURL(res.data.download_url)
       })
       .catch((error) => {
         console.error(error)
@@ -46,6 +49,9 @@ const Architecture: React.FC<ArchitectureProps> = ({ user }) => {
           durationMs: 20000,
           type: ALERT_TYPE.ERROR,
         })
+      })
+      .finally(() => {
+        // setLoading(false)
       })
   }
 
@@ -88,6 +94,8 @@ const Architecture: React.FC<ArchitectureProps> = ({ user }) => {
       setNavigationData(true)
     }
   }, [selectedModuleName])
+
+  if (isLoading) <Loading />
 
   return (
     <RouteContainer>
