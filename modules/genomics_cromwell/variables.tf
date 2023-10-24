@@ -118,14 +118,9 @@ variable "cromwell_db_tier" {
 
 }
 
-variable "cromwell_PAPI_endpoint" {
-  description = "Endpoint for Life Sciences APIs. For locations other than us-central1, the endpoint needs to be updated to match the location For example for \"europe-west4\" location the endpoint-url should be \"https://europe-west4-lifesciences.googleapi/\". {{UIMeta group=3 order=9 }}"
-  type        = string
-  default     = "https://lifesciences.googleapis.com"
-}
 
-variable "cromwell_PAPI_location" {
-  description = "Google Cloud region or multi-region where the Life Sciences API endpoint will be used. This does not affect where worker instances or data will be stored. {{UIMeta group=3 order=10 }}"
+variable "cromwell_batch_location" {
+  description = "Google Cloud region where the Batch API endpoint will be used. This does not affect where worker instances or data will be stored. {{UIMeta group=3 order=10 }}"
   type        = string
   default     = "us-central1"
 }
@@ -157,14 +152,14 @@ variable "cromwell_server_instance_type" {
 variable "cromwell_version" {
   description = "Cromwell version that will be downloaded, for the latest release version, please check https://github.com/broadinstitute/cromwell/releases for the latest releases. {{UIMeta group=3 order=6 }}"
   type        = string
-  default     = "72"
+  default     = "86"
 
 }
 
 variable "cromwell_zones" {
   description = "GCP Zones that will be set as the default runtime in Cromwell config file. {{UIMeta group=3 order=7 }}"
   type        = list(any)
-  default     = ["us-central1-a", "us-central1-b"]
+  default     = ["us-central1-a"]
 }
 
 variable "db_service_network_cidr_range" {

@@ -23,7 +23,7 @@ You can start an IAP tunnel on your local device from the terminal and then from
 
 ## GCP Products/Services 
 
-* Life Sciences API
+* Batch API
 * Cloud Compute
 * CloudSQL
 * Cloud Storage
@@ -95,16 +95,15 @@ _Usage:_
 | *create_budget* | If the budget should be created | <code title="">bool</code> |  | <code title="">false</code> |
 | *create_network* | If the module has to be deployed in an existing network, set this variable to false | <code title="">bool</code> |  | <code title="">true</code> |
 | *create_project* | Set to true if the module has to create a project.  If you want to deploy in an existing project, set this variable to false | <code title="">bool</code> |  | <code title="">true</code> |
-| *cromwell_PAPI_endpoint* | Endpoint for Life Sciences APIs. For locations other than us-central1, the endpoint needs to be updated to match the location For example for \"europe-west4\" location the endpoint-url should be \"https://europe-west4-lifesciences.googleapi/\" | <code title="">string</code> |  | <code title="">https://lifesciences.googleapis.com</code> |
-| *cromwell_PAPI_location* | Google Cloud region or multi-region where the Life Sciences API endpoint will be used. This does not affect where worker instances or data will be stored | <code title="">string</code> |  | <code title="">us-central1</code> |
+| *cromwell_batch_location* | Google Cloud region where the Batch API endpoint will be used. This does not affect where worker instances or data will be stored | <code title="">string</code> |  | <code title="">us-central1</code> |
 | *cromwell_db_name* | The name of the SQL Database instance | <code title="">string</code> |  | <code title="">cromwelldb</code> |
 | *cromwell_db_tier* | CloudSQL tier, please refere to the documentation at https://cloud.google.com/sql/docs/mysql/instance-settings#machine-type-2ndgen | <code title="">string</code> |  | <code title="">db-n1-standard-2</code> |
 | *cromwell_port* | Port Cromwell server will use for the REST API and web user interface | <code title="">string</code> |  | <code title="">8000</code> |
 | *cromwell_sa_roles* | List of roles granted to the cromwell service account. This server account will be used to run both the Cromwell server and workers as well | <code title="list&#40;any&#41;">list(any)</code> |  | <code title="">["roles/lifesciences.workflowsRunner", "roles/serviceusage.serviceUsageConsumer", "roles/storage.objectAdmin", "roles/cloudsql.client", "roles/browser"]</code> |
 | *cromwell_server_instance_name* | Name of the VM instance that will be used to deploy Cromwell Server, this should be a valid Google Cloud instance name | <code title="">string</code> |  | <code title="">cromwell-server</code> |
 | *cromwell_server_instance_type* | Cromwell server instance type | <code title="">string</code> |  | <code title="">e2-standard-4</code> |
-| *cromwell_version* | Cromwell version that will be downloaded, for the latest release version, please check https://github.com/broadinstitute/cromwell/releases for the latest releases | <code title="">string</code> |  | <code title="">72</code> |
-| *cromwell_zones* | GCP Zones that will be set as the default runtime in Cromwell config file | <code title="list&#40;any&#41;">list(any)</code> |  | <code title="">["us-central1-a", "us-central1-b"]</code> |
+| *cromwell_version* | Cromwell version that will be downloaded, for the latest release version, please check https://github.com/broadinstitute/cromwell/releases for the latest releases | <code title="">string</code> |  | <code title="">86</code> |
+| *cromwell_zones* | GCP Zones that will be set as the default runtime in Cromwell config file | <code title="list&#40;any&#41;">list(any)</code> |  | <code title="">["us-central1-a"]</code> |
 | *db_service_network_cidr_range* | CIDR range used for the private service range for CloudSQL | <code title="">string</code> |  | <code title="">10.128.50.0/24</code> |
 | *deployment_id* | Adds a suffix of 4 random characters to the `project_id` | <code title="">string</code> |  | <code title="">null</code> |
 | *enable_services* | Enable the necessary APIs on the project.  When using an existing project, this can be set to false | <code title="">bool</code> |  | <code title="">true</code> |
