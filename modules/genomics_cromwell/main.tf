@@ -43,7 +43,8 @@ locals {
     "sql-component.googleapis.com",
     "sqladmin.googleapis.com",
     "iam.googleapis.com",
-    "lifesciences.googleapis.com"
+    "batch.googleapis.com",
+    "logging.googleapis.com"
   ]
   project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis, ["pubsub.googleapis.com"])) : local.default_apis) : []
 }
