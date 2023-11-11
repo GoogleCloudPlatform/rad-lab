@@ -23,7 +23,7 @@
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
     "@tailwindcss/forms": "^0.4.0",
-    "axios": "^0.27.2",
+    "axios": "^1.6.0",
     "daisyui": "^2.2.2",
     "firebase": "^9.6.5",
     "firebase-admin": "^11.0.1",
