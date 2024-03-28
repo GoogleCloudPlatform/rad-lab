@@ -3,47 +3,6 @@ sidebar_position: 4
 title: 04 - Web Application
 ---
 
-import create from "zustand";
-const projectIdStore = create((set) => ({
-  projectId: "",
-  setProjectId: (projectId) => set({ projectId }),
-}));
-
-export const ProjectIdInput = () => {
-  const setProjectId = projectIdStore((state) => state.setProjectId);
-  return (
-    <div>
-      <label htmlFor="projectId" name="projectId">
-        RAD Lab UI Project ID
-      </label>
-      <input
-        id="projectId"
-        style={{
-          borderRadius: "0.25rem",
-          padding: "0.5rem",
-          fontSize: "1rem",
-          marginLeft: "1rem",
-          marginBottom: "1rem",
-        }}
-        type="text"
-        onChange={(e) => setProjectId(e.target.value)}
-      />
-    </div>
-  );
-};
-
-export const ProjectIdLink = ({ href, fallback, children }) => {
-  const projectId = projectIdStore((state) => state.projectId);
-  const interpolated =
-    projectId !== "" ? href.replace("${RLUI_PROJECT_ID}", projectId) : fallback;
-  return <a href={interpolated}>{children}</a>;
-};
-
-export const ProjectIdText = ({ success, fallback, children }) => {
-  const projectId = projectIdStore((state) => state.projectId);
-  return projectId ? success(projectId) : fallback;
-};
-
 The RAD Lab UI application is a Firebase application, which requires a number of manual steps to complete the installation.
 
 To retrieve the correct project ID, either open a web browser and go to the [Google Cloud console](https://console.cloud.google.com) or run the following command in the `radlab-ui/automation/terraform/infrastructure` folder:
@@ -55,8 +14,6 @@ echo "$(terraform show -json | jq -r .values.outputs.project_id.value)"
 :::important Dynamic Documentation
 Add your Project ID here to have the documentation be be customized to your Google Cloud project
 :::
-
-<ProjectIdInput />
 
 # Add Firebase
 
@@ -133,7 +90,7 @@ firebase deploy --only firestore:indexes
 
 ## Configure the Webapp
 
-For these next steps, open the <ProjectIdLink href="https://console.firebase.google.com/project/${RLUI_PROJECT_ID}/settings/general" fallback="https://console.firebase.google.com">Firebase Console</ProjectIdLink> and open the Project that corresponds to <ProjectIdText success={(pid) => <code>{pid}</code>} fallback={<code>$RLUI_PROJECT_ID</code>} />.
+For these next steps, open the <a href="https://console.firebase.google.com">Firebase Console</a> and open the Project that corresponds to your project ID.
 
 ### Authentication
 
@@ -143,7 +100,7 @@ For these next steps, open the <ProjectIdLink href="https://console.firebase.goo
 1. Click on **Enable** and provide a valid **Project support email**
 1. Click on **Save**
 
-As a final step, go Authentication > Settings and click on **Authorized domains**. Add the domain of the App Engine application: <ProjectIdText success={(pid) => <code>{pid}.uc.r.appspot.com</code>} fallback={<code>$RLUI_PROJECT_ID.uc.r.appspot.com</code>} />. You can also get this value by running the following command in the `radlab-ui/automation/terraform/infrastructure` folder:
+As a final step, go Authentication > Settings and click on **Authorized domains**. Add the domain of the App Engine application. You can get this value by running the following command in the `radlab-ui/automation/terraform/infrastructure` folder:
 
 ```shell
 echo "$(cd ../automation/terraform/infrastructure && terraform show -json | jq -r .values.outputs.app_engine_url.value)"
@@ -151,7 +108,7 @@ echo "$(cd ../automation/terraform/infrastructure && terraform show -json | jq -
 
 ### Firebase app
 
-The final step is to add the configuration to your local directory. Navigate to <ProjectIdLink href="https://console.firebase.google.com/project/${RLUI_PROJECT_ID}/settings/general" fallback="https://console.firebase.google.com">Firebase Console</ProjectIdLink> and go to your Project settings:
+The final step is to add the configuration to your local directory. Navigate to <a href="https://console.firebase.google.com/project/${RLUI_PROJECT_ID}/settings/general" fallback="https://console.firebase.google.com">Firebase Console</a> and go to your Project settings:
 
 ![Project settings for your Firebase project](../../../static/img/settings.png)
 

@@ -14,9 +14,9 @@ The video below provides a quick overview on how to setup RAD Lab UI variables a
     width="980"
     height="480"
     src="https://www.youtube.com/embed/8KNDAIb-Z2I"
-    frameborder="0"
+    frameBorder="0"
     allow="encrypted-media"
-    allowfullscreen
+    allowFullScreen
 >
 </iframe>
 

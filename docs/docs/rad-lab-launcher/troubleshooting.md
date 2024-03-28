@@ -22,13 +22,13 @@ sidebar_position: 4
 **Issue**: When running the `python3 radlab.py` installation from Cloud Shell, you receive the following error:
 
 ```
-Error: Error waiting to create Instance: Error waiting for Creating Instance: Error code 25, message: Constraint constraints/compute.vmExternalIpAccess violated for project <project_id>. Add instance projects/<project_id>/zones/us-east4-c/instances/notebooks-instance-0 to the constraint to use external IP with it.
+Error: Error waiting to create Instance: Error waiting for Creating Instance: Error code 25, message: Constraint constraints/compute.vmExternalIpAccess violated for project [project_id]. Add instance projects/[project_id]/zones/us-east4-c/instances/notebooks-instance-0 to the constraint to use external IP with it.
 .
 .
-Error Occurred - Deployment failed for ID: <deployment_id>
+Error Occurred - Deployment failed for ID:[deployment_id]
 ```
 
-**Solution**: If you see above error in your initial deployment run, rerun the deployment via ```python3 radlab.py``` using the <deployment_id> and select `Update` (in [Steps to Deploy RAD Lab Modules](../rad-lab-launcher/launcher_deployment/launcher.md#deploy-a-rad-lab-module)). This may have been caused as the Organization Policy ```constraints/compute.vmExternalIpAccess``` is not completely rolled out.
+**Solution**: If you see above error in your initial deployment run, rerun the deployment via ```python3 radlab.py``` using the [deployment_id] and select `Update` (in [Steps to Deploy RAD Lab Modules](../rad-lab-launcher/launcher_deployment/launcher.md#deploy-a-rad-lab-module)). This may have been caused as the Organization Policy ```constraints/compute.vmExternalIpAccess``` is not completely rolled out.
 
 **NOTE:** Similarly, if the error occurs for any other organization policies, then the workaround is same as above.  
 
@@ -62,7 +62,7 @@ with google_project_organization_policy.external_ip_policy[0],
 **Issue**: When running the `python3 radlab.py` installation from Cloud Shell, you receive the following error: 
 
 ```
- Error: Error setting billing account "<yourBillingID>" for project "projects/radlab-ds-analytics-<deployment_id>": 
+ Error: Error setting billing account "[yourBillingID]" for project "projects/radlab-ds-analytics-[deployment_id]": 
  googleapi: Error 400: Precondition check failed., 
  failedPrecondition
 
@@ -83,10 +83,10 @@ Please be sure you are logged in as a user with Google Cloud project Owner right
 │ 
 .
 .
-Error Occurred - Deployment failed for ID: <deployment_id>
+Error Occurred - Deployment failed for ID:[deployment_id]
 ```
 
-**Solution**: If you see above error, rerun the deployment via ```python3 radlab.py``` using the <deployment_id> and select `Delete` (in [Steps to Deploy RAD Lab Modules](../rad-lab-launcher/launcher_deployment/launcher.md#deploy-a-rad-lab-module)). This may have been caused if it took longer than expected to destroy any resource(s).
+**Solution**: If you see above error, rerun the deployment via ```python3 radlab.py``` using the [deployment_id] and select `Delete` (in [Steps to Deploy RAD Lab Modules](../rad-lab-launcher/launcher_deployment/launcher.md#deploy-a-rad-lab-module)). This may have been caused if it took longer than expected to destroy any resource(s).
 
 ## Operations Troubleshooting
 
@@ -99,7 +99,7 @@ File "radlab.py", line 134, in main
     os.mkdir(env_path)
 
 FileExistsError: [Errno 17] File exists:
- '/home/<radlabAdminUser>/radlab/deployments/data_science_<deployment_id_>'
+ '/home/[radlabAdminUser]/radlab/deployments/data_science_[deployment_id]'
 ```
 
 **Solution**:  You likely have a local copy of a Terraform `/deployments` folder with the same deploymentID in your Cloud Shell instance that needs to be removed. This can happen if you  perform multiple Actions on a single deployment from the same Cloud Shell instance. Even though you are looking to a shared Google Cloud bucket to get the current Terraform state, Terraform will still try to create a local copy of the deployment first.
@@ -113,7 +113,7 @@ cd ./deployments
 And removing the module folder with the conflicting deploymentID:
 
 ```bash
-rm -rfv /data_science_<deployment_id>/
+rm -rfv /data_science_[deployment_id]/
 ```
 
-**Note:** The above command will remove all files and sub-directories in the ```/data_science_<deployment_id>/``` directory before removing the ```/data_science_<deployment_id>/``` directory. The contents of this directory will sync from the Google Cloud state bucket next time you run the `python3 radlab.py` installation.
+**Note:** The above command will remove all files and sub-directories in the ```/data_science_[deployment_id]/``` directory before removing the ```/data_science_[deployment_id]/``` directory. The contents of this directory will sync from the Google Cloud state bucket next time you run the `python3 radlab.py` installation.
