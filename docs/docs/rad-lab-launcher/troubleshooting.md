@@ -28,7 +28,7 @@ Error: Error waiting to create Instance: Error waiting for Creating Instance: Er
 Error Occurred - Deployment failed for ID:[deployment_id]
 ```
 
-**Solution**: If you see above error in your initial deployment run, rerun the deployment via ```python3 radlab.py``` using the[deployment_id] and select `Update` (in [Steps to Deploy RAD Lab Modules](../rad-lab-launcher/launcher_deployment/launcher.md#deploy-a-rad-lab-module)). This may have been caused as the Organization Policy ```constraints/compute.vmExternalIpAccess``` is not completely rolled out.
+**Solution**: If you see above error in your initial deployment run, rerun the deployment via ```python3 radlab.py``` using the [deployment_id] and select `Update` (in [Steps to Deploy RAD Lab Modules](../rad-lab-launcher/launcher_deployment/launcher.md#deploy-a-rad-lab-module)). This may have been caused as the Organization Policy ```constraints/compute.vmExternalIpAccess``` is not completely rolled out.
 
 **NOTE:** Similarly, if the error occurs for any other organization policies, then the workaround is same as above.  
 
@@ -86,7 +86,7 @@ Please be sure you are logged in as a user with Google Cloud project Owner right
 Error Occurred - Deployment failed for ID:[deployment_id]
 ```
 
-**Solution**: If you see above error, rerun the deployment via ```python3 radlab.py``` using the[deployment_id] and select `Delete` (in [Steps to Deploy RAD Lab Modules](../rad-lab-launcher/launcher_deployment/launcher.md#deploy-a-rad-lab-module)). This may have been caused if it took longer than expected to destroy any resource(s).
+**Solution**: If you see above error, rerun the deployment via ```python3 radlab.py``` using the [deployment_id] and select `Delete` (in [Steps to Deploy RAD Lab Modules](../rad-lab-launcher/launcher_deployment/launcher.md#deploy-a-rad-lab-module)). This may have been caused if it took longer than expected to destroy any resource(s).
 
 ## Operations Troubleshooting
 
