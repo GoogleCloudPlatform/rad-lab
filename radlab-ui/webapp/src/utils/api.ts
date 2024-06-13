@@ -198,3 +198,19 @@ export const getGitHubVariables = async (moduleName: string, token: string) => {
     throw error
   }
 }
+
+export const getGitHubModulesData = async (path: string, token: string) => {
+  try {
+    const result = await axios({
+      method: "GET",
+      url: `${NEXT_PUBLIC_GIT_API_URL}/contents${path}?ref=${NEXT_PUBLIC_GIT_BRANCH}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    return result.data || null
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
