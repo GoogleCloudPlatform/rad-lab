@@ -34,3 +34,8 @@ export const gcpLinkFromDeployment = (deployment: IDeployment) =>
 
 export const localDateFromSeconds = (seconds: number) =>
   new Date(seconds * 1000).toLocaleDateString()
+
+export const capitalizeLetter = (word: string) => {
+  const result = word.charAt(0).toUpperCase() + word.slice(1)
+  return result
+}

@@ -51,12 +51,12 @@ const Search = ({
 
   return (
     <div className="relative">
-      <SearchIcon className="h-6 absolute mt-3 ml-3 text-base-content" />
+      <SearchIcon className="h-4 absolute mt-4 ml-3 text-base-content" />
       <input
         ref={inputRef ?? null}
         type="text"
         placeholder={placeholder || "Search"}
-        className="input px-10 py-3 w-full"
+        className="input px-10 py-6 w-full input-sm"
         onChange={onChange}
       />
     </div>

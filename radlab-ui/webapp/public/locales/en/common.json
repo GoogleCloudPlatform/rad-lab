@@ -42,7 +42,8 @@
   "access-denied": "Access Denied!",
   "access-denied-message": "You are not authorized to use this part of the application",
   "gcp-admin": "Please check with your GCP admin to proceed further",
-  "delete-deployment": "Are you sure you want to delete the deployment?",
+  "delete-deployment-title": "Delete Deployment",
+  "delete-deployment-message": "Are you sure you want to delete the deployment(s)?",
   "close": "Close",
   "deployment-id": "Deployment ID:",
   "available-modules": "Available Modules",
@@ -76,5 +77,7 @@
   "loading": "Loading",
   "no-modules-message": "If you are not seeing the module you want, reach out to your RAD Lab Admin",
   "build-status": "Build Status",
-  "history": "History"
+  "history": "History",
+  "modules": "Modules",
+  "clear": "Clear"
 }
