@@ -10,21 +10,32 @@ import StringField from "@/components/forms/fields/StringField"
 import ZoneStringField from "@/components/forms/fields/ZoneStringField"
 import { IUIVariable } from "@/utils/types"
 import { validators } from "@/utils/validation"
-import { useField } from "formik"
+import { useField, useFormikContext } from "formik"
 import sortBy from "lodash/sortBy"
 import startCase from "lodash/startCase"
+import { useEffect } from "react"
 
 interface StepCreator {
   variableList: IUIVariable[]
   idx: number
+  handleChangeValues: Function
 }
 
 const TF_PRIMITIVES = ["number", "string"]
 
 type IFieldValidateValue = { value: string | number | boolean }
 
-const StepCreator: React.FC<StepCreator> = ({ variableList, idx }) => {
+const StepCreator: React.FC<StepCreator> = ({
+  variableList,
+  idx,
+  handleChangeValues,
+}) => {
   const sortedList = sortBy(variableList, "order")
+  const { values } = useFormikContext()
+
+  useEffect(() => {
+    handleChangeValues(values)
+  }, [values])
 
   const validate = (variable: IUIVariable) => (value: IFieldValidateValue) => {
     // Type checks

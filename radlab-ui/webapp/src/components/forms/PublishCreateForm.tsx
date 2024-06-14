@@ -1,7 +1,7 @@
 import StepCreator from "@/components/forms/StepCreator"
 import { alertStore } from "@/store"
 import { classNames } from "@/utils/dom"
-import { initialFormikData } from "@/utils/terraform"
+import { formatRelevantVariables, initialFormikData } from "@/utils/terraform"
 import {
   ALERT_TYPE,
   IFormData,
@@ -11,7 +11,7 @@ import {
 } from "@/utils/types"
 import { mergeAllSafe } from "@/utils/variables"
 import axios from "axios"
-import { Form, Formik } from "formik"
+import { Form, Formik, FormikValues } from "formik"
 import startCase from "lodash/startCase"
 import { useTranslation } from "next-i18next"
 import React, { useEffect, useState } from "react"
@@ -39,6 +39,7 @@ const PublishCreateForm: React.FC<IPublishCreateFormProps> = ({
   const [completed, setCompleted] = useState(false)
   const [isSubmitLoading, setSubmitLoading] = useState(false)
   const [isSubmit, setSubmit] = useState(false)
+  const [answerValueData, setAnswerValueData] = useState<FormikValues>({})
 
   const currentVarsData = formVariables[step]
   if (!currentVarsData) {
@@ -137,11 +138,21 @@ const PublishCreateForm: React.FC<IPublishCreateFormProps> = ({
     ])
   }
 
+  const handleChangeValues = (answerValues: FormikValues) => {
+    setAnswerValueData(answerValues)
+  }
+
   useEffect(() => {
     const initialFormVariable = setDefaultSettingVariables()
+    const currentVarDataFormat = Object.values(currentVarsData.variables)
+    const relevantFormVariables = formatRelevantVariables(
+      currentVarDataFormat,
+      answerValueData,
+    )
+    const relevantFormVariablesFormat = Object.assign({}, relevantFormVariables)
     setInitialData(initialFormVariable)
-    setFormData([currentVarsData.variables])
-  }, [currentVarsData.variables])
+    setFormData([relevantFormVariablesFormat])
+  }, [currentVarsData.variables, answerValueData])
 
   return (
     <div className="w-full">
@@ -174,7 +185,12 @@ const PublishCreateForm: React.FC<IPublishCreateFormProps> = ({
                 {Object.keys(formData).map((grpId, index) => {
                   const group: undefined | IUIVariable[] = formData[grpId]
                   return group ? (
-                    <StepCreator variableList={group} idx={index} key={grpId} />
+                    <StepCreator
+                      variableList={group}
+                      idx={index}
+                      key={grpId}
+                      handleChangeValues={handleChangeValues}
+                    />
                   ) : (
                     <></>
                   )

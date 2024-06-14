@@ -35,8 +35,8 @@ export function FormikStepper({
   return (
     <>
       <Formik
-        {...props}
-        validationSchema={currentChild.props.validationSchema}
+        enableReinitialize
+        initialValues={props.initialValues}
         onSubmit={async (values, helpers) => {
           helpers.setSubmitting(false)
           window.scrollTo(0, 0)
@@ -46,10 +46,11 @@ export function FormikStepper({
             setCompleted(true)
           } else {
             setStep((s) => s + 1)
-            helpers.setTouched({})
+            helpers.validateForm(props.initialValues)
           }
         }}
         validateOnMount
+        isInitialValid
       >
         {({ isSubmitting, isValid }) => (
           <Form autoComplete="off">
