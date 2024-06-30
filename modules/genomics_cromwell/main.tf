@@ -43,7 +43,8 @@ locals {
     "sql-component.googleapis.com",
     "sqladmin.googleapis.com",
     "iam.googleapis.com",
-    "lifesciences.googleapis.com"
+    "batch.googleapis.com",
+    "logging.googleapis.com"
   ]
   project_services = var.enable_services ? (var.billing_budget_pubsub_topic ? distinct(concat(local.default_apis, ["pubsub.googleapis.com"])) : local.default_apis) : []
 }
@@ -114,10 +115,10 @@ resource "google_storage_bucket_object" "config" {
   content = templatefile("scripts/build/cromwell.conf", {
     CROMWELL_PROJECT         = local.project.project_id,
     CROMWELL_ROOT_BUCKET     = google_storage_bucket.cromwell_workflow_bucket.url,
-    CROMWELL_VPC             = var.network_name
+    CROMWELL_VPC             = var.network_name,
+    CROMWELL_REGION          = var.region,
     CROMWELL_SERVICE_ACCOUNT = module.cromwell_service_account.email,
-    CROMWELL_PAPI_LOCATION   = var.cromwell_PAPI_location,
-    CROMWELL_PAPI_ENDPOINT   = var.cromwell_PAPI_endpoint,
+    CROMWELL_BATCH_LOCATION  = var.cromwell_batch_location,
     REQUESTER_PAY_PROJECT    = local.project.project_id,
     CROMWELL_ZONES           = "[${join(", ", var.cromwell_zones)}]"
     CROMWELL_PORT            = var.cromwell_port,
