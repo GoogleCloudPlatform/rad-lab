@@ -16,7 +16,7 @@
 
 # data "google_compute_image" "debian" {
 #   project = "debian-cloud"
-#   family  = "debian-10"
+#   family  = "debian-11"
 # }
 
 //Create Cromwell service account and assign required roles
@@ -53,7 +53,7 @@ resource "google_compute_instance" "cromwell_server" {
   boot_disk {
     initialize_params {
       # image = data.google_compute_image.debian.self_link
-      image = "debian-cloud/debian-10"
+      image = "debian-cloud/debian-11"
 
     }
   }

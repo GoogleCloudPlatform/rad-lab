@@ -19,15 +19,15 @@ locals {
 }
 
 resource "google_monitoring_notification_channel" "email_notif" {
-  count        = var.create_budget ? length(local.emails) : 0 
+  count        = var.create_budget ? length(local.emails) : 0
   display_name = "Billing Budget Notification Channel - ${element(local.emails, count.index)}"
   project      = local.project.project_id
   type         = "email"
-  labels       = {
+  labels = {
     email_address = "${element(local.emails, count.index)}"
   }
-  
-  depends_on   = [
+
+  depends_on = [
     time_sleep.wait_120_seconds
   ]
 }

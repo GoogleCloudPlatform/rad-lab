@@ -118,14 +118,9 @@ variable "cromwell_db_tier" {
 
 }
 
-variable "cromwell_PAPI_endpoint" {
-  description = "Endpoint for Life Sciences APIs. For locations other than us-central1, the endpoint needs to be updated to match the location For example for \"europe-west4\" location the endpoint-url should be \"https://europe-west4-lifesciences.googleapi/\". {{UIMeta group=3 order=9 }}"
-  type        = string
-  default     = "https://lifesciences.googleapis.com"
-}
 
-variable "cromwell_PAPI_location" {
-  description = "Google Cloud region or multi-region where the Life Sciences API endpoint will be used. This does not affect where worker instances or data will be stored. {{UIMeta group=3 order=10 }}"
+variable "cromwell_batch_location" {
+  description = "Google Cloud region where the Batch API endpoint will be used. This does not affect where worker instances or data will be stored. {{UIMeta group=3 order=10 }}"
   type        = string
   default     = "us-central1"
 }
@@ -139,7 +134,16 @@ variable "cromwell_port" {
 variable "cromwell_sa_roles" {
   description = "List of roles granted to the cromwell service account. This server account will be used to run both the Cromwell server and workers as well. {{UIMeta group=3 order=11 updatesafe }}"
   type        = list(any)
-  default = ["roles/lifesciences.workflowsRunner", "roles/serviceusage.serviceUsageConsumer", "roles/storage.objectAdmin", "roles/cloudsql.client", "roles/browser"]
+  default = [
+    "roles/batch.agentReporter",
+    "roles/batch.jobsEditor", 
+    "roles/batch.serviceAgent",
+    "roles/cloudsql.client",
+    "roles/logging.logWriter",
+    "roles/logging.viewer", 
+    "roles/serviceusage.serviceUsageConsumer", 
+    "roles/storage.objectAdmin",  
+    "roles/browser"]
 }
 
 variable "cromwell_server_instance_name" {
@@ -157,14 +161,14 @@ variable "cromwell_server_instance_type" {
 variable "cromwell_version" {
   description = "Cromwell version that will be downloaded, for the latest release version, please check https://github.com/broadinstitute/cromwell/releases for the latest releases. {{UIMeta group=3 order=6 }}"
   type        = string
-  default     = "72"
+  default     = "87"
 
 }
 
 variable "cromwell_zones" {
   description = "GCP Zones that will be set as the default runtime in Cromwell config file. {{UIMeta group=3 order=7 }}"
   type        = list(any)
-  default     = ["us-central1-a", "us-central1-b"]
+  default     = ["us-central1-a"]
 }
 
 variable "db_service_network_cidr_range" {
@@ -194,7 +198,7 @@ variable "folder_id" {
 variable "ip_cidr_range" {
   description = "Unique IP CIDR Range for cromwell subnet. {{UIMeta group=2 order=3 }}"
   type        = string
-  default     = "10.142.190.0/24"
+  default     = "10.142.188.0/22"
 }
 
 variable "network_name" {
