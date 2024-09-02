@@ -49,12 +49,12 @@ jobs:
         run: |
           if [[ "${{ github.event.inputs.BRname }}" == "staging" || "${{ github.event.ref }}" == *"staging"* ]]
           then
-            echo "::set-output name=branch::staging"
+            echo "branch=staging" >> "$GITHUB_OUTPUT"
             echo "${{ secrets.STAGING_APP_YAML }}" > app.yaml
             echo "${{ secrets.STAGING_ENV }}" > .env.production.local
           elif [[ "${{ github.event.inputs.BRname }}" == "main" || "${{ github.event.ref }}" == *"main"* ]]
           then
-            echo "::set-output name=branch::main"
+            echo "branch=main" >> "$GITHUB_OUTPUT"
             echo "${{ secrets.PROD_APP_YAML }}" > app.yaml
             echo "${{ secrets.PROD_ENV }}" > .env.production.local
           else
