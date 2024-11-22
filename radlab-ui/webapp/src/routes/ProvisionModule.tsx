@@ -46,10 +46,12 @@ const ProvisionModule: React.FC<provisionMouduleInterface> = ({}) => {
     await axios
       .get(apiUrl)
       .then((response) => {
+        console.log("response", response)
         let decodeToString = Buffer.from(
           response.data.variables.content,
           "base64",
         ).toString()
+        console.log("decode", decodeToString)
         const parseData = parseVarsFile(decodeToString)
         const filterParseData = parseData.filter(
           (vars) => vars.name !== "deployment_id",
