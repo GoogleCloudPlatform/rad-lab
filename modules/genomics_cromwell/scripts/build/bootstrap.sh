@@ -32,12 +32,12 @@ mkdir /opt/cromwell
 mv cromwell-${CROMWELL_VERSION}.jar /opt/cromwell/cromwell.jar
 
 # Copy Config and Service files from Bucket
-gsutil cp ${BUCKET_URL}/provisioning/cromwell.conf /opt/cromwell/cromwell.conf
-gsutil cp ${BUCKET_URL}/provisioning/cromwell.service /etc/systemd/system/cromwell.service
+gcloud storage cp ${BUCKET_URL}/provisioning/cromwell.conf /opt/cromwell/cromwell.conf
+gcloud storage cp ${BUCKET_URL}/provisioning/cromwell.service /etc/systemd/system/cromwell.service
 
 #Delete Config file as no longer needed on the bucket
-gsutil rm ${BUCKET_URL}/provisioning/cromwell.conf
-gsutil rm ${BUCKET_URL}/provisioning/cromwell.service
+gcloud storage rm ${BUCKET_URL}/provisioning/cromwell.conf
+gcloud storage rm ${BUCKET_URL}/provisioning/cromwell.service
 
 # Reload linux daemons and start the service
 systemctl daemon-reload

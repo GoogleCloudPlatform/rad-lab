@@ -19,8 +19,8 @@ steps:
     args:
       - '-c'
       - |
-        gsutil cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/terraform.tfvars.json ./terraform.tfvars.json
-        gsutil cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/backend.tf ./backend.tf
+        gcloud storage cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/terraform.tfvars.json ./terraform.tfvars.json
+        gcloud storage cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/backend.tf ./backend.tf
     dir: ./modules/${_MODULE_NAME}
 
   - id: 'Init'
@@ -53,17 +53,17 @@ steps:
       - '-c'
       - |
         terraform output -json > output.json
-        gsutil -m cp output.json gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/output/output.json
+        gcloud storage cp output.json gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/output/output.json
     dir: ./modules/${_MODULE_NAME}
 
   - id: 'Upload Files'
-    name: 'gcr.io/cloud-builders/gsutil'
+    name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         tar -czf ${_MODULE_NAME}.tar.gz -C ${_MODULE_NAME} .
-        gsutil -m cp ${_MODULE_NAME}.tar.gz gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files
+        gcloud storage cp ${_MODULE_NAME}.tar.gz gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files
     dir: ./modules
 
 options:
