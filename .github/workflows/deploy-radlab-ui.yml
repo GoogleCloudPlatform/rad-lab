@@ -47,12 +47,12 @@ jobs:
       - name: Create app.yaml and .env.development.local files
         id: setup
         run: |
-          if [[ "${{ github.event.inputs.BRname }}" == "staging" || "${{ github.event.ref }}" == *"staging"* ]]
+          if [[ "${GITHUB_EVENT_INPUTS_BRNAME}" == "staging" || "${GITHUB_EVENT_REF}" == *"staging"* ]]
           then
             echo "::set-output name=branch::staging"
             echo "${{ secrets.STAGING_APP_YAML }}" > app.yaml
             echo "${{ secrets.STAGING_ENV }}" > .env.production.local
-          elif [[ "${{ github.event.inputs.BRname }}" == "main" || "${{ github.event.ref }}" == *"main"* ]]
+          elif [[ "${GITHUB_EVENT_INPUTS_BRNAME}" == "main" || "${GITHUB_EVENT_REF}" == *"main"* ]]
           then
             echo "::set-output name=branch::main"
             echo "${{ secrets.PROD_APP_YAML }}" > app.yaml
@@ -61,6 +61,9 @@ jobs:
             echo "Auto RAD Lab UI deployment is only avaialble for main and staging branches."
             exit 1
           fi
+        env:
+          GITHUB_EVENT_INPUTS_BRNAME: ${{ github.event.inputs.BRname }}
+          GITHUB_EVENT_REF: ${{ github.event.ref }}
 
       - name: Install dependencies
         run: npm ci
@@ -86,8 +89,10 @@ jobs:
           credentials: ${{ secrets.STAGING_GCP_SA_KEY }}
 
       - name: Test Staging
-        run: curl "${{ steps.deploy-staging.outputs.url }}"
+        run: curl "${STEPS_DEPLOY_STAGING_OUTPUTS_URL}"
         if: steps.setup.outputs.branch == 'staging'
+        env:
+          STEPS_DEPLOY_STAGING_OUTPUTS_URL: ${{ steps.deploy-staging.outputs.url }}
 
       - name: Setup Google Cloud SDK for main
         if: steps.setup.outputs.branch == 'main'
@@ -108,4 +113,6 @@ jobs:
 
       - name: Test Main
         if: steps.setup.outputs.branch == 'main'
-        run: curl "${{ steps.deploy-main.outputs.url }}"
+        run: curl "${STEPS_DEPLOY_MAIN_OUTPUTS_URL}"
+        env:
+          STEPS_DEPLOY_MAIN_OUTPUTS_URL: ${{ steps.deploy-main.outputs.url }}
