@@ -27,7 +27,7 @@ if [ -n "$(echo ${SYSTEM_NAME} | grep 'Google Compute Engine')" ]; then
 echo "DaisyStatus: fetching provisioning script"
 DAISY_SOURCES_PATH=$(curl -H 'Metadata-Flavor: Google' http://metadata.google.internal/computeMetadata/v1/instance/attributes/daisy-sources-path)
 mkdir -p ${PROVISION_DIR}
-gsutil -m rsync ${DAISY_SOURCES_PATH}/provision/ ${PROVISION_DIR}/ || true
+gcloud storage rsync ${DAISY_SOURCES_PATH}/provision/ ${PROVISION_DIR}/ || true
 fi
 
 echo "DaisyStatus: installing conda-eda environment"

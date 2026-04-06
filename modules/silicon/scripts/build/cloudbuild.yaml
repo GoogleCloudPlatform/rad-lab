@@ -34,7 +34,7 @@ steps:
     python3 -m venv env-jupytext/
     env-jupytext/bin/python -m pip install jupytext
     env-jupytext/bin/jupytext --to notebook scripts/build/notebooks/*.md
-    echo 'gsutil cp gs://$_NOTEBOOKS_BUCKET/*.ipynb /home/jupyter/' > scripts/build/notebooks/copy-notebooks.sh
+    echo 'gcloud storage cp gs://$_NOTEBOOKS_BUCKET/*.ipynb /home/jupyter/' > scripts/build/notebooks/copy-notebooks.sh
   waitFor: ['-']
 - id: 'compute-image-build'
   name: 'gcr.io/cloud-builders/gcloud'
@@ -43,7 +43,7 @@ steps:
   - '-c'
   - |-
     cd scripts/build/images/
-    gsutil cp gs://compute-image-tools/release/linux/daisy .
+    gcloud storage cp gs://compute-image-tools/release/linux/daisy .
     chmod +x daisy
     ./daisy -project $PROJECT_ID -zone $_ZONE -variables image_name=$_COMPUTE_IMAGE,image_tag=$BUILD_ID,network=$_COMPUTE_NETWORK,subnet=$_COMPUTE_SUBNET,service_account=$_CLOUD_BUILD_SA compute_image.wf.json
   waitFor: ['-']

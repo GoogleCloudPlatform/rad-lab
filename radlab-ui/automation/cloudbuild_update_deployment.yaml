@@ -20,20 +20,20 @@ steps:
       - '-c'
       - |
         echo "Check if the TAR file has already been uploaded.  If not, this is an initial deployment"
-        TAR_FILE_EXISTS=$(gsutil ls gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/${_MODULE_NAME}.tar.gz > /dev/null 2>&1)
+        TAR_FILE_EXISTS=$(gcloud storage ls gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/${_MODULE_NAME}.tar.gz > /dev/null 2>&1)
 
         if [[ "$?" -ne "0" ]]
         then
           echo "Archive with deployed files does not exist yet, running first deploy."
-          gsutil cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/terraform.tfvars.json ./terraform.tfvars.json
-          gsutil cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/backend.tf ./backend.tf
+          gcloud storage cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/terraform.tfvars.json ./terraform.tfvars.json
+          gcloud storage cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/backend.tf ./backend.tf
         else
           echo "Updating existing deployment"
 
           rm -rfv *
-          gsutil -m cp -r gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/* .
+          gcloud storage cp --recursive gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/* .
           tar -xzf ${_MODULE_NAME}.tar.gz
-          gsutil cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/terraform.tfvars.json ./terraform.tfvars.json
+          gcloud storage cp gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/terraform.tfvars.json ./terraform.tfvars.json
           rm -rf ${_MODULE_NAME}.tar.gz
         fi
     dir: ./modules/${_MODULE_NAME}
@@ -68,17 +68,17 @@ steps:
       - '-c'
       - |
         terraform output -json > output.json
-        gsutil -m cp output.json gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/output/output.json
+        gcloud storage cp output.json gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/output/output.json
     dir: ./modules/${_MODULE_NAME}
 
   - id: 'Upload files'
-    name: 'gcr.io/cloud-builders/gsutil'
+    name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         tar -czf ${_MODULE_NAME}.tar.gz -C ${_MODULE_NAME} .
-        gsutil -m cp ${_MODULE_NAME}.tar.gz gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files
+        gcloud storage cp ${_MODULE_NAME}.tar.gz gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files
     dir: ./modules
 
 options:

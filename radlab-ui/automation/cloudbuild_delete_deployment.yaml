@@ -20,7 +20,7 @@ steps:
   - '-c'
   - |
     rm -rfv *
-    gsutil -m cp -r gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/* .
+    gcloud storage cp --recursive gs://${_DEPLOYMENT_BUCKET_ID}/deployments/${_MODULE_NAME}_${_DEPLOYMENT_ID}/files/* .
     tar -xzf ${_MODULE_NAME}.tar.gz
   dir: ./modules/${_MODULE_NAME}
 

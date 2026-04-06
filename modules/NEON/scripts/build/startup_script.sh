@@ -24,7 +24,7 @@ export PROJECT_ID=$(gcloud config get-value project)
 
 # Copy neon .pynb to the notebook
 echo "Copying sample notebooks to the instance."
-gsutil -m cp -r gs://user-scripts-${PROJECT_ID}/notebooks/*.ipynb /home/jupyter/NEON/notebooks
+gcloud storage cp --recursive gs://user-scripts-${PROJECT_ID}/notebooks/*.ipynb /home/jupyter/NEON/notebooks
 
 echo "Startup script finished."
 
