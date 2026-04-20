@@ -36,7 +36,7 @@
     "next-i18next": "^10.2.0",
     "next-seo": "^4.29.0",
     "next-swagger-doc": "^0.3.4",
-    "nodemailer": "^6.9.5",
+    "nodemailer": "^6.9.9",
     "nookies": "^2.5.2",
     "ramda": "^0.28.0",
     "react": "^17.0.2",
