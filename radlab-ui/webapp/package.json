@@ -33,7 +33,7 @@
     "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
     "next": "^12.0.8",
-    "next-i18next": "^10.2.0",
+    "next-i18next": "^16.0.5",
     "next-seo": "^4.29.0",
     "next-swagger-doc": "^0.3.4",
     "nodemailer": "^6.9.5",
