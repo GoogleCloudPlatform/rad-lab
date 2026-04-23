@@ -45,7 +45,7 @@
     "styled-jsx-plugin-postcss": "^4.0.1",
     "swagger-ui-react": "^4.12.0",
     "theme-change": "^2.0.2",
-    "uuid": "^8.3.2",
+    "uuid": "^14.0.0",
     "yup": "^0.32.11",
     "zod": "^3.17.3",
     "zustand": "^4.3.7"
