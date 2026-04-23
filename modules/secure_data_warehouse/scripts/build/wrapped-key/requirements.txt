@@ -7,7 +7,7 @@ google-auth==2.3.3
 google-cloud-kms==2.10.1
 googleapis-common-protos==1.53.0
 grpc-google-iam-v1==0.12.3
-grpcio==1.42.0
+grpcio==1.53.2
 grpcio-status==1.42.0
 idna==3.3
 proto-plus==1.19.8
