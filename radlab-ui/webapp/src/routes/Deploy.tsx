@@ -32,7 +32,10 @@ const Deploy: React.FC<DeployProps> = () => {
   )
 
   const handleCardClick = (moduleTitle: string) => {
-    navigate("/modules/provision", {
+    // navigate("/modules/provision", {
+    //   state: { moduleName: moduleTitle },
+    // })
+    navigate("/modules/architecture", {
       state: { moduleName: moduleTitle },
     })
   }

@@ -4,14 +4,14 @@ import { withAuth } from "@/utils/middleware"
 import { AuthedNextApiHandler } from "@/utils/types"
 import { NextApiResponse } from "next"
 
-const GIT_TOKEN_SECRET_KEY_NAME = envOrFail(
-  "GIT_TOKEN_SECRET_KEY_NAME",
-  process.env.GIT_TOKEN_SECRET_KEY_NAME,
-)
 const getModulesFromGitHub = async (
   _req: AuthedNextApiHandler,
   res: NextApiResponse,
 ) => {
+  const GIT_TOKEN_SECRET_KEY_NAME = envOrFail(
+    "GIT_TOKEN_SECRET_KEY_NAME",
+    process.env.GIT_TOKEN_SECRET_KEY_NAME,
+  )
   const secret = await getSecretKeyValue(GIT_TOKEN_SECRET_KEY_NAME)
   const modules = await getGitHubModules(secret)
   return res.status(200).json(modules)

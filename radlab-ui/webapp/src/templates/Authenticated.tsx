@@ -69,7 +69,7 @@ const Authenticated: React.FC<AuthenticatedProps> = ({
             userRoutes={DropdownNavigation}
           />
 
-          <AppRouter />
+          <AppRouter user={user} />
 
           <Footer routes={FooterNavigation} />
         </div>
